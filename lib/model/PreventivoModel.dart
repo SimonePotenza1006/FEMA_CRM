@@ -45,9 +45,9 @@ class PreventivoModel {
     return PreventivoModel(
       json['id']?.toString(),
       json['descrizione']?.toString(),
-      json['importo']?.toString(),
-      json['cliente']?.toString(),
-      json['utente']?.toString(),
+      json['importo'].float.parse(),
+      ClienteModel.fromJson(json),
+      UtenteModel.fromJson(json),
       json['listini']
           ?.map((data) => CategoriaPrezzoListinoModel.fromJson(data))
           .toList(),

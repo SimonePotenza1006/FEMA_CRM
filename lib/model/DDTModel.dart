@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fema_crm/model/CategoriaDDTModel.dart';
 import 'package:fema_crm/model/ClienteModel.dart';
+import 'package:fema_crm/model/DestinazioneModel.dart';
 import 'package:fema_crm/model/ProdottoModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
 
@@ -15,7 +16,7 @@ class DDTModel {
   DestinazioneModel? destinazione;
   CategoriaDDTModel? categoriaDDT;
   UtenteModel? utente;
-  List<ProdottoModel> prodotti;
+  List<ProdottoModel>? prodotti;
 
   DDTModel(
       this.id,
@@ -43,5 +44,45 @@ class DDTModel {
       'prodotti': prodotti
     };
     return map;
+  }
+
+  DDTModel.fromMap(Map<String, dynamic> map) {
+    id = map['id'];
+    data = map['data'];
+    orario = map['orario'];
+    firmaUser = map['firmaUser'];
+    imageData = map['imageData'];
+    cliente = map['cliente'];
+    destinazione = map['destinazione'];
+    categoriaDDT = map['catetgoriaDDT'];
+    utente = map['utente'];
+    prodotti = map['prodotti'];
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'data': data,
+        'orario': orario,
+        'firmaUser': firmaUser,
+        'imageData': imageData,
+        'cliente': cliente,
+        'destinazione': destinazione,
+        'categoriaDDT': categoriaDDT,
+        'utente': utente,
+        'prodotti': prodotti,
+      };
+
+  factory DDTModel.fromJson(Map<String, dynamic> json) {
+    return DDTModel(
+        json['id']?.toString(),
+        json['data'],
+        json['orario'],
+        json['firmaUser'],
+        json['imageData'],
+        json['cliente'],
+        DestinazioneModel.fromJson(json),
+        CategoriaDDTModel.fromJson(json),
+        UtenteModel.fromJson(json),
+        json['prodotti']?.map((data) => ProdottoModel.fromJson(data)).toList());
   }
 }
