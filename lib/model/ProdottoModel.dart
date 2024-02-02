@@ -6,7 +6,6 @@ import 'package:fema_crm/model/DDTModel.dart';
 import 'package:fema_crm/model/FornitoreModel.dart';
 import 'package:fema_crm/model/PreventivoModel.dart';
 import 'package:fema_crm/model/SopralluogoModel.dart';
-import 'package:flutter/foundation.dart';
 
 class ProdottoModel {
   String? id;

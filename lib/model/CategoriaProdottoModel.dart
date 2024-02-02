@@ -17,6 +17,7 @@ class CategoriaProdottoModel {
     return CategoriaProdottoModel(json['id'].toString(), json['descrizione']);
   }
 
+  @override
   String toString() {
     return '{id: $id, descrizione: $descrizione}';
   }
