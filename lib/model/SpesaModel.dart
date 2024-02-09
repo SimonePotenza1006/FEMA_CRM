@@ -1,8 +1,10 @@
 import 'dart:ffi';
 
-import 'package:fema_crm/model/TipologiaPagamento.dart';
-import 'package:fema_crm/model/TipologiaSpesaModel.dart';
-import 'package:fema_crm/model/ViaggioModel.dart';
+
+
+import 'TipologiaPagamento.dart';
+import 'TipologiaSpesaModel.dart';
+import 'ViaggioModel.dart';
 
 class SpesaModel {
   String? id;

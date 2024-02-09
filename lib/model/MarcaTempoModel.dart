@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:fema_crm/model/UtenteModel.dart';
-import 'package:fema_crm/model/ViaggioModel.dart';
+import 'UtenteModel.dart';
+import 'ViaggioModel.dart';
 
 class MarcaTempoModel {
   String? id;

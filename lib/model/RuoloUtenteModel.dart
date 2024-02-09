@@ -14,7 +14,7 @@ class RuoloUtenteModel {
   }
 
   factory RuoloUtenteModel.fromJson(Map<String, dynamic> json) {
-    return RuoloUtenteModel(json['id'].toString(), json['descrizione']);
+    return RuoloUtenteModel(json['id']?.toString(), json['descrizione']);
   }
 
   @override

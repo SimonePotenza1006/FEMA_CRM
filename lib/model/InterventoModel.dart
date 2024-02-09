@@ -1,13 +1,13 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:fema_crm/model/CategoriaInterventoSpecificoModel.dart';
-import 'package:fema_crm/model/ClienteModel.dart';
-import 'package:fema_crm/model/DestinazioneModel.dart';
-import 'package:fema_crm/model/TipologiaInterventoModel.dart';
-import 'package:fema_crm/model/TipologiaPagamento.dart';
-import 'package:fema_crm/model/UtenteModel.dart';
-import 'package:fema_crm/model/VeicoloModel.dart';
+import 'CategoriaInterventoSpecificoModel.dart';
+import 'ClienteModel.dart';
+import 'DestinazioneModel.dart';
+import 'TipologiaInterventoModel.dart';
+import 'TipologiaPagamento.dart';
+import 'UtenteModel.dart';
+import 'VeicoloModel.dart';
 
 class InterventoModel {
   String? id;

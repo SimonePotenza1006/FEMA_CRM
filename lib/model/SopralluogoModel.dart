@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:fema_crm/model/CategoriaInterventoSpecificoModel.dart';
-import 'package:fema_crm/model/ClienteModel.dart';
-import 'package:fema_crm/model/ProdottoModel.dart';
-import 'package:fema_crm/model/TipologiaInterventoModel.dart';
+
+import 'CategoriaInterventoSpecificoModel.dart';
+import 'ClienteModel.dart';
+import 'ProdottoModel.dart';
+import 'TipologiaInterventoModel.dart';
 
 class SopralluogoModel {
   String? id;

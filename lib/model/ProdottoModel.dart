@@ -1,11 +1,13 @@
 import 'dart:core';
 import 'dart:ffi';
 
-import 'package:fema_crm/model/CategoriaProdottoModel.dart';
-import 'package:fema_crm/model/DDTModel.dart';
-import 'package:fema_crm/model/FornitoreModel.dart';
-import 'package:fema_crm/model/PreventivoModel.dart';
-import 'package:fema_crm/model/SopralluogoModel.dart';
+
+
+import 'CategoriaProdottoModel.dart';
+import 'DDTModel.dart';
+import 'FornitoreModel.dart';
+import 'PreventivoModel.dart';
+import 'SopralluogoModel.dart';
 
 class ProdottoModel {
   String? id;

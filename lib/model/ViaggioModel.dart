@@ -1,7 +1,8 @@
-import 'package:fema_crm/model/AttivitaModel.dart';
-import 'package:fema_crm/model/AttrezzaturaModel.dart';
-import 'package:fema_crm/model/CartaDiCreditoModel.dart';
-import 'package:fema_crm/model/UtenteModel.dart';
+
+import 'AttivitaModel.dart';
+import 'AttrezzaturaModel.dart';
+import 'CartaDiCreditoModel.dart';
+import 'UtenteModel.dart';
 
 class ViaggioModel {
   String? id;

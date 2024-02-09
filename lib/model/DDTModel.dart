@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:fema_crm/model/CategoriaDDTModel.dart';
-import 'package:fema_crm/model/ClienteModel.dart';
-import 'package:fema_crm/model/DestinazioneModel.dart';
-import 'package:fema_crm/model/ProdottoModel.dart';
-import 'package:fema_crm/model/UtenteModel.dart';
+
+import 'CategoriaDDTModel.dart';
+import 'ClienteModel.dart';
+import 'DestinazioneModel.dart';
+import 'ProdottoModel.dart';
+import 'UtenteModel.dart';
 
 class DDTModel {
   String? id;

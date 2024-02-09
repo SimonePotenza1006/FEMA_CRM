@@ -1,5 +1,7 @@
-import 'package:fema_crm/model/RuoloUtenteModel.dart';
-import 'package:fema_crm/model/TipologiaInterventoModel.dart';
+
+
+import 'RuoloUtenteModel.dart';
+import 'TipologiaInterventoModel.dart';
 
 class UtenteModel {
   String? id;
@@ -13,7 +15,7 @@ class UtenteModel {
   String? iban;
 
   RuoloUtenteModel? ruolo;
-  List<TipologiaInterventoModel>? competenze;
+  TipologiaInterventoModel? tipologiaintervento;
 
   UtenteModel(
       this.id,
@@ -26,7 +28,7 @@ class UtenteModel {
       this.codiceFiscale,
       this.iban,
       this.ruolo,
-      this.competenze);
+      this.tipologiaintervento);
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -40,7 +42,7 @@ class UtenteModel {
       'codiceFiscale': codiceFiscale,
       'iban': iban,
       'ruolo': ruolo,
-      'competenze': competenze
+      'tipologiaIntervento': tipologiaintervento,
     };
     return map;
   }
@@ -56,8 +58,8 @@ class UtenteModel {
     codiceFiscale = map['codiceFiscale'];
     iban = map['iban'];
     ruolo = map['ruolo'];
-    competenze =
-        TipologiaInterventoModel.fromMap(map) as List<TipologiaInterventoModel>;
+    tipologiaintervento = map['tipologiaIntervento'];
+
   }
 
   Map<String, dynamic> toJson() => {
@@ -71,7 +73,7 @@ class UtenteModel {
         'codiceFiscale': codiceFiscale,
         'iban': iban,
         'ruolo': ruolo,
-        'competenze': competenze,
+        'tipologiaIntervento': tipologiaintervento,
       };
 
   factory UtenteModel.fromJson(Map<String, dynamic> json) {
@@ -86,8 +88,7 @@ class UtenteModel {
         json['codiceFiscale']?.toString(),
         json['iban']?.toString(),
         RuoloUtenteModel.fromJson(json),
-        json['competenze']
-            ?.map((data) => TipologiaInterventoModel.fromJson(data))
-            .toList());
+        TipologiaInterventoModel.fromJson(json),
+    );
   }
 }

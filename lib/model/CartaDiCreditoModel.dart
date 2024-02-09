@@ -1,5 +1,7 @@
-import 'package:fema_crm/model/TipologiaCarta.dart';
-import 'package:fema_crm/model/ViaggioModel.dart';
+
+
+import 'TipologiaCarta.dart';
+import 'ViaggioModel.dart';
 
 class CartaDiCreditoModel {
   String? id;

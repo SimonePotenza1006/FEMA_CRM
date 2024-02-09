@@ -1,4 +1,6 @@
-import 'package:fema_crm/model/UtenteModel.dart';
+
+
+import 'UtenteModel.dart';
 
 class AttrezzaturaModel {
   String? id;

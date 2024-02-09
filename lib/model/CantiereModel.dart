@@ -1,7 +1,8 @@
 import 'dart:core';
 
-import 'package:fema_crm/model/ClienteModel.dart';
-import 'package:fema_crm/model/UtenteModel.dart';
+
+import 'ClienteModel.dart';
+import 'UtenteModel.dart';
 
 class CantiereModel {
   String? id;

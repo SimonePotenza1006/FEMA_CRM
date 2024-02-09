@@ -1,9 +1,10 @@
 import 'dart:ffi';
 
-import 'package:fema_crm/model/CategoriaPrezzoListinoModel.dart';
-import 'package:fema_crm/model/ClienteModel.dart';
-import 'package:fema_crm/model/ProdottoModel.dart';
-import 'package:fema_crm/model/UtenteModel.dart';
+
+import 'CategoriaPrezzoListinoModel.dart';
+import 'ClienteModel.dart';
+import 'ProdottoModel.dart';
+import 'UtenteModel.dart';
 
 class PreventivoModel {
   String? id;
