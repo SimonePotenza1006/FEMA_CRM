@@ -1,5 +1,3 @@
-
-
 import 'ClienteModel.dart';
 import 'UtenteModel.dart';
 
@@ -24,9 +22,10 @@ class CredenzialiClienteModel {
   CredenzialiClienteModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     descrizione = map['descrizione'];
-    cliente = map['cliente'];
-    utente = map['utente'];
+    cliente = ClienteModel.fromJson(map['cliente']);
+    utente = UtenteModel.fromJson(map['utente']);
   }
+
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -39,7 +38,7 @@ class CredenzialiClienteModel {
     return CredenzialiClienteModel(
         json['id']?.toString(),
         json['descrizione']?.toString(),
-        ClienteModel.fromJson(json),
-        UtenteModel.fromJson(json));
+        ClienteModel.fromJson(json['cliente'] as Map<String, dynamic>),
+        UtenteModel.fromJson(json['utente'] as Map<String, dynamic>));
   }
 }

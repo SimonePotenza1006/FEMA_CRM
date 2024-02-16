@@ -1,31 +1,29 @@
+import 'package:fema_crm/model/DestinazioneModel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../databaseHandler/DbHelper.dart';
-import '../model/ClienteModel.dart';
-import 'ListaDestinazioniClientePage.dart';
-import 'ModificaClientePage.dart';
+import 'ModificaDestinazionePage.dart';
 
-class DettaglioClientePage extends StatefulWidget {
-  final ClienteModel cliente;
+class DettaglioDestinazionePage extends StatefulWidget{
+  final DestinazioneModel destinazione;
 
-  const DettaglioClientePage({Key? key, required this.cliente}) : super(key: key);
+  const DettaglioDestinazionePage({Key? key, required this.destinazione}): super(key:key);
 
   @override
-  _DettaglioClientePageState createState() => _DettaglioClientePageState();
+  _DettaglioDestinazionePageState createState() => _DettaglioDestinazionePageState();
 }
 
-class _DettaglioClientePageState extends State<DettaglioClientePage> {
+class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage>{
 
   DbHelper? dbHelper;
-  List<ClienteModel> allClienti = [];
-
+  List<DestinazioneModel> allDestinazioni = [];
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dettaglio ${widget.cliente.denominazione}',
+        title: Text('Dettaglio ${widget.destinazione.denominazione}',
             style: const TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
@@ -36,67 +34,37 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Indirizzo: ${widget.cliente.indirizzo}',
+              'Indirizzo: ${widget.destinazione.indirizzo}',
               style: const TextStyle(fontSize: 20),
             ),
             Text(
-              'Partita Iva: ${widget.cliente.partita_iva}',
+              'CAP: ${widget.destinazione.cap}',
               style: const TextStyle(fontSize: 20),
             ),
             Text(
-              'Cap: ${widget.cliente.cap}',
+              'Città: ${widget.destinazione.citta}',
               style: const TextStyle(fontSize: 20),
             ),
             Text(
-              'Città: ${widget.cliente.citta}',
+              'Provincia: ${widget.destinazione.provincia}',
               style: const TextStyle(fontSize: 20),
             ),
             Text(
-              'Provincia: ${widget.cliente.provincia}',
+              'Codice Fiscale: ${widget.destinazione.codice_fiscale}',
               style: const TextStyle(fontSize: 20),
             ),
             Text(
-              'Nazione: ${widget.cliente.nazione}',
-              style: const TextStyle(fontSize: 20),
-            ), Text(
-              'Recapito fatturazione elettronica: ${widget.cliente
-                  .recapito_fatturazione_elettronica}',
+              'Partita IVA: ${widget.destinazione.partita_iva}',
               style: const TextStyle(fontSize: 20),
             ),
             Text(
-              'Riferimento amministrativo: ${widget.cliente
-                  .riferimento_amministrativo}',
+              'Telefono: ${widget.destinazione.telefono}',
               style: const TextStyle(fontSize: 20),
             ),
             Text(
-              'Referente: ${widget.cliente.referente}',
+              'Cellulare: ${widget.destinazione.cellulare}',
               style: const TextStyle(fontSize: 20),
             ),
-            Text(
-              'Fax: ${widget.cliente.fax}',
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              'Telefono: ${widget.cliente.telefono}',
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              'Cellulare: ${widget.cliente.cellulare}',
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              'Email: ${widget.cliente.email}',
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              'PEC: ${widget.cliente.pec}',
-              style: const TextStyle(fontSize: 20),
-            ),
-            Text(
-              'Note: ${widget.cliente.note}',
-              style: const TextStyle(fontSize: 20),
-            ),
-
 
             const SizedBox(height: 20),
             Row(
@@ -112,7 +80,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
                       .size
                       .width * 0.10,
                   child: ElevatedButton(
-                    onPressed:(){ deleteCliente(context ,widget.cliente.id);},
+                    onPressed:(){ deleteDestinazione(context ,widget.destinazione.id);},
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         shape: RoundedRectangleBorder(
@@ -147,7 +115,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
                     onPressed: () {
                       Navigator.push(
                         context, MaterialPageRoute(
-                          builder: (context) => ModificaClientePage(cliente: widget.cliente)),
+                          builder: (context) => ModificaDestinazionePage(destinazione: widget.destinazione)),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -170,71 +138,33 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.15,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.10,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context, MaterialPageRoute(
-                          builder: (context) => ListaDestinazioniClientePage(cliente: widget.cliente)),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(35.0),
-                        ),
-                        shadowColor: Colors.black,
-                        elevation: 15
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.maps_home_work_outlined,
-                          size: 50,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+              ]
+            )
+          ]
+        )
+      )
     );
   }
 
-  Future<void> deleteCliente(BuildContext context, String? id) async {
+  Future<void> deleteDestinazione(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://192.168.1.52:8080/api/cliente/$id'),
+        Uri.parse('http://192.168.1.52:8080/api/destinazione/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cliente eliminato con successo')),
+          const SnackBar(content: Text('Destinazione eliminata con successo')),
         );
         setState(() {
-          allClienti.removeWhere((cliente) => cliente.id == id);
+          allDestinazioni.removeWhere((destinazione) => destinazione.id == id);
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossibile eliminare il cliente')),
+          const SnackBar(content: Text('Impossibile eliminare la destinazione')),
         );
       }
     } catch (e) {
       print('Errore durante l\'eliminazione del cliente: $e');
     }
   }
-
 }

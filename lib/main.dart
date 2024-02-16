@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
 
 ThemeData myThemeData(){
   return ThemeData(
-    fontFamily: GoogleFonts.aldrich().fontFamily
+      fontFamily: GoogleFonts.aldrich().fontFamily
   );
 }
 
@@ -81,28 +81,29 @@ class _LoginFormState extends State<LoginForm> {
     }
     else {
       print('Ooook!');
-        print("AOOOOOO");
-        await dbHelper.getLoginUser(uid, passwd).then((userData) {
-          print('$uid, $passwd');
-          print("Checking userData!");
-          if(userData != null) {
-            print("PROVA!@");
-            setSP(userData).whenComplete(() {
-              print("PROVA3");
-              print("userdata: $userData");
-              TextInput.finishAutofillContext();
-              if(userData.ruolo.descrizione == "Developer" || userData.ruolo.descrizione == "Tecnico"){
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeFormTecnico()),
-                        (Route<dynamic> route) => false);
-              } else if(userData.ruolo.descrizione == "Amministrazione") {
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeFormAmministrazione()),
-                        (Route<dynamic> route) => false);
-              } else {
-                print("C'è qualcosa che non va!");
-              }
-            });
-          }
-        });
+      print("AOOOOOO");
+
+      await dbHelper.getLoginUser(uid, passwd).then((userData) {
+        print('$uid, $passwd');
+        print("Checking userData!");
+        if(userData != null) {
+          print("PROVA!@");
+          setSP(userData).whenComplete(() {
+            print("PROVA3");
+            print("userdata: $userData");
+            TextInput.finishAutofillContext();
+            if(userData.ruolo.descrizione == "Developer" || userData.ruolo.descrizione == "Tecnico"){
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeFormTecnico()),
+                      (Route<dynamic> route) => false);
+            } else if(userData.ruolo.descrizione == "Amministrazione") {
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeFormAmministrazione()),
+                      (Route<dynamic> route) => false);
+            } else {
+              print("C'è qualcosa che non va!");
+            }
+          });
+        }
+      });
     }
   }
 
@@ -146,7 +147,7 @@ class _LoginFormState extends State<LoginForm> {
                     hintText: 'Inserisci il tuo username'),
               ),
             ),
-             Padding(
+            Padding(
               padding: const EdgeInsets.only(
                   left: 15.0, right: 15.0, top: 15, bottom: 0),
               //padding: EdgeInsets.symmetric(horizontal: 15),

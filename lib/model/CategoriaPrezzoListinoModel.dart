@@ -6,28 +6,28 @@ class CategoriaPrezzoListinoModel {
   String? descrizione;
   double? prezzo; // Modificato da Float a double
   CategoriaInterventoSpecificoModel? categoriaInterventoSpecifico;
-  List<PreventivoModel>? preventivi;
+  //List<PreventivoModel>? preventivi;
 
   CategoriaPrezzoListinoModel(
-      this.id, this.descrizione, this.prezzo, this.categoriaInterventoSpecifico, this.preventivi);
+      this.id, this.descrizione, this.prezzo, this.categoriaInterventoSpecifico);
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
       'descrizione': descrizione,
       'prezzo': prezzo,
-      'categoriaInterventoSpecifico' : categoriaInterventoSpecifico,
-      'preventivi': preventivi
+      'categoriaInterventoSpecificoId': categoriaInterventoSpecifico?.id, // Invia solo l'ID della categoria
     };
     return map;
   }
+
 
   CategoriaPrezzoListinoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     descrizione = map['descrizione'];
     prezzo = map['prezzo'];
     categoriaInterventoSpecifico = map['categoriaInterventoSpecifico'];
-    preventivi = map['preventivi'];
+    //preventivi = map['preventivi'];
   }
 
   Map<String, dynamic> toJson() => {
@@ -35,7 +35,7 @@ class CategoriaPrezzoListinoModel {
     'descrizione': descrizione,
     'prezzo': prezzo != null ? double.parse(prezzo!.toStringAsFixed(2)) : null,
     'categoriaInterventoSpecifico': categoriaInterventoSpecifico,
-    'preventivi': preventivi,
+    //'preventivi': preventivi,
   };
 
   factory CategoriaPrezzoListinoModel.fromJson(Map<String, dynamic> json) {
@@ -45,7 +45,7 @@ class CategoriaPrezzoListinoModel {
       json['descrizione']?.toString(),
       json['prezzo']?.toDouble(), // Converti il valore in double
       CategoriaInterventoSpecificoModel.fromJson(json),
-      preventiviJson != null ? preventiviJson.map((data) => PreventivoModel.fromJson(data)).toList() : null,
+      //preventiviJson != null ? preventiviJson.map((data) => PreventivoModel.fromJson(data)).toList() : null,
     );
   }
 }

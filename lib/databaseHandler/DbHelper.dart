@@ -64,25 +64,25 @@ class DbHelper{
                 .toList();
           }
           ClienteModel cliente = ClienteModel(
-              singoloCliente['id'].toString(),
-              singoloCliente['codice_fiscale'].toString(),
-              singoloCliente['partita_iva'].toString(),
-              singoloCliente['denominazione'].toString(),
-              singoloCliente['indirizzo'].toString(),
-              singoloCliente['cap'].toString(),
-              singoloCliente['citta'].toString(),
-              singoloCliente['provincia'].toString(),
-              singoloCliente['nazione'].toString(),
-              singoloCliente['recapito_fatturazione_elettronica'].toString(),
-              singoloCliente['riferimento_amministrativo'].toString(),
-              singoloCliente['referente'].toString(),
-              singoloCliente['fax'].toString(),
-              singoloCliente['telefono'].toString(),
-              singoloCliente['cellulare'].toString(),
-              singoloCliente['email'].toString(),
-              singoloCliente['pec'].toString(),
-              singoloCliente['note'].toString(),
-              tipologieIntervento,
+            singoloCliente['id'].toString(),
+            singoloCliente['codice_fiscale'].toString(),
+            singoloCliente['partita_iva'].toString(),
+            singoloCliente['denominazione'].toString(),
+            singoloCliente['indirizzo'].toString(),
+            singoloCliente['cap'].toString(),
+            singoloCliente['citta'].toString(),
+            singoloCliente['provincia'].toString(),
+            singoloCliente['nazione'].toString(),
+            singoloCliente['recapito_fatturazione_elettronica'].toString(),
+            singoloCliente['riferimento_amministrativo'].toString(),
+            singoloCliente['referente'].toString(),
+            singoloCliente['fax'].toString(),
+            singoloCliente['telefono'].toString(),
+            singoloCliente['cellulare'].toString(),
+            singoloCliente['email'].toString(),
+            singoloCliente['pec'].toString(),
+            singoloCliente['note'].toString(),
+            tipologieIntervento,
           );
           clienti.add(cliente);
         }
@@ -102,11 +102,11 @@ class DbHelper{
     http.Response? response;
     try{
       http.Response response = await http.get(
-        Uri.parse('$ipaddress/api/utente/1'),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        });
+          Uri.parse('$ipaddress/api/utente/1'),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          });
       return print('$response');
     } catch(e){
       throw Exception(e);
@@ -119,16 +119,16 @@ class DbHelper{
     try {
       print('AIUTO');
       http.Response response = await http.post(
-        Uri.parse('$ipaddress/api/utente/ulogin'),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-      },
-        body: json.encode({
-          'email': email,
-          'password': password
-        }),
-        encoding: Encoding.getByName('utf-8')
+          Uri.parse('$ipaddress/api/utente/ulogin'),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: json.encode({
+            'email': email,
+            'password': password
+          }),
+          encoding: Encoding.getByName('utf-8')
       );
 
       if(response.statusCode == 200){
@@ -167,17 +167,17 @@ class DbHelper{
       var responseData = jsonDecode(response.body.toString());
       print("$responseData");
       UtenteModel utente = UtenteModel(
-          responseData["id"].toString(),
-          responseData["attivo"],
-          responseData["nome"],
-          responseData["cognome"],
-          responseData["email"],
-          responseData["password"],
-          responseData["cellulare"],
-          responseData["codiceFiscale"],
-          responseData["iban"],
-          RuoloUtenteModel.fromJson(responseData["ruolo"]),
-          TipologiaInterventoModel.fromJson(responseData["tipologiaIntervento"]),
+        responseData["id"].toString(),
+        responseData["attivo"],
+        responseData["nome"],
+        responseData["cognome"],
+        responseData["email"],
+        responseData["password"],
+        responseData["cellulare"],
+        responseData["codiceFiscale"],
+        responseData["iban"],
+        RuoloUtenteModel.fromJson(responseData["ruolo"]),
+        TipologiaInterventoModel.fromJson(responseData["tipologiaIntervento"]),
       );
       return utente;
     } else {

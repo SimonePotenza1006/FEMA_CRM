@@ -14,7 +14,7 @@ class TipologiaInterventoModel {
     var map = <String, dynamic>{
       'id': id,
       'descrizione': descrizione,
-      'tecnici': tecnici
+      'tecnici': tecnici != null ? tecnici!.map((tecnico) => tecnico.toJson()).toList() : null
     };
     return map;
   }
@@ -22,8 +22,9 @@ class TipologiaInterventoModel {
   factory TipologiaInterventoModel.fromMap(Map<String, dynamic> map) {
     final List<dynamic>? tecniciJson = map['tecnici'];
     return TipologiaInterventoModel(
-        map['id'], map['descrizione'],
-        tecniciJson != null ? tecniciJson.map((data) => UtenteModel.fromMap(data)).toList() : null
+      map['id']?.toString(),
+      map['descrizione']?.toString(),
+      tecniciJson != null ? tecniciJson.map((data) => UtenteModel.fromMap(data)).toList() : [],
     );
   }
 
@@ -32,8 +33,8 @@ class TipologiaInterventoModel {
     final List<dynamic>? tecniciJson = json['tecnici'];
 
     return TipologiaInterventoModel(
-      json['id'].toString(),
-      json['descrizione'],
+      json['id']?.toString(),
+      json['descrizione']?.toString(),
       // Converti ogni oggetto JSON in un UtenteModel
       tecniciJson != null ? tecniciJson.map((data) => UtenteModel.fromJson(data)).toList() : null,
     );
@@ -47,9 +48,9 @@ class TipologiaInterventoModel {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      "id": id?.toString(),
       "descrizione": descrizione,
-      "tecnici": tecnici != null ? tecnici!.map((tecnico) => tecnico.toJson()).toList() : null,
+      "tecnici": tecnici != null ? tecnici!.map((tecnico) => tecnico.toJson()).toList() : [],
     };
   }
 

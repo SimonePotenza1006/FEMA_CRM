@@ -48,7 +48,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (
-                                context) => const ListaCredenzialiPage()),
+                                context) => const ListaInterventiPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -92,7 +92,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (
-                                context) => const ListaInterventiPage()),
+                                context) => const ListaCredenzialiPage()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

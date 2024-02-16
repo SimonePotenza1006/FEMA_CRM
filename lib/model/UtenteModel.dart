@@ -57,38 +57,38 @@ class UtenteModel {
     cellulare = map['cellulare'];
     codiceFiscale = map['codiceFiscale'];
     iban = map['iban'];
-    ruolo = map['ruolo'];
-    tipologiaintervento = map['tipologiaIntervento'];
+    ruolo = map['ruolo'] != null ? RuoloUtenteModel.fromMap(map['ruolo']) : null;
+    tipologiaintervento = map['tipologiaIntervento'] != null ? TipologiaInterventoModel.fromMap(map['tipologiaIntervento']) : null;
 
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'attivo': attivo,
-        'nome': nome,
-        'cognome': cognome,
-        'email': email,
-        'password': password,
-        'cellulare': cellulare,
-        'codiceFiscale': codiceFiscale,
-        'iban': iban,
-        'ruolo': ruolo,
-        'tipologiaIntervento': tipologiaintervento,
-      };
+    'id': id,
+    'attivo': attivo,
+    'nome': nome,
+    'cognome': cognome,
+    'email': email,
+    'password': password,
+    'cellulare': cellulare,
+    'codiceFiscale': codiceFiscale,
+    'iban': iban,
+    'ruolo': ruolo,
+    'tipologiaIntervento': tipologiaintervento,
+  };
 
   factory UtenteModel.fromJson(Map<String, dynamic> json) {
     return UtenteModel(
-        json['id']?.toString(),
-        json['attivo'],
-        json['nome']?.toString(),
-        json['cognome']?.toString(),
-        json['email']?.toString(),
-        json['password']?.toString(),
-        json['cellulare']?.toString(),
-        json['codiceFiscale']?.toString(),
-        json['iban']?.toString(),
-        RuoloUtenteModel.fromJson(json),
-        TipologiaInterventoModel.fromJson(json),
+      json['id']?.toString(),
+      json['attivo'],
+      json['nome']?.toString(),
+      json['cognome']?.toString(),
+      json['email']?.toString(),
+      json['password']?.toString(),
+      json['cellulare']?.toString(),
+      json['codiceFiscale']?.toString(),
+      json['iban']?.toString(),
+      json['ruolo'] != null ? RuoloUtenteModel.fromJson(json['ruolo']) : null,
+      json['tipologiaIntervento'] != null ? TipologiaInterventoModel.fromJson(json['tipologiaIntervento']) : null,
     );
   }
 }

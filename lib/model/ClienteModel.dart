@@ -1,5 +1,3 @@
-
-
 import 'TipologiaInterventoModel.dart';
 
 class ClienteModel {
@@ -24,26 +22,26 @@ class ClienteModel {
   List<TipologiaInterventoModel>? tipologie_interventi;
 
   ClienteModel(
-    this.id,
-    this.codice_fiscale,
-    this.partita_iva,
-    this.denominazione,
-    this.indirizzo,
-    this.cap,
-    this.citta,
-    this.provincia,
-    this.nazione,
-    this.recapito_fatturazione_elettronica,
-    this.riferimento_amministrativo,
-    this.referente,
-    this.fax,
-    this.telefono,
-    this.cellulare,
-    this.email,
-    this.pec,
-    this.note,
-    this.tipologie_interventi,
-  );
+      this.id,
+      this.codice_fiscale,
+      this.partita_iva,
+      this.denominazione,
+      this.indirizzo,
+      this.cap,
+      this.citta,
+      this.provincia,
+      this.nazione,
+      this.recapito_fatturazione_elettronica,
+      this.riferimento_amministrativo,
+      this.referente,
+      this.fax,
+      this.telefono,
+      this.cellulare,
+      this.email,
+      this.pec,
+      this.note,
+      this.tipologie_interventi,
+      );
 
 
   Map<String, dynamic> toMap() {
@@ -91,36 +89,38 @@ class ClienteModel {
     pec = map['pec'];
     note = map['note'];
     //tipologieIntervento = map['tipologieIntervento'];
-    tipologie_interventi = map['tipologie_interventi'];
+    tipologie_interventi = (map['tipologie_interventi'] as List<dynamic>?)
+        ?.map((data) => TipologiaInterventoModel.fromJson(data as Map<String, dynamic>))
+        .toList() ?? [];
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'codice_fiscale': codice_fiscale,
-        'partita_iva': partita_iva,
-        'denominazione': denominazione,
-        'indirizzo': indirizzo,
-        'cap': cap,
-        'citta': citta,
-        'provincia': provincia,
-        'nazione': nazione,
-        'recapito_fatturazione_elettronica': recapito_fatturazione_elettronica,
-        'riferimento_amministrativo': riferimento_amministrativo,
-        'referente': referente,
-        'fax': fax,
-        'telefono': telefono,
-        'cellulare': cellulare,
-        'email': email,
-        'pec': pec,
-        'note': note,
-        'tipologie_interventi': tipologie_interventi
-      };
+    'id': id,
+    'codice_fiscale': codice_fiscale,
+    'partita_iva': partita_iva,
+    'denominazione': denominazione,
+    'indirizzo': indirizzo,
+    'cap': cap,
+    'citta': citta,
+    'provincia': provincia,
+    'nazione': nazione,
+    'recapito_fatturazione_elettronica': recapito_fatturazione_elettronica,
+    'riferimento_amministrativo': riferimento_amministrativo,
+    'referente': referente,
+    'fax': fax,
+    'telefono': telefono,
+    'cellulare': cellulare,
+    'email': email,
+    'pec': pec,
+    'note': note,
+    'tipologie_interventi': tipologie_interventi
+  };
 
   factory ClienteModel.fromJson(Map<String, dynamic> json) {
     return ClienteModel(
-      json['id']?.toString(),
+      json['id'].toString(),
       json['codice_fiscale']?.toString(),
-      json['partitaIva']?.toString(),
+      json['partita_iva']?.toString(),
       json['denominazione']?.toString(),
       json['indirizzo']?.toString(),
       json['cap']?.toString(),

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-// necessario per codificare/decodificare dati JSON
-
 import '../databaseHandler/DbHelper.dart';
 import '../model/ClienteModel.dart';
 import 'DettaglioClientePage.dart';
-
+import 'CreazioneClientePage.dart';
 class ListaClientiPage extends StatefulWidget {
   const ListaClientiPage({super.key, Key? key1});
 
@@ -39,10 +37,30 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Lista Clienti',
-          style: TextStyle(color: Colors.white)
-      ),
+            style: TextStyle(color: Colors.white)
+        ),
         centerTitle: true,
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+            },
+          ),
+          IconButton(
+              icon: Icon(Icons.person_add_alt_1,
+              size: 40,
+              color: Colors.white,
+              ),
+          onPressed: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CreazioneClientePage())
+                );
+            },
+          )
+        ],
       ),
 
       body: isLoading
@@ -70,7 +88,7 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-              builder: (context) => DettaglioClientePage(cliente: cliente),));
+                builder: (context) => DettaglioClientePage(cliente: cliente),));
         },
         leading: const Column(
           mainAxisAlignment: MainAxisAlignment.center,

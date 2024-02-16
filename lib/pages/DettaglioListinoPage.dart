@@ -7,6 +7,7 @@ import 'package:io/ansi.dart';
 import 'package:http/http.dart' as http;
 
 import '../model/CategoriaPrezzoListinoModel.dart';
+import 'NuovoListinoPage.dart';
 
 class DettaglioListinoPage extends StatefulWidget {
   final CategoriaInterventoSpecificoModel categoria;
@@ -49,12 +50,18 @@ class _DettaglioListinoPageState extends State<DettaglioListinoPage>{
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
-         const IconButton(
-              icon: Icon(Icons.add,
+         IconButton(
+              icon: const Icon(Icons.add,
                 size: 40,
                 color: Colors.white,
               ),
-              onPressed: () {},
+              onPressed: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NuovoListinoPage(categoria: widget.categoria),)
+                );
+              },
           )
         ],
       ),

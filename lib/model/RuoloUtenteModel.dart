@@ -10,17 +10,28 @@ class RuoloUtenteModel {
   }
 
   factory RuoloUtenteModel.fromMap(Map<String, dynamic> map) {
-    return RuoloUtenteModel(map['id'], map['descrizione']);
+    return RuoloUtenteModel(
+        map['id']?.toString(),
+        map['descrizione']?.toString());
   }
 
   factory RuoloUtenteModel.fromJson(Map<String, dynamic> json) {
-    return RuoloUtenteModel(json['id']?.toString(), json['descrizione']);
+    return RuoloUtenteModel(
+      json['id']?.toString(),
+      json['descrizione']?.toString(),
+    );
   }
+
 
   @override
   String toString() {
     return '{id: $id, descrizione: $descrizione}';
   }
 
-  Map<String, dynamic> toJson() => {"id": id, "descrizione": descrizione};
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id.toString(),
+      'descrizione': descrizione.toString(),
+    };
+  }
 }
