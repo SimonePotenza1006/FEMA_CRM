@@ -28,7 +28,7 @@ class InterventoModel {
   VeicoloModel? veicolo;
   TipologiaInterventoModel? tipologia;
   CategoriaInterventoSpecificoModel? categoria_intervento_specifico;
-  TipologiaPagamentoModel? tipologiaPagamento;
+  TipologiaPagamentoModel? tipologia_pagamento;
   DestinazioneModel? destinazione;
   //List<UtenteModel>? utenti;
 
@@ -49,7 +49,7 @@ class InterventoModel {
       this.veicolo,
       this.tipologia,
       this.categoria_intervento_specifico,
-      this.tipologiaPagamento,
+      this.tipologia_pagamento,
       this.destinazione,
       //this.utenti);
       );
@@ -72,7 +72,7 @@ class InterventoModel {
       'veicolo': veicolo?.toMap(),
       'tipologia': tipologia?.toMap(),
       'categoria_intervento_specifico': categoria_intervento_specifico?.toMap(),
-      'tipologiaPagamento': tipologiaPagamento?.toMap(),
+      'tipologia_pagamento': tipologia_pagamento?.toMap(),
       'destinazione': destinazione?.toMap(),
     };
 
@@ -105,7 +105,7 @@ class InterventoModel {
     veicolo = map['veicolo'] != null ? VeicoloModel.fromMap(map['veicolo']) : null;
     tipologia = map['tipologia'] != null ? TipologiaInterventoModel.fromMap(map['tipologia']) : null;
     categoria_intervento_specifico = map['categoria_intervento_specifico'] != null ? CategoriaInterventoSpecificoModel.fromMap(map['categoria_intervento_specifico']) : null;
-    tipologiaPagamento = map['tipologiaPagamento'] != null ? TipologiaPagamentoModel.fromMap(map['tipologiaPagamento']) : null;
+    tipologia_pagamento = map['tipologia_pagamento'] != null ? TipologiaPagamentoModel.fromMap(map['tipologia_pagamento']) : null;
     destinazione = map['destinazione'] != null ? DestinazioneModel.fromMap(map['destinazione']) : null;
     //utenti = (map['utenti'] as List<Map<String, dynamic>>?)?.map((data) => UtenteModel.fromMap(data)).toList();
   }
@@ -128,7 +128,7 @@ class InterventoModel {
     'veicolo': veicolo?.toJson(),
     'tipologia': tipologia?.toJson(),
     'categoria_intervento_specifico': categoria_intervento_specifico?.toJson(),
-    'tipologiaPagamento': tipologiaPagamento?.toJson(),
+    'tipologia_pagamento': tipologia_pagamento?.toJson(),
     'destinazione': destinazione?.toJson(),
   };
 
@@ -151,7 +151,7 @@ class InterventoModel {
       json['veicolo'] != null ? VeicoloModel.fromJson(json['veicolo']) : null,
       json['tipologia'] != null ? TipologiaInterventoModel.fromJson(json['tipologia']) : null,
       json['categoriaInterventoSpecifico'] != null ? CategoriaInterventoSpecificoModel.fromJson(json['categoriaInterventoSpecifico']) : null,
-      json['tipologiaPagamento'] != null ? TipologiaPagamentoModel.fromJson(json['tipologiaPagamento']) : null,
+      json['tipologiaPagamento'] != null ? TipologiaPagamentoModel.fromJson(json['tipologia_pagamento']) : null,
       json['destinazione'] != null ? DestinazioneModel.fromJson(json['destinazione']) : null,
     );
   }

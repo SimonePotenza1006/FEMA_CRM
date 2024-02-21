@@ -471,7 +471,7 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
       'veicolo': widget.intervento.veicolo?.toMap(),
       'tipologia': widget.intervento.tipologia?.toMap(),
       'categoria_intervento_specifico': categoriaSelezionata.toMap(),
-      'tipologiaPagamento': widget.intervento.tipologiaPagamento?.toMap(),
+      'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
       'destinazione': widget.intervento.destinazione?.toMap(),
     });
     try {
@@ -535,7 +535,7 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
         'veicolo': widget.intervento.veicolo?.toMap(),
         'tipologia': widget.intervento.tipologia?.toMap(),
         'categoria_intervento_specifico': categoriaSelezionata.toMap(),
-        'tipologiaPagamento': widget.intervento.tipologiaPagamento?.toMap(),
+        'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
         'destinazione': widget.intervento.destinazione?.toMap(),
       });
 

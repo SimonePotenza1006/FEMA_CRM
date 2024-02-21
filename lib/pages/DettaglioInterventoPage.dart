@@ -78,7 +78,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'veicolo': widget.intervento.veicolo?.toMap(),
           'tipologia': widget.intervento.tipologia?.toMap(),
           'categoria_intervento_specifico': widget.intervento.categoria_intervento_specifico?.toMap(),
-          'tipologia_pagamento': widget.intervento.tipologiaPagamento?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
           'destinazione': widget.intervento.destinazione?.toMap(),
         }),
       );
@@ -262,6 +262,16 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                         ),
                         subtitle: Text(
                           widget.intervento.note.toString() ?? 'N/A',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      ListTile(
+                        title: Text(
+                          'Metodo di pagamento',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        subtitle: Text(
+                          widget.intervento.tipologia_pagamento != null ? widget.intervento.tipologia_pagamento.toString() : 'N/A',
                           style: TextStyle(fontSize: 16),
                         ),
                       ),
