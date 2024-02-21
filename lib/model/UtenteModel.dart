@@ -11,11 +11,11 @@ class UtenteModel {
   String? email;
   String? password;
   String? cellulare;
-  String? codiceFiscale;
+  String? codice_fiscale;
   String? iban;
 
   RuoloUtenteModel? ruolo;
-  TipologiaInterventoModel? tipologiaintervento;
+  TipologiaInterventoModel? tipologia_intervento;
 
   UtenteModel(
       this.id,
@@ -25,24 +25,25 @@ class UtenteModel {
       this.email,
       this.password,
       this.cellulare,
-      this.codiceFiscale,
+      this.codice_fiscale,
       this.iban,
       this.ruolo,
-      this.tipologiaintervento);
+      this.tipologia_intervento
+      );
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
       'attivo': attivo,
-      'nome': nome,
-      'cognome': cognome,
-      'email': email,
-      'password': password,
-      'cellulare': cellulare,
-      'codiceFiscale': codiceFiscale,
-      'iban': iban,
+      'nome': nome.toString(),
+      'cognome': cognome.toString(),
+      'email': email.toString(),
+      'password': password.toString(),
+      'cellulare': cellulare.toString(),
+      'codice_fiscale': codice_fiscale.toString(),
+      'iban': iban.toString(),
       'ruolo': ruolo,
-      'tipologiaIntervento': tipologiaintervento,
+      'tipologia_intervento': tipologia_intervento,
     };
     return map;
   }
@@ -55,10 +56,10 @@ class UtenteModel {
     email = map['email'];
     password = map['password'];
     cellulare = map['cellulare'];
-    codiceFiscale = map['codiceFiscale'];
+    codice_fiscale = map['codiceFiscale'];
     iban = map['iban'];
     ruolo = map['ruolo'] != null ? RuoloUtenteModel.fromMap(map['ruolo']) : null;
-    tipologiaintervento = map['tipologiaIntervento'] != null ? TipologiaInterventoModel.fromMap(map['tipologiaIntervento']) : null;
+        tipologia_intervento = map['tipologia_intervento'] != null ? TipologiaInterventoModel.fromMap(map['tipologia_itervento']) : null;
 
   }
 
@@ -70,10 +71,10 @@ class UtenteModel {
     'email': email,
     'password': password,
     'cellulare': cellulare,
-    'codiceFiscale': codiceFiscale,
+    'codice_fiscale': codice_fiscale,
     'iban': iban,
     'ruolo': ruolo,
-    'tipologiaIntervento': tipologiaintervento,
+    'tipologia_intervento': tipologia_intervento,
   };
 
   factory UtenteModel.fromJson(Map<String, dynamic> json) {
@@ -85,10 +86,10 @@ class UtenteModel {
       json['email']?.toString(),
       json['password']?.toString(),
       json['cellulare']?.toString(),
-      json['codiceFiscale']?.toString(),
+      json['codice_fiscale']?.toString(),
       json['iban']?.toString(),
       json['ruolo'] != null ? RuoloUtenteModel.fromJson(json['ruolo']) : null,
-      json['tipologiaIntervento'] != null ? TipologiaInterventoModel.fromJson(json['tipologiaIntervento']) : null,
+      json['tipologia_intervento'] != null ? TipologiaInterventoModel.fromJson(json['tipologia_intervento']) : null,
     );
   }
 }

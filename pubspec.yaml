@@ -39,7 +39,8 @@ dependencies:
   #toast: ^0.1.5 #^0.2.9
   fluttertoast: ^8.2.1
   http:
-  image_picker: ^0.7.0-nullsafety
+  image_picker: ^0.8.4+3
+  connectivity_plus: ^5.0.2
   plugin_platform_interface: ^2.1.4
   io: #^1.0.4
   file_picker: ^5.2.5
@@ -56,8 +57,9 @@ dependencies:
   google_maps_flutter: ^2.1.1
   google_fonts: ^4.0.3
   easy_signature_pad: ^1.0.6
-  pdf: ## add this
+  pdf: ^3.6.0
   #flutter_full_pdf_viewer: ^1.0.6
+  flutter_pdfview: ^1.0.6
   printing: ^5.11.0
   path_provider: ^2.0.13
   path: ^1.8.3

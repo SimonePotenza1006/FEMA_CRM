@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fema_crm/model/InterventoModel.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -15,7 +16,6 @@ class DbHelper{
   String ipaddress1 = 'http://localhost:8080';
   String ipaddress3 ='http://79.10.122.110:8084';
   String ipaddress4 = 'http://10.0.2.2.8080';
-
 
   Future<List<TipologiaInterventoModel>> getAllTipologieIntervento() async{
     try{
@@ -143,10 +143,10 @@ class DbHelper{
           responseData['email'].toString(),
           responseData['password'].toString(),
           responseData['cellulare'].toString(),
-          responseData['codiceFiscale'].toString(),
+          responseData['codice_fiscale'].toString(),
           responseData['iban'].toString(),
           RuoloUtenteModel.fromJson(responseData['ruolo']),
-          TipologiaInterventoModel.fromJson(responseData['tipologiaIntervento']),
+          TipologiaInterventoModel.fromJson(responseData['tipologia_intervento']),
 
         );
         print('Login done successfully!');
@@ -174,10 +174,10 @@ class DbHelper{
         responseData["email"],
         responseData["password"],
         responseData["cellulare"],
-        responseData["codiceFiscale"],
+        responseData["codice_fiscale"],
         responseData["iban"],
         RuoloUtenteModel.fromJson(responseData["ruolo"]),
-        TipologiaInterventoModel.fromJson(responseData["tipologiaIntervento"]),
+        TipologiaInterventoModel.fromJson(responseData["tipologia_intervento"]),
       );
       return utente;
     } else {

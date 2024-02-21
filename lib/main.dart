@@ -92,15 +92,16 @@ class _LoginFormState extends State<LoginForm> {
             print("PROVA3");
             print("userdata: $userData");
             TextInput.finishAutofillContext();
-            if(userData.ruolo.descrizione == "Developer" || userData.ruolo.descrizione == "Tecnico"){
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeFormTecnico()),
-                      (Route<dynamic> route) => false);
-            } else if(userData.ruolo.descrizione == "Amministrazione") {
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const HomeFormAmministrazione()),
-                      (Route<dynamic> route) => false);
-            } else {
-              print("C'è qualcosa che non va!");
-            }
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => userData.ruolo.descrizione == "Developer" || userData.ruolo.descrizione == "Tecnico"
+                    ? HomeFormTecnico(userData: userData)
+                    : HomeFormAmministrazione(userData: userData),
+              ),
+                  (Route<dynamic> route) => false,
+            );
+
           });
         }
       });

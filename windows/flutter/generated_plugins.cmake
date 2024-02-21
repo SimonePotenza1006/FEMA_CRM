@@ -4,6 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   address_search_field
+  connectivity_plus
+  file_selector_windows
   flutter_localization
   geolocator_windows
   permission_handler_windows

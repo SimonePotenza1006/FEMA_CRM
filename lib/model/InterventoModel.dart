@@ -17,7 +17,6 @@ class InterventoModel {
   DateTime? orario_inizio;
   DateTime? orario_fine;
   String? descrizione;
-  File? foto;
   double? importo_intervento;
   bool? assegnato;
   bool? concluso;
@@ -39,7 +38,6 @@ class InterventoModel {
       this.orario_inizio,
       this.orario_fine,
       this.descrizione,
-      this.foto,
       this.importo_intervento,
       this.assegnato,
       this.concluso,
@@ -60,15 +58,14 @@ class InterventoModel {
     var map = <String, dynamic>{
       'id': id,
       'data': data,
-      'orarioInizio': orario_inizio,
-      'orarioFine': orario_fine,
+      'orario_inizio': orario_inizio,
+      'orario_fine': orario_fine,
       'descrizione': descrizione,
-      'foto': foto,
       'importoIntervento': importo_intervento,
       'assegnato': assegnato,
       'concluso': concluso,
-      'saldato' : saldato,
-      'note' : note,
+      'saldato': saldato,
+      'note': note,
       'firmaCliente': firma_cliente,
       'utente': utente?.toMap(),
       'cliente': cliente?.toMap(),
@@ -77,24 +74,32 @@ class InterventoModel {
       'categoria_intervento_specifico': categoria_intervento_specifico?.toMap(),
       'tipologiaPagamento': tipologiaPagamento?.toMap(),
       'destinazione': destinazione?.toMap(),
-      //'utenti': utenti
-  };
+    };
+
     return map;
   }
+
+
+  void _addToMapIfNotNull(Map<String, dynamic> map, String key, dynamic value) {
+    if (value != null) {
+      map[key] = value;
+    }
+  }
+
+
 
   InterventoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     data = map['data'];
-    orario_inizio = map['orarioInizio'];
-    orario_fine = map['orarioFine'];
+    orario_inizio = map['orario_inizio'];
+    orario_fine = map['orario_fine'];
     descrizione = map['descrizione'];
-    foto = map['foto'];
     importo_intervento = map['importoIntervento'];
     assegnato = map['assegnato'];
     concluso = map['concluso'];
     saldato = map['saldato'];
     note = map['note'];
-    firma_cliente = map['firmaCliente'];
+    firma_cliente = map['firma_cliente'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
     cliente = map['cliente'] != null ? ClienteModel.fromMap(map['cliente']) : null;
     veicolo = map['veicolo'] != null ? VeicoloModel.fromMap(map['veicolo']) : null;
@@ -107,42 +112,40 @@ class InterventoModel {
 
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'data': data,
-        'orarioInizio': orario_inizio,
-        'orarioFine': orario_fine,
-        'descrizione': descrizione,
-        'foto': foto,
-        'importoIntervento': importo_intervento,
-        'assegnato' : assegnato,
-        'concluso': concluso,
-        'saldato': saldato,
-        'note': note,
-        'firmaCliente': firma_cliente,
-        'utente': utente,
-        'cliente': cliente,
-        'veicolo': veicolo,
-        'tipologia': tipologia,
-        'categoria_intervento_specifico': categoria_intervento_specifico,
-        'tipologiaPagamento': tipologiaPagamento,
-        'destinazione': destinazione,
-        //'utenti': utenti
-      };
+    'id': id,
+    'data': data?.toIso8601String(),
+    'orario_inizio': orario_inizio?.toIso8601String(),
+    'orario_fine': orario_fine?.toIso8601String(),
+    'descrizione': descrizione,
+    'importoIntervento': importo_intervento,
+    'assegnato': assegnato,
+    'concluso': concluso,
+    'saldato': saldato,
+    'note': note,
+    'firma_cliente': firma_cliente,
+    'utente': utente?.toJson(),
+    'cliente': cliente?.toJson(),
+    'veicolo': veicolo?.toJson(),
+    'tipologia': tipologia?.toJson(),
+    'categoria_intervento_specifico': categoria_intervento_specifico?.toJson(),
+    'tipologiaPagamento': tipologiaPagamento?.toJson(),
+    'destinazione': destinazione?.toJson(),
+  };
 
-  factory InterventoModel.fromJson(Map<String, dynamic> json){
+
+  factory InterventoModel.fromJson(Map<String, dynamic> json) {
     return InterventoModel(
-      json['id'].toString(),
+      json['id']?.toString(),
       json['data'] != null ? DateTime.parse(json['data']) : null,
-      json['orario_inizio'] != null ? DateTime.parse(json['orarioInizio']) : null,
-      json['orario_fine'] != null ? DateTime.parse(json['orarioFine']) : null,
-      json['descrizione'].toString(),
-      json['foto'],
-      json['importo_intervento'] != null ? double.parse(json['importoIntervento'].toString()) : null,
+      json['orario_inizio'] != null ? DateTime.parse(json['orario_inizio']) : null,
+      json['orario_fine'] != null ? DateTime.parse(json['orario_fine']) : null,
+      json['descrizione']?.toString(),
+      json['importoIntervento'] != null ? double.parse(json['importoIntervento'].toString()) : null,
       json['assegnato'],
       json['concluso'],
       json['saldato'],
-      json['note'] != null ? json['note'].toString() : null,
-      json['firma_cliente'],
+      json['note']?.toString(),
+      json['firmaCliente'],
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
       json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
       json['veicolo'] != null ? VeicoloModel.fromJson(json['veicolo']) : null,
@@ -150,9 +153,9 @@ class InterventoModel {
       json['categoriaInterventoSpecifico'] != null ? CategoriaInterventoSpecificoModel.fromJson(json['categoriaInterventoSpecifico']) : null,
       json['tipologiaPagamento'] != null ? TipologiaPagamentoModel.fromJson(json['tipologiaPagamento']) : null,
       json['destinazione'] != null ? DestinazioneModel.fromJson(json['destinazione']) : null,
-      //(json['utenti'] as List<dynamic>?)?.map((data) => UtenteModel.fromJson(data)).toList(),
     );
   }
+
 
 
 }

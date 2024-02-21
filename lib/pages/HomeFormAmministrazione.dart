@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../model/UtenteModel.dart';
 import 'ListaClientiPage.dart';
 import 'ListaCredenzialiPage.dart';
 import 'ListaInterventiPage.dart';
@@ -8,7 +9,10 @@ import 'MagazzinoPage.dart';
 import 'RegistroCassaPage.dart';
 
 class HomeFormAmministrazione extends StatefulWidget {
-  const HomeFormAmministrazione({Key? key}) : super(key: key);
+  final UtenteModel userData;
+
+  const HomeFormAmministrazione({Key? key, required this.userData}) : super(key: key);
+
 
   @override
   _HomeFormAmministrazioneState createState() => _HomeFormAmministrazioneState();
@@ -31,6 +35,17 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Text(
+                    "Bentornato ${widget.userData.nome.toString()}",
+                    textAlign: TextAlign.center, // Centra il testo
+                    style: TextStyle(
+                      fontSize: 24, // Imposta la dimensione del testo
+                      fontWeight: FontWeight.bold, // Imposta il grassetto
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [

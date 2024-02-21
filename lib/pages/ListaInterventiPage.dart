@@ -36,7 +36,7 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
         // Creazione degli oggetti Intervento dalla risposta JSON
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
-          //debugPrint('${item}', wrapWidth: 1024);
+          //debugPrint('AIUTOOOOOO${item}', wrapWidth: 1024);
           interventi.add(InterventoModel.fromJson(item));
         }
 
