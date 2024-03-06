@@ -1,4 +1,4 @@
-
+import '';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,14 +9,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'model/UtenteModel.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+  const MyApp({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,26 +27,23 @@ class MyApp extends StatelessWidget {
   }
 }
 
-ThemeData myThemeData(){
+ThemeData myThemeData() {
   return ThemeData(
-      fontFamily: GoogleFonts.aldrich().fontFamily
+    fontFamily: GoogleFonts.aldrich().fontFamily,
   );
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
-
-  // const LoginForm({super.key});
+  const LoginForm({Key? key});
 
   @override
   _LoginFormState createState() => _LoginFormState();
 }
 
 class _LoginFormState extends State<LoginForm> {
-
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
 
-  final _formKey =GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   final _conUserId = TextEditingController();
   final _conPassword = TextEditingController();
@@ -75,18 +71,16 @@ class _LoginFormState extends State<LoginForm> {
     String uid = _conUserId.text.trim();
     String passwd = _conPassword.text;
 
-
-    if(false) {
+    if (false) {
       print("ERROR FALSE");
-    }
-    else {
+    } else {
       print('Ooook!');
       print("AOOOOOO");
 
       await dbHelper.getLoginUser(uid, passwd).then((userData) {
         print('$uid, $passwd');
         print("Checking userData!");
-        if(userData != null) {
+        if (userData != null) {
           print("PROVA!@");
           setSP(userData).whenComplete(() {
             print("PROVA3");
@@ -95,24 +89,23 @@ class _LoginFormState extends State<LoginForm> {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (_) => userData.ruolo.descrizione == "Developer" || userData.ruolo.descrizione == "Tecnico"
+                builder: (_) => userData.ruolo.descrizione == "Developer" ||
+                    userData.ruolo.descrizione == "Tecnico"
                     ? HomeFormTecnico(userData: userData)
                     : HomeFormAmministrazione(userData: userData),
               ),
                   (Route<dynamic> route) => false,
             );
-
           });
         }
       });
     }
   }
 
-  reset(){
+  reset() {
     _conUserId.text = '';
     _conPassword.text = '';
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -129,51 +122,58 @@ class _LoginFormState extends State<LoginForm> {
               padding: EdgeInsets.only(top: 60.0),
               child: Center(
                 child: SizedBox(
-                    width: 400,
-                    height: 250,
-                    /*decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(50.0)),*/
-                    child: Image(image: AssetImage('assets/images/logo.png'))),
+                  width: 400,
+                  height: 250,
+                  child: Image(image: AssetImage('assets/images/logo.png')),
+                ),
               ),
             ),
             Padding(
-              //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 50),
               child: TextFormField(
                 controller: _conUserId,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Username',
-                    hintText: 'Inserisci il tuo username'),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(30),
+                    ),
+                  ),
+                  labelText: 'Username',
+                  hintText: 'Inserisci il tuo username',
+                ),
               ),
             ),
+            SizedBox(height: 15),
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 15.0, right: 15.0, top: 15, bottom: 0),
-              //padding: EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 50),
               child: TextField(
                 controller: _conPassword,
                 obscureText: true,
                 decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                    hintText: 'Inserisci la password'),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(30),
+                    ),
+                  ),
+                  labelText: 'Password',
+                  hintText: 'Inserisci la password',
+                ),
               ),
             ),
-
+            SizedBox(height: 30),
             Container(
-              margin: const EdgeInsets.only(top: 30),
               height: 50,
               width: 250,
               decoration: BoxDecoration(
-                  color: Colors.blue, borderRadius: BorderRadius.circular(20)),
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(25),
+              ),
               child: FloatingActionButton(
                 backgroundColor: Colors.red,
                 onPressed: login,
                 child: const Text(
                   'ACCEDI',
-                  style: TextStyle(color: Colors.white, fontSize: 25),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
               ),
             ),

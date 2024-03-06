@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -13,19 +14,18 @@ import '../model/InterventoModel.dart';
 import '../model/ImmagineModel.dart';
 import 'dart:ui' as ui;
 
+import 'HomeFormTecnico.dart';
 
 class CompilazioneRapportinoPage extends StatefulWidget {
   final InterventoModel intervento;
 
   CompilazioneRapportinoPage({Key? key, required this.intervento}) : super(key: key);
 
-
   @override
   _CompilazioneRapportinoPageState createState() => _CompilazioneRapportinoPageState();
 }
 
 class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage> {
-
   String? selectedListino;
   List<CategoriaPrezzoListinoModel> listini = [];
   late DateTime selectedDate;
@@ -38,6 +38,7 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
   List<CategoriaInterventoSpecificoModel> categorie =[];
   XFile? pickedImage;
   bool showListinoDropdown = false;
+  TextEditingController credenzialiController = TextEditingController();
 
   String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
     final now = DateTime.now();
@@ -143,13 +144,13 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
                         } else if (snapshot.hasError) {
                           return Text('Errore durante il recupero dei dati: ${snapshot.error}');
                         } else if (snapshot.hasData) {
-                          List<CategoriaInterventoSpecificoModel> categorie = snapshot.data!;
+                          categorie = snapshot.data!; // Aggiorna la variabile di classe con i dati ottenuti
                           return DropdownButton<String>(
                             value: selectedInterventoSpecifico,
                             onChanged: (String? newValue) {
                               setState(() {
                                 selectedInterventoSpecifico = newValue!;
-                                selectedListino = null;
+                                selectedListino = null; // Resetta il listino selezionato quando viene selezionata una nuova categoria specifica di intervento
                               });
                             },
                             isExpanded: true,
@@ -166,6 +167,7 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
                         }
                       },
                     ),
+
                     SizedBox(height: 20),
                     Text(
                       'Seleziona il Listino associato:',
@@ -173,7 +175,7 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
                     ),
                     SizedBox(height: 10),
                     FutureBuilder<List<CategoriaPrezzoListinoModel>>(
-                      future: getListiniByCategoria(selectedInterventoSpecifico ?? ''),
+                      future: selectedInterventoSpecifico != null ? getListiniByCategoria(selectedInterventoSpecifico!) : null,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return CircularProgressIndicator();
@@ -322,16 +324,49 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
                 ],
               ),
               SizedBox(height: 20),
+              Text(
+                'Credenziali cliente:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                child: TextFormField(
+                  controller: credenzialiController,
+                  decoration: InputDecoration(
+                    hintText: 'Inserisci le credenziali del cliente (Username e password)',
+                    border: OutlineInputBorder(),
+                  ),
+                  // Gestisci il valore inserito dall'utente come preferisci
+                  onChanged: (value) {
+                    // Puoi gestire il valore inserito dall'utente qui
+                  },
+                ),
+              ),
+              SizedBox(height: 20),
               Container(
                 width: double.infinity,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
                       onPressed: () {
                         saveIntervento();
+                        saveCredenziale();
                         print('Rapportino salvato');
-                        //Navigator.pop(context); // Torna alla pagina precedente
+
+                        // Reindirizzamento alla pagina "HomeFormTecnico"
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeFormTecnico(userData: widget.intervento.utente!)),
+                        );
+
+                        // Mostra lo snackBar
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Rapportino compilato con successo'),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         primary: Colors.red,
@@ -340,6 +375,7 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
                       ),
                       child: Text('Salva Rapportino'),
                     ),
+
                     ElevatedButton(
                       onPressed: () {
                         if (pickedImage != null) {
@@ -382,6 +418,33 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
     } catch (e) {
       print('Errore durante il fetch dei veicoli: $e');
       return [];
+    }
+  }
+
+  Future<void> saveCredenziale() async {
+    try {
+      Map<String, dynamic> body = {
+        "descrizione" : credenzialiController.text.toString(),
+        "cliente": widget.intervento.cliente?.toMap(),
+        "utente": widget.intervento.utente?.toMap(),
+      };
+      print('Body credenziali della richiesta: $body');
+      final response = await http.post(
+        Uri.parse('http://192.168.1.52:8080/api/credenziali'),
+        body: jsonEncode(body),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      print('Risposta: ${response.statusCode} - ${response.body}');
+
+      if (response.statusCode == 201) {
+        print('Credenziali salvate con successo, daje');
+      } else {
+        print('Qualcosa non va');
+      }
+    } catch (e) {
+      print('Errore durante il salvataggio delle credenziali: $e');
     }
   }
 
@@ -434,26 +497,39 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
 
   Future<void> saveIntervento() async {
     Map<String, dynamic> body = {};
+
     final CategoriaPrezzoListinoModel listinoSelezionato = listini.firstWhere(
           (listino) => listino.id == selectedListino,
       orElse: () => CategoriaPrezzoListinoModel(null, null, null, null),
     );
-    final CategoriaInterventoSpecificoModel categoriaSelezionata = categorie.firstWhere(
-          (categoria) => categoria.id == selectedInterventoSpecifico,
-      orElse: () => CategoriaInterventoSpecificoModel(null, null, null),
-    );
-    if (listinoSelezionato != null) {
-      body['listino'] = listinoSelezionato.toJson();
+
+    CategoriaInterventoSpecificoModel? categoriaSelezionata;
+
+    // Controllo per evitare sovrascrittura indesiderata della tipologia
+    if (selectedInterventoSpecifico != null) {
+      categoriaSelezionata = categorie.firstWhere(
+            (categoria) => categoria.id == selectedInterventoSpecifico,
+        orElse: () => CategoriaInterventoSpecificoModel(null, null, null),
+      );
+
+      if (listinoSelezionato != null) {
+        body['listino'] = listinoSelezionato.toJson();
+      } else {
+        print('Errore: Listino non trovato');
+        return;
+      }
+
+      if (categoriaSelezionata != null && categoriaSelezionata.tipologia != null) {
+        body['categoria_intervento_specifico'] = categoriaSelezionata.toJson();
+      } else {
+        print('Errore: Categoria intervento specifico non trovata');
+        return;
+      }
     } else {
-      print('Errore: Listino non trovato');
+      print('Errore: Categoria intervento specifico non selezionata');
       return;
     }
-    if (categoriaSelezionata != null) {
-      body['categoria_intervento_specifico'] = categoriaSelezionata.toJson();
-    } else {
-      print('Errore: Categoria intervento specifico non trovata');
-      return;
-    }
+
     body.addAll({
       'id': widget.intervento.id,
       'data': selectedDate.toIso8601String(),
@@ -470,10 +546,11 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
       'cliente': widget.intervento.cliente?.toMap(),
       'veicolo': widget.intervento.veicolo?.toMap(),
       'tipologia': widget.intervento.tipologia?.toMap(),
-      'categoria_intervento_specifico': categoriaSelezionata.toMap(),
+      'categoria_intervento_specifico': categoriaSelezionata.toJson(),
       'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
       'destinazione': widget.intervento.destinazione?.toMap(),
     });
+
     try {
       final response = await http.post(
         Uri.parse('http://192.168.1.52:8080/api/intervento'),
@@ -484,6 +561,14 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
       );
       if (response.statusCode == 201) {
         print('Intervento salvato con successo');
+        // Naviga alla pagina HomeFormTecnico
+        Navigator.pushReplacementNamed(context, '/HomeFormTecnico');
+        // Mostra lo Snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Rapportino compilato con successo'),
+          ),
+        );
       } else {
         print('Errore durante il salvataggio dell\'intervento: ${response.statusCode}');
       }
@@ -491,6 +576,8 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
       print('Errore durante la chiamata HTTP: $e');
     }
   }
+
+
 
   Future<void> saveImageIntervento(File imageFile) async {
     try {
@@ -505,45 +592,28 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
       String interventoId = widget.intervento.id.toString();
 
       // Creazione della richiesta multipart
-      var request = http.MultipartRequest('POST', Uri.parse('http://192.168.1.52:8080/api/immagine/$interventoId'));
+      var request = http.MultipartRequest('POST', Uri.parse('http://192.168.1.52:8080/api/immagine'));
+      request.fields.addAll({
+        'id': interventoId,
+      });
+      request.headers.addAll(<String, String>{
+        'Content-Type': 'multipart/form-data',
+      });
 
-      // Aggiunta del file come parte della richiesta multipart
+      // Aggiunta dell'immagine alla richiesta
       request.files.add(
         await http.MultipartFile.fromPath(
-          'intervento', // Nome del campo nel backend
+          'immagine',
           imageFile.path,
+          contentType: MediaType('image', 'jpeg'),
         ),
       );
 
-      // Aggiunta dei dati relativi all'intervento come parte della richiesta
-      request.fields['name'] = 'immagine_intervento${widget.intervento.id.toString()}.jpg';
-      request.fields['type'] = 'jpg';
-      request.fields['intervento'] = jsonEncode({
-        'id': widget.intervento.id,
-        'data': selectedDate.toIso8601String(),
-        'orario_inizio': timeOfDayToIso8601String(selectedStartTime),
-        'orario_fine': DateTime.now().toIso8601String(),
-        'descrizione': widget.intervento.descrizione,
-        'importo_intervento': listinoSelezionato.prezzo,
-        'assegnato': true,
-        'concluso': true,
-        'saldato': true,
-        'note': rapportinoText.toString(),
-        'firma_cliente': signatureBytes,
-        'utente': widget.intervento.utente?.toMap(),
-        'cliente': widget.intervento.cliente?.toMap(),
-        'veicolo': widget.intervento.veicolo?.toMap(),
-        'tipologia': widget.intervento.tipologia?.toMap(),
-        'categoria_intervento_specifico': categoriaSelezionata.toMap(),
-        'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-        'destinazione': widget.intervento.destinazione?.toMap(),
-      });
-
-      // Invio della richiesta multipart
+      // Invio della richiesta
       var response = await request.send();
 
-      // Controllo dello stato della risposta
-      if (response.statusCode == 200) {
+      // Controllo della risposta
+      if (response.statusCode == 201) {
         print('Immagine salvata con successo');
       } else {
         print('Errore durante il salvataggio dell\'immagine: ${response.statusCode}');
@@ -552,7 +622,4 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
       print('Errore durante la chiamata HTTP: $e');
     }
   }
-
-
-
 }

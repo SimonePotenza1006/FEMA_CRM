@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../model/InterventoModel.dart';
 
+
 // Definiamo il widget per la generazione del PDF
 class PDFInterventoPage extends StatefulWidget {
   final InterventoModel intervento;
@@ -50,7 +51,7 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
   // Metodo per generare il PDF
   Future<Uint8List> _generatePDF() async {
     final pdf = pw.Document();
-
+    const IconData euro_symbol = IconData(0xe23c, fontFamily: 'MaterialIcons');
     pdf.addPage(
       pw.Page(
         margin: pw.EdgeInsets.symmetric(horizontal: 20), // Aggiungi margine a destra e sinistra
@@ -638,6 +639,7 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 ),
                               ),
                             ),
+                            pw.SizedBox(height: 20),
                             pw.Padding(
                               padding: pw.EdgeInsets.symmetric(horizontal: 8),
                               child: pw.Text(
@@ -660,7 +662,113 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             bottom: pw.BorderSide(color: PdfColors.black, width: 1),
                           ),
                         ),
-                        // Contenuto della colonna di destra
+                        child:
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children:[
+                            pw.Padding(
+                              padding: pw.EdgeInsets.only(top: 8, left: 8, right: 8),
+                              child: pw.Text(
+                                'Tot. imponibile:',
+                                style: pw.TextStyle(
+                                  fontSize: 9
+                                ),
+                              ),
+                            ),
+                            pw.SizedBox(height: 2),
+                            pw.Padding(
+                              padding: pw.EdgeInsets.only(left: 8, right: 8),
+                              child: pw.Text(
+                                'Tot. Iva:',
+                                style: pw.TextStyle(
+                                    fontSize: 9
+                                ),
+                              ),
+                            ),
+                            pw.SizedBox(height:10),
+                            pw.Padding(
+                              padding: pw.EdgeInsets.only(left: 8, right: 8),
+                              child: pw.Row(
+                                children: [
+                                  pw.Text(
+                                    'Tot. documento: ' + String.fromCharCode(128),
+                                    style: pw.TextStyle(
+                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            pw.SizedBox(height: 2),
+                            pw.Container(
+                              width: PdfPageFormat.cm * 7.5,
+                              height: 1,
+                              color: PdfColors.black,
+                            ),
+                            pw.SizedBox(height:2),
+                            pw.Padding(
+                              padding: pw.EdgeInsets.only(left: 8),
+                              child:
+                              pw.Row(
+                                children: [
+                                  pw.SizedBox(height: 30),
+                                  pw.Text('SALDATO:'),
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.only(left: 8.0),
+                                    child: pw.Container(
+                                      decoration: pw.BoxDecoration(
+                                        border: pw.Border.all(color: PdfColors.black, width: 1.0),
+                                      ),
+                                      padding: const pw.EdgeInsets.all(4.0),
+                                      child: pw.Row(
+                                        children: [
+                                          pw.Checkbox(
+                                            value: widget.intervento.saldato == true, // Imposta il valore della checkbox "SI" in base a widget.intervento.saldato
+                                            name: '',
+                                          ), // Checkbox "SI" se widget.intervento.saldato è true, altrimenti "NO"
+                                          pw.Container(
+                                            padding: const pw.EdgeInsets.symmetric(horizontal: 4.0),
+                                            child: pw.FittedBox(
+                                              fit: pw.BoxFit.scaleDown,
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text('SI'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  pw.Padding(
+                                    padding: const pw.EdgeInsets.only(left: 8.0),
+                                    child: pw.Container(
+                                      decoration: pw.BoxDecoration(
+                                        border: pw.Border.all(color: PdfColors.black, width: 1.0),
+                                      ),
+                                      padding: const pw.EdgeInsets.all(4.0),
+                                      child: pw.Row(
+                                        children: [
+                                          pw.Checkbox(
+                                            value: widget.intervento.saldato == false, // Imposta il valore della checkbox "NO" in base a widget.intervento.saldato
+                                            name: '',
+                                          ), // Checkbox "NO" se widget.intervento.saldato è true, altrimenti "SI"
+                                          pw.Container(
+                                            padding: const pw.EdgeInsets.symmetric(horizontal: 2.0),
+                                            child: pw.FittedBox(
+                                              fit: pw.BoxFit.scaleDown,
+                                              alignment: pw.Alignment.center,
+                                              child: pw.Text('NO'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ]
+                        )
                       ),
                     ),
                   ],

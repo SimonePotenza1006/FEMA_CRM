@@ -30,13 +30,15 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
+        // Stampare il JSON ricevuto
+        debugPrint('JSON ricevuto: ${response.body}', wrapWidth: 1024);
+
         // Parsing dei dati JSON ricevuti
         var jsonData = jsonDecode(response.body);
-        debugPrint("Prova: ${jsonData.toString()}", wrapWidth: 1024);
+
         // Creazione degli oggetti Intervento dalla risposta JSON
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
-          //debugPrint('AIUTOOOOOO${item}', wrapWidth: 1024);
           interventi.add(InterventoModel.fromJson(item));
         }
 
@@ -49,7 +51,8 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error: $e');
+      // Gestione degli errori
+      print('Errore durante la chiamata all\'API: $e');
 
       showDialog(
         context: context,
@@ -70,6 +73,7 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
       );
     }
   }
+
 
 
   @override
@@ -158,7 +162,6 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
                     ),
                   ),
                 ],
-                // Aggiunta del GestureDetector per la navigazione alla nuova pagina
                 onSelectChanged: (isSelected) {
                   if (isSelected != null) {
                     Navigator.push(

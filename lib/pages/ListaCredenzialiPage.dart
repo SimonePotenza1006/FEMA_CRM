@@ -1,23 +1,27 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 import '../databaseHandler/DbHelper.dart';
 import '../model/CredenzialiClienteModel.dart';
 import 'DettaglioCredenzialiPage.dart';
 
 class ListaCredenzialiPage extends StatefulWidget {
-  const ListaCredenzialiPage({super.key});
+  const ListaCredenzialiPage({Key? key}) : super(key: key);
 
   @override
   _ListaCredenzialiPageState createState() => _ListaCredenzialiPageState();
 }
 
-class _ListaCredenzialiPageState extends State<ListaCredenzialiPage>{
+class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
   DbHelper? dbHelper;
   List<CredenzialiClienteModel> allCredenziali = [];
+  List<CredenzialiClienteModel> filteredCredenziali = [];
   bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
+  bool isSearching = false;
 
   @override
-  void initState(){
+  void initState() {
     dbHelper = DbHelper();
     init();
     super.initState();
@@ -25,10 +29,56 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage>{
 
   Future<void> init() async {
     print('Tiro giù tutte le credenziali');
-    //allCredenziali = await dbHelper?.getAllCredenziali() ?? [];
-    print('Numero totale di credenziali: ${allCredenziali.length}');
+    try {
+      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/credenziali');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<CredenzialiClienteModel> credenziali = [];
+        for (var item in jsonData) {
+          credenziali.add(CredenzialiClienteModel.fromJson(item));
+        }
+        setState(() {
+          allCredenziali = credenziali;
+          filteredCredenziali = allCredenziali; // Inizialmente, la lista filtrata è uguale a quella completa
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Gestione degli errori
+      print('Errore durante la chiamata all\'API: $e');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Errore di connessione'),
+            content: Text('Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void filterCredenziali(String query) {
     setState(() {
-      isLoading = false;
+      filteredCredenziali = allCredenziali.where((credenziale) {
+        final utenteCognome = credenziale.utente?.cognome?.toLowerCase() ?? '';
+        final utenteNome = credenziale.utente?.nome?.toLowerCase() ?? '';
+        final searchQuery = query.toLowerCase();
+        return utenteCognome.contains(searchQuery) ||
+            utenteNome.contains(searchQuery);
+      }).toList();
     });
   }
 
@@ -37,56 +87,81 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage>{
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Lista credenziali',
-          style: TextStyle(color: Colors.white)
+        title: !isSearching
+            ? Text('Lista credenziali', style: TextStyle(color: Colors.white))
+            : TextField(
+          controller: searchController,
+          onChanged: filterCredenziali,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Cerca per nome e cognome',
+            hintStyle: TextStyle(color: Colors.white70),
+            border: InputBorder.none,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: (){
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //       builder: (context) => DettaglioCredenzialiPage(credenziali : credenziali))
-              //)
+          isSearching
+              ? IconButton(
+            icon: Icon(Icons.cancel),
+            onPressed: () {
+              setState(() {
+                this.isSearching = false;
+                this.searchController.clear();
+                this.filteredCredenziali = allCredenziali;
+              });
+            },
+          )
+              : IconButton(
+            icon: Icon(Icons.search),
+            color: Colors.white,
+            onPressed: () {
+              setState(() {
+                this.isSearching = true;
+              });
             },
           ),
         ],
       ),
       body: isLoading
-        ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-          itemCount: allCredenziali.length,
-          separatorBuilder: (context, index) => const Divider(),
-          itemBuilder: (context, index) {
-            final credenziale = allCredenziali[index];
-            return buildViewCredenziali(credenziale);
-          }),
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              itemCount: filteredCredenziali.length,
+              separatorBuilder: (context, index) => Divider(),
+              itemBuilder: (context, index) {
+                final credenziale = filteredCredenziali[index];
+                return buildViewCredenziali(credenziale);
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-
-  Widget buildViewCredenziali(CredenzialiClienteModel credenziale){
+  Widget buildViewCredenziali(CredenzialiClienteModel credenziale) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       color: Colors.white.withOpacity(0.4),
       child: ListTile(
         minLeadingWidth: 12,
         visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
-        onTap: (){
+        onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
-              builder: (context) => DettaglioCredenzialiPage(credenziale : credenziale))
-          );
+                  builder: (context) =>
+                      DettaglioCredenzialiPage(credenziale: credenziale)));
         },
         leading: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[Icon(Icons.lock_person)],
-      ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[Icon(Icons.lock_person)],
+        ),
         trailing: Text('Id. ${credenziale.id}'),
         title: Text(
           '${credenziale.cliente?.denominazione}',

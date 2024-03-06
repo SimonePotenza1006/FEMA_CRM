@@ -271,7 +271,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                           style: TextStyle(fontSize: 18),
                         ),
                         subtitle: Text(
-                          widget.intervento.tipologia_pagamento != null ? widget.intervento.tipologia_pagamento.toString() : 'N/A',
+                          widget.intervento.tipologia_pagamento != null ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A' : 'N/A',
                           style: TextStyle(fontSize: 16),
                         ),
                       ),

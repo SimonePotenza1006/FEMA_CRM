@@ -4,31 +4,36 @@ class TipologiaPagamentoModel {
 
   TipologiaPagamentoModel(this.id, this.descrizione);
 
-  Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{'id': id, 'descrizione': descrizione};
-    return map;
-  }
-
   factory TipologiaPagamentoModel.fromMap(Map<String, dynamic> map) {
     return TipologiaPagamentoModel(
-      map['id'] ?? '',
-      map['descrizione'] ?? '',
+      map['id'],
+      map['descrizione'],
     );
   }
 
   factory TipologiaPagamentoModel.fromJson(Map<String, dynamic> json) {
-    return TipologiaPagamentoModel(json['id'], json['descrizione']);
+    return TipologiaPagamentoModel(
+      json['id'].toString(),
+      json['descrizione'].toString(),
+    );
   }
 
-  @override
-  String toString() {
-    return '{id: $id, descrizione: $descrizione}';
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'descrizione': descrizione,
+    };
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id ?? '',
-      "descrizione": descrizione ?? '',
+      'id': id.toString(),
+      'descrizione': descrizione.toString(),
     };
+  }
+
+  @override
+  String toString() {
+    return 'TipologiaPagamentoModel{id: $id, descrizione: $descrizione}';
   }
 }

@@ -26,7 +26,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
         for (var interventoJson in responseData) {
-          print(interventoJson.toString());
+          debugPrint(interventoJson.toString(), wrapWidth: 1024);
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           allInterventiByUtente.add(intervento);
         }

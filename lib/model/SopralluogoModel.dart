@@ -37,6 +37,20 @@ class SopralluogoModel {
     return map;
   }
 
+  factory SopralluogoModel.fromMap(Map<String, dynamic> map) {
+    return SopralluogoModel(
+      map['id'],
+      map['descrizione'],
+      map['foto'],
+      ClienteModel.fromMap(map['cliente']),
+      TipologiaInterventoModel.fromMap(map['tipologiaIntervento']),
+      CategoriaInterventoSpecificoModel.fromMap(map['categoriaInterventoSpecifico']),
+      (map['prodotti'] as List<dynamic>?)
+          ?.map((e) => ProdottoModel.fromMap(e))
+          .toList(),
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'descrizione': descrizione,

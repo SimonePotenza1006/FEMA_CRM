@@ -171,50 +171,6 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
     );
   }
 
-  // Future<void> updateCliente() async {
-  //   try {
-  //     print('${widget.cliente.tipologie_interventi}');
-  //     ClienteModel updatedCliente = ClienteModel(
-  //       widget.cliente.id,
-  //       _codiceFiscaleController.text,
-  //       _partitaIvaController.text,
-  //       _denominazioneController.text,
-  //       _indirizzoController.text,
-  //       _capController.text,
-  //       _cittaController.text,
-  //       _provinciaController.text,
-  //       _nazioneController.text,
-  //       _fatturazioneElettronicaController.text,
-  //       _riferimentoAmministrativoController.text,
-  //       _referenteController.text,
-  //       _faxController.text,
-  //       _telefonoController.text,
-  //       _cellulareController.text,
-  //       _emailController.text,
-  //       _pecController.text,
-  //       _noteController.text,
-  //       widget.cliente.tipologie_interventi
-  //     );
-  //
-  //     final response = await http.put(
-  //       Uri.parse('http://192.168.1.52:8080/api/cliente/${widget.cliente.id}'),
-  //       body: updatedCliente.toJson(),
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Cliente aggiornato con successo')),
-  //       );
-  //       Navigator.pop(context, updatedCliente);
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Impossibile aggiornare il cliente')),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     print('Errore durante l\'aggiornamento del cliente: $e');
-  //   }
-  // }
  
 Future<http.Response> updateCliente() async {
     late http.Response response;

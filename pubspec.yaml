@@ -48,6 +48,8 @@ dependencies:
   syncfusion_flutter_signaturepad: ^21.1.35 #^20.4.50
   intl: ^0.18.0
   geolocator: ^9.0.2
+  qr_code_scanner: ^1.0.1
+
   geocoding: ^2.1.0
   address_search_field: ^5.0.3
   uuid: ^3.0.6
@@ -58,6 +60,7 @@ dependencies:
   google_fonts: ^4.0.3
   easy_signature_pad: ^1.0.6
   pdf: ^3.6.0
+  flutter_barcode_scanner: ^2.0.0
   #flutter_full_pdf_viewer: ^1.0.6
   flutter_pdfview: ^1.0.6
   printing: ^5.11.0
@@ -88,6 +91,7 @@ dependencies:
     git:
       url: https://github.com/lohanidamodar/pdf_viewer.git
       ref: 4e5d96be29de515f1081c0b6897741b8dca84722
+  native_qr: ^0.0.3
   #pdfx: ^2.0.0
   #advance_pdf_viewer2: ^2.0.4
 

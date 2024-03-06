@@ -3,8 +3,9 @@ import '../databaseHandler/DbHelper.dart';
 import '../model/ClienteModel.dart';
 import 'DettaglioClientePage.dart';
 import 'CreazioneClientePage.dart';
+
 class ListaClientiPage extends StatefulWidget {
-  const ListaClientiPage({super.key, Key? key1});
+  const ListaClientiPage({Key? key}) : super(key: key);
 
   @override
   _ListaClientiPageState createState() => _ListaClientiPageState();
@@ -13,7 +14,10 @@ class ListaClientiPage extends StatefulWidget {
 class _ListaClientiPageState extends State<ListaClientiPage> {
   DbHelper? dbHelper;
   List<ClienteModel> allClienti = [];
+  List<ClienteModel> filteredClienti = [];
   bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
+  bool isSearching = false;
 
   @override
   void initState() {
@@ -27,7 +31,31 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
     allClienti = await dbHelper?.getAllClienti() ?? [];
     print("Numero totale di clienti: ${allClienti.length}");
     setState(() {
+      filteredClienti = allClienti;
       isLoading = false;
+    });
+  }
+
+  void filterClienti(String query) {
+    setState(() {
+      filteredClienti = allClienti.where((cliente) {
+        final denominazione = cliente.denominazione?.toLowerCase();
+        return denominazione!.contains(query.toLowerCase());
+      }).toList();
+    });
+  }
+
+  void startSearch() {
+    setState(() {
+      isSearching = true;
+    });
+  }
+
+  void stopSearch() {
+    setState(() {
+      isSearching = false;
+      searchController.clear();
+      filterClienti('');
     });
   }
 
@@ -36,47 +64,64 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Lista Clienti',
-            style: TextStyle(color: Colors.white)
-        ),
+        title: isSearching
+            ? TextField(
+          controller: searchController,
+          onChanged: filterClienti,
+          decoration: InputDecoration(
+            hintText: 'Cerca per denominazione cliente',
+            hintStyle: TextStyle(color: Colors.white), // colore del testo dell'hint
+            border: InputBorder.none,
+          ),
+          style: TextStyle(color: Colors.white),
+        )
+            : Text('Lista Clienti', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: isSearching
+                ? Icon(Icons.cancel, color: Colors.white) // colore dell'icona di cancellazione
+                : Icon(Icons.search, color: Colors.white), // colore dell'icona di ricerca
             onPressed: () {
+              if (isSearching) {
+                stopSearch();
+              } else {
+                startSearch();
+              }
             },
           ),
           IconButton(
-              icon: Icon(Icons.person_add_alt_1,
-              size: 40,
-              color: Colors.white,
-              ),
-          onPressed: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const CreazioneClientePage())
-                );
+            icon: Icon(Icons.person_add_alt_1, size: 40, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CreazioneClientePage()),
+              );
             },
           )
         ],
       ),
-
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-          itemCount: allClienti.length,
-          separatorBuilder: (context, index) => const Divider(),
-          itemBuilder: (context, index) {
-            final cliente = allClienti[index];
-            return buildViewClienti(cliente);
-          }),
+          : Column(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              itemCount: filteredClienti.length,
+              separatorBuilder: (context, index) => const Divider(),
+              itemBuilder: (context, index) {
+                final cliente = filteredClienti[index];
+                return buildViewClienti(cliente);
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget buildViewClienti(ClienteModel cliente) {
-    print(cliente.codice_fiscale);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       color: Colors.white.withOpacity(0.4),
@@ -84,11 +129,10 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
         minLeadingWidth: 12,
         visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
         onTap: () {
-          print(cliente.codice_fiscale);
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DettaglioClientePage(cliente: cliente),));
+            context,
+            MaterialPageRoute(builder: (context) => DettaglioClientePage(cliente: cliente)),
+          );
         },
         leading: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -108,4 +152,3 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
     );
   }
 }
-

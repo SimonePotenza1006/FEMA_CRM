@@ -1,8 +1,4 @@
-import 'dart:ffi';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
-
 import 'CategoriaInterventoSpecificoModel.dart';
 import 'ClienteModel.dart';
 import 'DestinazioneModel.dart';
@@ -57,9 +53,9 @@ class InterventoModel {
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
-      'data': data,
-      'orario_inizio': orario_inizio,
-      'orario_fine': orario_fine,
+      'data': data?.toIso8601String(),
+      'orario_inizio': orario_inizio?.toIso8601String(),
+      'orario_fine': orario_fine?.toIso8601String(),
       'descrizione': descrizione,
       'importoIntervento': importo_intervento,
       'assegnato': assegnato,
@@ -75,24 +71,16 @@ class InterventoModel {
       'tipologia_pagamento': tipologia_pagamento?.toMap(),
       'destinazione': destinazione?.toMap(),
     };
-
     return map;
-  }
-
-
-  void _addToMapIfNotNull(Map<String, dynamic> map, String key, dynamic value) {
-    if (value != null) {
-      map[key] = value;
-    }
   }
 
 
 
   InterventoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
-    data = map['data'];
-    orario_inizio = map['orario_inizio'];
-    orario_fine = map['orario_fine'];
+    map['data'] != null ? DateTime.parse(map['data']) : null;
+    map['orario_inizio'] != null ? DateTime.parse(map['orario_inizio']) : null;
+    map['orario_fine'] != null ? DateTime.parse(map['orario_fine']) : null;
     descrizione = map['descrizione'];
     importo_intervento = map['importoIntervento'];
     assegnato = map['assegnato'];
@@ -150,12 +138,9 @@ class InterventoModel {
       json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
       json['veicolo'] != null ? VeicoloModel.fromJson(json['veicolo']) : null,
       json['tipologia'] != null ? TipologiaInterventoModel.fromJson(json['tipologia']) : null,
-      json['categoriaInterventoSpecifico'] != null ? CategoriaInterventoSpecificoModel.fromJson(json['categoriaInterventoSpecifico']) : null,
-      json['tipologiaPagamento'] != null ? TipologiaPagamentoModel.fromJson(json['tipologia_pagamento']) : null,
+      json['categoria_intervento_specifico'] != null ? CategoriaInterventoSpecificoModel.fromJson(json['categoria_intervento_specifico']) : null,
+      json['tipologia_pagamento'] != null ? TipologiaPagamentoModel.fromJson(json['tipologia_pagamento']) : null,
       json['destinazione'] != null ? DestinazioneModel.fromJson(json['destinazione']) : null,
     );
   }
-
-
-
 }
