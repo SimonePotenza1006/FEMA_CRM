@@ -22,7 +22,7 @@ class AziendaModel {
   Map<String, dynamic> toMap(){
     var map = <String, dynamic>{
       'id': id,
-      'nome': nome,
+      'nome': nome.toString(),
       'luogo_di_lavoro': luogo_di_lavoro,
       'partita_iva': partita_iva,
       'pec': pec,
@@ -35,7 +35,7 @@ class AziendaModel {
 
   AziendaModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
-    nome = map['nome'];
+    nome = map['nome'].toString();
     luogo_di_lavoro = map['luogo_di_lavoro'];
     partita_iva = map['partita_iva'];
     pec = map['pec'];

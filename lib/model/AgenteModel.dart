@@ -5,8 +5,9 @@ class AgenteModel {
   String? nome;
   String? cognome;
   String? email;
+  String? riferimento_aziendale;
   String? cellulare;
-  String? codice_fiscale;
+  String? luogo_di_lavoro;
   String? iban;
   double? categoria_provvigione;
 
@@ -16,8 +17,9 @@ class AgenteModel {
       this.nome,
       this.cognome,
       this.email,
+      this.riferimento_aziendale,
       this.cellulare,
-      this.codice_fiscale,
+      this.luogo_di_lavoro,
       this.iban,
       this.categoria_provvigione
       );
@@ -28,8 +30,9 @@ class AgenteModel {
       'nome': nome.toString(),
       'cognome': cognome.toString(),
       'email': email.toString(),
+      'riferimento_aziendale' : riferimento_aziendale.toString(),
       'cellulare': cellulare.toString(),
-      'codice_fiscale': codice_fiscale.toString(),
+      'luogo_di_lavoro': luogo_di_lavoro.toString(),
       'iban': iban.toString(),
       'categoria_provvigione': double.parse(categoria_provvigione.toString()),
     };
@@ -41,8 +44,9 @@ class AgenteModel {
     nome = map['nome'];
     cognome = map['cognome'];
     email = map['email'];
+    riferimento_aziendale = map['riferimento_aziendale'];
     cellulare = map['cellulare'];
-    codice_fiscale = map['codice_fiscale'];
+    luogo_di_lavoro = map['luogo_di_lavoro'];
     iban = map['iban'];
     categoria_provvigione = map['categoria_provvigione'];
   }
@@ -52,8 +56,9 @@ class AgenteModel {
     'nome': nome,
     'cognome': cognome,
     'email': email,
+    'riferimento_aziendale': riferimento_aziendale,
     'cellulare': cellulare,
-    'codice_fiscale': codice_fiscale,
+    'luogo_di_lavoro': luogo_di_lavoro,
     'iban': iban,
     'categoria_provvigione': categoria_provvigione,
   };
@@ -64,8 +69,9 @@ class AgenteModel {
       json['nome']?.toString(),
       json['cognome']?.toString(),
       json['email']?.toString(),
+      json['riferimento_aziendale']?.toString(),
       json['cellulare']?.toString(),
-      json['codice_fiscale']?.toString(),
+      json['luogo_di_lavoro']?.toString(),
       json['iban']?.toString(),
       double.parse(json['categoria_provvigione']!.toString())
     );

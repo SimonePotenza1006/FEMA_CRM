@@ -1,8 +1,11 @@
-import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:flutter/material.dart';
+import 'package:fema_crm/model/UtenteModel.dart';
+import 'package:fema_crm/pages/ReportPreventiviPage.dart';
 
 import 'RegistrazioneAgentePage.dart';
 import 'RegistrazioneAziendaPage.dart';
+import 'RegistrazionePreventivoAmministrazionePage.dart';
+import 'ReportPreventiviPerAgentePage.dart';
 
 class LogisticaPreventiviHomepage extends StatefulWidget {
   final UtenteModel userData;
@@ -23,58 +26,75 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
         backgroundColor: Colors.red,
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              buildMenuButton(
-                icon: Icons.business_outlined,
-                text: 'Registra Azienda',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RegistrazioneAziendaPage()),
-                  );
-                },
-              ),
-              SizedBox(height: 10),
-              buildMenuButton(
-                icon: Icons.person_add_alt_1_outlined,
-                text: 'Registra Agente',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const RegistrazioneAgentePage()),
-                  );
-                },
-              ),
-              SizedBox(height: 10),
-              buildMenuButton(
-                icon: Icons.playlist_add_outlined,
-                text: 'Registra Preventivo',
-                onPressed: () {
-
-                },
-              ),
-              SizedBox(height: 10),
-              buildMenuButton(
-                icon: Icons.bar_chart_outlined,
-                text: 'Report Preventivi',
-                onPressed: () {
-
-                },
-              ),
-              SizedBox(height: 10),
-              buildMenuButton(
-                icon: Icons.article_outlined,
-                text: 'I Tuoi Preventivi',
-                onPressed: () {
-
-                },
-              ),
-            ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                buildMenuButton(
+                  icon: Icons.business_outlined,
+                  text: 'Registra Azienda',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const RegistrazioneAziendaPage()),
+                    );
+                  },
+                ),
+                SizedBox(height: 10),
+                buildMenuButton(
+                  icon: Icons.person_add_alt_1_outlined,
+                  text: 'Registra Agente',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const RegistrazioneAgentePage()),
+                    );
+                  },
+                ),
+                SizedBox(height: 10),
+                buildMenuButton(
+                  icon: Icons.playlist_add_outlined,
+                  text: 'Registra Preventivo',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RegistrazionePreventivoAmministrazionePage(userData: widget.userData)),
+                    );
+                  },
+                ),
+                SizedBox(height: 10),
+                buildMenuButton(
+                  icon: Icons.bar_chart_outlined,
+                  text: 'Report Preventivi',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ReportPreventiviPage()),
+                    );
+                  },
+                ),
+                SizedBox(height: 10),
+                buildMenuButton(
+                  icon: Icons.article_outlined,
+                  text: 'I Tuoi Preventivi',
+                  onPressed: () {},
+                ),
+                SizedBox(height: 10),
+                buildMenuButton(
+                  icon: Icons.folder_shared_outlined,
+                  text: 'Report Preventivi per agente',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ReportPreventiviPerAgentePage()),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

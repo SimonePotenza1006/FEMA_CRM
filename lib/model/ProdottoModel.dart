@@ -132,7 +132,7 @@ class ProdottoModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'id': int.parse(id.toString()),
       'codice_danea': codice_danea,
       'descrizione': descrizione,
       'tipologia': tipologia,

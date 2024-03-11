@@ -76,6 +76,8 @@ dependencies:
   flutter_svg: ^2.0.4
   location_geocoder: ^1.0.5
   flutter_typeahead: ^4.3.7
+  json_annotation: ^4.0.1
+  json_serializable: ^4.1.4
   #open_file: ^3.3.1
   open_filex: ^4.3.2
   http_parser: ^4.0.2

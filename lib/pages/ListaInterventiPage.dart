@@ -25,35 +25,24 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
 
   Future<void> getAllInterventi() async {
     try {
-      // Esempio di URL dell'API
       var apiUrl = Uri.parse('http://192.168.1.52:8080/api/intervento/ordered');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
-        // Stampare il JSON ricevuto
         debugPrint('JSON ricevuto: ${response.body}', wrapWidth: 1024);
-
-        // Parsing dei dati JSON ricevuti
         var jsonData = jsonDecode(response.body);
-
-        // Creazione degli oggetti Intervento dalla risposta JSON
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
           interventi.add(InterventoModel.fromJson(item));
         }
-
-        // Aggiornamento dello stato con i dati ottenuti dall'API
         setState(() {
           interventiList = interventi;
         });
       } else {
-        // Se la chiamata all'API non ha avuto successo
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
-      // Gestione degli errori
       print('Errore durante la chiamata all\'API: $e');
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -74,90 +63,79 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lista Interventi'),
+        title: Text(
+          'Lista Interventi',
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.red,
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: // Dentro il metodo build, sostituisci la costruzione della DataTable con questo codice:
-
-          DataTable(
+          child: DataTable(
             columns: [
-              DataColumn(label: Text('Cliente')),
-              DataColumn(label: Text('Destinazione')),
-              DataColumn(label: Text('Tipologia Intervento')),
-              DataColumn(label: Text('Data')),
-              DataColumn(label: Text('Assegnato')),
-              DataColumn(label: Text('Concluso')),
-              DataColumn(label: Text('Note')),
-              DataColumn(label: Text('Saldato')),
+              DataColumn(label: Text('Data', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(label: Text('Cliente', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(label: Text('Assegnato', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(label: Text('Concluso', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(label: Text('Destinazione', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(label: Text('Tipologia Intervento', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(label: Text('Note', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(label: Text('Saldato', style: TextStyle(fontWeight: FontWeight.bold))),
             ],
             rows: interventiList.map((intervento) {
               return DataRow(
                 cells: [
+                  DataCell(Text(DateFormat('dd/MM/yyyy').format(intervento.data ?? DateTime.now()))),
                   DataCell(Text(intervento.cliente?.denominazione ?? 'N/A')),
+                  DataCell(
+                    Container(
+                      decoration: BoxDecoration(
+                        color: intervento.assegnato ?? false ? Colors.green : Colors.red,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        intervento.assegnato ?? false ? 'Assegnato' : 'Non assegnato',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  DataCell(
+                    Container(
+                      decoration: BoxDecoration(
+                        color: intervento.concluso ?? false ? Colors.green : Colors.red,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        intervento.concluso ?? false ? 'Concluso' : 'Non concluso',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
                   DataCell(Text(intervento.destinazione?.denominazione ?? 'N/A')),
                   DataCell(Text(intervento.tipologia?.descrizione.toString() ?? 'N/A')),
-                  DataCell(Text(DateFormat('dd/MM/yyyy').format(intervento.data ?? DateTime.now()))),
-                  DataCell(
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: intervento.assegnato ?? false ? Colors.green : Colors.red,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                        child: Center(
-                          child: Text(
-                            intervento.assegnato ?? false ? '     ' : '      ',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  DataCell(
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: intervento.concluso ?? false ? Colors.green : Colors.red,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                        child: Center(
-                          child: Text(
-                            intervento.concluso ?? false ? '      ' : '       ',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                   DataCell(Text(intervento.note ?? "N/A")),
                   DataCell(
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: intervento.saldato ?? false ? Colors.green : Colors.red,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                        child: Center(
-                          child: Text(
-                            intervento.saldato ?? false ? '      ' : '       ',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: intervento.saldato ?? false ? Colors.green : Colors.red,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        intervento.saldato ?? false ? 'Saldato' : 'Non saldato',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -180,6 +158,3 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
     );
   }
 }
-
-
-

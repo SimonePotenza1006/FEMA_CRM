@@ -203,7 +203,7 @@ Future<http.Response> updateCliente() async {
           'tipologie_interventi': widget.cliente.tipologie_interventi,
         }),
       );
-      if (response.statusCode == 200){
+      if (response.statusCode == 201){
         print("Cliente modificato correttamente!");
       } else {
         print("Hai toppato :(");
