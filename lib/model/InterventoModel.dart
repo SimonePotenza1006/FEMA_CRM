@@ -18,7 +18,7 @@ class InterventoModel {
   bool? concluso;
   bool? saldato;
   String? note;
-  File? firma_cliente;
+  String? firma_cliente;
   UtenteModel? utente;
   ClienteModel? cliente;
   VeicoloModel? veicolo;
@@ -57,12 +57,12 @@ class InterventoModel {
       'orario_inizio': orario_inizio?.toIso8601String(),
       'orario_fine': orario_fine?.toIso8601String(),
       'descrizione': descrizione,
-      'importoIntervento': importo_intervento,
+      'importo_intervento': importo_intervento,
       'assegnato': assegnato,
       'concluso': concluso,
       'saldato': saldato,
       'note': note,
-      'firmaCliente': firma_cliente,
+      'firma_cliente': firma_cliente,
       'utente': utente?.toMap(),
       'cliente': cliente?.toMap(),
       'veicolo': veicolo?.toMap(),
@@ -82,7 +82,7 @@ class InterventoModel {
     map['orario_inizio'] != null ? DateTime.parse(map['orario_inizio']) : null;
     map['orario_fine'] != null ? DateTime.parse(map['orario_fine']) : null;
     descrizione = map['descrizione'];
-    importo_intervento = map['importoIntervento'];
+    importo_intervento = map['importo_intervento'];
     assegnato = map['assegnato'];
     concluso = map['concluso'];
     saldato = map['saldato'];
@@ -105,7 +105,7 @@ class InterventoModel {
     'orario_inizio': orario_inizio?.toIso8601String(),
     'orario_fine': orario_fine?.toIso8601String(),
     'descrizione': descrizione,
-    'importoIntervento': importo_intervento,
+    'importo_intervento': importo_intervento,
     'assegnato': assegnato,
     'concluso': concluso,
     'saldato': saldato,
@@ -128,12 +128,12 @@ class InterventoModel {
       json['orario_inizio'] != null ? DateTime.parse(json['orario_inizio']) : null,
       json['orario_fine'] != null ? DateTime.parse(json['orario_fine']) : null,
       json['descrizione']?.toString(),
-      json['importoIntervento'] != null ? double.parse(json['importoIntervento'].toString()) : null,
+      json['importo_intervento'] != null ? double.parse(json['importoIntervento'].toString()) : null,
       json['assegnato'],
       json['concluso'],
       json['saldato'],
       json['note']?.toString(),
-      json['firmaCliente'],
+      json['firma_cliente'],
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
       json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
       json['veicolo'] != null ? VeicoloModel.fromJson(json['veicolo']) : null,

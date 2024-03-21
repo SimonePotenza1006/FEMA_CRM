@@ -62,6 +62,7 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red,
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

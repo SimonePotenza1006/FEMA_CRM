@@ -17,6 +17,7 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   final TextEditingController recapitoFatturazioneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController sitoController = TextEditingController();
+  final TextEditingController telefonoController = TextEditingController();
 
   bool _areFieldsFilled = false;
 
@@ -34,7 +35,9 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
           pecController.text.trim().isNotEmpty &&
           recapitoFatturazioneController.text.trim().isNotEmpty &&
           emailController.text.trim().isNotEmpty &&
-          sitoController.text.trim().isNotEmpty;
+          sitoController.text.trim().isNotEmpty &&
+          telefonoController.text.trim().isNotEmpty;
+
     });
   }
 
@@ -47,6 +50,7 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
       'pec': pecController.text.toString(),
       'recapito_fatturazione_elettronica': recapitoFatturazioneController.text.toString(),
       'email': emailController.text.toString(),
+      'telefono': telefonoController.text.toString(),
       'sito': sitoController.text.toString()
     });
     try {
@@ -186,6 +190,23 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
               decoration: InputDecoration(
                 labelText: 'Email',
                 hintText: 'Inserisci l\'indirizzo email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.red),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextFormField(
+              controller: telefonoController,
+              onChanged: (_) => _updateAreFieldsFilled(),
+              decoration: InputDecoration(
+                labelText: 'Telefono',
+                hintText: 'Inserisci il numero di telefono',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.grey),

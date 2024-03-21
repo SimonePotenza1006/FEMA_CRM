@@ -4,18 +4,19 @@ import 'dart:convert';
 
 import 'package:fema_crm/model/PreventivoModel.dart';
 import 'package:fema_crm/model/ProdottoModel.dart';
+import 'ModificaSelezioneProdottiPreventivoByAgentePage.dart';
 import 'ModificaSelezioneProdottiPreventivoPage.dart';
 
-class AggiuntaProdottoPreventivoPage extends StatefulWidget {
+class AggiuntaProdottoPreventivoByAgentePage extends StatefulWidget {
   final PreventivoModel preventivo;
 
-  const AggiuntaProdottoPreventivoPage({Key? key, required this.preventivo}) : super(key: key);
+  const AggiuntaProdottoPreventivoByAgentePage({Key? key, required this.preventivo}) : super(key: key);
 
   @override
-  _AggiuntaProdottoPreventivoPageState createState() => _AggiuntaProdottoPreventivoPageState();
+  _AggiuntaProdottoPreventivoByAgentePageState createState() => _AggiuntaProdottoPreventivoByAgentePageState();
 }
 
-class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPreventivoPage> {
+class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdottoPreventivoByAgentePage> {
   bool isSearching = false;
   late TextEditingController searchController;
   List<ProdottoModel> prodottiList = [];
@@ -97,7 +98,7 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.3), // Sfondo azzurro per i prodotti selezionati
+              color: Colors.yellowAccent.withOpacity(0.3),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -243,7 +244,7 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ModificaSelezioneProdottiPreventivoPage(prodottiSelezionati: selectedProducts.toList(), preventivo: widget.preventivo),
+              builder: (context) => ModificaSelezioneProdottiPreventivoByAgentePage(prodottiSelezionati: selectedProducts.toList(), preventivo: widget.preventivo),
             ),
           );
         },

@@ -3,27 +3,25 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-import '../model/AgenteModel.dart';
-import '../model/PreventivoModel.dart';
-import 'DettaglioPreventivoPerAgentePage.dart';
+import '../model/CommissioneModel.dart';
+import '../model/UtenteModel.dart';
 
-class ReportPreventiviPerAgentePage extends StatefulWidget {
-  const ReportPreventiviPerAgentePage({Key? key}) : super(key: key);
+class ReportCommissioniPerAgentePage extends StatefulWidget {
+  const ReportCommissioniPerAgentePage({Key? key}) : super(key: key);
 
   @override
-  _ReportPreventiviPerAgentePageState createState() =>
-      _ReportPreventiviPerAgentePageState();
+  _ReportCommissioniPerAgentePageState createState() => _ReportCommissioniPerAgentePageState();
 }
 
-class _ReportPreventiviPerAgentePageState
-    extends State<ReportPreventiviPerAgentePage> {
-  List<AgenteModel> agentiList = [];
-  Map<String, List<PreventivoModel>> preventiviPerAgenteMap = {};
+class _ReportCommissioniPerAgentePageState extends State<ReportCommissioniPerAgentePage>{
+
+  List<UtenteModel> utentiList = [];
+  Map<String, List<CommissioneModel>> commissioniPerUtenteMap = {};
 
   @override
   void initState() {
     super.initState();
-    getAllAgenti();
+    getAllUtenti();
   }
 
   @override
@@ -31,7 +29,7 @@ class _ReportPreventiviPerAgentePageState
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Preventivi per agente',
+          'Commissioni per utente',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red,
@@ -56,10 +54,8 @@ class _ReportPreventiviPerAgentePageState
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
-                        Text('Giallo: Accettato e in attesa di consegna'),
-                        Text('Rosso: Rifiutato'),
-                        Text('Verde: Consegnato'),
-                        Text('Bianco: Attesa di accettazione'),
+                        Text('Rosso: Non concluso'),
+                        Text('Verde: Concluso'),
                       ],
                     ),
                   );
@@ -75,22 +71,20 @@ class _ReportPreventiviPerAgentePageState
           scrollDirection: Axis.horizontal,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildAgentTables(),
+            children: _buildUtentiTables(),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildAgentTables() {
-    if (agentiList.isEmpty) {
-      return [Text('Nessun agente trovato')];
+  List<Widget> _buildUtentiTables() {
+    if (utentiList.isEmpty) {
+      return [Text('Nessun utente trovato')];
     }
-
     List<Widget> tables = [];
-
-    for (var agente in agentiList) {
-      final preventivi = preventiviPerAgenteMap[agente.id!] ?? [];
+    for (var utente in utentiList) {
+      final commissioni = commissioniPerUtenteMap[utente.id!] ?? [];
       tables.add(
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -98,97 +92,71 @@ class _ReportPreventiviPerAgentePageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Agente: ${agente.nome} ${agente.cognome}',
+                'Utente: ${utente.nome} ${utente.cognome}',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Text(
-                'Totale preventivi emessi: ${preventivi.length}',
+                'Totale commissioni svolte: ${commissioni.length}',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               DataTable(
                 columns: [
-                  DataColumn(label: Text('Cliente')),
-                  DataColumn(label: Text('Importo')),
-                  DataColumn(label: Text('Accettato')),
-                  DataColumn(label: Text('Rifiutato')),
-                  DataColumn(label: Text('Consegnato')),
                   DataColumn(label: Text('Data Creazione')),
-                  DataColumn(label: Text('Data Accettazione')),
-                  DataColumn(label: Text('Data Consegna')),
+                  DataColumn(label: Text('Data')),
+                  DataColumn(label: Text('Descrizione')),
+                  DataColumn(label: Text('Note')),
                 ],
-                rows: _buildRows(preventivi, agente.id!),
+                rows: _buildRows(commissioni, utente.id!),
               ),
             ],
           ),
         ),
       );
-
-      if (agentiList.last != agente) {
+      if (utentiList.last != utente) {
         tables.add(SizedBox(height: 20));
       }
     }
-
     return tables;
   }
 
-  List<DataRow> _buildRows(List<PreventivoModel> preventivi, String agenteId) {
-    return preventivi.map((preventivo) {
+
+  List<DataRow> _buildRows(List<CommissioneModel> commissioni, String utenteId) {
+    return commissioni.map((commissione) {
       Color backgroundColor = Colors.white;
       Color textColor = Colors.black;
 
-      if (preventivo.accettato ?? false) {
-        backgroundColor = Colors.yellow;
-      } else if (preventivo.rifiutato ?? false) {
+      if (commissione.concluso ?? false) {
+        backgroundColor = Colors.green;
+      } else {
         backgroundColor = Colors.red;
         textColor = Colors.white;
-      } else if (preventivo.consegnato ?? false) {
-        backgroundColor = Colors.green;
-        textColor = Colors.white;
-      } else if (preventivo.pendente ?? false) {
-        backgroundColor = Colors.orangeAccent;
       }
 
       return DataRow(
         color: MaterialStateColor.resolveWith((states) => backgroundColor),
         cells: [
           DataCell(Text(
-            preventivo.cliente?.denominazione ?? 'N/A',
+            commissione.data_creazione != null ? DateFormat('yyyy-MM-dd').format(commissione.data_creazione!) : 'N/A',
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
-            preventivo.importo != null ? '${preventivo.importo!.toStringAsFixed(2)} \u20AC' : 'N/A',
+            commissione.data != null ? DateFormat('yyyy-MM-dd').format(commissione.data!) : 'N/A',
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
-            preventivo.accettato ?? false ? 'SI' : 'NO',
+            commissione.descrizione != null ? commissione.descrizione.toString() : 'N/A',
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
-            preventivo.rifiutato ?? false ? 'SI' : 'NO',
-            style: TextStyle(color: textColor),
-          )),
-          DataCell(Text(
-            preventivo.consegnato ?? false ? 'SI' : 'NO',
-            style: TextStyle(color: textColor),
-          )),
-          DataCell(Text(
-            preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!) : 'N/A',
-            style: TextStyle(color: textColor),
-          )),
-          DataCell(Text(
-            preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_accettazione!) : 'N/A',
-            style: TextStyle(color: textColor),
-          )),
-          DataCell(Text(
-            preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_consegna!) : 'N/A',
+            commissione.note != null ? commissione.note.toString() : 'N/A',
             style: TextStyle(color: textColor),
           )),
         ].map<DataCell>((cell) {
           return DataCell(
             InkWell(
               onTap: () {
-                _handleRowTap(preventivo);
+                _handleRowTap(commissione);
               },
               child: cell.child,
             ),
@@ -198,29 +166,30 @@ class _ReportPreventiviPerAgentePageState
     }).toList();
   }
 
-  void _handleRowTap(PreventivoModel preventivo) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DettaglioPreventivoPerAgentePage(preventivo: preventivo),
-      ),
-    );
+  void _handleRowTap(CommissioneModel commissione) {
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => DettaglioPreventivoPerAgentePage(preventivo: preventivo),
+    //   ),
+    // );
   }
 
-  Future<void> getAllAgenti() async {
+
+  Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/agente');
+      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
-        List<AgenteModel> agenti = [];
+        List<UtenteModel> utenti = [];
         for (var item in jsonData) {
-          agenti.add(AgenteModel.fromJson(item));
+          utenti.add(UtenteModel.fromJson(item));
         }
         setState(() {
-          agentiList = agenti;
+          utentiList = utenti;
         });
-        await getAllPreventiviOrderedByAgente();
+        await getAllCommissioniOrderedByUtente();
       } else {
         throw Exception('Failed to load agenti data from API: ${response.statusCode}');
       }
@@ -246,30 +215,32 @@ class _ReportPreventiviPerAgentePageState
     }
   }
 
-  Future<void> getAllPreventiviOrderedByAgente() async {
-    for (var agente in agentiList) {
-      await getAllPreventiviForAgente(agente.id!);
+  Future<void> getAllCommissioniOrderedByUtente() async {
+    for (var utente in utentiList) {
+      await getAllCommissioniForUtente(utente.id!);
     }
   }
 
-  Future<void> getAllPreventiviForAgente(String agenteId) async {
+
+  Future<void> getAllCommissioniForUtente(String utenteId) async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/preventivo/agente/$agenteId');
+      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/commissione/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
-        List<PreventivoModel> preventivi = [];
+        List<CommissioneModel> commissioni = [];
         for (var item in jsonData) {
-          preventivi.add(PreventivoModel.fromJson(item));
+          commissioni.add(CommissioneModel.fromJson(item));
         }
         setState(() {
-          preventiviPerAgenteMap[agenteId] = preventivi;
+          commissioniPerUtenteMap[utenteId] = commissioni;
         });
       } else {
-        throw Exception('Failed to load preventivi data from API: ${response.statusCode}');
+        throw Exception('Failed to load commissioni data from API: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching preventivi data from API for agente $agenteId: $e');
+      print('Error fetching commissioni data from API for utente $utenteId: $e');
     }
   }
+
 }

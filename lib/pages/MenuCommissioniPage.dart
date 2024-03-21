@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:fema_crm/model/UtenteModel.dart';
-import 'package:fema_crm/pages/ReportPreventiviPage.dart';
 
-import 'RegistrazioneAgentePage.dart';
-import 'RegistrazioneAziendaPage.dart';
-import 'RegistrazionePreventivoAmministrazionePage.dart';
-import 'ReportPreventiviPerAgentePage.dart';
+import 'AssegnazioneCommissionePage.dart';
+import 'ReportCommissioniPage.dart';
+import 'ReportCommissioniPerAgentePage.dart';
 
-class LogisticaPreventiviHomepage extends StatefulWidget {
-  final UtenteModel userData;
-
-  const LogisticaPreventiviHomepage({Key? key, required this.userData}) : super(key: key);
+class MenuCommissioniPage extends StatefulWidget {
+  const MenuCommissioniPage ({Key? key}) : super(key: key);
 
   @override
-  _LogisticaPreventiviHomepageState createState() => _LogisticaPreventiviHomepageState();
+  _MenuCommissioniPageState createState() => _MenuCommissioniPageState();
 }
 
-class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepage> {
+class _MenuCommissioniPageState extends State<MenuCommissioniPage> {
+
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Logistica e Preventivi', style: TextStyle(color: Colors.white)),
+        title: const Text('Commissioni', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
@@ -33,57 +30,36 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                buildMenuButton(
-                  icon: Icons.business_outlined,
-                  text: 'Registra Azienda',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegistrazioneAziendaPage()),
-                    );
-                  },
-                ),
-                SizedBox(height: 10),
-                buildMenuButton(
-                  icon: Icons.person_add_alt_1_outlined,
-                  text: 'Registra Agente',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RegistrazioneAgentePage()),
-                    );
-                  },
-                ),
                 SizedBox(height: 10),
                 buildMenuButton(
                   icon: Icons.playlist_add_outlined,
-                  text: 'Registra Preventivo',
+                  text: 'Assegna Commissione',
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => RegistrazionePreventivoAmministrazionePage(userData: widget.userData)),
+                      MaterialPageRoute(builder: (context) => AssegnazioneCommissionePage()),
                     );
                   },
                 ),
                 SizedBox(height: 10),
                 buildMenuButton(
                   icon: Icons.bar_chart_outlined,
-                  text: 'Report Preventivi',
+                  text: 'Report Commissioni',
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const ReportPreventiviPage()),
+                      MaterialPageRoute(builder: (context) => ReportCommissioniPage()),
                     );
                   },
                 ),
                 SizedBox(height: 10),
                 buildMenuButton(
                   icon: Icons.folder_shared_outlined,
-                  text: 'Report Preventivi per agente',
+                  text: 'Report Commissioni per utente',
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const ReportPreventiviPerAgentePage()),
+                      MaterialPageRoute(builder: (context) => const ReportCommissioniPerAgentePage()),
                     );
                   },
                 ),

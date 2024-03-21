@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fema_crm/pages/HomeFormTecnico.dart';
 import 'package:fema_crm/pages/ReportPreventiviPage.dart';
 import 'package:flutter/material.dart';
 import 'package:fema_crm/model/ProdottoModel.dart';
@@ -7,24 +8,24 @@ import '../model/PreventivoModel.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class ModificaSelezioneProdottiPreventivoPage extends StatefulWidget {
+class ModificaSelezioneProdottiPreventivoByAgentePage extends StatefulWidget {
   final List<ProdottoModel> prodottiSelezionati;
   final PreventivoModel preventivo;
 
-  const ModificaSelezioneProdottiPreventivoPage({
+  const ModificaSelezioneProdottiPreventivoByAgentePage({
     Key? key,
     required this.prodottiSelezionati,
     required this.preventivo,
   }) : super(key: key);
 
   @override
-  _ModificaSelezioneProdottiPreventivoPageState createState() =>
-      _ModificaSelezioneProdottiPreventivoPageState();
+  _ModificaSelezioneProdottiPreventivoByAgentePageState createState() =>
+      _ModificaSelezioneProdottiPreventivoByAgentePageState();
 }
 
-class _ModificaSelezioneProdottiPreventivoPageState
-    extends State<ModificaSelezioneProdottiPreventivoPage> {
-  late List<double> quantitaProdotti;
+class _ModificaSelezioneProdottiPreventivoByAgentePageState
+    extends State<ModificaSelezioneProdottiPreventivoByAgentePage> {
+  late List<int> quantitaProdotti;
   late List<TextEditingController> quantityControllers;
   late Timer _debounce;
 
@@ -61,7 +62,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
     // Avvia un nuovo debounce
     _debounce = Timer(Duration(milliseconds: 500), () {
       setState(() {
-        quantitaProdotti[index] = double.tryParse(value) ?? 0;
+        quantitaProdotti[index] = int.tryParse(value) ?? 0;
       });
     });
   }
@@ -74,7 +75,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
           widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
       double listino =
           double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
-      double quantity = quantitaProdotti[i];
+      int quantity = quantitaProdotti[i];
 
       totalAmount +=
           (productPrice + (productPrice * (listino / 100))) * quantity;
@@ -93,7 +94,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
           widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
       double listino =
           double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
-      double quantity = quantitaProdotti[i];
+      int quantity = quantitaProdotti[i];
 
       // Calcola il prezzo finale del prodotto con il listino applicato
       double finalProductPrice = productPrice + (productPrice * (listino / 100));
@@ -165,13 +166,6 @@ class _ModificaSelezioneProdottiPreventivoPageState
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Totale provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
@@ -220,23 +214,13 @@ class _ModificaSelezioneProdottiPreventivoPageState
                             ),
                             Padding(
                               padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                'Totale Provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
                               child: ElevatedButton(
                                 onPressed: () {
                                   aggiornaPreventivo();
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ReportPreventiviPage(),
+                                      builder: (context) => HomeFormTecnico(userData: widget.preventivo.utente),
                                     ),
                                   );
                                 },

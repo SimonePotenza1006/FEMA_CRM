@@ -66,7 +66,7 @@ class ProdottoModel {
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
-      'codice_danea': codice_danea,
+      'codiceDanea': codice_danea,
       'descrizione': descrizione,
       'tipologia' : tipologia,
       'categoria': categoria,
@@ -87,7 +87,7 @@ class ProdottoModel {
       'ultimo_costo_acquisto': ultimo_costo_acquisto,
       'prezzo_medio_vendita': prezzo_medio_vendita,
       'stato_magazzino' : stato_magazzino,
-      'lotto_seriale': lotto_seriale,
+      'lottoSeriale': lotto_seriale,
       'preventivi': preventivi?.map((e) => e.toMap()).toList(),
       'sopralluoghi': sopralluoghi?.map((e) => e.toMap()).toList(),
       'relazioni_ddt': relazioni_ddt?.map((e) => e.toMap()).toList()
@@ -97,7 +97,7 @@ class ProdottoModel {
 
   ProdottoModel.fromMap(Map<String, dynamic> map) {
       id = map['id'];
-      codice_danea = map['codice_danea'];
+      codice_danea = map['codiceDanea'];
       descrizione = map['descrizione'];
       tipologia = map['tipologia'];
       categoria = map['categoria'];
@@ -118,7 +118,7 @@ class ProdottoModel {
       ultimo_costo_acquisto = map['ultimo_costo_acquisto'];
       prezzo_medio_vendita = map['prezzo_medio_vendita'];
       stato_magazzino = map['stato_magazzino'];
-      lotto_seriale = map['lotto_seriale'];
+      lotto_seriale = map['lottoSeriale'];
       preventivi = (map['preventivi'] as List<dynamic>?)
           ?.map((e) => PreventivoModel.fromMap(e))
           .toList();
@@ -133,7 +133,7 @@ class ProdottoModel {
   Map<String, dynamic> toJson() {
     return {
       'id': int.parse(id.toString()),
-      'codice_danea': codice_danea,
+      'codiceDanea': codice_danea,
       'descrizione': descrizione,
       'tipologia': tipologia,
       'categoria': categoria,
@@ -154,7 +154,7 @@ class ProdottoModel {
       'ultimo_costo_acquisto': ultimo_costo_acquisto,
       'prezzo_medio_vendita': prezzo_medio_vendita,
       'stato_magazzino': stato_magazzino,
-      'lotto_seriale': lotto_seriale,
+      'lottoSeriale': lotto_seriale,
       'preventivi': preventivi?.map((e) => e.toJson()).toList(),
       'sopralluoghi': sopralluoghi?.map((e) => e.toJson()).toList(),
       'relazioniDdt': relazioni_ddt?.map((e) => e.toJson()).toList(),
@@ -164,7 +164,7 @@ class ProdottoModel {
   factory ProdottoModel.fromJson(Map<String, dynamic> json) {
     return ProdottoModel(
       json['id'].toString(),
-      json['codice_danea'],
+      json['codiceDanea'],
       json['descrizione'],
       json['tipologia'],
       json['categoria'],
@@ -185,7 +185,7 @@ class ProdottoModel {
       json['ultimo_costo_acquisto'],
       json['prezzo_medio_vendita'],
       json['stato_magazzino'],
-      json['lotto_seriale'],
+      json['lottoSeriale'],
       json['preventivi'] != null ? (json['preventivi'] as List<dynamic>?)
           ?.map((e) => PreventivoModel.fromJson(e))
           .toList() : null,

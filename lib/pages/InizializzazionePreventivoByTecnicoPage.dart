@@ -1,7 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:fema_crm/model/AziendaModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/model/ClienteModel.dart';
@@ -9,24 +8,23 @@ import 'package:fema_crm/model/DestinazioneModel.dart';
 
 import '../model/AgenteModel.dart';
 
-class RegistrazionePreventivoAmministrazionePage extends StatefulWidget {
-  final UtenteModel userData;
+class InizializzazionePreventivoByTecnicoPage extends StatefulWidget {
+  final UtenteModel utente;
 
-  const RegistrazionePreventivoAmministrazionePage({Key? key, required this.userData}) : super(key: key);
+  const InizializzazionePreventivoByTecnicoPage({Key? key, required this.utente}) : super(key: key);
 
   @override
-  _RegistrazionePreventivoAmministrazionePageState createState() => _RegistrazionePreventivoAmministrazionePageState();
+  _InizializzazionePreventivoByTecnicoPageState createState() =>
+      _InizializzazionePreventivoByTecnicoPageState();
 }
 
-class _RegistrazionePreventivoAmministrazionePageState extends State<RegistrazionePreventivoAmministrazionePage> {
-  TextEditingController clienteController = TextEditingController();
-
-  AziendaModel? selectedAzienda;
-  AgenteModel? selectedAgente;
+class _InizializzazionePreventivoByTecnicoPageState extends State<InizializzazionePreventivoByTecnicoPage> {
   String? selectedCategoria;
   String? selectedListino;
   ClienteModel? selectedCliente;
   DestinazioneModel? selectedDestinazione;
+  AgenteModel? agente;
+  AziendaModel? selectedAzienda;
 
   List<AziendaModel> aziendeList = [];
   List<ClienteModel> clientiList = [];
@@ -37,9 +35,15 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
   @override
   void initState() {
     super.initState();
-    getAllAziende();
-    getAllAgenti();
-    getAllClienti();
+    initializeData();
+  }
+
+  Future<void> initializeData() async {
+    await getAllAziende();
+    await getAllAgenti();
+    await getAllClienti();
+    await findAgente();
+    await findAndSetAzienda();
   }
 
   @override
@@ -61,44 +65,6 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
-                  SizedBox(
-                    height: 50,
-                    child: DropdownButton<AziendaModel>(
-                      value: selectedAzienda,
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedAzienda = newValue;
-                        });
-                      },
-                      items: aziendeList.map((azienda) {
-                        return DropdownMenuItem<AziendaModel>(
-                          value: azienda,
-                          child: Text(azienda.nome.toString()),
-                        );
-                      }).toList(),
-                      hint: Text('Seleziona Azienda'),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () {
-                      _showAgentiDialog();
-                    },
-                    child: SizedBox(
-                      height: 50,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedAgente?.nome ?? 'Seleziona Agente',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Icon(Icons.arrow_drop_down),
-                        ],
-                      ),
-                    ),
-                  ),
                   SizedBox(height: 16),
                   SizedBox(
                     height: 50,
@@ -137,12 +103,12 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
                         });
                       },
                       items: [
-                        '15%',
-                        '30%',
-                        '35%',
-                        '40%',
-                        '45%',
-                        '50%',
+                        'Listino 0',
+                        'Listino 1',
+                        'Listino 2',
+                        'Listino 3',
+                        'Listino 4',
+                        'Listino 5',
                       ].map((listino) {
                         return DropdownMenuItem<String>(
                           value: listino,
@@ -220,51 +186,65 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
     );
   }
 
-  Future<void> getAllAgenti() async {
-    try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/agente');
-      var response = await http.get(apiUrl);
+  Future<void> savePrimePreventivo() async {
+    String? selectedListinoValue;
 
-      if(response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-        List<AgenteModel> agenti = [];
-        for(var item in jsonData) {
-          agenti.add(AgenteModel.fromJson(item));
-        }
-        setState(() {
-          agentiList = agenti;
-        });
-      } else {
-        throw Exception('Failed to load data from API: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Errore durante la chiamata all\'API: $e');
-      _showErrorDialog();
+    // Assegna il valore corretto a selectedListinoValue in base all'opzione selezionata
+    switch (selectedListino) {
+      case 'Listino 0':
+        selectedListinoValue = '15%';
+        break;
+      case 'Listino 1':
+        selectedListinoValue = '30%';
+        break;
+      case 'Listino 2':
+        selectedListinoValue = '35%';
+        break;
+      case 'Listino 3':
+        selectedListinoValue = '40%';
+        break;
+      case 'Listino 4':
+        selectedListinoValue = '45%';
+        break;
+      case 'Listino 5':
+        selectedListinoValue = '50%';
+        break;
+      default:
+      // Se nessun valore corrisponde, mantieni il valore attuale di selectedListino
+        selectedListinoValue = selectedListino;
+    }
+
+    try {
+      final response = await http.post(
+          Uri.parse('http://192.168.1.52:8080/api/preventivo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'azienda' : selectedAzienda?.toMap(),
+            'agente': agente?.toMap(),
+            'categoria_merceologica' : selectedCategoria.toString(),
+            'listino': selectedListinoValue, // Utilizza selectedListinoValue invece di selectedListino
+            'cliente' : selectedCliente?.toMap(),
+            'destinazione' : selectedDestinazione?.toMap(),
+            'accettato' : false,
+            'rifiutato' : false,
+            'attesa': true,
+            'pendente':false,
+            'consegnato' : false,
+            'descrizione' : "Destinazione: " + selectedDestinazione!.denominazione.toString(),
+            'utente' : widget.utente.toMap(),
+          })
+      );
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Preventivo registrato, attesa di compilazione completa'),
+        ),
+      );
+    } catch (e){
+      print('Errore durante il salvataggio del preventivo');
     }
   }
 
-  Future<void> getAllAziende() async {
-    try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/azienda');
-      var response = await http.get(apiUrl);
-
-      if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-        List<AziendaModel> aziende = [];
-        for (var item in jsonData) {
-          aziende.add(AziendaModel.fromJson(item));
-        }
-        setState(() {
-          aziendeList = aziende;
-        });
-      } else {
-        throw Exception('Failed to load data from API: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Errore durante la chiamata all\'API: $e');
-      _showErrorDialog();
-    }
-  }
 
   Future<void> getAllClienti() async {
     try {
@@ -290,43 +270,10 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
     }
   }
 
-  Future<void> savePrimePreventivo() async {
-    try {
-      final response = await http.post(
-          Uri.parse('http://192.168.1.52:8080/api/preventivo'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'azienda' : selectedAzienda?.toMap(),
-            'agente': selectedAgente?.toMap(),
-            'categoria_merceologica' : selectedCategoria.toString(),
-            'listino':selectedListino.toString(),
-            'cliente' : selectedCliente?.toMap(),
-            'accettato' : false,
-            'rifiutato' : false,
-            'attesa': true,
-            'pendente':false,
-            'consegnato' : false,
-            'destinazione' : selectedDestinazione?.toMap(),
-            'descrizione' : "Destinazione: " + selectedDestinazione!.denominazione.toString(),
-            'utente' : widget.userData.toMap(),
-          })
-      );
-      Navigator.pop(context);
-      print(selectedDestinazione?.toMap().toString());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Preventivo registrato, attesa di compilazione completa'),
-        ),
-      );
-    } catch (e){
-      print('Errore durante il salvataggio del preventivo');
-    }
-  }
-
-  Future<void> getAllDestinazioniByCliente(String clientId) async{
+  Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
       final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/destinazione/cliente/$clientId'));
-      if(response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
           allDestinazioniByCliente = responseData.map((data) => DestinazioneModel.fromJson(data)).toList();
@@ -334,7 +281,7 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
       } else {
         throw Exception('Failed to load Destinazioni per cliente');
       }
-    } catch(e) {
+    } catch (e) {
       print('Errore durante la richiesta HTTP: $e');
     }
   }
@@ -375,11 +322,11 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
                         return ListTile(
                           leading: Icon(Icons.contact_page_outlined),
                           title: Text(cliente.denominazione! + ", " + cliente.indirizzo!),
-                          onTap: () {
+                          onTap: () async {
                             setState(() {
                               selectedCliente = cliente;
-                              getAllDestinazioniByCliente(cliente.id!);
                             });
+                            await getAllDestinazioniByCliente(cliente.id!);
                             Navigator.of(context).pop();
                           },
                         );
@@ -436,47 +383,6 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
     );
   }
 
-  void _showAgentiDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Seleziona Agente',
-            textAlign: TextAlign.center,
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: agentiList.map((agente) {
-                        return ListTile(
-                          leading: Icon(Icons.person),
-                          title: Text(agente.nome! + " " + agente.cognome!),
-                          onTap: () {
-                            setState(() {
-                              selectedAgente = agente;
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   void _showErrorDialog() {
     showDialog(
       context: context,
@@ -497,5 +403,82 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
         );
       },
     );
+  }
+
+  Future<void> getAllAgenti() async {
+    try {
+      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/agente');
+      var response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<AgenteModel> agenti = [];
+        for (var item in jsonData) {
+          agenti.add(AgenteModel.fromJson(item));
+        }
+        setState(() {
+          agentiList = agenti;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+      _showErrorDialog();
+    }
+  }
+
+  Future<void> getAllAziende() async {
+    try {
+      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/azienda');
+      var response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<AziendaModel> aziende = [];
+        for (var item in jsonData) {
+          aziende.add(AziendaModel.fromJson(item));
+        }
+        setState(() {
+          aziendeList = aziende;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+      _showErrorDialog();
+    }
+  }
+
+  Future<void> findAgente() async {
+    await getAllAgenti();
+    for (var agente in agentiList) {
+      if (agente.nome == widget.utente.nome && agente.cognome == widget.utente.cognome) {
+        setState(() {
+          this.agente = agente;
+        });
+        print('Agente: ${agente.nome} ${agente.cognome}');
+        break;
+      }
+    }
+  }
+
+  Future<void> findAndSetAzienda() async {
+    await findAgente();
+    if (agente != null) {
+      String? aziendaName = agente!.riferimento_aziendale;
+      AziendaModel? foundAzienda;
+      for (var azienda in aziendeList) {
+        if (azienda.nome == aziendaName) {
+          foundAzienda = azienda;
+          break;
+        }
+      }
+      setState(() {
+        selectedAzienda = foundAzienda;
+      });
+      print('Azienda: ${selectedAzienda?.nome}');
+    }
   }
 }

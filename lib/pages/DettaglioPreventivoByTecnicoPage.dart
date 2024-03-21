@@ -6,20 +6,20 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../model/ProdottoModel.dart';
+import 'AggiuntaProdottiPreventivoByAgentePage.dart';
 import 'AggiuntaProdottoPreventivoPage.dart';
 import 'PDFPreventivoPage.dart';
 
-class DettaglioPreventivoAmministrazionePage extends StatefulWidget {
+class DettaglioPreventivoByTecnicoPage extends StatefulWidget {
   final PreventivoModel preventivo;
-  final VoidCallback? onNavigateBack;
 
-  const DettaglioPreventivoAmministrazionePage({Key? key, required this.preventivo, this.onNavigateBack}) : super(key: key);
+  const DettaglioPreventivoByTecnicoPage({Key? key, required this.preventivo}) : super(key: key);
 
   @override
-  _DettaglioPreventivoAmministrazionePageState createState() => _DettaglioPreventivoAmministrazionePageState();
+  _DettaglioPreventivoByTecnicoPageState createState() => _DettaglioPreventivoByTecnicoPageState();
 }
 
-class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreventivoAmministrazionePage> {
+class _DettaglioPreventivoByTecnicoPageState extends State<DettaglioPreventivoByTecnicoPage> {
   late http.Response response;
   List<RelazionePreventivoProdottiModel> allProdotti = [];
 
@@ -101,7 +101,7 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
               ),
               SizedBox(height: 4.0),
               Text(
-                '${widget.preventivo.utente?.cognome ?? 'N/A'}',
+                '${widget.preventivo.utente?.nome}',
                 style: TextStyle(fontSize: 16.0),
               ),
               SizedBox(height: 8.0),
@@ -184,18 +184,6 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
               ),
               SizedBox(height: 8.0),
               buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Provvigioni:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.provvigioni != null ? '${widget.preventivo.provvigioni?.toStringAsFixed(2)} \u20AC' : 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8.0),
               Text(
                 'Accettato:',
@@ -287,7 +275,7 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AggiuntaProdottoPreventivoPage(preventivo: widget.preventivo),
+                          builder: (context) => AggiuntaProdottoPreventivoByAgentePage(preventivo: widget.preventivo),
                         ),
                       );
                     },
@@ -392,6 +380,7 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
       var response = await http.get(apiUrl);
 
       if(response.statusCode == 200){
+        debugPrint('JSON ricevuto: ${response.body}', wrapWidth: 1024);
         var jsonData = jsonDecode(response.body);
         List<RelazionePreventivoProdottiModel> prodotti =[];
         for(var item in jsonData) {
@@ -443,7 +432,6 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
           'descrizione': widget.preventivo.descrizione,
           'importo': widget.preventivo.importo,
           'cliente': widget.preventivo.cliente?.toJson(),
-          'destinazione': widget.preventivo.destinazione?.toJson(),
           'accettato': true,
           'rifiutato' : false,
           'attesa': false,
@@ -460,11 +448,9 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
       if (response.statusCode == 201) {
         print("Preventivo accettato");
         Navigator.pop(context);
-        if (widget.onNavigateBack != null) {
-          widget.onNavigateBack!();
-        }
       } else {
         print("Hai toppato :(");
+        print(response.body.toString());
       }
     } catch(e) {
       print(e.toString());
@@ -489,7 +475,6 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
           'descrizione': widget.preventivo.descrizione,
           'importo': widget.preventivo.importo,
           'cliente': widget.preventivo.cliente?.toJson(),
-          'destinazione': widget.preventivo.destinazione?.toJson(),
           'accettato': false,
           'rifiutato': true,
           'attesa': false,
@@ -506,11 +491,9 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
       if (response.statusCode == 201) {
         print("Preventivo rifiutato");
         Navigator.pop(context);
-        if (widget.onNavigateBack != null) {
-          widget.onNavigateBack!();
-        }
       } else {
         print("Hai toppato :(");
+        print(response.body.toString());
       }
     } catch (e) {
       print(e.toString());
@@ -535,7 +518,6 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
           'descrizione': widget.preventivo.descrizione,
           'importo': widget.preventivo.importo,
           'cliente': widget.preventivo.cliente?.toJson(),
-          'destinazione': widget.preventivo.destinazione?.toJson(),
           'accettato': false,
           'rifiutato': false,
           'attesa': false,
@@ -552,11 +534,9 @@ class _DettaglioPreventivoAmministrazionePageState extends State<DettaglioPreven
       if (response.statusCode == 201) {
         print("Preventivo consegnato");
         Navigator.pop(context);
-        if (widget.onNavigateBack != null) {
-          widget.onNavigateBack!();
-        }
       } else {
         print("Hai toppato :(");
+        print(response.body.toString());
       }
     } catch (e) {
       print(e.toString());

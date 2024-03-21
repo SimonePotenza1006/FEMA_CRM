@@ -7,11 +7,12 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../model/InterventoModel.dart';
 import 'package:intl/intl.dart';
-import 'CompilazioneDDTByTecnicoPage.dart';
 import 'package:http/http.dart' as http;
 import 'ScannerBarCodePage.dart';
 import 'ScannerQrCodePage.dart';
 import 'CompilazioneRapportinoPage.dart'; // Importa il pacchetto per il formato delle date
+import 'package:fema_crm/model/RelazioneDdtProdottiModel.dart';
+
 
 class DettaglioInterventoByTecnicoPage extends StatefulWidget {
   final InterventoModel intervento;
@@ -25,6 +26,8 @@ class DettaglioInterventoByTecnicoPage extends StatefulWidget {
 class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoByTecnicoPage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy'); // Formato della data
   final DateFormat timeFormat = DateFormat('HH:mm');
+
+  List<RelazioneDdtProdottoModel> prodotti = [];
 
 
   @override
@@ -60,9 +63,8 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CompilazioneDDTByTecnicoPage(intervento: widget.intervento)),
+                      MaterialPageRoute(builder: (context) => ScannerQrCodePage(intervento: widget.intervento)),
                     );
-                    savePrimeDDT();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), // Padding interno
@@ -70,7 +72,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                     primary: Colors.red, // Colore di sfondo del pulsante
                   ),
                   child: Text(
-                    'Allega DDT',
+                    'Scannerizza QrCode',
                     style: TextStyle(color: Colors.white), // Colore del testo
                   ),
                 ),
@@ -92,26 +94,6 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                   ),
                   child: Text(
                     'Compila rapportino',
-                    style: TextStyle(color: Colors.white), // Colore del testo
-                  ),
-                ),
-              ),
-              SizedBox(height: 20), // Spazio tra gli ultimi dettagli e il pulsante
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ScannerBarCodePage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), // Padding interno
-                    textStyle: TextStyle(fontSize: 20), // Dimensione del testo
-                    primary: Colors.red, // Colore di sfondo del pulsante
-                  ),
-                  child: Text(
-                    'Scanner Barcode',
                     style: TextStyle(color: Colors.white), // Colore del testo
                   ),
                 ),
@@ -145,46 +127,4 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
       ],
     );
   }
-
-  Future<void> savePrimeDDT() async {
-    try {
-      Map<String, dynamic> body = {
-        'data': widget.intervento.data?.toIso8601String(),
-        'orario': DateTime.now().toIso8601String(),
-        'concluso': false,
-        'firmaUser': null,
-        'imageData': null,
-        'cliente': widget.intervento.cliente?.toMap(),
-        'destinazione': widget.intervento.destinazione?.toMap(),
-        'categoriaDdt': {
-          'id': 1,
-          'descrizione': "DDT Intervento"
-        },
-        'utente': widget.intervento.utente?.toMap(),
-        'intervento': widget.intervento.toMap(),
-        'relazioni_prodotti': null,
-      };
-
-      debugPrint('Body della richiesta: $body', wrapWidth: 1024);
-
-      final response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/ddt'),
-        body: jsonEncode(body),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
-      print('Risposta: ${response.statusCode} - ${response.body}');
-
-      if (response.statusCode == 201) {
-        print('DDT inizializzato, daje');
-      } else {
-        print('Qualcosa non va');
-      }
-    } catch (e) {
-      print('Errore: $e');
-    }
-  }
-
 }

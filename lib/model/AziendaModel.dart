@@ -6,6 +6,7 @@ class AziendaModel {
   String? pec;
   String? recapito_fatturazione_elettronica;
   String? email;
+  String? telefono;
   String? sito;
 
   AziendaModel(
@@ -16,6 +17,7 @@ class AziendaModel {
       this.pec,
       this.recapito_fatturazione_elettronica,
       this.email,
+      this.telefono,
       this.sito
       );
 
@@ -28,6 +30,7 @@ class AziendaModel {
       'pec': pec,
       'recapito_fatturazione_elettronica': recapito_fatturazione_elettronica,
       'email': email,
+      'telefono' : telefono,
       'sito': sito
     };
     return map;
@@ -41,6 +44,7 @@ class AziendaModel {
     pec = map['pec'];
     recapito_fatturazione_elettronica = map['recapito_fatturazione_elettronica'];
     email = map['email'];
+    telefono = map['telefono'];
     sito = map['sito'];
   }
 
@@ -52,6 +56,7 @@ class AziendaModel {
     'pec': pec,
     'recapito_fatturazione_elettronica': recapito_fatturazione_elettronica,
     'email': email,
+    'telefono' : telefono,
     'sito' : sito,
   };
 
@@ -64,6 +69,7 @@ class AziendaModel {
       json['pec']?.toString(),
       json['recapito_fatturazione_elettronica']?.toString(),
       json['email']?.toString(),
+      json['telefono']?.toString(),
       json['sito']?.toString()
     );
   }

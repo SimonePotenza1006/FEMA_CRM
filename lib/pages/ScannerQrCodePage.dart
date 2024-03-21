@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:fema_crm/model/DDTModel.dart';
@@ -5,13 +6,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:native_qr/native_qr.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-
+import 'package:http/http.dart' as http;
 import '../model/InterventoModel.dart';
+import '../model/ProdottoModel.dart';
+import 'CompilazioneDDTByTecnicoPage.dart';
 
 class ScannerQrCodePage extends StatefulWidget {
-  final DDTModel DDT;
 
-  ScannerQrCodePage({Key? key, required this.DDT}) : super(key: key);
+  final InterventoModel intervento;
+
+  ScannerQrCodePage({Key? key, required this.intervento, }) : super(key: key);
 
   @override
   _ScannerQrCodePageState createState() => _ScannerQrCodePageState();
@@ -22,10 +26,12 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool qrRead = false;
   String qrData = "";
+  List<ProdottoModel> prodottiDaAggiungere =[];
 
   @override
   void initState() {
     super.initState();
+    savePrimeDDT();
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       _initializeCamera();
     });
@@ -80,7 +86,6 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
-    log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
     if (!p) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('no Permission')),
@@ -124,10 +129,26 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  _callApiAndPrintResult(qrCode);
                 },
                 child: Text(
-                  'Allega al DDT',
+                  'Allega prodotto al DDT',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CompilazioneDDTByTecnicoPage(intervento : widget.intervento, prodotti : prodottiDaAggiungere)),
+                  );
+                },
+                child: Text(
+                  'Conferma',
                   style: TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
@@ -141,6 +162,83 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
     );
     qrRead = false;
     controller.resumeCamera();
+  }
+
+  Future<void> _callApiAndPrintResult(String qrCode) async {
+    // Estrai i parametri dal QR code
+    List<String> qrDataParts = qrCode.split(',');
+    // Rimuovi l'ultima virgola da ogni parte
+    qrDataParts = qrDataParts.map((part) => part.trim()).toList();
+    // Estrai i parametri
+    String codiceDanea = qrDataParts[0].substring(14);
+    String lottoSeriale = qrDataParts[1].substring(15);
+
+    print(lottoSeriale);
+    print(codiceDanea);
+
+    // Effettua la chiamata API con un timeout di 10 secondi
+    String apiUrl = 'http://192.168.1.52:8080/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
+    final response = await http.get(Uri.parse(apiUrl)).timeout(Duration(seconds: 10));
+
+    // Controlla lo stato della risposta
+    if (response.statusCode == 200) {
+      print('Chiamata API riuscita. Risposta:');
+      print(json.decode(response.body));
+
+      var responseData = json.decode(response.body);
+      ProdottoModel prodotto = ProdottoModel.fromJson(responseData);
+      prodottiDaAggiungere.add(prodotto);
+      print(prodottiDaAggiungere.toList());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Prodotto aggiunto con successo'),
+          duration: Duration(seconds: 3), // Durata dello Snackbar
+        ),
+      );
+    } else {
+      print('Errore durante la chiamata API: ${response.statusCode}');
+    }
+  }
+
+  Future<void> savePrimeDDT() async {
+    try {
+      Map<String, dynamic> body = {
+        'data': widget.intervento.data?.toIso8601String(),
+        'orario': DateTime.now().toIso8601String(),
+        'concluso': false,
+        'firmaUser': null,
+        'imageData': null,
+        'cliente': widget.intervento.cliente?.toMap(),
+        'destinazione': widget.intervento.destinazione?.toMap(),
+        'categoriaDdt': {
+          'id': 1,
+          'descrizione': "DDT Intervento"
+        },
+        'utente': widget.intervento.utente?.toMap(),
+        'intervento': widget.intervento.toMap(),
+        'relazioni_prodotti': null,
+      };
+
+      debugPrint('Body della richiesta: $body', wrapWidth: 1024);
+
+      final response = await http.post(
+        Uri.parse('http://192.168.1.52:8080/api/ddt'),
+        body: jsonEncode(body),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      print('Risposta: ${response.statusCode} - ${response.body}');
+
+      if (response.statusCode == 201) {
+        print('DDT inizializzato, daje');
+      } else {
+        print('Qualcosa non va');
+      }
+    } catch (e) {
+      print('Errore: $e');
+    }
   }
 
   @override

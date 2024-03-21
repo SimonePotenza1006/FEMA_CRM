@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 import 'DettaglioPreventivoAmministrazionePage.dart';
 import 'package:fema_crm/model/PreventivoModel.dart';
@@ -19,6 +22,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
   TextEditingController _searchController = TextEditingController();
   bool _isSearchActive = false;
   String? _filterValue;
+  bool _isFilterButtonPressed = false; // New variable to manage filter and download button state
 
   @override
   void initState() {
@@ -204,11 +208,18 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showFilterDialog();
-        },
         backgroundColor: Colors.red,
-        child: Icon(Icons.filter_list, color: Colors.white),
+        onPressed: () {
+          if (_isFilterButtonPressed) {
+            _showFilterDialog();
+          } else {
+            _showConfirmationDialog();
+          }
+        },
+        child: Icon(
+          _isFilterButtonPressed ? Icons.filter_list : Icons.arrow_downward,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -331,5 +342,102 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
         );
       },
     );
+  }
+
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Scaricare excel del report?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                _generateExcel();
+                Navigator.of(context).pop();
+              },
+              child: Text('Conferma', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _generateExcel() async {
+    var excel = Excel.createExcel();
+    Sheet sheetObject = excel['Sheet1'];
+
+    // Aggiungi intestazioni
+    sheetObject.appendRow([
+      'Azienda',
+      'Categoria merceologica',
+      'Cliente',
+      'Agente',
+      'Utente',
+      'Importo',
+      'Accettato',
+      'Rifiutato',
+      'Attesa di accettazione',
+      'Attesa di consegna',
+      'Consegnato',
+      'Data creazione',
+      'Data accettazione',
+      'Data consegna',
+    ]);
+
+    // Aggiungi righe di dati
+    for (var preventivo in preventiviList) {
+      sheetObject.appendRow([
+        preventivo.azienda?.nome ?? 'N/A',
+        preventivo.categoria_merceologica ?? 'N/A',
+        preventivo.cliente?.denominazione ?? 'N/A',
+        preventivo.agente?.nome ?? 'N/A',
+        preventivo.utente?.cognome ?? 'N/A',
+        preventivo.importo?.toStringAsFixed(2) ?? '0.0',
+        preventivo.accettato ?? false ? 'SI' : 'NO',
+        preventivo.rifiutato ?? false ? 'SI' : 'NO',
+        preventivo.attesa ?? false ? 'SI' : 'NO',
+        preventivo.pendente ?? false ? 'SI' : 'NO',
+        preventivo.consegnato ?? false ? 'SI' : 'NO',
+        preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!) : 'N/A',
+        preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_accettazione!) : 'N/A',
+        preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_consegna!) : 'Non consegnato',
+      ]);
+    }
+
+    // Salvataggio del file
+    try {
+      late String filePath;
+      if (Platform.isWindows) {
+        // Percorso di salvataggio su Windows
+        String appDocumentsPath = 'C:\\Users\\Utente1\\Documents';
+        filePath = '$appDocumentsPath\\report_preventivi.xlsx';
+      } else if (Platform.isAndroid) {
+        // Percorso di salvataggio su Android
+        Directory? externalStorageDir = await getExternalStorageDirectory();
+        if (externalStorageDir != null) {
+          String appDocumentsPath = externalStorageDir.path;
+          filePath = '$appDocumentsPath/report_preventivi.xlsx';
+        } else {
+          throw Exception('Impossibile ottenere il percorso di salvataggio.');
+        }
+      }
+
+      var excelBytes = await excel.encode();
+      if (excelBytes != null) {
+        await File(filePath).create(recursive: true).then((file) {
+          file.writeAsBytesSync(excelBytes);
+        });
+        // Notifica all'utente che il file è stato salvato con successo
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Excel salvato in $filePath')));
+      } else {
+        // Gestisci il caso in cui excel.encode() restituisce null
+        print('Errore durante la codifica del file Excel');
+      }
+    } catch (error) {
+      // Gestisci eventuali errori durante il salvataggio del file
+      print('Errore durante il salvataggio del file Excel: $error');
+    }
   }
 }

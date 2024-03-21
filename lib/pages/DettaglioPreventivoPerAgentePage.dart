@@ -19,7 +19,7 @@ class DettaglioPreventivoPerAgentePage extends StatefulWidget {
 class _DettaglioPreventivoPerAgentePageState
     extends State<DettaglioPreventivoPerAgentePage> {
   List<RelazionePreventivoProdottiModel> allProdotti = [];
-  bool isLoading = false;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -50,8 +50,12 @@ class _DettaglioPreventivoPerAgentePageState
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
+              SizedBox(height: 8),
               Text(
                   'Data Creazione: ${DateFormat('yyyy-MM-dd').format(widget.preventivo.data_creazione!)}'),
+              SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
               SizedBox(height: 8),
               Text(
                 'Azienda:',
@@ -59,6 +63,8 @@ class _DettaglioPreventivoPerAgentePageState
               ),
               Text('${widget.preventivo.azienda?.nome}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Categoria Merceologica:',
@@ -68,12 +74,16 @@ class _DettaglioPreventivoPerAgentePageState
                   '${widget.preventivo.categoria_merceologica ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
+              SizedBox(height: 8),
               Text(
                 'Listino:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text('${widget.preventivo.listino ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Descrizione:',
@@ -83,6 +93,8 @@ class _DettaglioPreventivoPerAgentePageState
                   '${widget.preventivo.descrizione ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
+              SizedBox(height: 8),
               Text(
                 'Importo:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -90,6 +102,8 @@ class _DettaglioPreventivoPerAgentePageState
               Text(
                   '${widget.preventivo.importo != null ? widget.preventivo.importo!.toStringAsFixed(2) + ' €' : 'N/A'}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Cliente:',
@@ -99,6 +113,8 @@ class _DettaglioPreventivoPerAgentePageState
                   '${widget.preventivo.cliente?.denominazione ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
+              SizedBox(height: 8),
               Text(
                 'Accettato:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -106,6 +122,8 @@ class _DettaglioPreventivoPerAgentePageState
               Text(
                   '${widget.preventivo.accettato ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Rifiutato:',
@@ -115,6 +133,8 @@ class _DettaglioPreventivoPerAgentePageState
                   '${widget.preventivo.rifiutato ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
+              SizedBox(height: 8),
               Text(
                 'Attesa:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -122,6 +142,8 @@ class _DettaglioPreventivoPerAgentePageState
               Text(
                   '${widget.preventivo.attesa ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Pendente:',
@@ -131,6 +153,8 @@ class _DettaglioPreventivoPerAgentePageState
                   '${widget.preventivo.pendente ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
+              SizedBox(height: 8),
               Text(
                 'Consegnato:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -138,6 +162,8 @@ class _DettaglioPreventivoPerAgentePageState
               Text(
                   '${widget.preventivo.consegnato ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Provvigioni:',
@@ -147,6 +173,8 @@ class _DettaglioPreventivoPerAgentePageState
                   '${widget.preventivo.provvigioni != null ? widget.preventivo.provvigioni!.toStringAsFixed(2) + ' €' : 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
+              SizedBox(height: 8),
               Text(
                 'Data Consegna:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -154,6 +182,8 @@ class _DettaglioPreventivoPerAgentePageState
               Text(
                   '${widget.preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_consegna!) : 'N/A'}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Data Accettazione:',
@@ -163,6 +193,8 @@ class _DettaglioPreventivoPerAgentePageState
                   '${widget.preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_accettazione!) : 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
+              buildDarkDivider(), // Riga divisoria grigia scura
+              SizedBox(height: 8),
               Text(
                 'Utente:',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -170,6 +202,8 @@ class _DettaglioPreventivoPerAgentePageState
               Text(
                   '${widget.preventivo.utente?.nome ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              buildLightDivider(), // Riga divisoria grigia chiara
               SizedBox(height: 8),
               Text(
                 'Agente:',
@@ -212,7 +246,39 @@ class _DettaglioPreventivoPerAgentePageState
               final prezzoVendita = prezzoFornitore * (1 + listino / 100);
               return ListTile(
                 title: Text(allProdotti[index].prodotto?.descrizione ?? 'N/A'),
-                subtitle: Text('Prezzo di vendita: ${prezzoFornitore.toStringAsFixed(2)} € (Prezzo fornitore) + ${listino.toStringAsFixed(2)}% = ${prezzoVendita.toStringAsFixed(2)} €'),
+                subtitle: RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: 'Prezzo di vendita: ',
+                      ),
+                      TextSpan(
+                        text: '${prezzoFornitore.toStringAsFixed(2)} € ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: Colors.blue, // Colore blu
+                        ),
+                      ),
+                      TextSpan(
+                        text: '(Prezzo fornitore) + ${listino.toStringAsFixed(2)}% = ',
+                      ),
+                      TextSpan(
+                        text: '${prezzoVendita.toStringAsFixed(2)} €',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: Colors.lightGreen[700], // Colore verde
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
@@ -243,7 +309,8 @@ class _DettaglioPreventivoPerAgentePageState
         });
       } else {
         throw Exception(
-            'Failed to load data from API: ${response.statusCode}');
+            'Failed to load data from API: ${response.statusCode}'
+        );
       }
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
@@ -269,5 +336,21 @@ class _DettaglioPreventivoPerAgentePageState
         isLoading = false;
       });
     }
+  }
+
+  // Funzione per creare una riga divisoria grigia chiara
+  Widget buildLightDivider() {
+    return Divider(
+      height: 1,
+      color: Colors.grey[300],
+    );
+  }
+
+  // Funzione per creare una riga divisoria grigia scura
+  Widget buildDarkDivider() {
+    return Divider(
+      height: 1,
+      color: Colors.grey[600],
+    );
   }
 }

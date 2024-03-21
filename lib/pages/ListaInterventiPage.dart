@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
+import '../model/CategoriaInterventoSpecificoModel.dart';
+import '../model/CategoriaPrezzoListinoModel.dart';
 import '../model/InterventoModel.dart';
+import '../model/VeicoloModel.dart';
 import 'DettaglioInterventoPage.dart';
 
 class ListaInterventiPage extends StatefulWidget {
@@ -21,6 +24,63 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
     super.initState();
     // Chiamata all'API
     getAllInterventi();
+  }
+
+  Future<List<VeicoloModel>> getAllVeicoli() async {
+    try {
+      http.Response response = await http.get(Uri.parse('http://192.168.1.52:8080/api/veicolo'));
+      var responseData = json.decode(response.body.toString());
+      if (response.statusCode == 200) {
+        List<VeicoloModel> allVeicoli = [];
+        for (var veicoloJson in responseData) {
+          VeicoloModel veicolo = VeicoloModel.fromJson(veicoloJson);
+          allVeicoli.add(veicolo);
+        }
+        return allVeicoli;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Errore durante il fetch dei veicoli: $e');
+      return [];
+    }
+  }
+
+
+  Future<List<CategoriaInterventoSpecificoModel>> getCategoriaByTipologia(String tipologiaId) async {
+    try {
+      http.Response response = await http.get(Uri.parse('http://192.168.1.52:8080/api/categorieIntervento/tipologia/$tipologiaId'));
+      var responseData = json.decode(response.body.toString());
+      if (response.statusCode == 200) {
+        List<CategoriaInterventoSpecificoModel> allCategorieByTipologia = [];
+        for (var categoriaJson in responseData) {
+          CategoriaInterventoSpecificoModel categoria = CategoriaInterventoSpecificoModel.fromJson(categoriaJson);
+          allCategorieByTipologia.add(categoria);
+        }
+        return allCategorieByTipologia;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Errore durante il fetch delle categorie: $e');
+      return [];
+    }
+  }
+
+  Future<List<CategoriaPrezzoListinoModel>> getListiniByCategoria(String categoriaId) async {
+    try {
+      final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/listino/categoria/$categoriaId'));
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = json.decode(response.body);
+        List<CategoriaPrezzoListinoModel> listini = responseData.map((data) => CategoriaPrezzoListinoModel.fromJson(data)).toList();
+        return listini;
+      } else {
+        throw Exception('Failed to load listini');
+      }
+    } catch (e) {
+      print('Error fetching listini: $e');
+      throw Exception('Failed to load listini');
+    }
   }
 
   Future<void> getAllInterventi() async {

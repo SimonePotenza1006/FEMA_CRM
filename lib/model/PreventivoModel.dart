@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'CategoriaPrezzoListinoModel.dart';
 import 'ClienteModel.dart';
+import 'DestinazioneModel.dart';
 import 'ProdottoModel.dart';
 import 'UtenteModel.dart';
 
@@ -19,6 +20,7 @@ class PreventivoModel {
   String? descrizione;
   double? importo;
   ClienteModel? cliente;
+  DestinazioneModel? destinazione;
   bool? accettato;
   bool? rifiutato;
   bool? attesa;
@@ -40,6 +42,7 @@ class PreventivoModel {
       this.descrizione,
       this.importo,
       this.cliente,
+      this.destinazione,
       this.accettato,
       this.rifiutato,
       this.attesa,
@@ -63,6 +66,7 @@ class PreventivoModel {
       'descrizione': descrizione,
       'importo': importo,
       'cliente': cliente,
+      'destinazione' : destinazione,
       'accettato': accettato,
       'rifiutato': rifiutato,
       'attesa': attesa,
@@ -87,6 +91,7 @@ class PreventivoModel {
     descrizione = map['descrizione'];
     importo = map['importo'];
     cliente = map['cliente'];
+    destinazione = map['destinazione'];
     accettato = map['accettato'];
     rifiutato = map['rifiutato'];
     attesa = map['attesa'];
@@ -109,6 +114,7 @@ class PreventivoModel {
     'descrizione': descrizione,
     'importo': importo,
     'cliente': cliente,
+    'destinazione' : destinazione,
     'accettato': accettato,
     'rifiutato': rifiutato,
     'attesa': attesa,
@@ -132,6 +138,7 @@ class PreventivoModel {
       json['descrizione']?.toString(),
       json['importo'] != null ? json['importo'].toDouble() : null,
       json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
+      json['destinazione'] != null ? DestinazioneModel.fromJson(json['destinazione']) : null,
       json['accettato'],
       json['rifiutato'],
       json['attesa'],

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import '../model/AziendaModel.dart';
+
 class RegistrazioneAgentePage extends StatefulWidget {
   const RegistrazioneAgentePage({Key? key}) : super(key: key);
 
@@ -18,6 +20,8 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   final TextEditingController luogoLavoroController = TextEditingController();
   final TextEditingController ibanController = TextEditingController();
   String selectedProvvigione = '3%';
+  List<AziendaModel> aziendeList = [];
+  AziendaModel? selectedAzienda;
 
   bool _areFieldsFilled = false;
 
@@ -25,6 +29,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   void initState() {
     super.initState();
     _updateAreFieldsFilled();
+    getAllAziende();
   }
 
   void _updateAreFieldsFilled() {
@@ -32,7 +37,6 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
       _areFieldsFilled = nomeController.text.trim().isNotEmpty &&
           cognomeController.text.trim().isNotEmpty &&
           emailController.text.trim().isNotEmpty &&
-          riferimentoAziendaleController.text.trim().isNotEmpty &&
           cellulareController.text.trim().isNotEmpty &&
           luogoLavoroController.text.trim().isNotEmpty &&
           ibanController.text.trim().isNotEmpty;
@@ -49,7 +53,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
       'nome': nomeController.text.toString(),
       'cognome': cognomeController.text.toString(),
       'email': emailController.text.toString(),
-      'riferimento_aziendale': riferimentoAziendaleController.text.toString(),
+      'riferimento_aziendale': selectedAzienda?.nome.toString(),
       'cellulare': cellulareController.text.toString(),
       'luogo_di_lavoro': luogoLavoroController.text.toString(),
       'iban': ibanController.text.toString(),
@@ -75,6 +79,29 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
       }
     } catch (e) {
       print('Errore durante la richiesta HTTP: $e');
+    }
+  }
+
+  Future<void> getAllAziende() async {
+    try {
+      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/azienda');
+      var response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<AziendaModel> aziende = [];
+        for (var item in jsonData) {
+          aziende.add(AziendaModel.fromJson(item));
+        }
+        setState(() {
+          aziendeList = aziende;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+      _showErrorDialog();
     }
   }
 
@@ -153,12 +180,16 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
                 ),
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: riferimentoAziendaleController,
-                onChanged: (_) => _updateAreFieldsFilled(),
+              DropdownButtonFormField<AziendaModel>(
+                value: selectedAzienda,
+                onChanged: (azienda) {
+                  setState(() {
+                    selectedAzienda = azienda;
+                    _updateAreFieldsFilled(); // Aggiorna lo stato dei campi compilati
+                  });
+                },
                 decoration: InputDecoration(
-                  labelText: 'Riferimento Aziendale',
-                  hintText: 'Inserisci il riferimento aziendale',
+                  labelText: 'Azienda',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: Colors.grey),
@@ -168,6 +199,12 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
                     borderSide: BorderSide(color: Colors.red),
                   ),
                 ),
+                items: aziendeList.map((azienda) {
+                  return DropdownMenuItem<AziendaModel>(
+                    value: azienda,
+                    child: Text(azienda.nome!),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -296,6 +333,28 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Errore di connessione'),
+          content: Text(
+            'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
