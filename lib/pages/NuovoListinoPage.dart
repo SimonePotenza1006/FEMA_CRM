@@ -7,7 +7,8 @@ import 'package:fema_crm/model/CategoriaInterventoSpecificoModel.dart';
 class NuovoListinoPage extends StatefulWidget {
   final CategoriaInterventoSpecificoModel categoria;
 
-  const NuovoListinoPage({Key? key1, required this.categoria}) : super(key : key1);
+  const NuovoListinoPage({Key? key1, required this.categoria})
+      : super(key: key1);
 
   @override
   _NuovoListinoPageState createState() => _NuovoListinoPageState();
@@ -17,7 +18,7 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
   final _formKey = GlobalKey<FormState>();
   final _descrizioneController = TextEditingController();
   final _prezzoController = TextEditingController();
-
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +27,7 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
       appBar: AppBar(
         title: Text(
             'Aggiungi listino alla categoria ${widget.categoria.descrizione}',
-            style: TextStyle(color: Colors.white)
-        ),
+            style: TextStyle(color: Colors.white)),
         centerTitle: false,
         backgroundColor: Colors.red,
       ),
@@ -70,7 +70,10 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
                     createNewListino(descrizione, prezzo, categoria);
                   }
                 },
-                child: Text('Salva'),
+                child: Text('Salva', style: TextStyle(color: Colors.white)),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                ),
               ),
             ],
           ),
@@ -81,14 +84,14 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
 
   Future<void> createNewListino(String descrizione, double prezzo,
       CategoriaInterventoSpecificoModel categoria) async {
-    final url = Uri.parse('http://192.168.1.52:8080/api/listino');
+    final url = Uri.parse('${ipaddress}/api/listino');
     final body = jsonEncode({
       'descrizione': descrizione,
       'prezzo': prezzo,
       'categoriaInterventoSpecifico': {
         'id': widget.categoria.id,
         'descrizione': widget.categoria.descrizione,
-        'tipologia' : widget.categoria.tipologia,
+        'tipologia': widget.categoria.tipologiaIntervento,
       }
     });
     try {
@@ -106,6 +109,4 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
       print('Errore durante la richiesta HTTP: $e');
     }
   }
-
 }
-

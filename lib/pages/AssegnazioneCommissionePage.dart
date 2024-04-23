@@ -20,6 +20,7 @@ class _AssegnazioneCommissionePageState
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _dataController = TextEditingController();
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   // Selected user
   UtenteModel? selectedUser;
@@ -163,13 +164,15 @@ class _AssegnazioneCommissionePageState
       ),
     );
   }
-  
+
   Future<void> createCommissione() async {
-    final formatter = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
-    final formattedDate = formatter.format(DateTime.parse(_dataController.text)); // Formatta la data in base al formatter creato
+    final formatter = DateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
+    final formattedDate = formatter.format(DateTime.parse(
+        _dataController.text)); // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/commissione'),
+        Uri.parse('${ipaddress}/api/commissione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': formattedDate, // Utilizza la data formattata
@@ -192,7 +195,7 @@ class _AssegnazioneCommissionePageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/utente');
+      var apiUrl = Uri.parse('${ipaddress}/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -230,5 +233,3 @@ class _AssegnazioneCommissionePageState
     }
   }
 }
-
-

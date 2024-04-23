@@ -8,6 +8,8 @@ import '../model/PreventivoModel.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../model/RelazionePreventivoProdottiModel.dart';
+
 class ModificaSelezioneProdottiPreventivoByAgentePage extends StatefulWidget {
   final List<ProdottoModel> prodottiSelezionati;
   final PreventivoModel preventivo;
@@ -25,9 +27,11 @@ class ModificaSelezioneProdottiPreventivoByAgentePage extends StatefulWidget {
 
 class _ModificaSelezioneProdottiPreventivoByAgentePageState
     extends State<ModificaSelezioneProdottiPreventivoByAgentePage> {
-  late List<int> quantitaProdotti;
+  late List<double> quantitaProdotti;
   late List<TextEditingController> quantityControllers;
   late Timer _debounce;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  List<RelazionePreventivoProdottiModel> allProdotti = [];
 
   @override
   void initState() {
@@ -36,16 +40,14 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
     print("Provvigioni agente:" +
         widget.preventivo.agente!.categoria_provvigione.toString());
     super.initState();
-    quantitaProdotti =
-        List.filled(widget.prodottiSelezionati.length, 1);
+    quantitaProdotti = List.filled(widget.prodottiSelezionati.length, 1);
     quantityControllers = List.generate(
-        widget.prodottiSelezionati.length,
-            (index) => TextEditingController());
+        widget.prodottiSelezionati.length, (index) => TextEditingController());
     for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
       quantityControllers[i].text = '1';
     }
-    _debounce =
-        Timer(Duration(milliseconds: 500), () {}); // Inizializzazione del timer debounce
+    _debounce = Timer(Duration(milliseconds: 500), () {});
+    getProdotti(); // Inizializzazione del timer debounce
   }
 
   @override
@@ -62,7 +64,7 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
     // Avvia un nuovo debounce
     _debounce = Timer(Duration(milliseconds: 500), () {
       setState(() {
-        quantitaProdotti[index] = int.tryParse(value) ?? 0;
+        quantitaProdotti[index] = double.tryParse(value) ?? 0;
       });
     });
   }
@@ -70,15 +72,22 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
   double _calculateTotalAmount() {
     double totalAmount = 0;
 
+    // Calcola il totale per i prodotti selezionati
     for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
-      double productPrice =
-          widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
-      double listino =
-          double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
-      int quantity = quantitaProdotti[i];
+      double productPrice = widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
+      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
+      double quantity = quantitaProdotti[i];
 
-      totalAmount +=
-          (productPrice + (productPrice * (listino / 100))) * quantity;
+      totalAmount += (productPrice + (productPrice * (listino / 100))) * quantity;
+    }
+
+    // Calcola il totale per i prodotti ottenuti dalla chiamata API
+    for (int i = 0; i < allProdotti.length; i++) {
+      double productPrice = allProdotti[i].prodotto?.prezzo_fornitore ?? 0;
+      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
+      double quantity = 1; // Quantità fissa per i prodotti ottenuti dalla chiamata API
+
+      totalAmount += (productPrice + (productPrice * (listino / 100))) * quantity;
     }
 
     return totalAmount;
@@ -86,21 +95,38 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
 
   double _calculateAgentCommission() {
     double totalCommission = 0;
-    double agentCommissionPercentage =
-        widget.preventivo.agente!.categoria_provvigione ?? 0;
+    double agentCommissionPercentage = widget.preventivo.agente!.categoria_provvigione ?? 0;
 
+    // Calcola le provvigioni per i prodotti selezionati
     for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
-      double productPrice =
-          widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
-      double listino =
-          double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
-      int quantity = quantitaProdotti[i];
+      double productPrice = widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
+      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
+      double quantity = quantitaProdotti[i];
 
       // Calcola il prezzo finale del prodotto con il listino applicato
       double finalProductPrice = productPrice + (productPrice * (listino / 100));
 
       // Calcola la differenza tra il prezzo finale e il prezzo di fornitore del prodotto, moltiplicato per la quantità
       double priceDifference = (finalProductPrice - productPrice) * quantity;
+
+      // Calcola le provvigioni dell'agente per questo prodotto
+      double productCommission = priceDifference * (agentCommissionPercentage / 100);
+
+      // Aggiungi le provvigioni dell'agente al totale
+      totalCommission += productCommission;
+    }
+
+    // Calcola le provvigioni per i prodotti ottenuti dalla chiamata API
+    for (int i = 0; i < allProdotti.length; i++) {
+      double productPrice = allProdotti[i].prodotto?.prezzo_fornitore ?? 0;
+      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
+      double quantity = 1; // Quantità fissa per i prodotti ottenuti dalla chiamata API
+
+      // Calcola il prezzo finale del prodotto con il listino applicato
+      double finalProductPrice = productPrice + (productPrice * (listino / 100));
+
+      // Calcola la differenza tra il prezzo finale e il prezzo di fornitore del prodotto
+      double priceDifference = finalProductPrice - productPrice;
 
       // Calcola le provvigioni dell'agente per questo prodotto
       double productCommission = priceDifference * (agentCommissionPercentage / 100);
@@ -127,34 +153,68 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: widget.prodottiSelezionati.length,
+              itemCount: widget.prodottiSelezionati.length + allProdotti.length,
               itemBuilder: (context, index) {
-                final prodotto = widget.prodottiSelezionati[index];
-                return ListTile(
-                  title: Text(prodotto.descrizione ?? ''),
-                  subtitle: Text('Prezzo: ${prodotto.prezzo_fornitore} €'),
-                  trailing: SizedBox(
-                    width: 150, // Limita la larghezza del trailing
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text('Quantità:'),
-                        SizedBox(width: 5),
-                        SizedBox(
-                          width: 50, // Imposta una larghezza fissa per il TextField
-                          child: TextField(
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            controller: quantityControllers[index],
-                            onChanged: (value) {
-                              _onQuantityChanged(value, index);
-                            },
+                if (index < widget.prodottiSelezionati.length) {
+                  final prodotto = widget.prodottiSelezionati[index];
+                  return ListTile(
+                    title: Text(prodotto.descrizione ?? ''),
+                    subtitle: Text('Prezzo: ${prodotto.prezzo_fornitore} €'),
+                    trailing: SizedBox(
+                      width: 150, // Limita la larghezza del trailing
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text('Quantità:'),
+                          SizedBox(width: 5),
+                          SizedBox(
+                            width:
+                            50, // Imposta una larghezza fissa per il TextField
+                            child: TextField(
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              controller: quantityControllers[index],
+                              onChanged: (value) {
+                                _onQuantityChanged(value, index);
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                );
+                  );
+                } else {
+                  final prodotto =
+                  allProdotti[index - widget.prodottiSelezionati.length];
+                  return ListTile(
+                    title: Text(prodotto.prodotto?.descrizione ?? ''),
+                    subtitle:
+                    Text('Prezzo: ${prodotto.prodotto?.prezzo_fornitore} €'),
+                    trailing: SizedBox(
+                      width: 150, // Limita la larghezza del trailing
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text('Quantità:'),
+                          SizedBox(width: 5),
+                          SizedBox(
+                            width:
+                            50, // Imposta una larghezza fissa per il TextField
+                            child: TextField(
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              controller: TextEditingController(text: '1'),
+                              onChanged: (value) {
+                                // Implementa la logica di aggiornamento della quantità per i prodotti ottenuti dalla chiamata API
+                                // Suggerimento: puoi mantenere una lista separata di controller per questi prodotti se necessario
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ),
@@ -162,6 +222,13 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
             padding: const EdgeInsets.all(8.0),
             child: Text(
               'Totale preventivo: ${_calculateTotalAmount().toStringAsFixed(2)} €',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Totale provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -214,13 +281,24 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
                             ),
                             Padding(
                               padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                'Totale Provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
                               child: ElevatedButton(
                                 onPressed: () {
                                   aggiornaPreventivo();
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => HomeFormTecnico(userData: widget.preventivo.utente),
+                                      builder: (context) =>
+                                          HomeFormTecnico(userData: widget.preventivo.utente),
                                     ),
                                   );
                                 },
@@ -264,8 +342,47 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
     );
   }
 
-  Future<void> inserisciProdotti() async {
+  Future<void> getProdotti() async {
+    try {
+      var apiUrl = Uri.parse(
+          '${ipaddress}/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+      var response = await http.get(apiUrl);
 
+      if (response.statusCode == 200) {
+        debugPrint('JSON ricevuto: ${response.body}', wrapWidth: 1024);
+        var jsonData = jsonDecode(response.body);
+        List<RelazionePreventivoProdottiModel> prodotti = [];
+        for (var item in jsonData) {
+          prodotti.add(RelazionePreventivoProdottiModel.fromJson(item));
+        }
+        setState(() {
+          allProdotti = prodotti;
+        });
+      } else {
+        throw Exception(
+            'Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Errore di connessione'),
+            content: Text(
+                'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Future<void> aggiornaPreventivo() async {
@@ -276,7 +393,7 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
     try {
       // Chiamata POST per aggiornare il preventivo
       response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/preventivo'),
+        Uri.parse('${ipaddress}/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -290,15 +407,15 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
           'descrizione': widget.preventivo.descrizione,
           'importo': importoPreventivo,
           'cliente': widget.preventivo.cliente?.toJson(),
-          'destinazione' : widget.preventivo.destinazione?.toJson(),
+          'destinazione': widget.preventivo.destinazione?.toJson(),
           'accettato': widget.preventivo.accettato,
           'rifiutato': widget.preventivo.rifiutato,
           'attesa': widget.preventivo.attesa,
           'pendente': widget.preventivo.pendente,
           'consegnato': widget.preventivo.consegnato,
           'provvigioni': totaleProvvigioni,
-          'data_consegna': DateTime.now().toIso8601String(),
-          'data_accettazione' : widget.preventivo.data_accettazione?.toIso8601String(),
+          'data_consegna': null,
+          'data_accettazione': null,
           'utente': widget.preventivo.utente?.toJson(),
           'agente': widget.preventivo.agente?.toJson(),
           'prodotti': widget.preventivo.prodotti
@@ -314,7 +431,7 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
           final quantita = quantitaProdotti[i];
 
           response = await http.post(
-            Uri.parse('http://192.168.1.52:8080/api/relazionePreventivoProdotto'),
+            Uri.parse('${ipaddress}/api/relazionePreventivoProdotto'),
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json"
@@ -327,9 +444,11 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
           );
 
           if (response.statusCode == 201) {
-            print("Relazione preventivo-prodotto aggiornata con successo per il prodotto ${prodotto.id}");
+            print(
+                "Relazione preventivo-prodotto aggiornata con successo per il prodotto ${prodotto.id}");
           } else {
-            print("Errore durante l'aggiornamento della relazione preventivo-prodotto per il prodotto ${prodotto.id}");
+            print(
+                "Errore durante l'aggiornamento della relazione preventivo-prodotto per il prodotto ${prodotto.id}");
             debugPrint(response.body, wrapWidth: 1024);
           }
         }
@@ -341,5 +460,4 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
       print("Errore durante l'aggiornamento del preventivo: $e");
     }
   }
-
 }

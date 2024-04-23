@@ -9,7 +9,7 @@ class MovimentiModel {
   String? descrizione;
   TipoMovimentazione? tipo_movimentazione;
   double? importo;
-  UtenteModel? utente; // Cambiato da File a String
+  UtenteModel? utente;
 
   MovimentiModel(
     this.id,
@@ -21,7 +21,7 @@ class MovimentiModel {
   );
 
   MovimentiModel.fromMap(Map<String, dynamic> map) {
-    id = map['id'];
+    id = map['id'].toString();
     data = map['data'] != null ? DateTime.parse(map['data']) : null;
     descrizione = map['descrizione'].toString();
     tipo_movimentazione = TipoMovimentazione.values.firstWhere(
@@ -69,6 +69,8 @@ class MovimentiModel {
       return TipoMovimentazione.Entrata;
     } else if (tipoMovimentazione == 'Uscita') {
       return TipoMovimentazione.Uscita;
+    } else if (tipoMovimentazione == 'Prelievo') {
+      return TipoMovimentazione.Prelievo;
     } else {
       throw Exception('Valore non valido per TipoMovimentazione: $tipoMovimentazione');
     }
@@ -80,4 +82,5 @@ class MovimentiModel {
 enum TipoMovimentazione {
   Entrata,
   Uscita,
+  Prelievo
 }

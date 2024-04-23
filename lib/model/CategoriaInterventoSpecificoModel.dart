@@ -5,12 +5,12 @@ import 'TipologiaInterventoModel.dart';
 class CategoriaInterventoSpecificoModel {
   String? id;
   String? descrizione;
-  TipologiaInterventoModel? tipologia;
+  TipologiaInterventoModel? tipologiaIntervento;
 
   CategoriaInterventoSpecificoModel(
       this.id,
       this.descrizione,
-      this.tipologia
+      this.tipologiaIntervento
       ); //, this.listini);
 
   Map<String, dynamic> toMap() {
@@ -18,8 +18,8 @@ class CategoriaInterventoSpecificoModel {
       'id': id,
       'descrizione': descrizione,
     };
-    if (tipologia != null && tipologia!.id != null) {
-      map['tipologia'] = tipologia!.toMap();
+    if (tipologiaIntervento != null && tipologiaIntervento!.id != null) {
+      map['tipologiaIntervento'] = tipologiaIntervento!.toMap();
     }
     return map;
   }
@@ -28,7 +28,7 @@ class CategoriaInterventoSpecificoModel {
   CategoriaInterventoSpecificoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     descrizione = map['descrizione'];
-    tipologia = map['tipologia'] != null ? TipologiaInterventoModel.fromMap(map['tipologia']) : null;
+    tipologiaIntervento = map['tipologiaIntervento'] != null ? TipologiaInterventoModel.fromMap(map['tipologiaIntervento']) : null;
     // listini = (map['listini'] as List<dynamic>?)
     //     ?.map((data) => CategoriaPrezzoListinoModel.fromMap(data as Map<String, dynamic>))
     //     .toList();
@@ -40,7 +40,7 @@ class CategoriaInterventoSpecificoModel {
       {
         'id': id,
        'descrizione': descrizione,
-       'tipologia': tipologia?.toJson()
+       'tipologiaIntervento': tipologiaIntervento?.toJson()
       }; //, 'listini': listini};
 
 
@@ -49,7 +49,7 @@ class CategoriaInterventoSpecificoModel {
     return CategoriaInterventoSpecificoModel(
       json['id']?.toString(),
       json['descrizione']?.toString(),
-      json['tipologia'] != null ? TipologiaInterventoModel.fromJson(json['tipologia']) : null,
+      json['tipologiaIntervento'] != null ? TipologiaInterventoModel.fromJson(json['tipologiaIntervento']) : null,
     );
   }
 

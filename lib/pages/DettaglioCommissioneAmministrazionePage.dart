@@ -11,19 +11,25 @@ import 'HomeFormTecnico.dart';
 class DettaglioCommissioneAmministrazionePage extends StatefulWidget {
   final CommissioneModel commissione;
 
-  const DettaglioCommissioneAmministrazionePage({Key? key, required this.commissione}) : super(key: key);
+  const DettaglioCommissioneAmministrazionePage(
+      {Key? key, required this.commissione})
+      : super(key: key);
 
   @override
-  _DettaglioCommissioneAmministrazionePageState createState() => _DettaglioCommissioneAmministrazionePageState();
+  _DettaglioCommissioneAmministrazionePageState createState() =>
+      _DettaglioCommissioneAmministrazionePageState();
 }
 
-class _DettaglioCommissioneAmministrazionePageState extends State<DettaglioCommissioneAmministrazionePage> {
+class _DettaglioCommissioneAmministrazionePageState
+    extends State<DettaglioCommissioneAmministrazionePage> {
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   Widget build(BuildContext context) {
     // Formattazione delle date
     String formattedDataCreazione = widget.commissione.data_creazione != null
-        ? DateFormat('dd/MM/yyyy HH:mm').format(widget.commissione.data_creazione!)
+        ? DateFormat('dd/MM/yyyy HH:mm')
+            .format(widget.commissione.data_creazione!)
         : 'N/D';
     String formattedData = widget.commissione.data != null
         ? DateFormat('dd/MM/yyyy HH:mm').format(widget.commissione.data!)
@@ -87,9 +93,8 @@ class _DettaglioCommissioneAmministrazionePageState extends State<DettaglioCommi
     );
   }
 
-
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('http://192.168.1.52:8080/api/commissione');
+    final url = Uri.parse('${ipaddress}/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),

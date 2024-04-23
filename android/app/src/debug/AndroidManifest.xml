@@ -9,25 +9,28 @@
             <data android:scheme="mailto" />
         </intent>
     </queries>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera"/>
     <uses-permission android:name="android.permission.SEND_EMAIL" />
     package="com.example.myapp">
 
-    <!--    <application-->
-    <!--        android:allowBackup="true"-->
-    <!--        android:icon="@mipmap/ic_launcher"-->
-    <!--        android:label="@string/app_name"-->
-    <!--        android:roundIcon="@mipmap/ic_launcher_round"-->
-    <!--        android:supportsRtl="true"-->
-    <!--        android:theme="@style/AppTheme"-->
-    <!--        android:enableOnBackInvokedCallback="true"> &lt;!&ndash; Aggiungi questa riga &ndash;&gt;-->
+<!--        <application-->
+<!--            android:allowBackup="true"-->
+<!--            android:icon="@mipmap/ic_launcher"-->
+<!--            android:label="@string/app_name"-->
+<!--            android:roundIcon="@mipmap/ic_launcher_round"-->
+<!--            android:supportsRtl="true"-->
+<!--            android:theme="@style/AppTheme"-->
+<!--            android:enableOnBackInvokedCallback="true"> &lt;!&ndash; Aggiungi questa riga &ndash;&gt;-->
 
-    <!--        &lt;!&ndash; Altri elementi dell'application &ndash;&gt;-->
+<!--            &lt;!&ndash; Altri elementi dell'application &ndash;&gt;-->
 
-    <!--        <activity android:name=".MainActivity">-->
-    <!--            &lt;!&ndash; Configurazione dell'activity &ndash;&gt;-->
-    <!--        </activity>-->
-    <!--    </application>-->
+<!--            <activity android:name=".MainActivity">-->
+<!--                &lt;!&ndash; Configurazione dell'activity &ndash;&gt;-->
+<!--            </activity>-->
+<!--        </application>-->
 </manifest>

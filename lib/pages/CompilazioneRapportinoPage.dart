@@ -8,486 +8,427 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import '../model/CategoriaPrezzoListinoModel.dart';
+import '../model/DestinazioneModel.dart';
 import '../model/VeicoloModel.dart';
 import '../model/CategoriaInterventoSpecificoModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/ImmagineModel.dart';
 import 'dart:ui' as ui;
-
 import 'HomeFormTecnico.dart';
 
 class CompilazioneRapportinoPage extends StatefulWidget {
   final InterventoModel intervento;
 
-  CompilazioneRapportinoPage({Key? key, required this.intervento}) : super(key: key);
+  CompilazioneRapportinoPage({Key? key, required this.intervento})
+      : super(key: key);
 
   @override
-  _CompilazioneRapportinoPageState createState() => _CompilazioneRapportinoPageState();
+  _CompilazioneRapportinoPageState createState() =>
+      _CompilazioneRapportinoPageState();
 }
 
-class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage> {
-  String? selectedListino;
-  List<CategoriaPrezzoListinoModel> listini = [];
+class _CompilazioneRapportinoPageState
+    extends State<CompilazioneRapportinoPage> {
+  List<VeicoloModel> allVeicoli = [];
+  List<CategoriaPrezzoListinoModel> allListini = [];
+  XFile? pickedImage;
+  GlobalKey<SfSignaturePadState> _signaturePadKey =
+      GlobalKey<SfSignaturePadState>();
+  Uint8List? signatureBytes;
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController noteController = TextEditingController();
   late DateTime selectedDate;
   late TimeOfDay selectedStartTime;
-  String rapportinoText = '';
-  GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
-  Uint8List? signatureBytes;
-  String? selectedVeicolo;
-  String? selectedInterventoSpecifico;
-  List<CategoriaInterventoSpecificoModel> categorie =[];
-  XFile? pickedImage;
-  bool showListinoDropdown = false;
-  TextEditingController credenzialiController = TextEditingController();
-
-  String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
-    final now = DateTime.now();
-    final dateTime = DateTime(now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
-    return dateTime.toIso8601String();
-  }
+  VeicoloModel? selectedVeicolo;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  CategoriaPrezzoListinoModel? selectedListino;
+  List<DestinazioneModel> allDestinazioniByCliente = [];
+  DestinazioneModel? selectedDestinazione;
 
   @override
   void initState() {
     super.initState();
-    selectedDate = widget.intervento.data ?? DateTime.now();
+    getAllVeicoli();
+    getAllDestinazioniByCliente();
+    selectedDate = DateTime.now();
     selectedStartTime = TimeOfDay.now();
+  }
+
+  void _showDestinazioniDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Seleziona Destinazione', textAlign: TextAlign.center),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: allDestinazioniByCliente.map((destinazione) {
+                        return ListTile(
+                          leading: const Icon(Icons.home_work_outlined),
+                          title: Text(destinazione.denominazione!),
+                          onTap: () {
+                            setState(() {
+                              selectedDestinazione = destinazione;
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Compilazione Rapportino',
-          style: TextStyle(color: Colors.white),
+        appBar: AppBar(
+          title: Text(
+            'Compilazione Rapportino',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          centerTitle: true,
         ),
-        backgroundColor: Colors.red,
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Dettagli Intervento:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Text('Data: ${DateFormat('dd/MM/yyyy').format(selectedDate)}'),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Text('Orario Inizio: ${selectedStartTime.format(context)}'),
-                  IconButton(
-                    icon: Icon(Icons.access_time),
-                    onPressed: () async {
-                      final TimeOfDay? picked = await showTimePicker(
-                        context: context,
-                        initialTime: selectedStartTime,
-                      );
-                      if (picked != null && picked != selectedStartTime)
-                        setState(() {
-                          selectedStartTime = picked;
-                        });
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              FutureBuilder<List<VeicoloModel>>(
-                future: getAllVeicoli(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Errore durante il recupero dei veicoli: ${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    List<VeicoloModel> veicoli = snapshot.data!;
-                    return DropdownButton<String>(
-                      value: selectedVeicolo,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedVeicolo = newValue!;
-                          showListinoDropdown = true;
-                        });
-                      },
-                      isExpanded: true,
-                      hint: Text('Seleziona un veicolo'),
-                      items: veicoli.map<DropdownMenuItem<String>>((veicolo) {
-                        return DropdownMenuItem<String>(
-                          value: veicolo.id,
-                          child: Text(veicolo.descrizione.toString()),
-                        );
-                      }).toList(),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Dettagli Intervento:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Text('Data: ${DateFormat('dd/MM/yyyy').format(selectedDate)}'),
+                SizedBox(height: 10),
+                Text(
+                  'Seleziona il veicolo:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                DropdownButton<VeicoloModel>(
+                  value: selectedVeicolo,
+                  onChanged: (VeicoloModel? newValue) {
+                    setState(() {
+                      selectedVeicolo = newValue;
+                    });
+                  },
+                  items: allVeicoli.map((VeicoloModel veicolo) {
+                    return DropdownMenuItem<VeicoloModel>(
+                      value: veicolo,
+                      child: Text(veicolo
+                          .descrizione!), // Sostituisci 'nome' con il campo appropriato del tuo modello VeicoloModel
                     );
-                  } else {
-                    return Text('Nessun dato disponibile');
-                  }
-                },
-              ),
-              if (showListinoDropdown)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20),
-                    Text(
-                      'Seleziona Categoria Intervento Specifico:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    FutureBuilder<List<CategoriaInterventoSpecificoModel>>(
-                      future: getCategoriaByTipologia(widget.intervento.tipologia!.id.toString()),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Errore durante il recupero dei dati: ${snapshot.error}');
-                        } else if (snapshot.hasData) {
-                          categorie = snapshot.data!; // Aggiorna la variabile di classe con i dati ottenuti
-                          return DropdownButton<String>(
-                            value: selectedInterventoSpecifico,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedInterventoSpecifico = newValue!;
-                                selectedListino = null; // Resetta il listino selezionato quando viene selezionata una nuova categoria specifica di intervento
-                              });
-                            },
-                            isExpanded: true,
-                            hint: Text('Seleziona la categoria dell\'intervento'),
-                            items: categorie.map<DropdownMenuItem<String>>((categoria) {
-                              return DropdownMenuItem<String>(
-                                value: categoria.id,
-                                child: Text(categoria.descrizione.toString()),
-                              );
-                            }).toList(),
-                          );
-                        } else {
-                          return Text('Nessun dato disponibile');
-                        }
-                      },
-                    ),
-
-                    SizedBox(height: 20),
-                    Text(
-                      'Seleziona il Listino associato:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    FutureBuilder<List<CategoriaPrezzoListinoModel>>(
-                      future: selectedInterventoSpecifico != null ? getListiniByCategoria(selectedInterventoSpecifico!) : null,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Errore durante il recupero dei dati: ${snapshot.error}');
-                        } else if (snapshot.hasData) {
-                          List<CategoriaPrezzoListinoModel> listini = snapshot.data!;
-                          return DropdownButton<String>(
-                            value: selectedListino,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedListino = newValue!;
-                              });
-                            },
-                            isExpanded: true,
-                            hint: Text('Seleziona il listino associato'),
-                            items: listini.map<DropdownMenuItem<String>>((listino) {
-                              return DropdownMenuItem<String>(
-                                value: listino.id,
-                                child: Text(listino.descrizione.toString()),
-                              );
-                            }).toList(),
-                          );
-                        } else {
-                          return Text('Nessun dato disponibile');
-                        }
-                      },
-                    ),
-                  ],
+                  }).toList(),
                 ),
-              SizedBox(height: 20),
-              Text(
-                'Compila il rapportino:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                maxLines: null,
-                onChanged: (value) {
-                  setState(() {
-                    rapportinoText = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Inserisci qui il rapportino...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Inserisci la tua firma:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        content: Container(
-                          width: 700,
-                          height: 250,
-                          child: SfSignaturePad(
-                            key: _signaturePadKey,
-                            backgroundColor: Colors.white,
-                            strokeColor: Colors.black,
-                            minimumStrokeWidth: 2.0,
-                            maximumStrokeWidth: 4.0,
-                          ),
-                        ),
-                        actions: <Widget>[
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Chiudi'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              final signatureImage = await _signaturePadKey.currentState!.toImage(pixelRatio: 3.0);
-                              final data = await signatureImage.toByteData(format: ui.ImageByteFormat.png);
-                              setState(() {
-                                signatureBytes = data!.buffer.asUint8List();
-                              });
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Salva'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Center(
-                    child: signatureBytes != null
-                        ? Image.memory(signatureBytes!)
-                        : Text(
-                      'Tocca per aggiungere la firma',
-                      style: TextStyle(color: Colors.grey),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    _showDestinazioniDialog();
+                  },
+                  child: SizedBox(
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
+                        const Icon(Icons.arrow_drop_down),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Scatta una foto:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.camera_alt),
-                    onPressed: () {
-                      takePicture();
-                    },
-                  ),
-                  if (pickedImage != null)
-                    Container(
-                      width: 50,
-                      height: 50,
-                      child: InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Container(
-                                child: Image.file(
-                                  File(pickedImage!.path),
-                                  fit: BoxFit.contain,
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: Image.file(File(pickedImage!.path)),
-                      ),
-                    ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Credenziali cliente:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: TextFormField(
-                  controller: credenzialiController,
+                SizedBox(height: 20),
+                Text(
+                  'Compila il rapportino:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                TextFormField(
+                  controller: noteController,
+                  maxLines: null,
+                  onChanged: (value) {},
                   decoration: InputDecoration(
-                    hintText: 'Inserisci le credenziali del cliente (Username e password)',
+                    hintText: 'Inserisci qui il rapportino...',
                     border: OutlineInputBorder(),
                   ),
-                  // Gestisci il valore inserito dall'utente come preferisci
-                  onChanged: (value) {
-                    // Puoi gestire il valore inserito dall'utente qui
-                  },
                 ),
-              ),
-              SizedBox(height: 20),
-              Container(
-                width: double.infinity,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                SizedBox(height: 20),
+                Row(
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        saveIntervento();
-                        saveCredenziale();
-                        print('Rapportino salvato');
-
-                        // Reindirizzamento alla pagina "HomeFormTecnico"
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeFormTecnico(userData: widget.intervento.utente!)),
-                        );
-
-                        // Mostra lo snackBar
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Rapportino compilato con successo'),
-                          ),
-                        );
+                    Checkbox(
+                      value: widget.intervento.conclusione_parziale ?? false,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          widget.intervento.conclusione_parziale = value;
+                        });
                       },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        onPrimary: Colors.white,
-                        textStyle: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      child: Text('Salva Rapportino'),
                     ),
-
-                    ElevatedButton(
-                      onPressed: () {
-                        if (pickedImage != null) {
-                          saveImageIntervento(File(pickedImage!.path));
-                        }
-                        print('Immagine Salvata');
-                        //Navigator.pop(context); // Torna alla pagina precedente
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        onPrimary: Colors.white,
-                        textStyle: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      child: Text('Salva Foto'),
-                    ),
+                    Text('L\'intervento è terminato?'),
                   ],
                 ),
-              ),
-            ],
+                SizedBox(height: 30),
+                Text(
+                  'Inserisci la firma del cliente:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          content: Container(
+                            width: 700,
+                            height: 250,
+                            child: SfSignaturePad(
+                              key: _signaturePadKey,
+                              backgroundColor: Colors.white,
+                              strokeColor: Colors.black,
+                              minimumStrokeWidth: 2.0,
+                              maximumStrokeWidth: 4.0,
+                            ),
+                          ),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Chiudi'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final signatureImage = await _signaturePadKey
+                                    .currentState!
+                                    .toImage(pixelRatio: 3.0);
+                                final data = await signatureImage.toByteData(
+                                    format: ui.ImageByteFormat.png);
+                                setState(() {
+                                  signatureBytes = data!.buffer.asUint8List();
+                                });
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Salva'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: Center(
+                      child: signatureBytes != null
+                          ? Image.memory(signatureBytes!)
+                          : Text(
+                              'Tocca per aggiungere la firma',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Scatta una foto:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.camera_alt),
+                      onPressed: () {
+                        takePicture();
+                      },
+                    ),
+                    if (pickedImage != null)
+                      Container(
+                        width: 50,
+                        height: 50,
+                        child: InkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Container(
+                                  child: Image.file(
+                                    File(pickedImage!.path),
+                                    fit: BoxFit.contain,
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          child: Image.file(File(pickedImage!.path)),
+                        ),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Credenziali cliente:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  child: TextFormField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      hintText:
+                          'Inserisci le credenziali del cliente (Username)',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {},
+                  ),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  child: TextFormField(
+                    controller: passwordController,
+                    decoration: InputDecoration(
+                      hintText:
+                          'Inserisci le credenziali del cliente (Password)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          saveIntervento();
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('Rapportino compilato con successo'),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          onPrimary: Colors.white,
+                          textStyle: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        child: Text('Salva Rapportino'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (pickedImage != null) {
+                            saveImageIntervento(File(pickedImage!.path));
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          onPrimary: Colors.white,
+                          textStyle: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        child: Text('Salva Foto'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
-  Future<List<VeicoloModel>> getAllVeicoli() async {
-    try {
-      http.Response response = await http.get(Uri.parse('http://192.168.1.52:8080/api/veicolo'));
-      var responseData = json.decode(response.body.toString());
-      if (response.statusCode == 200) {
-        List<VeicoloModel> allVeicoli = [];
-        for (var veicoloJson in responseData) {
-          VeicoloModel veicolo = VeicoloModel.fromJson(veicoloJson);
-          allVeicoli.add(veicolo);
-        }
-        return allVeicoli;
-      } else {
-        return [];
-      }
-    } catch (e) {
-      print('Errore durante il fetch dei veicoli: $e');
-      return [];
-    }
+  String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
+    final now = DateTime.now();
+    final dateTime = DateTime(
+        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
+    return dateTime.toIso8601String();
   }
 
-  Future<void> saveCredenziale() async {
+  Future<void> saveCredenziali() async {
     try {
-      Map<String, dynamic> body = {
-        "descrizione" : credenzialiController.text.toString(),
-        "cliente": widget.intervento.cliente?.toMap(),
-        "utente": widget.intervento.utente?.toMap(),
-      };
-      print('Body credenziali della richiesta: $body');
-      final response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/credenziali'),
-        body: jsonEncode(body),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-      print('Risposta: ${response.statusCode} - ${response.body}');
-
+      final response =
+          await http.post(Uri.parse('${ipaddress}/api/credenziali'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'descrizione':
+                    "Username:${usernameController.text}, Password:${passwordController.text}",
+                'cliente': widget.intervento.cliente,
+                'utente': widget.intervento.utente
+              }));
       if (response.statusCode == 201) {
-        print('Credenziali salvate con successo, daje');
-      } else {
-        print('Qualcosa non va');
+        print("EVVIVAAAAAAAA");
       }
     } catch (e) {
-      print('Errore durante il salvataggio delle credenziali: $e');
+      print('Errore durante il salvataggio del preventivo');
     }
   }
 
-  Future<List<CategoriaInterventoSpecificoModel>> getCategoriaByTipologia(String tipologiaId) async {
+  Future<void> saveIntervento() async {
     try {
-      http.Response response = await http.get(Uri.parse('http://192.168.1.52:8080/api/categorieIntervento/tipologia/$tipologiaId'));
-      var responseData = json.decode(response.body.toString());
-      if (response.statusCode == 200) {
-        List<CategoriaInterventoSpecificoModel> allCategorieByTipologia = [];
-        for (var categoriaJson in responseData) {
-          CategoriaInterventoSpecificoModel categoria = CategoriaInterventoSpecificoModel.fromJson(categoriaJson);
-          allCategorieByTipologia.add(categoria);
+      final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': widget.intervento.id,
+            'data': widget.intervento.data?.toIso8601String(),
+            'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+            'orario_fine': DateTime.now().toIso8601String(),
+            'descrizione': widget.intervento.descrizione,
+            'importo_intervento': null,
+            'assegnato': true,
+            'conclusione_parziale' : widget.intervento.conclusione_parziale,
+            'concluso': true,
+            'saldato': false,
+            'note': noteController.text,
+            'firma_cliente': signatureBytes,
+            'utente': widget.intervento.utente?.toMap(),
+            'cliente': widget.intervento.cliente?.toMap(),
+            'veicolo': selectedVeicolo?.toMap(),
+            'merce' : widget.intervento.merce?.toMap(),
+            'tipologia': widget.intervento.tipologia,
+            'categoria': widget.intervento.categoria_intervento_specifico,
+            'tipologia_pagamento': widget.intervento.tipologia_pagamento,
+            'destinazione': selectedDestinazione?.toMap(),
+          }));
+      if (response.statusCode == 201) {
+        print('EVVAIIIIIIII');
+        if (usernameController.text.isNotEmpty &&
+            passwordController.text.isNotEmpty) {
+          saveCredenziali();
         }
-        return allCategorieByTipologia;
-      } else {
-        return [];
       }
     } catch (e) {
-      print('Errore durante il fetch delle categorie: $e');
-      return [];
-    }
-  }
-
-  Future<List<CategoriaPrezzoListinoModel>> getListiniByCategoria(String categoriaId) async {
-    try {
-      final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/listino/categoria/$categoriaId'));
-      if (response.statusCode == 200) {
-        final List<dynamic> responseData = json.decode(response.body);
-        List<CategoriaPrezzoListinoModel> listini = responseData.map((data) => CategoriaPrezzoListinoModel.fromJson(data)).toList();
-        return listini;
-      } else {
-        throw Exception('Failed to load listini');
-      }
-    } catch (e) {
-      print('Error fetching listini: $e');
-      throw Exception('Failed to load listini');
+      print('Errore durante il salvataggio del preventivo');
     }
   }
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       setState(() {
@@ -496,131 +437,71 @@ class _CompilazioneRapportinoPageState extends State<CompilazioneRapportinoPage>
     }
   }
 
-  Future<void> saveIntervento() async {
-    Map<String, dynamic> body = {};
-
-    final CategoriaPrezzoListinoModel listinoSelezionato = listini.firstWhere(
-          (listino) => listino.id == selectedListino,
-      orElse: () => CategoriaPrezzoListinoModel(null, null, null, null),
-    );
-
-    CategoriaInterventoSpecificoModel? categoriaSelezionata;
-
-    // Controllo per evitare sovrascrittura indesiderata della tipologia
-    if (selectedInterventoSpecifico != null) {
-      categoriaSelezionata = categorie.firstWhere(
-            (categoria) => categoria.id == selectedInterventoSpecifico,
-        orElse: () => CategoriaInterventoSpecificoModel(null, null, null),
-      );
-
-      if (listinoSelezionato != null) {
-        body['listino'] = listinoSelezionato.toJson();
-      } else {
-        print('Errore: Listino non trovato');
-        return;
-      }
-
-      if (categoriaSelezionata != null && categoriaSelezionata.tipologia != null) {
-        body['categoria_intervento_specifico'] = categoriaSelezionata.toJson();
-      } else {
-        print('Errore: Categoria intervento specifico non trovata');
-        return;
-      }
-    } else {
-      print('Errore: Categoria intervento specifico non selezionata');
-      return;
-    }
-
-    body.addAll({
-      'id': widget.intervento.id,
-      'data': selectedDate.toIso8601String(),
-      'orario_inizio': timeOfDayToIso8601String(selectedStartTime),
-      'orario_fine': DateTime.now().toIso8601String(),
-      'descrizione': widget.intervento.descrizione,
-      'importo_intervento': listinoSelezionato.prezzo,
-      'assegnato': true,
-      'concluso': true,
-      'saldato': true,
-      'note': rapportinoText.toString(),
-      'firma_cliente': signatureBytes,
-      'utente': widget.intervento.utente?.toMap(),
-      'cliente': widget.intervento.cliente?.toMap(),
-      'veicolo': widget.intervento.veicolo?.toMap(),
-      'tipologia': widget.intervento.tipologia?.toMap(),
-      'categoria_intervento_specifico': categoriaSelezionata.toJson(),
-      'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-      'destinazione': widget.intervento.destinazione?.toMap(),
-    });
-
+  Future<void> saveImageIntervento(File imageFile) async {
     try {
-      final response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/intervento'),
-        body: jsonEncode(body),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
+      var request = http.MultipartRequest('POST', Uri.parse('$ipaddress/api/immagine/${widget.intervento.id}'));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'intervento',
+          imageFile.path,
+          contentType: MediaType('image', 'jpeg'),
+        ),
       );
-      if (response.statusCode == 201) {
-        print('Intervento salvato con successo');
-        // Naviga alla pagina HomeFormTecnico
-        Navigator.pushReplacementNamed(context, '/HomeFormTecnico');
-        // Mostra lo Snackbar
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        print('Immagine salvata con successo');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Rapportino compilato con successo'),
+            content: Text('Foto salvata con successo!'),
+            duration: Duration(seconds: 2),
           ),
         );
       } else {
-        print('Errore durante il salvataggio dell\'intervento: ${response.statusCode}');
+        print('Errore durante il salvataggio dell\'immagine: ${response.statusCode}');
       }
     } catch (e) {
       print('Errore durante la chiamata HTTP: $e');
     }
   }
 
-
-
-  Future<void> saveImageIntervento(File imageFile) async {
+  Future<void> getAllDestinazioniByCliente() async {
     try {
-      final CategoriaPrezzoListinoModel listinoSelezionato = listini.firstWhere(
-            (listino) => listino.id == selectedListino,
-        orElse: () => CategoriaPrezzoListinoModel(null, null, null, null),
-      );
-      final CategoriaInterventoSpecificoModel categoriaSelezionata = categorie.firstWhere(
-            (categoria) => categoria.id == selectedInterventoSpecifico,
-        orElse: () => CategoriaInterventoSpecificoModel(null, null, null),
-      );
-      String interventoId = widget.intervento.id.toString();
-
-      // Creazione della richiesta multipart
-      var request = http.MultipartRequest('POST', Uri.parse('http://192.168.1.52:8080/api/immagine'));
-      request.fields.addAll({
-        'id': interventoId,
-      });
-      request.headers.addAll(<String, String>{
-        'Content-Type': 'multipart/form-data',
-      });
-
-      // Aggiunta dell'immagine alla richiesta
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'immagine',
-          imageFile.path,
-          contentType: MediaType('image', 'jpeg'),
-        ),
-      );
-
-      // Invio della richiesta
-      var response = await request.send();
-
-      // Controllo della risposta
-      if (response.statusCode == 201) {
-        print('Immagine salvata con successo');
+      final response = await http.get(Uri.parse(
+          '${ipaddress}/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = json.decode(response.body);
+        setState(() {
+          allDestinazioniByCliente = responseData
+              .map((data) => DestinazioneModel.fromJson(data))
+              .toList();
+        });
       } else {
-        print('Errore durante il salvataggio dell\'immagine: ${response.statusCode}');
+        throw Exception('Failed to load Destinazioni per cliente');
       }
     } catch (e) {
-      print('Errore durante la chiamata HTTP: $e');
+      print('Errore durante la richiesta HTTP: $e');
+      setState(() {
+
+      });
+    }
+  }
+
+
+  Future<void> getAllVeicoli() async {
+    http.Response response =
+        await http.get(Uri.parse('${ipaddress}/api/veicolo'));
+    var responseData = json.decode(response.body.toString());
+    if (response.statusCode == 200) {
+      List<VeicoloModel> veicoli = [];
+      for (var veicoloJson in responseData) {
+        VeicoloModel veicolo = VeicoloModel.fromJson(veicoloJson);
+        veicoli.add(veicolo);
+      }
+      setState(() {
+        allVeicoli = veicoli;
+      });
+    } else {
+      print("Errore");
     }
   }
 }

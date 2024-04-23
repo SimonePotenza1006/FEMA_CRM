@@ -19,6 +19,7 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
   bool isLoading = true;
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
   Future<void> init() async {
     print('Tiro giù tutte le credenziali');
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/credenziali');
+      var apiUrl = Uri.parse('${ipaddress}/api/credenziali');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -40,7 +41,8 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
         }
         setState(() {
           allCredenziali = credenziali;
-          filteredCredenziali = allCredenziali; // Inizialmente, la lista filtrata è uguale a quella completa
+          filteredCredenziali =
+              allCredenziali; // Inizialmente, la lista filtrata è uguale a quella completa
           isLoading = false;
         });
       } else {
@@ -55,7 +57,8 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Errore di connessione'),
-            content: Text('Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            content: Text(
+                'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -90,56 +93,56 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
         title: !isSearching
             ? Text('Lista credenziali', style: TextStyle(color: Colors.white))
             : TextField(
-          controller: searchController,
-          onChanged: filterCredenziali,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: 'Cerca per nome e cognome',
-            hintStyle: TextStyle(color: Colors.white70),
-            border: InputBorder.none,
-          ),
-        ),
+                controller: searchController,
+                onChanged: filterCredenziali,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Cerca per nome e cognome',
+                  hintStyle: TextStyle(color: Colors.white70),
+                  border: InputBorder.none,
+                ),
+              ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
           isSearching
               ? IconButton(
-            icon: Icon(Icons.cancel),
-            onPressed: () {
-              setState(() {
-                this.isSearching = false;
-                this.searchController.clear();
-                this.filteredCredenziali = allCredenziali;
-              });
-            },
-          )
+                  icon: Icon(Icons.cancel),
+                  onPressed: () {
+                    setState(() {
+                      this.isSearching = false;
+                      this.searchController.clear();
+                      this.filteredCredenziali = allCredenziali;
+                    });
+                  },
+                )
               : IconButton(
-            icon: Icon(Icons.search),
-            color: Colors.white,
-            onPressed: () {
-              setState(() {
-                this.isSearching = true;
-              });
-            },
-          ),
+                  icon: Icon(Icons.search),
+                  color: Colors.white,
+                  onPressed: () {
+                    setState(() {
+                      this.isSearching = true;
+                    });
+                  },
+                ),
         ],
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(
-        children: [
-          Expanded(
-            child: ListView.separated(
-              itemCount: filteredCredenziali.length,
-              separatorBuilder: (context, index) => Divider(),
-              itemBuilder: (context, index) {
-                final credenziale = filteredCredenziali[index];
-                return buildViewCredenziali(credenziale);
-              },
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: filteredCredenziali.length,
+                    separatorBuilder: (context, index) => Divider(),
+                    itemBuilder: (context, index) {
+                      final credenziale = filteredCredenziali[index];
+                      return buildViewCredenziali(credenziale);
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 

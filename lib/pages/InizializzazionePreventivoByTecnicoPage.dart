@@ -11,14 +11,17 @@ import '../model/AgenteModel.dart';
 class InizializzazionePreventivoByTecnicoPage extends StatefulWidget {
   final UtenteModel utente;
 
-  const InizializzazionePreventivoByTecnicoPage({Key? key, required this.utente}) : super(key: key);
+  const InizializzazionePreventivoByTecnicoPage(
+      {Key? key, required this.utente})
+      : super(key: key);
 
   @override
   _InizializzazionePreventivoByTecnicoPageState createState() =>
       _InizializzazionePreventivoByTecnicoPageState();
 }
 
-class _InizializzazionePreventivoByTecnicoPageState extends State<InizializzazionePreventivoByTecnicoPage> {
+class _InizializzazionePreventivoByTecnicoPageState
+    extends State<InizializzazionePreventivoByTecnicoPage> {
   String? selectedCategoria;
   String? selectedListino;
   ClienteModel? selectedCliente;
@@ -31,11 +34,48 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
   List<AgenteModel> agentiList = [];
   List<ClienteModel> filteredClientiList = [];
   List<DestinazioneModel> allDestinazioniByCliente = [];
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
     super.initState();
+    checkAgentExistence();
     initializeData();
+  }
+
+  Future<void> checkAgentExistence() async {
+    await getAllAgenti();
+    bool agentExists = false;
+    for (var agente in agentiList) {
+      if (agente.nome == widget.utente.nome &&
+          agente.cognome == widget.utente.cognome) {
+        agentExists = true;
+        break;
+      }
+    }
+    if (!agentExists) {
+      // Mostra un dialog di errore e torna alla pagina precedente
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Errore'),
+            content: Text(
+              'La tua utenza non è stata riconosciuta come agente!',
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(); // Torna alla pagina precedente
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Future<void> initializeData() async {
@@ -52,7 +92,8 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrazione preventivo', style: TextStyle(color: Colors.white)),
+        title: const Text('Registrazione preventivo',
+            style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
@@ -129,7 +170,8 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                            selectedCliente?.denominazione ??
+                                'Seleziona Cliente',
                             style: TextStyle(fontSize: 16),
                           ),
                           Icon(Icons.arrow_drop_down),
@@ -148,7 +190,8 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            selectedDestinazione?.denominazione ?? 'Seleziona Destinazione',
+                            selectedDestinazione?.denominazione ??
+                                'Seleziona Destinazione',
                             style: TextStyle(fontSize: 16),
                           ),
                           Icon(Icons.arrow_drop_down),
@@ -166,7 +209,8 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
                         savePrimePreventivo();
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.red),
                         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                           EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                         ),
@@ -210,45 +254,45 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
         selectedListinoValue = '50%';
         break;
       default:
-      // Se nessun valore corrisponde, mantieni il valore attuale di selectedListino
+        // Se nessun valore corrisponde, mantieni il valore attuale di selectedListino
         selectedListinoValue = selectedListino;
     }
 
     try {
-      final response = await http.post(
-          Uri.parse('http://192.168.1.52:8080/api/preventivo'),
+      final response = await http.post(Uri.parse('${ipaddress}/api/preventivo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
-            'azienda' : selectedAzienda?.toMap(),
+            'azienda': selectedAzienda?.toMap(),
             'agente': agente?.toMap(),
-            'categoria_merceologica' : selectedCategoria.toString(),
-            'listino': selectedListinoValue, // Utilizza selectedListinoValue invece di selectedListino
-            'cliente' : selectedCliente?.toMap(),
-            'destinazione' : selectedDestinazione?.toMap(),
-            'accettato' : false,
-            'rifiutato' : false,
+            'categoria_merceologica': selectedCategoria.toString(),
+            'listino':
+                selectedListinoValue, // Utilizza selectedListinoValue invece di selectedListino
+            'cliente': selectedCliente?.toMap(),
+            'destinazione': selectedDestinazione?.toMap(),
+            'accettato': false,
+            'rifiutato': false,
             'attesa': true,
-            'pendente':false,
-            'consegnato' : false,
-            'descrizione' : "Destinazione: " + selectedDestinazione!.denominazione.toString(),
-            'utente' : widget.utente.toMap(),
-          })
-      );
+            'pendente': false,
+            'consegnato': false,
+            'descrizione': "Destinazione: " +
+                selectedDestinazione!.denominazione.toString(),
+            'utente': widget.utente.toMap(),
+          }));
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Preventivo registrato, attesa di compilazione completa'),
+          content:
+              Text('Preventivo registrato, attesa di compilazione completa'),
         ),
       );
-    } catch (e){
+    } catch (e) {
       print('Errore durante il salvataggio del preventivo');
     }
   }
 
-
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/cliente');
+      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -272,11 +316,14 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/destinazione/cliente/$clientId'));
+      final response = await http
+          .get(Uri.parse('${ipaddress}/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
-          allDestinazioniByCliente = responseData.map((data) => DestinazioneModel.fromJson(data)).toList();
+          allDestinazioniByCliente = responseData
+              .map((data) => DestinazioneModel.fromJson(data))
+              .toList();
         });
       } else {
         throw Exception('Failed to load Destinazioni per cliente');
@@ -305,7 +352,9 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
                   onChanged: (value) {
                     setState(() {
                       filteredClientiList = clientiList
-                          .where((cliente) => cliente.denominazione!.toLowerCase().contains(value.toLowerCase()))
+                          .where((cliente) => cliente.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
                           .toList();
                     });
                   },
@@ -321,7 +370,7 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
                       children: filteredClientiList.map((cliente) {
                         return ListTile(
                           leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione! + ", " + cliente.indirizzo!),
+                          title: Text(cliente.denominazione!),
                           onTap: () async {
                             setState(() {
                               selectedCliente = cliente;
@@ -407,7 +456,7 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/agente');
+      var apiUrl = Uri.parse('${ipaddress}/api/agente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -430,7 +479,7 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/azienda');
+      var apiUrl = Uri.parse('${ipaddress}/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -454,7 +503,8 @@ class _InizializzazionePreventivoByTecnicoPageState extends State<Inizializzazio
   Future<void> findAgente() async {
     await getAllAgenti();
     for (var agente in agentiList) {
-      if (agente.nome == widget.utente.nome && agente.cognome == widget.utente.cognome) {
+      if (agente.nome == widget.utente.nome &&
+          agente.cognome == widget.utente.cognome) {
         setState(() {
           this.agente = agente;
         });

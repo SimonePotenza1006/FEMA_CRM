@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:io/ansi.dart';
 import 'dart:convert';
 import '../databaseHandler/DbHelper.dart';
 import 'package:http/http.dart' as http;
-
 
 class CreazioneClientePage extends StatefulWidget {
   const CreazioneClientePage({super.key, Key? key1});
@@ -11,7 +11,7 @@ class CreazioneClientePage extends StatefulWidget {
   _CreazioneClientePageState createState() => _CreazioneClientePageState();
 }
 
-class _CreazioneClientePageState extends State<CreazioneClientePage>{
+class _CreazioneClientePageState extends State<CreazioneClientePage> {
   DbHelper? dbHelper;
   final _formKey = GlobalKey<FormState>();
   final _codiceFiscaleController = TextEditingController();
@@ -31,254 +31,157 @@ class _CreazioneClientePageState extends State<CreazioneClientePage>{
   final _emailController = TextEditingController();
   final _pecController = TextEditingController();
   final _noteController = TextEditingController();
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
-  void initState(){
+  void initState() {
     dbHelper = DbHelper();
     super.initState();
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Creazione nuovo cliente',
-        style: TextStyle(color: Colors.white),
+        title: const Text(
+          'Creazione nuovo cliente',
+          style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
-
-      body : SingleChildScrollView(
-        child:Padding(
-          padding : const EdgeInsets.all(16.0),
-          child : Form(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextFormField(
-                    controller: _codiceFiscaleController,
-                    decoration: InputDecoration(labelText : 'Codice Fiscale'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un codice fiscale';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _partitaIvaController,
-                    decoration: InputDecoration(labelText : 'Partita IVA'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una Partita IVA';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _denominazioneController,
-                    decoration: InputDecoration(labelText : 'Denominazione'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una denominazione';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _indirizzoController,
-                    decoration: InputDecoration(labelText : 'Indirizzo'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un indirizzo';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _capController,
-                    decoration: InputDecoration(labelText : 'CAP'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un CAP';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _cittaController,
-                    decoration: InputDecoration(labelText : 'Città'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una città';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _provinciaController,
-                    decoration: InputDecoration(labelText : 'Provincia'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una provincia';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _nazioneController,
-                    decoration: InputDecoration(labelText : 'Nazione'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una nazione';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _recapitoFatturazioneElettronicaController,
-                    decoration: InputDecoration(labelText : 'Recapito Fatturazione Elettronica'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un recapito per la fatturazione elettronica';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _riferimentoAmministrativoController,
-                    decoration: InputDecoration(labelText : 'Riferimento Amministrativo'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un riferimento amministrativo';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _referenteController,
-                    decoration: InputDecoration(labelText : 'Referente'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un referente';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _faxController,
-                    decoration: InputDecoration(labelText : 'Fax'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un fax';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _telefonoController,
-                    decoration: InputDecoration(labelText : 'Telefono'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un numero di telefono';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _cellulareController,
-                    decoration: InputDecoration(labelText : 'Cellulare'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un numero di cellulare';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(labelText : 'Email'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un indirizzo email';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                    controller: _pecController,
-                    decoration: InputDecoration(labelText : 'Pec'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un indirizzo PEC';
-                      }
-                      return null;
-                    }
-                ),
-                TextFormField(
-                  controller: _noteController,
-                  decoration: InputDecoration(labelText : 'Note'),
-                ),
+                _buildTextFormField(_codiceFiscaleController, 'Codice Fiscale',
+                    'Inserisci un codice fiscale'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_partitaIvaController, 'Partita IVA',
+                    'Inserisci una Partita IVA'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_denominazioneController, 'Denominazione',
+                    'Inserisci una denominazione'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_indirizzoController, 'Indirizzo',
+                    'Inserisci un indirizzo'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_capController, 'CAP', 'Inserisci un CAP'),
+                SizedBox(height: 15,),
+                _buildTextFormField(
+                    _cittaController, 'Città', 'Inserisci una città'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_provinciaController, 'Provincia (Solo la sigla)',
+                    'Inserisci una provincia (Solo la sigla)'),
+                SizedBox(height: 15,),
+                _buildTextFormField(
+                    _nazioneController, 'Nazione', 'Inserisci una nazione'),
+                SizedBox(height: 15,),
+                _buildTextFormField(
+                    _recapitoFatturazioneElettronicaController,
+                    'Recapito Fatturazione Elettronica',
+                    'Inserisci un recapito per la fatturazione elettronica'),
+                SizedBox(height: 15,),
+                _buildTextFormField(
+                    _riferimentoAmministrativoController,
+                    'Riferimento Amministrativo',
+                    'Inserisci un riferimento amministrativo'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_referenteController, 'Referente',
+                    'Inserisci un referente'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_faxController, 'Fax', 'Inserisci un fax'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_telefonoController, 'Telefono',
+                    'Inserisci un numero di telefono'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_cellulareController, 'Cellulare',
+                    'Inserisci un numero di cellulare'),
+                SizedBox(height: 15,),
+                _buildTextFormField(
+                    _emailController, 'Email', 'Inserisci un indirizzo email'),
+                SizedBox(height: 15,),
+                _buildTextFormField(
+                    _pecController, 'PEC', 'Inserisci un indirizzo PEC'),
+                SizedBox(height: 15,),
+                _buildTextFormField(_noteController, 'Note', ''),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed:() {
+                  onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      final codiceFiscale = _codiceFiscaleController.text;
-                      final partitaIva = _partitaIvaController.text;
-                      final denominazione = _denominazioneController.text;
-                      final indirizzo = _indirizzoController.text;
-                      final cap = _capController.text;
-                      final citta = _cittaController.text;
-                      final provincia = _provinciaController.text;
-                      final nazione = _nazioneController.text;
-                      final recapitoFatturazioneElettronica = _recapitoFatturazioneElettronicaController
-                          .text;
-                      final riferimentoAmministrativo = _riferimentoAmministrativoController
-                          .text;
-                      final referente = _referenteController.text;
-                      final fax = _faxController.text;
-                      final telefono = _telefonoController.text;
-                      final cellulare = _cellulareController.text;
-                      final email = _emailController.text;
-                      final pec = _pecController.text;
-                      final note = _noteController.text;
-                      createNewCliente(codiceFiscale, partitaIva, denominazione, indirizzo, cap, citta, provincia, nazione, recapitoFatturazioneElettronica, riferimentoAmministrativo, referente, fax, telefono, cellulare, email, pec, note);
+                      createNewCliente();
                     }
                   },
-                  child: Text('Salva'),
+                  child: Text('Salva', style: TextStyle(color: Colors.white)),
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.red),
+                  ),
                 ),
               ],
             ),
           ),
         ),
-      )
-
+      ),
     );
   }
 
-  Future<void> createNewCliente(String codiceFiscale, String partitaIva, String denominazione, String indirizzo, String cap, String citta, String provincia, String nazione, String recapitoFatturazioneElettronica, String riferimentoAmministrativo, String referente, String fax, String telefono, String cellulare, String email, String pec, String note) async{
-    final url = Uri.parse('http://192.168.1.52:8080/api/cliente');
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(
+            color: Colors.grey,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(
+            color: Colors.red,
+          ),
+        ),
+        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Campo obbligatorio';
+        }
+        return null;
+      },
+    );
+  }
+
+  Future<void> createNewCliente() async {
+    final url = Uri.parse('${ipaddress}/api/cliente');
     final body = jsonEncode({
-      'codice_fiscale' : codiceFiscale,
-      'partita_iva': partitaIva,
-      'denominazione': denominazione,
-      'indirizzo': indirizzo,
-      'cap': cap,
-      'citta': citta,
-      'provincia': provincia,
-      'nazione' : nazione,
-      'recapito_fatturazione_elettronica': recapitoFatturazioneElettronica,
-      'riferimento_amministrativo': riferimentoAmministrativo,
-      'referente' : referente,
-      'fax': fax,
-      'telefono' : telefono,
-      'cellulare' : cellulare,
-      'email' : email,
-      'pec': pec,
-      'note': note,
+      'codice_fiscale': _codiceFiscaleController.text,
+      'partita_iva': _partitaIvaController.text,
+      'denominazione': _denominazioneController.text,
+      'indirizzo': _indirizzoController.text,
+      'cap': _capController.text,
+      'citta': _cittaController.text,
+      'provincia': _provinciaController.text,
+      'nazione': _nazioneController.text,
+      'recapito_fatturazione_elettronica':
+          _recapitoFatturazioneElettronicaController.text,
+      'riferimento_amministrativo': _riferimentoAmministrativoController.text,
+      'referente': _referenteController.text,
+      'fax': _faxController.text,
+      'telefono': _telefonoController.text,
+      'cellulare': _cellulareController.text,
+      'email': _emailController.text,
+      'pec': _pecController.text,
+      'note': _noteController.text,
     });
     try {
       final response = await http.post(
@@ -286,9 +189,21 @@ class _CreazioneClientePageState extends State<CreazioneClientePage>{
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-      if(response.statusCode == 200){
+      if (response.statusCode == 201) {
         print('Cliente creato con successo!');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Cliente creato!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Qualcosa è andato storto!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
         throw Exception('Errore durante il salvataggio del cliente');
       }
     } catch (e) {

@@ -4,11 +4,12 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/rendering.dart';
 
-
 import 'package:fema_crm/model/PreventivoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:email_validator/email_validator.dart';
 
@@ -20,7 +21,6 @@ import 'package:http/http.dart' as http;
 
 import '../model/RelazionePreventivoProdottiModel.dart';
 import 'PDFInterventoPage.dart';
-
 
 class PDFPreventivoPage extends StatefulWidget {
   final PreventivoModel preventivo;
@@ -35,7 +35,7 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
   late Future<Uint8List> _pdfFuture;
   List<RelazionePreventivoProdottiModel> allProdotti = [];
   GlobalKey globalKey = GlobalKey();
-
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -56,7 +56,9 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Errore durante la generazione del PDF: ${snapshot.error.toString()}'));
+            return Center(
+                child: Text(
+                    'Errore durante la generazione del PDF: ${snapshot.error.toString()}'));
           } else {
             return PDFViewerPage(pdfBytes: snapshot.data!);
           }
@@ -88,8 +90,10 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
 
                       // 3. Invia l'email
                       try {
-                        final String subject = '(PREVENTIVO) ${widget.preventivo.id} ${DateFormat('yyyy').format(widget.preventivo.data_creazione!)} del ${DateFormat('dd/MM/yyyy').format(widget.preventivo.data_creazione!)}';
-                        final String body = 'Allego il preventivo come richiesto.';
+                        final String subject =
+                            '(PREVENTIVO) ${widget.preventivo.id} ${DateFormat('yyyy').format(widget.preventivo.data_creazione!)} del ${DateFormat('dd/MM/yyyy').format(widget.preventivo.data_creazione!)}';
+                        final String body =
+                            'Allego il preventivo come richiesto.';
                         final List<String> recipients = ['info@femasistemi.it'];
 
                         // Genera un URL con i parametri dell'email
@@ -99,7 +103,8 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                           queryParameters: {
                             'subject': subject,
                             'body': body,
-                            'attachment': 'data:application/pdf;base64,${base64Encode(pdfBytes)}'
+                            'attachment':
+                                'data:application/pdf;base64,${base64Encode(pdfBytes)}'
                           },
                         );
 
@@ -110,7 +115,6 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                         print('Errore durante l\'invio dell\'email: $e');
                       }
                     },
-
                     child: Text('Si'),
                   ),
                 ],
@@ -128,6 +132,59 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
     );
   }
 
+  Future<void> _generateAndSendPDF() async {
+    try {
+      // Genera il PDF
+      final Uint8List pdfBytes = await _generatePDF();
+
+      // Crea un file temporaneo
+      final tempDir = await getTemporaryDirectory();
+      final tempFilePath = '${tempDir.path}/preventivo.pdf';
+      final File tempFile = File(tempFilePath);
+      await tempFile.writeAsBytes(pdfBytes);
+
+      // Prepara i dati per l'email
+      final String smtpServerHost = 'mail.femasistemi.it';
+      final String subject =
+          '(PREVENTIVO) n ${widget.preventivo.id} del ${widget.preventivo.data_creazione}';
+      final String body =
+          'In allegato il PDF del preventivo numero ${widget.preventivo.id} rivolto al cliente ${widget.preventivo.cliente?.denominazione}';
+      final String username =
+          'noreply@femasistemi.it'; // Inserisci il tuo indirizzo email
+      final String password = 'WGnr18@59.'; // Inserisci la tua password
+      final int smtpServerPort = 465;
+      final String recipient = 'info@femasistemi.it';
+
+      // Configura il server SMTP
+      final smtpServer = SmtpServer(
+        smtpServerHost,
+        port: smtpServerPort,
+        username: username,
+        password: password,
+        ssl: true, // Utilizza SSL/TLS per la connessione SMTP
+      );
+
+      // Crea il messaggio email con allegato
+      final message = Message()
+        ..from = Address(username, 'App FEMA')
+        ..recipients.add(recipient)
+        ..subject = subject
+        ..text = body
+        ..attachments.add(FileAttachment(
+          tempFile,
+          fileName: 'rapportino.pdf',
+        ));
+
+      // Invia l'email
+      final sendReport = await send(message, smtpServer);
+      print('Email inviata con successo: $sendReport');
+
+      // Elimina il file temporaneo
+      await tempFile.delete();
+    } catch (e) {
+      print('Errore durante l\'invio dell\'email: $e');
+    }
+  }
 
   Future<Uint8List> _generatePDF() async {
     try {
@@ -148,7 +205,7 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
           logoPath = 'assets/images/fema_logo.jpg';
           break;
         default:
-        // Logo di default nel caso in cui non corrisponda a nessuna delle aziende con logo specifico
+          // Logo di default nel caso in cui non corrisponda a nessuna delle aziende con logo specifico
           logoPath = 'assets/images/fema_logo.jpg';
       }
 
@@ -168,25 +225,40 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
                       pw.Container(
-                        padding: pw.EdgeInsets.only(left: 50), // Aggiunge un margine a sinistra
+                        padding: pw.EdgeInsets.only(
+                            left: 50), // Aggiunge un margine a sinistra
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text(
                               widget.preventivo.azienda!.nome!.toUpperCase(),
-                              style: pw.TextStyle(fontSize: 17), // Riduci la dimensione del font
+                              style: pw.TextStyle(
+                                  fontSize:
+                                      17), // Riduci la dimensione del font
                             ),
                             pw.SizedBox(height: 7),
-                            pw.Text(widget.preventivo.azienda!.luogo_di_lavoro!, style: pw.TextStyle(fontSize: 6)), // Riduci la dimensione del font
+                            pw.Text(widget.preventivo.azienda!.luogo_di_lavoro!,
+                                style: pw.TextStyle(
+                                    fontSize:
+                                        6)), // Riduci la dimensione del font
                             pw.SizedBox(height: 2),
-                            pw.Text('Tel. ${widget.preventivo.azienda!.telefono!}', style: pw.TextStyle(fontSize: 6)), // Riduci la dimensione del font
+                            pw.Text(
+                                'Tel. ${widget.preventivo.azienda!.telefono!}',
+                                style: pw.TextStyle(
+                                    fontSize:
+                                        6)), // Riduci la dimensione del font
                             pw.SizedBox(height: 2),
-                            pw.Text('C.F / P. iva ${widget.preventivo.azienda!.partita_iva!}', style: pw.TextStyle(fontSize: 6)), // Riduci la dimensione del font
+                            pw.Text(
+                                'C.F / P. iva ${widget.preventivo.azienda!.partita_iva!}',
+                                style: pw.TextStyle(
+                                    fontSize:
+                                        6)), // Riduci la dimensione del font
                           ],
                         ),
                       ),
                       pw.Container(
-                        margin: pw.EdgeInsets.only(right: 25), // Aggiunge del margine a sinistra
+                        margin: pw.EdgeInsets.only(
+                            right: 25), // Aggiunge del margine a sinistra
                         width: 100, // Larghezza del logo
                         height: 100, // Altezza del logo
                         child: pw.Image(
@@ -196,9 +268,11 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                     ],
                   ),
                   pw.SizedBox(height: 1),
-                  pw.Text("Preventivo ${widget.preventivo.azienda?.nome}", style: pw.TextStyle(fontSize: 15)),
+                  pw.Text("Preventivo ${widget.preventivo.azienda?.nome}",
+                      style: pw.TextStyle(fontSize: 15)),
                   pw.SizedBox(height: 3),
-                  pw.Text("n. ${widget.preventivo.id} / ${DateFormat('yyyy').format(widget.preventivo.data_creazione!)} del ${DateFormat('dd/MM/yyyy').format(widget.preventivo.data_creazione!)}"),
+                  pw.Text(
+                      "n. ${widget.preventivo.id} / ${DateFormat('yyyy').format(widget.preventivo.data_creazione!)} del ${DateFormat('dd/MM/yyyy').format(widget.preventivo.data_creazione!)}"),
                   pw.SizedBox(height: 4),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -208,8 +282,11 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                       _buildDestinazioneSection(),
                     ],
                   ),
-                  pw.SizedBox(height: 10), // Aggiungi uno spazio prima della tabella dei prodott
-                  _buildProdottiTable(allProdotti), // Aggiungi la tabella dei prodotti
+                  pw.SizedBox(
+                      height:
+                          10), // Aggiungi uno spazio prima della tabella dei prodott
+                  _buildProdottiTable(
+                      allProdotti), // Aggiungi la tabella dei prodotti
                 ],
               ),
             );
@@ -228,7 +305,8 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
   // Metodo per recuperare i dati dei prodotti dal server
   Future<void> getProdotti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+      var apiUrl = Uri.parse(
+          '${ipaddress}/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -250,7 +328,8 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Errore di connessione'),
-            content: Text('Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            content: Text(
+                'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -273,164 +352,163 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
 
   // Metodo per costruire la sezione del destinatario
   pw.Widget _buildDestinatarioSection() {
-    return
-      pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(
-            'Destinatario',
-            style: pw.TextStyle(
-              fontWeight: pw.FontWeight.bold,
-              fontSize: 9,
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          'Destinatario',
+          style: pw.TextStyle(
+            fontWeight: pw.FontWeight.bold,
+            fontSize: 9,
+          ),
+        ),
+        pw.SizedBox(height: 1),
+        pw.Container(
+          width: PdfPageFormat.cm * 9.5,
+          height: PdfPageFormat.cm * 3,
+          decoration: pw.BoxDecoration(
+            color: PdfColors.grey200,
+            border: pw.Border.all(
+              color: PdfColors.black,
+              width: 1,
             ),
           ),
-          pw.SizedBox(height: 1),
-          pw.Container(
-            width: PdfPageFormat.cm * 9.5,
-            height: PdfPageFormat.cm * 3,
-            decoration: pw.BoxDecoration(
-              color: PdfColors.grey200,
-              border: pw.Border.all(
-                color: PdfColors.black,
-                width: 1,
+          child: pw.Column(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'DENOMINAZIONE',
+                      style: pw.TextStyle(fontSize: 9),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.preventivo.cliente?.denominazione ?? '',
+                      style: pw.TextStyle(fontSize: 9),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            child: pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'DENOMINAZIONE',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'INDIRIZZO',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.preventivo.cliente?.denominazione ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.preventivo.cliente?.indirizzo ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'INDIRIZZO',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'CAP',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.preventivo.cliente?.indirizzo ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.preventivo.cliente?.cap ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'CAP',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 30, right: 3),
+                    child: pw.Text(
+                      'CITTÀ',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.preventivo.cliente?.cap ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.preventivo.cliente?.citta ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 30, right: 3),
-                      child: pw.Text(
-                        'CITTÀ',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 45, right: 3),
+                    child: pw.Text(
+                      '(${widget.preventivo.cliente?.provincia})',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.preventivo.cliente?.citta ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'C.F./P.Iva',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 45, right: 3),
-                      child: pw.Text(
-                        '(${widget.preventivo.cliente?.provincia})',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      (widget.preventivo.cliente?.codice_fiscale ?? '') != ''
+                          ? widget.preventivo.cliente!.codice_fiscale!
+                          : widget.preventivo.cliente?.partita_iva ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'C.F./P.Iva',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'Tel.',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        (widget.preventivo.cliente?.codice_fiscale ?? '') != ''
-                            ? widget.preventivo.cliente!.codice_fiscale!
-                            : widget.preventivo.cliente?.partita_iva ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.preventivo.cliente?.telefono ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'Tel.',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 40, right: 3),
+                    child: pw.Text(
+                      'Cell.',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.preventivo.cliente?.telefono ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.preventivo.cliente?.cellulare ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 40, right: 3),
-                      child: pw.Text(
-                        'Cell.',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
-                    ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.preventivo.cliente?.cellulare ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 
   // Metodo per costruire la sezione della destinazione
@@ -547,7 +625,8 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                   pw.Padding(
                     padding: pw.EdgeInsets.only(right: 3),
                     child: pw.Text(
-                      (widget.preventivo.destinazione?.codice_fiscale ?? '') != ''
+                      (widget.preventivo.destinazione?.codice_fiscale ?? '') !=
+                              ''
                           ? widget.preventivo.destinazione!.codice_fiscale!
                           : widget.preventivo.destinazione?.partita_iva ?? '',
                       style: pw.TextStyle(fontSize: 9),
@@ -595,11 +674,21 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
   }
 
   // Metodo per costruire la tabella dei prodotti
-  pw.Widget _buildProdottiTable(List<RelazionePreventivoProdottiModel> relazione) {
-    final headers = ['Codice', 'Descrizione', 'Quantità', 'Prezzo', 'Sconto', 'Importo', 'Iva'];
+  pw.Widget _buildProdottiTable(
+      List<RelazionePreventivoProdottiModel> relazione) {
+    final headers = [
+      'Codice',
+      'Descrizione',
+      'Quantità',
+      'Prezzo',
+      'Sconto',
+      'Importo',
+      'Iva'
+    ];
     final List<List<dynamic>> data = relazione.map((relazione) {
       // Estrai il valore numerico dalla stringa percentuale
-      double percentuale = double.parse(widget.preventivo.listino!.replaceAll('%', '')) / 100;
+      double percentuale =
+          double.parse(widget.preventivo.listino!.replaceAll('%', '')) / 100;
       double? prezzoListino = relazione.prodotto?.prezzo_fornitore ?? 0;
 
       // Calcola il prezzo considerando lo sconto
@@ -612,7 +701,9 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
       bool isPezzi = unitaMisura == 'pz' || unitaMisura == 'PZ';
 
       // Formatta la quantità in base all'unità di misura
-      String formattedQuantita = isPezzi ? relazione.quantita!.toInt().toString() : relazione.quantita!.toStringAsFixed(2);
+      String formattedQuantita = isPezzi
+          ? relazione.quantita!.toInt().toString()
+          : relazione.quantita!.toStringAsFixed(2);
 
       return [
         relazione.prodotto?.codice_danea,
@@ -636,8 +727,17 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
       pw.FixedColumnWidth(30), // Iva
     ];
 
-    num totaleImponibile = data.fold<num>(0, (previous, current) => previous + (double.parse(current[5].substring(1)) ?? 0));
-    num totaleIVA = data.fold<num>(0, (previous, current) => previous + ((double.parse(current[5].substring(1)) ?? 0) * (double.parse(current[6]) ?? 0) / 100));
+    num totaleImponibile = data.fold<num>(
+        0,
+        (previous, current) =>
+            previous + (double.parse(current[5].substring(1)) ?? 0));
+    num totaleIVA = data.fold<num>(
+        0,
+        (previous, current) =>
+            previous +
+            ((double.parse(current[5].substring(1)) ?? 0) *
+                (double.parse(current[6]) ?? 0) /
+                100));
     num totaleDocumento = totaleImponibile + totaleIVA;
 
     return pw.Column(
@@ -646,12 +746,15 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
           headers: headers,
           data: data,
           border: null,
-          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8), // Intestazioni più piccole
+          headerStyle: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              fontSize: 8), // Intestazioni più piccole
           cellAlignment: pw.Alignment.center, // Centra i dati delle colonne
           cellStyle: pw.TextStyle(fontSize: 9),
           headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
           cellHeight: 30,
-          columnWidths: Map.fromIterables(Iterable<int>.generate(headers.length, (i) => i), columnWidths),
+          columnWidths: Map.fromIterables(
+              Iterable<int>.generate(headers.length, (i) => i), columnWidths),
         ),
         pw.Container(
           height: 1, // Altezza della riga nera
@@ -671,18 +774,19 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                     children: [
                       pw.Text(
                         'Modalità di pagamento',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold, fontSize: 8),
                       ),
                       pw.SizedBox(height: 55),
                       pw.Text(
                         'Tutti i prezzi indicati hanno validità 10 giorni',
                         style: pw.TextStyle(
                           fontWeight: pw.FontWeight.bold,
-                          fontStyle: pw.FontStyle.italic, // Aggiunge lo stile corsivo
+                          fontStyle:
+                              pw.FontStyle.italic, // Aggiunge lo stile corsivo
                           fontSize: 9,
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -697,7 +801,8 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                     children: [
                       pw.Text(
                         'Acconto',
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold, fontSize: 8),
                       ),
                     ],
                   ),
@@ -717,12 +822,14 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                         children: [
                           pw.Text(
                             'Tot. Imponibile',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold, fontSize: 8),
                           ),
                           pw.Spacer(), // Aggiunge spazio tra "Tot. Imponibile" e il risultato
                           pw.Text(
                             '${String.fromCharCode(128)} ${totaleImponibile.toStringAsFixed(2)}',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold, fontSize: 8),
                           ),
                         ],
                       ),
@@ -732,12 +839,14 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                         children: [
                           pw.Text(
                             'Tot. IVA',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold, fontSize: 8),
                           ),
                           pw.Spacer(), // Aggiunge spazio tra "Tot. IVA" e il risultato
                           pw.Text(
                             '${String.fromCharCode(128)} ${totaleIVA.toStringAsFixed(2)}',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold, fontSize: 8),
                           ),
                         ],
                       ),
@@ -747,12 +856,14 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                         children: [
                           pw.Text(
                             'Tot. Documento',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 13),
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold, fontSize: 13),
                           ),
                           pw.Spacer(), // Aggiunge spazio tra "Tot. Documento" e il suo valore
                           pw.Text(
                             '${String.fromCharCode(128)} ${totaleDocumento.toStringAsFixed(2)}',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 13),
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold, fontSize: 13),
                           ),
                         ],
                       ),
@@ -766,5 +877,4 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
       ],
     );
   }
-
 }

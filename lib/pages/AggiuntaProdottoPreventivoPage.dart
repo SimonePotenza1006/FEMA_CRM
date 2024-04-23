@@ -9,24 +9,29 @@ import 'ModificaSelezioneProdottiPreventivoPage.dart';
 class AggiuntaProdottoPreventivoPage extends StatefulWidget {
   final PreventivoModel preventivo;
 
-  const AggiuntaProdottoPreventivoPage({Key? key, required this.preventivo}) : super(key: key);
+  const AggiuntaProdottoPreventivoPage({Key? key, required this.preventivo})
+      : super(key: key);
 
   @override
-  _AggiuntaProdottoPreventivoPageState createState() => _AggiuntaProdottoPreventivoPageState();
+  _AggiuntaProdottoPreventivoPageState createState() =>
+      _AggiuntaProdottoPreventivoPageState();
 }
 
-class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPreventivoPage> {
+class _AggiuntaProdottoPreventivoPageState
+    extends State<AggiuntaProdottoPreventivoPage> {
   bool isSearching = false;
   late TextEditingController searchController;
   List<ProdottoModel> prodottiList = [];
   List<ProdottoModel> filteredProdottiList = [];
   Set<ProdottoModel> selectedProducts = {};
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
     print("Id preventivo:" + widget.preventivo.id.toString());
     print("Provvigioni preventivo:" + widget.preventivo.listino.toString());
-    print("Provvigioni agente:" + widget.preventivo.agente!.categoria_provvigione.toString());
+    print("Provvigioni agente:" +
+        widget.preventivo.agente!.categoria_provvigione.toString());
     super.initState();
     searchController = TextEditingController();
     getAllProdotti();
@@ -36,10 +41,14 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: isSearching ? _buildSearchField() : Text(
-          'Aggiunta prodotti al preventivo',
-          style: TextStyle(color: Colors.white), // Imposta il colore del testo su bianco
-        ),
+        title: isSearching
+            ? _buildSearchField()
+            : Text(
+                'Aggiunta prodotti al preventivo',
+                style: TextStyle(
+                    color:
+                        Colors.white), // Imposta il colore del testo su bianco
+              ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: _buildActions(),
@@ -97,7 +106,8 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.3), // Sfondo azzurro per i prodotti selezionati
+              color: Colors.blue.withOpacity(
+                  0.3), // Sfondo azzurro per i prodotti selezionati
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -123,7 +133,6 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
       ),
     );
   }
-
 
   Widget _buildFilteredProductList() {
     return ListView.builder(
@@ -192,7 +201,7 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("http://192.168.1.52:8080/api/prodotto");
+      var apiUrl = Uri.parse("${ipaddress}/api/prodotto");
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -207,8 +216,7 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
           filteredProdottiList = prodotti;
         });
       } else {
-        throw Exception(
-            'Failed to load data from API: ${response.statusCode}');
+        throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
@@ -243,7 +251,9 @@ class _AggiuntaProdottoPreventivoPageState extends State<AggiuntaProdottoPrevent
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ModificaSelezioneProdottiPreventivoPage(prodottiSelezionati: selectedProducts.toList(), preventivo: widget.preventivo),
+              builder: (context) => ModificaSelezioneProdottiPreventivoPage(
+                  prodottiSelezionati: selectedProducts.toList(),
+                  preventivo: widget.preventivo),
             ),
           );
         },

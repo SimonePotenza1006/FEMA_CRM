@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import '../model/ProdottoModel.dart';
 import 'DettaglioProdottoPage.dart';
 
@@ -21,6 +19,7 @@ class _MagazzinoPageState extends State<MagazzinoPage> {
   bool isSearching = false;
   int currentPage = 0;
   int itemsPerPage = 50;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -30,28 +29,25 @@ class _MagazzinoPageState extends State<MagazzinoPage> {
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("http://192.168.1.52:8080/api/prodotto");
+      var apiUrl = Uri.parse("${ipaddress}/api/prodotto");
       var response = await http.get(apiUrl);
-
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<ProdottoModel> prodotti = [];
         for (var item in jsonData) {
           prodotti.add(ProdottoModel.fromJson(item));
         }
-
         setState(() {
           prodottiList = prodotti;
-          filteredProdottiList = prodotti; // Inizialmente, la lista filtrata è uguale a quella completa
+          filteredProdottiList =
+              prodotti; // Inizialmente, la lista filtrata è uguale a quella completa
           isLoading = false;
         });
       } else {
-        throw Exception(
-            'Failed to load data from API: ${response.statusCode}');
+        throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -77,7 +73,10 @@ class _MagazzinoPageState extends State<MagazzinoPage> {
     setState(() {
       filteredProdottiList = prodottiList.where((prodotto) {
         final descrizione = prodotto.descrizione?.toLowerCase();
-        return descrizione!.contains(query.toLowerCase());
+        final cod = prodotto.codice_danea?.toLowerCase();
+
+        return descrizione!.contains(query.toLowerCase()) ||
+                cod!.contains(query.toLowerCase());
       }).toList();
     });
   }
@@ -100,7 +99,10 @@ class _MagazzinoPageState extends State<MagazzinoPage> {
     final int startIndex = currentPage * itemsPerPage;
     final int endIndex = (currentPage + 1) * itemsPerPage;
     return filteredProdottiList.sublist(
-        startIndex, endIndex < filteredProdottiList.length ? endIndex : filteredProdottiList.length);
+        startIndex,
+        endIndex < filteredProdottiList.length
+            ? endIndex
+            : filteredProdottiList.length);
   }
 
   @override
@@ -110,374 +112,383 @@ class _MagazzinoPageState extends State<MagazzinoPage> {
       appBar: AppBar(
         title: isSearching
             ? TextField(
-          controller: searchController,
-          onChanged: filterProdotti,
-          decoration: InputDecoration(
-            hintText: 'Cerca per descrizione prodotto',
-            hintStyle: TextStyle(color: Colors.white),
-            border: InputBorder.none,
-          ),
-          style: TextStyle(color: Colors.white),
-        )
+                controller: searchController,
+                onChanged: filterProdotti,
+                decoration: InputDecoration(
+                  hintText: 'Cerca per descrizione prodotto',
+                  hintStyle: TextStyle(color: Colors.white),
+                  border: InputBorder.none,
+                ),
+                style: TextStyle(color: Colors.white),
+              )
             : Text('Magazzino', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
           isSearching
               ? IconButton(
-            icon: Icon(Icons.cancel, color: Colors.white),
-            onPressed: stopSearch,
-          )
+                  icon: Icon(Icons.cancel, color: Colors.white),
+                  onPressed: stopSearch,
+                )
               : IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
-            onPressed: startSearch,
-          ),
+                  icon: Icon(Icons.search, color: Colors.white),
+                  onPressed: startSearch,
+                ),
         ],
       ),
       body: isLoading
           ? Center(
-        child: CircularProgressIndicator(),
-      )
+              child: CircularProgressIndicator(),
+            )
           : SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: currentPage > 0
-                        ? () {
-                      setState(() {
-                        currentPage--;
-                      });
-                    }
-                        : null,
-                    icon: Icon(Icons.arrow_back_ios),
-                  ),
-                  Text(
-                    'Pagina ${currentPage + 1}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: (currentPage + 1) * itemsPerPage <
-                        filteredProdottiList.length
-                        ? () {
-                      setState(() {
-                        currentPage++;
-                      });
-                    }
-                        : null,
-                    icon: Icon(Icons.arrow_forward_ios),
-                  ),
-                ],
-              ),
-              DataTable(
-                columns: [
-                  DataColumn(
-                    label: Center(
-                      child: Text('Codice a Barre',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text(
-                        'Descrizione',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade700,
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: currentPage > 0
+                              ? () {
+                                  setState(() {
+                                    currentPage--;
+                                  });
+                                }
+                              : null,
+                          icon: Icon(Icons.arrow_back_ios),
                         ),
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text('Giacenza',
+                        Text(
+                          'Pagina ${currentPage + 1}',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: (currentPage + 1) * itemsPerPage <
+                                  filteredProdottiList.length
+                              ? () {
+                                  setState(() {
+                                    currentPage++;
+                                  });
+                                }
+                              : null,
+                          icon: Icon(Icons.arrow_forward_ios),
+                        ),
+                      ],
                     ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text('Unità di misura',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text('Prezzo fornitore',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text('Prezzo medio di vendita',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text('Ultimo costo acquisto',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text('Fornitore',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Center(
-                      child: Text('IVA',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey.shade700)),
-                    ),
-                  ),
-                ],
-                rows: getCurrentPageItems().map((prodotto) {
-                  return DataRow(cells: [
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Center(
-                          child: Text(prodotto.codice_danea ?? 'N/A',
+                    DataTable(
+                      columns: [
+                        DataColumn(
+                          label: Center(
+                            child: Text('Codice a Barre',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text(
+                              'Descrizione',
                               style: TextStyle(
-                                  color: Colors.grey.shade800)),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade700,
+                              ),
                             ),
-                          );
-                        },
-                        child: Text(
-                          prodotto.descrizione != null &&
-                              prodotto.descrizione!.length > 30
-                              ? prodotto.descrizione!.substring(0, 30)
-                              : prodotto.descrizione ?? 'N/A',
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text('Giacenza',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text('Unità di misura',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text('Prezzo fornitore',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text('Prezzo medio di vendita',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text('Ultimo costo acquisto',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text('Fornitore',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Center(
+                            child: Text('IVA',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700)),
+                          ),
+                        ),
+                      ],
+                      rows: getCurrentPageItems().map((prodotto) {
+                        return DataRow(cells: [
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: Text(prodotto.codice_danea ?? 'N/A',
+                                    style:
+                                        TextStyle(color: Colors.grey.shade800)),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                prodotto.descrizione != null &&
+                                        prodotto.descrizione!.length > 30
+                                    ? prodotto.descrizione!.substring(0, 30)
+                                    : prodotto.descrizione ?? 'N/A',
+                                style: TextStyle(
+                                  color: Colors.grey.shade800,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: Text(
+                                  prodotto.qta_giacenza != null
+                                      ? prodotto.qta_giacenza.toString()
+                                      : '0.0',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: Text(prodotto.unita_misura ?? 'N/A',
+                                    style:
+                                        TextStyle(color: Colors.grey.shade800)),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: Text(
+                                  prodotto.prezzo_fornitore != null
+                                      ? '${prodotto.prezzo_fornitore.toString()} €'
+                                      : 'N/A',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: Text(
+                                  prodotto.prezzo_medio_vendita != null
+                                      ? '${prodotto.prezzo_medio_vendita.toString()} €'
+                                      : 'N/A',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: Text(
+                                  prodotto.ultimo_costo_acquisto != null
+                                      ? '${prodotto.ultimo_costo_acquisto.toString()} €'
+                                      : '0.0',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                prodotto.fornitore ?? 'N/A',
+                                style: TextStyle(
+                                  color: Colors.grey.shade800,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioProdottoPage(
+                                        prodotto: prodotto),
+                                  ),
+                                );
+                              },
+                              child: Center(
+                                child: Text(
+                                  prodotto.iva != null
+                                      ? '${prodotto.iva.toString()} %'
+                                      : 'N/A',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]);
+                      }).toList(),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: currentPage > 0
+                              ? () {
+                                  setState(() {
+                                    currentPage--;
+                                  });
+                                }
+                              : null,
+                          icon: Icon(Icons.arrow_back_ios),
+                        ),
+                        Text(
+                          'Pagina ${currentPage + 1}',
                           style: TextStyle(
-                            color: Colors.grey.shade800,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Center(
-                          child: Text(
-                            prodotto.qta_giacenza != null
-                                ? prodotto.qta_giacenza.toString()
-                                : '0.0',
-                            style: TextStyle(
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
+                        IconButton(
+                          onPressed: (currentPage + 1) * itemsPerPage <
+                                  filteredProdottiList.length
+                              ? () {
+                                  setState(() {
+                                    currentPage++;
+                                  });
+                                }
+                              : null,
+                          icon: Icon(Icons.arrow_forward_ios),
                         ),
-                      ),
+                      ],
                     ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Center(
-                          child: Text(prodotto.unita_misura ?? 'N/A',
-                              style: TextStyle(
-                                  color: Colors.grey.shade800)),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Center(
-                          child: Text(
-                            prodotto.prezzo_fornitore != null
-                                ? '${prodotto.prezzo_fornitore.toString()} €'
-                                : 'N/A',
-                            style: TextStyle(
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Center(
-                          child: Text(
-                            prodotto.prezzo_medio_vendita != null
-                                ? '${prodotto.prezzo_medio_vendita.toString()} €'
-                                : 'N/A',
-                            style: TextStyle(
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Center(
-                          child: Text(
-                            prodotto.ultimo_costo_acquisto != null
-                                ? '${prodotto.ultimo_costo_acquisto.toString()} €'
-                                : '0.0',
-                            style: TextStyle(
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          prodotto.fornitore ?? 'N/A',
-                          style: TextStyle(
-                            color: Colors.grey.shade800,
-                          ),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DettaglioProdottoPage(prodotto: prodotto),
-                            ),
-                          );
-                        },
-                        child: Center(
-                          child: Text(
-                            prodotto.iva != null
-                                ? '${prodotto.iva.toString()} %'
-                                : 'N/A',
-                            style: TextStyle(
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ]);
-                }).toList(),
+                  ],
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: currentPage > 0
-                        ? () {
-                      setState(() {
-                        currentPage--;
-                      });
-                    }
-                        : null,
-                    icon: Icon(Icons.arrow_back_ios),
-                  ),
-                  Text(
-                    'Pagina ${currentPage + 1}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: (currentPage + 1) * itemsPerPage <
-                        filteredProdottiList.length
-                        ? () {
-                      setState(() {
-                        currentPage++;
-                      });
-                    }
-                        : null,
-                    icon: Icon(Icons.arrow_forward_ios),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

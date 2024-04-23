@@ -1,3 +1,4 @@
+import 'package:fema_crm/pages/DettaglioPreventivoAmministrazionePage.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -6,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../model/AgenteModel.dart';
 import '../model/PreventivoModel.dart';
 import 'DettaglioPreventivoPerAgentePage.dart';
+import 'PDFRendicontoMensilePreventiviPage.dart';
 
 class ReportPreventiviPerAgentePage extends StatefulWidget {
   const ReportPreventiviPerAgentePage({Key? key}) : super(key: key);
@@ -19,6 +21,8 @@ class _ReportPreventiviPerAgentePageState
     extends State<ReportPreventiviPerAgentePage> {
   List<AgenteModel> agentiList = [];
   Map<String, List<PreventivoModel>> preventiviPerAgenteMap = {};
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  DateTime? _selectedMonth; // Imposto il tipo come DateTime opzionale
 
   @override
   void initState() {
@@ -67,6 +71,13 @@ class _ReportPreventiviPerAgentePageState
               );
             },
           ),
+          IconButton(
+            icon: Icon(Icons.calendar_today),
+            color: Colors.white,
+            onPressed: () {
+              _showMonthPicker(context);
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -79,6 +90,79 @@ class _ReportPreventiviPerAgentePageState
           ),
         ),
       ),
+      floatingActionButton: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+        child: FloatingActionButton(
+          onPressed: () {
+            _showDownloadConfirmationDialog();
+          },
+          backgroundColor: Colors.red,
+          child: Icon(Icons.file_download, color: Colors.white),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  void _showDownloadConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Scaricare il report delle provvigioni divise per agente?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showMonthSelectionDialog();
+              },
+              child: Text("Si"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("No"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showMonthSelectionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Seleziona il mese"),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: 12,
+              itemBuilder: (BuildContext context, int index) {
+                final month = DateFormat.MMMM('it_IT').format(DateTime(DateTime.now().year, index + 1));
+                return ListTile(
+                  title: Text(month),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PDFRendicontoMensilePreventiviPage(mese : month)
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -91,6 +175,19 @@ class _ReportPreventiviPerAgentePageState
 
     for (var agente in agentiList) {
       final preventivi = preventiviPerAgenteMap[agente.id!] ?? [];
+
+      // Filtra i preventivi solo se è stato selezionato un mese
+      final filteredPreventivi = _selectedMonth != null
+          ? preventivi.where((preventivo) =>
+      preventivo.data_creazione != null &&
+          preventivo.data_creazione!.month == _selectedMonth!.month &&
+          preventivo.data_creazione!.year == _selectedMonth!.year).toList()
+          : preventivi;
+
+      // Calcolo delle provvigioni totali per l'agente corrente
+      double totalProvvigioni = filteredPreventivi.fold<double>(
+          0.0, (acc, preventivo) => acc + (preventivo.provvigioni ?? 0.0));
+
       tables.add(
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -102,7 +199,11 @@ class _ReportPreventiviPerAgentePageState
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Text(
-                'Totale preventivi emessi: ${preventivi.length}',
+                'Totale preventivi emessi: ${filteredPreventivi.length}',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Totale delle provvigioni: ${totalProvvigioni.toStringAsFixed(2)} \u20AC',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
@@ -117,18 +218,16 @@ class _ReportPreventiviPerAgentePageState
                   DataColumn(label: Text('Data Accettazione')),
                   DataColumn(label: Text('Data Consegna')),
                 ],
-                rows: _buildRows(preventivi, agente.id!),
+                rows: _buildRows(filteredPreventivi, agente.id!),
               ),
             ],
           ),
         ),
       );
-
       if (agentiList.last != agente) {
         tables.add(SizedBox(height: 20));
       }
     }
-
     return tables;
   }
 
@@ -157,7 +256,9 @@ class _ReportPreventiviPerAgentePageState
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
-            preventivo.importo != null ? '${preventivo.importo!.toStringAsFixed(2)} \u20AC' : 'N/A',
+            preventivo.importo != null
+                ? '${preventivo.importo!.toStringAsFixed(2)} \u20AC'
+                : 'N/A',
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
@@ -173,15 +274,21 @@ class _ReportPreventiviPerAgentePageState
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
-            preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!) : 'N/A',
+            preventivo.data_creazione != null
+                ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!)
+                : 'N/A',
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
-            preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_accettazione!) : 'N/A',
+            preventivo.data_accettazione != null
+                ? DateFormat('yyyy-MM-dd').format(preventivo.data_accettazione!)
+                : 'N/A',
             style: TextStyle(color: textColor),
           )),
           DataCell(Text(
-            preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_consegna!) : 'N/A',
+            preventivo.data_consegna != null
+                ? DateFormat('yyyy-MM-dd').format(preventivo.data_consegna!)
+                : 'N/A',
             style: TextStyle(color: textColor),
           )),
         ].map<DataCell>((cell) {
@@ -202,14 +309,15 @@ class _ReportPreventiviPerAgentePageState
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DettaglioPreventivoPerAgentePage(preventivo: preventivo),
+        builder: (context) =>
+            DettaglioPreventivoAmministrazionePage(preventivo: preventivo),
       ),
     );
   }
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/agente');
+      var apiUrl = Uri.parse('${ipaddress}/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -222,7 +330,8 @@ class _ReportPreventiviPerAgentePageState
         });
         await getAllPreventiviOrderedByAgente();
       } else {
-        throw Exception('Failed to load agenti data from API: ${response.statusCode}');
+        throw Exception(
+            'Failed to load agenti data from API: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching agenti data from API: $e');
@@ -231,7 +340,8 @@ class _ReportPreventiviPerAgentePageState
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Connection Error'),
-            content: Text('Unable to load data from API. Please check your internet connection and try again.'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -254,7 +364,7 @@ class _ReportPreventiviPerAgentePageState
 
   Future<void> getAllPreventiviForAgente(String agenteId) async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/preventivo/agente/$agenteId');
+      var apiUrl = Uri.parse('${ipaddress}/api/preventivo/agente/$agenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -266,10 +376,27 @@ class _ReportPreventiviPerAgentePageState
           preventiviPerAgenteMap[agenteId] = preventivi;
         });
       } else {
-        throw Exception('Failed to load preventivi data from API: ${response.statusCode}');
+        throw Exception(
+            'Failed to load preventivi data from API: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching preventivi data from API for agente $agenteId: $e');
     }
   }
+
+  Future<void> _showMonthPicker(BuildContext context) async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedMonth ?? DateTime.now(),
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime(DateTime.now().year + 5),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _selectedMonth = pickedDate;
+      });
+    }
+  }
 }
+

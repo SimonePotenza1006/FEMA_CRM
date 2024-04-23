@@ -6,15 +6,12 @@ class TipologiaInterventoModel {
   String? id;
   String? descrizione;
 
-  List<UtenteModel>? tecnici;
-
-  TipologiaInterventoModel(this.id, this.descrizione, this.tecnici);
+  TipologiaInterventoModel(this.id, this.descrizione);
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
       'descrizione': descrizione,
-      'tecnici': tecnici != null ? tecnici!.map((tecnico) => tecnico.toJson()).toList() : null
     };
     return map;
   }
@@ -24,33 +21,26 @@ class TipologiaInterventoModel {
     return TipologiaInterventoModel(
       map['id']?.toString(),
       map['descrizione']?.toString(),
-      tecniciJson != null ? tecniciJson.map((data) => UtenteModel.fromMap(data)).toList() : [],
     );
   }
 
   factory TipologiaInterventoModel.fromJson(Map<String, dynamic> json) {
-    // Controlla se il campo tecnici nel JSON è una lista
-    final List<dynamic>? tecniciJson = json['tecnici'];
-
-    return TipologiaInterventoModel(
+        return TipologiaInterventoModel(
       json['id']?.toString(),
       json['descrizione']?.toString(),
-      // Converti ogni oggetto JSON in un UtenteModel
-      tecniciJson != null ? tecniciJson.map((data) => UtenteModel.fromJson(data)).toList() : null,
-    );
+        );
   }
 
 
   @override
   String toString() {
-    return '{id: $id, descrizione: $descrizione, tecnici: $tecnici}';
+    return '{id: $id, descrizione: $descrizione}';
   }
 
   Map<String, dynamic> toJson() {
     return {
       "id": id?.toString(),
       "descrizione": descrizione,
-      "tecnici": tecnici != null ? tecnici!.map((tecnico) => tecnico.toJson()).toList() : [],
     };
   }
 

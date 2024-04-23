@@ -8,20 +8,23 @@ class RegistrazioneAgentePage extends StatefulWidget {
   const RegistrazioneAgentePage({Key? key}) : super(key: key);
 
   @override
-  _RegistrazioneAgentePageState createState() => _RegistrazioneAgentePageState();
+  _RegistrazioneAgentePageState createState() =>
+      _RegistrazioneAgentePageState();
 }
 
 class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController cognomeController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController riferimentoAziendaleController = TextEditingController();
+  final TextEditingController riferimentoAziendaleController =
+      TextEditingController();
   final TextEditingController cellulareController = TextEditingController();
   final TextEditingController luogoLavoroController = TextEditingController();
   final TextEditingController ibanController = TextEditingController();
   String selectedProvvigione = '3%';
   List<AziendaModel> aziendeList = [];
   AziendaModel? selectedAzienda;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   bool _areFieldsFilled = false;
 
@@ -48,7 +51,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   }
 
   Future<void> createAgente() async {
-    final url = Uri.parse('http://192.168.1.52:8080/api/agente');
+    final url = Uri.parse('${ipaddress}/api/agente');
     final body = jsonEncode({
       'nome': nomeController.text.toString(),
       'cognome': cognomeController.text.toString(),
@@ -84,7 +87,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/azienda');
+      var apiUrl = Uri.parse('${ipaddress}/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

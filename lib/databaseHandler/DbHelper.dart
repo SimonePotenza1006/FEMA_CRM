@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:fema_crm/model/InterventoModel.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -12,7 +10,7 @@ import '../model/ClienteModel.dart';
 
 class DbHelper{
 
-  String ipaddress = 'http://192.168.1.52:8080';
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddress1 = 'http://localhost:8080';
   String ipaddress3 ='http://79.10.122.110:8084';
   String ipaddress4 = 'http://10.0.2.2.8080';
@@ -33,7 +31,6 @@ class DbHelper{
           TipologiaInterventoModel tipologiaIntervento = TipologiaInterventoModel(
             singolaTipologia['id'].toString(),
             singolaTipologia['descrizione'].toString(),
-            tecniciList,
           );
           allTipologieIntervento.add(tipologiaIntervento);
         }
@@ -82,6 +79,7 @@ class DbHelper{
             singoloCliente['email'].toString(),
             singoloCliente['pec'].toString(),
             singoloCliente['note'].toString(),
+            singoloCliente['note_tecnico'].toString(),
             tipologieIntervento,
           );
           clienti.add(cliente);

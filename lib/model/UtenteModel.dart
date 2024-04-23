@@ -13,7 +13,6 @@ class UtenteModel {
   String? cellulare;
   String? codice_fiscale;
   String? iban;
-
   RuoloUtenteModel? ruolo;
   TipologiaInterventoModel? tipologia_intervento;
 
@@ -30,6 +29,10 @@ class UtenteModel {
       this.ruolo,
       this.tipologia_intervento
       );
+
+  String? nomeCompleto(){
+    return this.nome.toString() + " " + this.cognome.toString();
+  }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -56,7 +59,7 @@ class UtenteModel {
     email = map['email'];
     password = map['password'];
     cellulare = map['cellulare'];
-    codice_fiscale = map['codiceFiscale'];
+    codice_fiscale = map['codice_fiscale'];
     iban = map['iban'];
     ruolo = map['ruolo'] != null ? RuoloUtenteModel.fromMap(map['ruolo']) : null;
         tipologia_intervento = map['tipologia_intervento'] != null ? TipologiaInterventoModel.fromMap(map['tipologia_itervento']) : null;

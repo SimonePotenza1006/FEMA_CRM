@@ -19,6 +19,7 @@ class ClienteModel {
   String? email;
   String? pec;
   String? note;
+  String? note_tecnico;
   List<TipologiaInterventoModel>? tipologie_interventi;
 
   ClienteModel(
@@ -40,6 +41,7 @@ class ClienteModel {
       this.email,
       this.pec,
       this.note,
+      this.note_tecnico,
       this.tipologie_interventi,
       );
 
@@ -64,6 +66,7 @@ class ClienteModel {
       'email': email,
       'pec': pec,
       'note': note,
+      'note_tecnico' : note_tecnico,
       'tipologie_interventi': tipologie_interventi
     };
     return map;
@@ -88,6 +91,7 @@ class ClienteModel {
     email = map['email'];
     pec = map['pec'];
     note = map['note'];
+    note_tecnico = map['note_tecnico'];
     //tipologieIntervento = map['tipologieIntervento'];
     tipologie_interventi = (map['tipologie_interventi'] as List<dynamic>?)
         ?.map((data) => TipologiaInterventoModel.fromJson(data as Map<String, dynamic>))
@@ -113,6 +117,7 @@ class ClienteModel {
     'email': email,
     'pec': pec,
     'note': note,
+    'note_tecnico' : note_tecnico,
     'tipologie_interventi': tipologie_interventi
   };
 
@@ -136,6 +141,7 @@ class ClienteModel {
       json['email']?.toString(),
       json['pec']?.toString(),
       json['note']?.toString(),
+      json['note_tecnico']?.toString(),
       (json['tipologie_interventi'] as List<dynamic>?)
           ?.map((data) => TipologiaInterventoModel.fromJson(data as Map<String, dynamic>))
           .toList() ?? [],

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fema_crm/model/TipologiaInterventoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/model/AziendaModel.dart';
@@ -12,13 +13,17 @@ import '../model/AgenteModel.dart';
 class RegistrazionePreventivoAmministrazionePage extends StatefulWidget {
   final UtenteModel userData;
 
-  const RegistrazionePreventivoAmministrazionePage({Key? key, required this.userData}) : super(key: key);
+  const RegistrazionePreventivoAmministrazionePage(
+      {Key? key, required this.userData})
+      : super(key: key);
 
   @override
-  _RegistrazionePreventivoAmministrazionePageState createState() => _RegistrazionePreventivoAmministrazionePageState();
+  _RegistrazionePreventivoAmministrazionePageState createState() =>
+      _RegistrazionePreventivoAmministrazionePageState();
 }
 
-class _RegistrazionePreventivoAmministrazionePageState extends State<RegistrazionePreventivoAmministrazionePage> {
+class _RegistrazionePreventivoAmministrazionePageState
+    extends State<RegistrazionePreventivoAmministrazionePage> {
   TextEditingController clienteController = TextEditingController();
 
   AziendaModel? selectedAzienda;
@@ -33,6 +38,7 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
   List<AgenteModel> agentiList = [];
   List<ClienteModel> filteredClientiList = [];
   List<DestinazioneModel> allDestinazioniByCliente = [];
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -48,7 +54,8 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrazione preventivo', style: TextStyle(color: Colors.white)),
+        title: const Text('Registrazione preventivo',
+            style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
@@ -163,7 +170,8 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                            selectedCliente?.denominazione ??
+                                'Seleziona Cliente',
                             style: TextStyle(fontSize: 16),
                           ),
                           Icon(Icons.arrow_drop_down),
@@ -182,7 +190,8 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            selectedDestinazione?.denominazione ?? 'Seleziona Destinazione',
+                            selectedDestinazione?.denominazione ??
+                                'Seleziona Destinazione',
                             style: TextStyle(fontSize: 16),
                           ),
                           Icon(Icons.arrow_drop_down),
@@ -200,7 +209,8 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
                         savePrimePreventivo();
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.red),
                         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                           EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                         ),
@@ -222,13 +232,13 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/agente');
+      var apiUrl = Uri.parse('${ipaddress}/api/agente');
       var response = await http.get(apiUrl);
 
-      if(response.statusCode == 200) {
+      if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<AgenteModel> agenti = [];
-        for(var item in jsonData) {
+        for (var item in jsonData) {
           agenti.add(AgenteModel.fromJson(item));
         }
         setState(() {
@@ -245,7 +255,7 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/azienda');
+      var apiUrl = Uri.parse('${ipaddress}/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -268,7 +278,7 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/cliente');
+      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -292,49 +302,52 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
 
   Future<void> savePrimePreventivo() async {
     try {
-      final response = await http.post(
-          Uri.parse('http://192.168.1.52:8080/api/preventivo'),
+      final response = await http.post(Uri.parse('${ipaddress}/api/preventivo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
-            'azienda' : selectedAzienda?.toMap(),
+            'azienda': selectedAzienda?.toMap(),
             'agente': selectedAgente?.toMap(),
-            'categoria_merceologica' : selectedCategoria.toString(),
-            'listino':selectedListino.toString(),
-            'cliente' : selectedCliente?.toMap(),
-            'accettato' : false,
-            'rifiutato' : false,
+            'categoria_merceologica': selectedCategoria.toString(),
+            'listino': selectedListino.toString(),
+            'cliente': selectedCliente?.toMap(),
+            'accettato': false,
+            'rifiutato': false,
             'attesa': true,
-            'pendente':false,
-            'consegnato' : false,
-            'destinazione' : selectedDestinazione?.toMap(),
-            'descrizione' : "Destinazione: " + selectedDestinazione!.denominazione.toString(),
-            'utente' : widget.userData.toMap(),
-          })
-      );
+            'pendente': false,
+            'consegnato': false,
+            'destinazione': selectedDestinazione?.toMap(),
+            'descrizione': "Destinazione: " +
+                selectedDestinazione!.denominazione.toString(),
+            'utente': widget.userData.toMap(),
+          }));
       Navigator.pop(context);
       print(selectedDestinazione?.toMap().toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Preventivo registrato, attesa di compilazione completa'),
+          content:
+              Text('Preventivo registrato, attesa di compilazione completa'),
         ),
       );
-    } catch (e){
+    } catch (e) {
       print('Errore durante il salvataggio del preventivo');
     }
   }
 
-  Future<void> getAllDestinazioniByCliente(String clientId) async{
+  Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/destinazione/cliente/$clientId'));
-      if(response.statusCode == 200) {
+      final response = await http
+          .get(Uri.parse('${ipaddress}/api/destinazione/cliente/$clientId'));
+      if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
-          allDestinazioniByCliente = responseData.map((data) => DestinazioneModel.fromJson(data)).toList();
+          allDestinazioniByCliente = responseData
+              .map((data) => DestinazioneModel.fromJson(data))
+              .toList();
         });
       } else {
         throw Exception('Failed to load Destinazioni per cliente');
       }
-    } catch(e) {
+    } catch (e) {
       print('Errore durante la richiesta HTTP: $e');
     }
   }
@@ -358,7 +371,9 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
                   onChanged: (value) {
                     setState(() {
                       filteredClientiList = clientiList
-                          .where((cliente) => cliente.denominazione!.toLowerCase().contains(value.toLowerCase()))
+                          .where((cliente) => cliente.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
                           .toList();
                     });
                   },
@@ -374,7 +389,9 @@ class _RegistrazionePreventivoAmministrazionePageState extends State<Registrazio
                       children: filteredClientiList.map((cliente) {
                         return ListTile(
                           leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione! + ", " + cliente.indirizzo!),
+                          title: Text(cliente.denominazione! +
+                              ", " +
+                              cliente.indirizzo!),
                           onTap: () {
                             setState(() {
                               selectedCliente = cliente;

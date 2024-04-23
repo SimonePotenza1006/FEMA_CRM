@@ -5,15 +5,10 @@ import 'dart:ui';
 import 'package:fema_crm/model/DDTModel.dart';
 import 'package:fema_crm/model/RelazioneDdtProdottiModel.dart';
 import 'package:flutter/rendering.dart';
-
-
-import 'package:fema_crm/model/PreventivoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:email_validator/email_validator.dart';
-
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -23,7 +18,7 @@ import 'package:http/http.dart' as http;
 import '../model/AziendaModel.dart';
 import 'PDFInterventoPage.dart';
 
-class PDFDDTPage extends StatefulWidget{
+class PDFDDTPage extends StatefulWidget {
   final DDTModel ddt;
   final AziendaModel azienda;
 
@@ -37,6 +32,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   late Future<Uint8List> _pdfFuture;
   List<RelazioneDdtProdottoModel> allProdotti = [];
   GlobalKey globalKey = GlobalKey();
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -57,7 +53,9 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Errore durante la generazione del PDF: ${snapshot.error.toString()}'));
+            return Center(
+                child: Text(
+                    'Errore durante la generazione del PDF: ${snapshot.error.toString()}'));
           } else {
             return PDFViewerPage(pdfBytes: snapshot.data!);
           }
@@ -70,7 +68,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Confermare il preventivo?'),
+                title: Text('Confermare il DDT?'),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () {
@@ -83,36 +81,8 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
                     onPressed: () async {
                       // 1. Chiudi il Dialog
                       Navigator.of(context).pop();
-
-                      // 2. Genera il PDF
-                      final pdfBytes = await _pdfFuture;
-
-                      // 3. Invia l'email
-                      try {
-                        String? clienteEmail = widget.ddt.cliente?.email!.toString();
-                        final String subject = '(DDT) ${widget.ddt.id} ${DateFormat('yyyy').format(widget.ddt.data!)} del ${DateFormat('dd/MM/yyyy').format(widget.ddt.data!)}';
-                        final String body = 'Allego il preventivo come richiesto.';
-                        final List<String> recipients = ['info@femasistemi.it', clienteEmail.toString()];
-
-                        // Genera un URL con i parametri dell'email
-                        final Uri emailLaunchUri = Uri(
-                          scheme: 'mailto',
-                          path: recipients.join(','),
-                          queryParameters: {
-                            'subject': subject,
-                            'body': body,
-                            'attachment': 'data:application/pdf;base64,${base64Encode(pdfBytes)}'
-                          },
-                        );
-
-                        // Apre il client email predefinito del dispositivo
-                        await launch(emailLaunchUri.toString());
-                        print('Email inviata con successo.');
-                      } catch (e) {
-                        print('Errore durante l\'invio dell\'email: $e');
-                      }
+                      await _generateAndSendPDF();
                     },
-
                     child: Text('Si'),
                   ),
                 ],
@@ -128,6 +98,60 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
+  }
+
+  Future<void> _generateAndSendPDF() async {
+    try {
+      // Genera il PDF
+      final Uint8List pdfBytes = await _generatePDF();
+
+      // Crea un file temporaneo
+      final tempDir = await getTemporaryDirectory();
+      final tempFilePath = '${tempDir.path}/ddt${widget.ddt.id}.pdf';
+      final File tempFile = File(tempFilePath);
+      await tempFile.writeAsBytes(pdfBytes);
+
+      // Prepara i dati per l'email
+      final String smtpServerHost = 'mail.femasistemi.it';
+      final String subject =
+          '(DDT) n ${widget.ddt.id}, utente: ${widget.ddt.utente?.nome} ${widget.ddt.utente?.cognome} del ${widget.ddt.data}';
+      final String body =
+          'In allegato il PDF del DDT numero ${widget.ddt.id} rivolto al cliente ${widget.ddt.cliente?.denominazione}';
+      final String username =
+          'noreply@femasistemi.it'; // Inserisci il tuo indirizzo email
+      final String password = 'WGnr18@59.'; // Inserisci la tua password
+      final int smtpServerPort = 465;
+      final String recipient = 'info@femasistemi.it';
+
+      // Configura il server SMTP
+      final smtpServer = SmtpServer(
+        smtpServerHost,
+        port: smtpServerPort,
+        username: username,
+        password: password,
+        ssl: true, // Utilizza SSL/TLS per la connessione SMTP
+      );
+
+      // Crea il messaggio email con allegato
+      final message = Message()
+        ..from = Address(username, 'App FEMA')
+        ..recipients.add(recipient)
+        ..subject = subject
+        ..text = body
+        ..attachments.add(FileAttachment(
+          tempFile,
+          fileName: 'ddt_${widget.ddt.id}.pdf',
+        ));
+
+      // Invia l'email
+      final sendReport = await send(message, smtpServer);
+      print('Email inviata con successo: $sendReport');
+
+      // Elimina il file temporaneo
+      await tempFile.delete();
+    } catch (e) {
+      print('Errore durante l\'invio dell\'email: $e');
+    }
   }
 
   Future<Uint8List> _generatePDF() async {
@@ -150,31 +174,47 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     children: [
                       pw.Container(
-                        padding: pw.EdgeInsets.only(left: 50), // Aggiunge un margine a sinistra
+                        padding: pw.EdgeInsets.only(
+                            left: 50), // Aggiunge un margine a sinistra
                         child: pw.Column(
                           crossAxisAlignment: pw.CrossAxisAlignment.start,
                           children: [
                             pw.Text(
                               widget.azienda.nome!.toUpperCase(),
-                              style: pw.TextStyle(fontSize: 17), // Riduci la dimensione del font
+                              style: pw.TextStyle(
+                                  fontSize:
+                                      17), // Riduci la dimensione del font
                             ),
                             pw.SizedBox(height: 7),
-                            pw.Text(widget.azienda.luogo_di_lavoro!, style: pw.TextStyle(fontSize: 6)), // Riduci la dimensione del font
+                            pw.Text(widget.azienda.luogo_di_lavoro!,
+                                style: pw.TextStyle(
+                                    fontSize:
+                                        6)), // Riduci la dimensione del font
                             pw.SizedBox(height: 2),
-                            pw.Text('Tel. ${widget.azienda.telefono!}', style: pw.TextStyle(fontSize: 6)), // Riduci la dimensione del font
+                            pw.Text('Tel. ${widget.azienda.telefono!}',
+                                style: pw.TextStyle(
+                                    fontSize:
+                                        6)), // Riduci la dimensione del font
                             pw.SizedBox(height: 2),
-                            pw.Text('C.F / P. iva ${widget.azienda.partita_iva!}', style: pw.TextStyle(fontSize: 6)), // Riduci la dimensione del font
+                            pw.Text(
+                                'C.F / P. iva ${widget.azienda.partita_iva!}',
+                                style: pw.TextStyle(
+                                    fontSize:
+                                        6)), // Riduci la dimensione del font
                           ],
                         ),
                       ),
                     ],
                   ),
                   pw.SizedBox(height: 20),
-                  pw.Text("Doc. di trasporto",
-                    style: pw.TextStyle(fontSize: 20, fontStyle: pw.FontStyle.italic),
+                  pw.Text(
+                    "Doc. di trasporto",
+                    style: pw.TextStyle(
+                        fontSize: 20, fontStyle: pw.FontStyle.italic),
                   ),
                   pw.SizedBox(height: 3),
-                  pw.Text("n. ${widget.ddt.id} / ${DateFormat('yyyy').format(widget.ddt.data!)} del ${DateFormat('dd/MM/yyyy').format(widget.ddt.data!)}"),
+                  pw.Text(
+                      "n. ${widget.ddt.id} / ${DateFormat('yyyy').format(widget.ddt.data!)} del ${DateFormat('dd/MM/yyyy').format(widget.ddt.data!)}"),
                   pw.SizedBox(height: 4),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -184,8 +224,11 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
                       _buildDestinazioneSection(),
                     ],
                   ),
-                  pw.SizedBox(height: 10), // Aggiungi uno spazio prima della tabella dei prodott
-                  _buildProdottiTable(allProdotti), // Aggiungi la tabella dei prodotti
+                  pw.SizedBox(
+                      height:
+                          10), // Aggiungi uno spazio prima della tabella dei prodott
+                  _buildProdottiTable(
+                      allProdotti), // Aggiungi la tabella dei prodotti
                 ],
               ),
             );
@@ -202,164 +245,163 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   }
 
   pw.Widget _buildDestinatarioSection() {
-    return
-      pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(
-            'Destinatario',
-            style: pw.TextStyle(
-              fontWeight: pw.FontWeight.bold,
-              fontSize: 9,
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          'Destinatario',
+          style: pw.TextStyle(
+            fontWeight: pw.FontWeight.bold,
+            fontSize: 9,
+          ),
+        ),
+        pw.SizedBox(height: 1),
+        pw.Container(
+          width: PdfPageFormat.cm * 9.5,
+          height: PdfPageFormat.cm * 3,
+          decoration: pw.BoxDecoration(
+            color: PdfColors.grey200,
+            border: pw.Border.all(
+              color: PdfColors.black,
+              width: 1,
             ),
           ),
-          pw.SizedBox(height: 1),
-          pw.Container(
-            width: PdfPageFormat.cm * 9.5,
-            height: PdfPageFormat.cm * 3,
-            decoration: pw.BoxDecoration(
-              color: PdfColors.grey200,
-              border: pw.Border.all(
-                color: PdfColors.black,
-                width: 1,
+          child: pw.Column(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'DENOMINAZIONE',
+                      style: pw.TextStyle(fontSize: 9),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.ddt.intervento?.cliente?.denominazione ?? '',
+                      style: pw.TextStyle(fontSize: 9),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            child: pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'DENOMINAZIONE',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'INDIRIZZO',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.ddt.intervento?.cliente?.denominazione ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.ddt.intervento?.cliente?.indirizzo ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'INDIRIZZO',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'CAP',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.ddt.intervento?.cliente?.indirizzo ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.ddt.intervento?.cliente?.cap ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'CAP',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 30, right: 3),
+                    child: pw.Text(
+                      'CITTÀ',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.ddt.intervento?.cliente?.cap ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.ddt.intervento?.cliente?.citta ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 30, right: 3),
-                      child: pw.Text(
-                        'CITTÀ',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 45, right: 3),
+                    child: pw.Text(
+                      '(${widget.ddt.intervento?.cliente?.provincia})',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.ddt.intervento?.cliente?.citta ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'C.F./P.Iva',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 45, right: 3),
-                      child: pw.Text(
-                        '(${widget.ddt.intervento?.cliente?.provincia})',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    // child: pw.Text(
+                    //   (widget.ddt.intervento?.cliente.codice_fiscale ?? '') != ''
+                    //       ? widget.ddt.intervento?.cliente.codice_fiscale
+                    //       : widget.ddt.intervento?.cliente.partita_iva ?? '',
+                    //   style: pw.TextStyle(fontSize: 9),
+                    // ),
+                  ),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 3, right: 3),
+                    child: pw.Text(
+                      'Tel.',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'C.F./P.Iva',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.ddt.intervento?.cliente?.telefono ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      // child: pw.Text(
-                      //   (widget.ddt.intervento?.cliente.codice_fiscale ?? '') != ''
-                      //       ? widget.ddt.intervento?.cliente.codice_fiscale
-                      //       : widget.ddt.intervento?.cliente.partita_iva ?? '',
-                      //   style: pw.TextStyle(fontSize: 9),
-                      // ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(left: 40, right: 3),
+                    child: pw.Text(
+                      'Cell.',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                  ],
-                ),
-                pw.Row(
-                  children: [
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 3, right: 3),
-                      child: pw.Text(
-                        'Tel.',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
+                  ),
+                  pw.Padding(
+                    padding: pw.EdgeInsets.only(right: 3),
+                    child: pw.Text(
+                      widget.ddt.intervento?.cliente?.cellulare ?? '',
+                      style: pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.ddt.intervento?.cliente?.telefono ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
-                    ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(left: 40, right: 3),
-                      child: pw.Text(
-                        'Cell.',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
-                    ),
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(right: 3),
-                      child: pw.Text(
-                        widget.ddt.intervento?.cliente?.cellulare ?? '',
-                        style: pw.TextStyle(fontSize: 9),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 
   // Metodo per costruire la sezione della destinazione
@@ -523,10 +565,10 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
     );
   }
 
-
   Future<void> getProdotti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
+      var apiUrl = Uri.parse(
+          '${ipaddress}/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -549,7 +591,8 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Errore di connessione'),
-            content: Text('Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            content: Text(
+                'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -575,11 +618,9 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
       String formattedQuantita = isPezzi
           ? relazione.quantita!.toInt().toString()
           : relazione.quantita!.toStringAsFixed(2);
-      double? importo = double.parse(formattedQuantita) *
-          double.parse(relazione.prodotto!.prezzo_fornitore.toString());
 
       return [
-        relazione.prodotto?.codice_danea,
+        relazione.prodotto?.codice_danea ?? 'N/A',
         relazione.prodotto?.descrizione,
         formattedQuantita,
       ];
@@ -607,8 +648,8 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
           headers: headers,
           data: data,
           border: null,
-          headerStyle: pw.TextStyle(
-              fontWeight: pw.FontWeight.bold, fontSize: 8),
+          headerStyle:
+              pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
           // Intestazioni più piccole
           cellAlignment: pw.Alignment.center,
           // Centra i dati delle colonne
@@ -629,10 +670,13 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
           child: pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Text('Incaricato del trasporto', style: pw.TextStyle(fontSize: 7)),
-              pw.Text('Causale del trasporto', style: pw.TextStyle(fontSize: 7)),
+              pw.Text('Incaricato del trasporto',
+                  style: pw.TextStyle(fontSize: 7)),
+              pw.Text('Causale del trasporto',
+                  style: pw.TextStyle(fontSize: 7)),
               pw.Text('Porto', style: pw.TextStyle(fontSize: 6)),
-              pw.Text('Firma incaricato del trasporto', style: pw.TextStyle(fontSize: 7)),
+              pw.Text('Firma incaricato del trasporto',
+                  style: pw.TextStyle(fontSize: 7)),
               pw.Text('Firma destinatario', style: pw.TextStyle(fontSize: 7))
             ],
           ),
@@ -641,7 +685,8 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
         pw.Container(
           margin: pw.EdgeInsets.only(top: 1),
           child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.start, // Allinea gli elementi all'inizio della riga
+            mainAxisAlignment: pw.MainAxisAlignment
+                .start, // Allinea gli elementi all'inizio della riga
             children: [
               pw.Container(
                 width: PdfPageFormat.cm * 2, // Larghezza per ogni elemento
@@ -653,11 +698,13 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
               ),
               pw.Container(
                 width: PdfPageFormat.cm * 3.5, // Larghezza per ogni elemento
-                child: pw.Text('Aspetto esteriore dei beni', style: pw.TextStyle(fontSize: 7)),
+                child: pw.Text('Aspetto esteriore dei beni',
+                    style: pw.TextStyle(fontSize: 7)),
               ),
               pw.Container(
                 width: PdfPageFormat.cm * 3, // Larghezza per ogni elemento
-                child: pw.Text('Data e ora inizio trasporto', style: pw.TextStyle(fontSize: 7)),
+                child: pw.Text('Data e ora inizio trasporto',
+                    style: pw.TextStyle(fontSize: 7)),
               ),
             ],
           ),

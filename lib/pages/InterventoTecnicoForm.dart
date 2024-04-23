@@ -8,7 +8,6 @@ import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
 
-
 class InterventoTecnicoForm extends StatefulWidget {
   final UtenteModel userData;
 
@@ -18,7 +17,7 @@ class InterventoTecnicoForm extends StatefulWidget {
   _InterventoTecnicoFormState createState() => _InterventoTecnicoFormState();
 }
 
-class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
+class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   CategoriaInterventoSpecificoModel? selectedCategoria;
   List<TipologiaInterventoModel> allTipologie = [];
   VeicoloModel? _selectedVeicolo;
@@ -37,6 +36,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
   List<CategoriaInterventoSpecificoModel> allCategorieByTipologia = [];
   TextEditingController _descrizioneController = TextEditingController();
   TipologiaInterventoModel? _selectedTipologia;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -54,11 +54,12 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/tipologiaIntervento'));
+      final response =
+          await http.get(Uri.parse('${ipaddress}/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
-        for(var item in jsonData) {
+        for (var item in jsonData) {
           tipologie.add(TipologiaInterventoModel.fromJson(item));
         }
         setState(() {
@@ -76,7 +77,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
   Future<void> getCategoriaByTipologia() async {
     try {
       if (_selectedTipologia != null) {
-        final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
+        final response = await http.get(Uri.parse(
+            '${ipaddress}/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
         if (response.statusCode == 200) {
           var jsonData = jsonDecode(response.body);
           List<CategoriaInterventoSpecificoModel> categorie = [];
@@ -88,7 +90,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
             selectedCategoria = null; // Resetta la categoria selezionata
           });
         } else {
-          throw Exception('Failed to load data from API: ${response.statusCode}');
+          throw Exception(
+              'Failed to load data from API: ${response.statusCode}');
         }
       }
     } catch (e) {
@@ -136,10 +139,11 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inserimento Intervento Tecnico', style: TextStyle(color: Colors.white)),
+        title: const Text('Inserimento Intervento Tecnico',
+            style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red, // Imposta il colore di sfondo
       ),
@@ -148,18 +152,21 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Data: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
+            Text(
+                'Data: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
             ElevatedButton(
               onPressed: _selezionaData,
               style: ElevatedButton.styleFrom(
                 primary: Colors.red, // Imposta il colore di sfondo
               ),
-              child: const Text('Seleziona Data', style: TextStyle(color: Colors.white)),
+              child: const Text('Seleziona Data',
+                  style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 20.0),
             Row(
               children: [
-                const Text('Intervento Concluso:', style: TextStyle(color: Colors.black)),
+                const Text('Intervento Concluso:',
+                    style: TextStyle(color: Colors.black)),
                 Checkbox(
                   value: _interventoConcluso,
                   onChanged: (bool? value) {
@@ -173,14 +180,17 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
             SizedBox(height: 20),
             DropdownButton<TipologiaInterventoModel>(
               value: _selectedTipologia,
-              hint: Text('Seleziona tipologia di intervento'), // Testo di default
+              hint:
+                  Text('Seleziona tipologia di intervento'), // Testo di default
               onChanged: (TipologiaInterventoModel? newValue) {
                 setState(() {
                   _selectedTipologia = newValue;
                   getCategoriaByTipologia(); // Carica le categorie di intervento specifiche
                 });
               },
-              items: allTipologie.map<DropdownMenuItem<TipologiaInterventoModel>>((TipologiaInterventoModel value) {
+              items: allTipologie
+                  .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                      (TipologiaInterventoModel value) {
                 return DropdownMenuItem<TipologiaInterventoModel>(
                   value: value,
                   child: Text(value.descrizione!),
@@ -191,13 +201,16 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
             // Dropdown per selezionare la categoria di intervento
             DropdownButton<CategoriaInterventoSpecificoModel>(
               value: selectedCategoria,
-              hint: Text('Seleziona categoria di intervento'), // Testo di default
+              hint:
+                  Text('Seleziona categoria di intervento'), // Testo di default
               onChanged: (CategoriaInterventoSpecificoModel? newValue) {
                 setState(() {
                   selectedCategoria = newValue;
                 });
               },
-              items: allCategorieByTipologia.map<DropdownMenuItem<CategoriaInterventoSpecificoModel>>((CategoriaInterventoSpecificoModel value) {
+              items: allCategorieByTipologia
+                  .map<DropdownMenuItem<CategoriaInterventoSpecificoModel>>(
+                      (CategoriaInterventoSpecificoModel value) {
                 return DropdownMenuItem<CategoriaInterventoSpecificoModel>(
                   value: value,
                   child: Text(value.descrizione!),
@@ -217,7 +230,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
                         _selectedVeicolo = newValue;
                       });
                     },
-                    items: veicoliList.map<DropdownMenuItem<VeicoloModel>>((VeicoloModel value) {
+                    items: veicoliList.map<DropdownMenuItem<VeicoloModel>>(
+                        (VeicoloModel value) {
                       return DropdownMenuItem<VeicoloModel>(
                         value: value,
                         child: Text(value.descrizione!),
@@ -230,7 +244,9 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red, // Imposta il colore di sfondo
                     ),
-                    child: Text('Orario Inizio: ${_orarioInizio.format(context)}', style: TextStyle(color: Colors.white)),
+                    child: Text(
+                        'Orario Inizio: ${_orarioInizio.format(context)}',
+                        style: TextStyle(color: Colors.white)),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -238,7 +254,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red, // Imposta il colore di sfondo
                     ),
-                    child: Text('Orario Fine: ${_orarioFine.format(context)}', style: TextStyle(color: Colors.white)),
+                    child: Text('Orario Fine: ${_orarioFine.format(context)}',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
@@ -282,7 +299,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      selectedDestinazione?.denominazione ?? 'Seleziona Destinazione',
+                      selectedDestinazione?.denominazione ??
+                          'Seleziona Destinazione',
                       style: TextStyle(fontSize: 16),
                     ),
                     Icon(Icons.arrow_drop_down),
@@ -302,7 +320,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red, // Imposta il colore di sfondo
                   ),
-                  child: const Text('Salva Intervento', style: TextStyle(color: Colors.white)),
+                  child: const Text('Salva Intervento',
+                      style: TextStyle(color: Colors.white)),
                 ),
               ),
             ),
@@ -312,18 +331,21 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
     );
   }
 
-  Future<void> getAllDestinazioniByCliente(String clientId) async{
+  Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/destinazione/cliente/$clientId'));
-      if(response.statusCode == 200) {
+      final response = await http
+          .get(Uri.parse('${ipaddress}/api/destinazione/cliente/$clientId'));
+      if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
-          allDestinazioniByCliente = responseData.map((data) => DestinazioneModel.fromJson(data)).toList();
+          allDestinazioniByCliente = responseData
+              .map((data) => DestinazioneModel.fromJson(data))
+              .toList();
         });
       } else {
         throw Exception('Failed to load Destinazioni per cliente');
       }
-    } catch(e) {
+    } catch (e) {
       print('Errore durante la richiesta HTTP: $e');
     }
   }
@@ -347,7 +369,9 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
                   onChanged: (value) {
                     setState(() {
                       filteredClientiList = clientiList
-                          .where((cliente) => cliente.denominazione!.toLowerCase().contains(value.toLowerCase()))
+                          .where((cliente) => cliente.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
                           .toList();
                     });
                   },
@@ -363,7 +387,9 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
                       children: filteredClientiList.map((cliente) {
                         return ListTile(
                           leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione! + ", " + cliente.indirizzo!),
+                          title: Text(cliente.denominazione! +
+                              ", " +
+                              cliente.indirizzo!),
                           onTap: () {
                             setState(() {
                               selectedCliente = cliente;
@@ -427,7 +453,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
 
   DateTime timeOfDayToDateTime(TimeOfDay timeOfDay) {
     final now = DateTime.now();
-    return DateTime(now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
+    return DateTime(
+        now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
   }
 
   Future<void> saveIntervento() async {
@@ -458,7 +485,6 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
           _orarioFine.hour,
           _orarioFine.minute,
         );
-        // Impostiamo i valori delle proprietà assegnato e concluso
         assegnatoValue = true;
         conclusoValue = true;
         veicolo = selectedVeicolo?.toMap();
@@ -467,7 +493,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
 
       // Effettuiamo la richiesta HTTP con i dati appropriati in base allo stato della checkbox
       final response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/intervento'),
+        Uri.parse('${ipaddress}/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -476,6 +502,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
           'descrizione': _descrizioneController.text,
           'importo_intervento': null,
           'assegnato': assegnatoValue,
+          'conclusione_parziale': false,
           'concluso': conclusoValue,
           'saldato': false,
           'note': null,
@@ -501,10 +528,9 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
     }
   }
 
-
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/cliente');
+      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -528,7 +554,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm>{
 
   Future<void> getAllVeicoli() async {
     try {
-      http.Response response = await http.get(Uri.parse('http://192.168.1.52:8080/api/veicolo'));
+      http.Response response =
+          await http.get(Uri.parse('${ipaddress}/api/veicolo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<VeicoloModel> allVeicoli = [];

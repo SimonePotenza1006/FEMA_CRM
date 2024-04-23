@@ -6,7 +6,8 @@ class RegistrazioneAziendaPage extends StatefulWidget {
   const RegistrazioneAziendaPage({Key? key}) : super(key: key);
 
   @override
-  _RegistrazioneAziendaPageState createState() => _RegistrazioneAziendaPageState();
+  _RegistrazioneAziendaPageState createState() =>
+      _RegistrazioneAziendaPageState();
 }
 
 class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
@@ -14,10 +15,12 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   final TextEditingController luogoLavoroController = TextEditingController();
   final TextEditingController partitaIVAController = TextEditingController();
   final TextEditingController pecController = TextEditingController();
-  final TextEditingController recapitoFatturazioneController = TextEditingController();
+  final TextEditingController recapitoFatturazioneController =
+      TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController sitoController = TextEditingController();
   final TextEditingController telefonoController = TextEditingController();
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   bool _areFieldsFilled = false;
 
@@ -37,18 +40,18 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
           emailController.text.trim().isNotEmpty &&
           sitoController.text.trim().isNotEmpty &&
           telefonoController.text.trim().isNotEmpty;
-
     });
   }
 
   Future<void> createAzienda() async {
-    final url = Uri.parse('http://192.168.1.52:8080/api/azienda');
+    final url = Uri.parse('${ipaddress}/api/azienda');
     final body = jsonEncode({
       'nome': denominazioneController.text.toString(),
       'luogo_di_lavoro': luogoLavoroController.text.toString(),
       'partita_iva': partitaIVAController.text.toString(),
       'pec': pecController.text.toString(),
-      'recapito_fatturazione_elettronica': recapitoFatturazioneController.text.toString(),
+      'recapito_fatturazione_elettronica':
+          recapitoFatturazioneController.text.toString(),
       'email': emailController.text.toString(),
       'telefono': telefonoController.text.toString(),
       'sito': sitoController.text.toString()

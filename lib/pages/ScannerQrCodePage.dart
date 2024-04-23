@@ -12,10 +12,12 @@ import '../model/ProdottoModel.dart';
 import 'CompilazioneDDTByTecnicoPage.dart';
 
 class ScannerQrCodePage extends StatefulWidget {
-
   final InterventoModel intervento;
 
-  ScannerQrCodePage({Key? key, required this.intervento, }) : super(key: key);
+  ScannerQrCodePage({
+    Key? key,
+    required this.intervento,
+  }) : super(key: key);
 
   @override
   _ScannerQrCodePageState createState() => _ScannerQrCodePageState();
@@ -26,7 +28,8 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool qrRead = false;
   String qrData = "";
-  List<ProdottoModel> prodottiDaAggiungere =[];
+  List<ProdottoModel> prodottiDaAggiungere = [];
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -54,7 +57,7 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
 
   Widget _buildQrView(BuildContext context) {
     var scanArea = (MediaQuery.of(context).size.width < 400 ||
-        MediaQuery.of(context).size.height < 400)
+            MediaQuery.of(context).size.height < 400)
         ? 150.0
         : 300.0;
     return QRView(
@@ -144,7 +147,10 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CompilazioneDDTByTecnicoPage(intervento : widget.intervento, prodotti : prodottiDaAggiungere)),
+                    MaterialPageRoute(
+                        builder: (context) => CompilazioneDDTByTecnicoPage(
+                            intervento: widget.intervento,
+                            prodotti: prodottiDaAggiungere)),
                   );
                 },
                 child: Text(
@@ -177,8 +183,9 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
     print(codiceDanea);
 
     // Effettua la chiamata API con un timeout di 10 secondi
-    String apiUrl = 'http://192.168.1.52:8080/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
-    final response = await http.get(Uri.parse(apiUrl)).timeout(Duration(seconds: 10));
+    String apiUrl = '${ipaddress}/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
+    final response =
+        await http.get(Uri.parse(apiUrl)).timeout(Duration(seconds: 10));
 
     // Controlla lo stato della risposta
     if (response.statusCode == 200) {
@@ -210,10 +217,7 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
         'imageData': null,
         'cliente': widget.intervento.cliente?.toMap(),
         'destinazione': widget.intervento.destinazione?.toMap(),
-        'categoriaDdt': {
-          'id': 1,
-          'descrizione': "DDT Intervento"
-        },
+        'categoriaDdt': {'id': 1, 'descrizione': "DDT Intervento"},
         'utente': widget.intervento.utente?.toMap(),
         'intervento': widget.intervento.toMap(),
         'relazioni_prodotti': null,
@@ -222,7 +226,7 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
       debugPrint('Body della richiesta: $body', wrapWidth: 1024);
 
       final response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/ddt'),
+        Uri.parse('${ipaddress}/api/ddt'),
         body: jsonEncode(body),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',

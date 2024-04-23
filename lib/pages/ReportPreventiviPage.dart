@@ -22,7 +22,9 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
   TextEditingController _searchController = TextEditingController();
   bool _isSearchActive = false;
   String? _filterValue;
-  bool _isFilterButtonPressed = false; // New variable to manage filter and download button state
+  bool _isFilterButtonPressed =
+      false; // New variable to manage filter and download button state
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -36,24 +38,24 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
       appBar: AppBar(
         title: _isSearchActive
             ? Padding(
-          padding: const EdgeInsets.only(right: 50.0),
-          child: TextField(
-            controller: _searchController,
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Cerca per cliente',
-              hintStyle: TextStyle(color: Colors.white),
-              border: InputBorder.none,
-            ),
-            onChanged: (value) {
-              filterPreventivi(value);
-            },
-          ),
-        )
+                padding: const EdgeInsets.only(right: 50.0),
+                child: TextField(
+                  controller: _searchController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Cerca per cliente',
+                    hintStyle: TextStyle(color: Colors.white),
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    filterPreventivi(value);
+                  },
+                ),
+              )
             : Text(
-          'Report preventivi',
-          style: TextStyle(color: Colors.white, fontSize: 20),
-        ),
+                'Report preventivi',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
@@ -85,7 +87,8 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
                       children: [
                         Text(
                           'Legenda colori:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
                         Text('Giallo: Accettato e in attesa di consegna'),
@@ -107,20 +110,48 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
           child: DataTable(
             columnSpacing: 20,
             columns: [
-              DataColumn(label: Text('Azienda', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Categoria merceologica', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Cliente', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Agente', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Utente', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Importo', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Accettato', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Rifiutato', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Attesa di accettazione', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Attesa di consegna', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Consegnato', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Data creazione', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Data accettazione', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(label: Text('Data consegna', style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Azienda',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Categoria merceologica',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Cliente',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Agente',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Utente',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Importo',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Accettato',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Rifiutato',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Attesa di accettazione',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Attesa di consegna',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Consegnato',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Data creazione',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Data accettazione',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
+              DataColumn(
+                  label: Text('Data consegna',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
             ],
             rows: preventiviList.map((preventivo) {
               Color backgroundColor = Colors.white;
@@ -138,67 +169,112 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
                 backgroundColor = Colors.orangeAccent;
               }
 
-              if (backgroundColor == Colors.red || backgroundColor == Colors.green) {
+              if (backgroundColor == Colors.red ||
+                  backgroundColor == Colors.green) {
                 textColor = Colors.white;
               }
 
               return DataRow(
-                color: MaterialStateColor.resolveWith((states) => backgroundColor),
+                color:
+                    MaterialStateColor.resolveWith((states) => backgroundColor),
                 cells: [
                   DataCell(
-                    Center(child: Text(preventivo.azienda?.nome.toString() ?? 'N/A', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(
+                            preventivo.azienda?.nome.toString() ?? 'N/A',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.categoria_merceologica ?? 'N/A', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.categoria_merceologica ?? 'N/A',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.cliente?.denominazione ?? 'N/A', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.cliente?.denominazione ?? 'N/A',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.agente?.nome ?? 'N/A', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.agente?.nome ?? 'N/A',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.utente?.cognome ?? 'N/A', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.utente?.cognome ?? 'N/A',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.importo?.toStringAsFixed(2) ?? '0.0', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(
+                            preventivo.importo?.toStringAsFixed(2) ?? '0.0',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.accettato ?? false ? 'SI' : 'NO', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.accettato ?? false ? 'SI' : 'NO',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.rifiutato ?? false ? 'SI' : 'NO', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.rifiutato ?? false ? 'SI' : 'NO',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.attesa ?? false ? 'SI' : 'NO', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.attesa ?? false ? 'SI' : 'NO',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.pendente ?? false ? 'SI' : 'NO', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(preventivo.pendente ?? false ? 'SI' : 'NO',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.consegnato ?? false ? 'SI' : 'NO', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(
+                            preventivo.consegnato ?? false ? 'SI' : 'NO',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!) : 'N/A', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(
+                            preventivo.data_creazione != null
+                                ? DateFormat('yyyy-MM-dd')
+                                    .format(preventivo.data_creazione!)
+                                : 'N/A',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_accettazione!) : 'N/A', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(
+                            preventivo.data_accettazione != null
+                                ? DateFormat('yyyy-MM-dd')
+                                    .format(preventivo.data_accettazione!)
+                                : 'N/A',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                   DataCell(
-                    Center(child: Text(preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_consegna!) : 'Non consegnato', style: TextStyle(color: textColor))),
+                    Center(
+                        child: Text(
+                            preventivo.data_consegna != null
+                                ? DateFormat('yyyy-MM-dd')
+                                    .format(preventivo.data_consegna!)
+                                : 'Non consegnato',
+                            style: TextStyle(color: textColor))),
                     onTap: () => _navigateToDetailsPage(preventivo),
                   ),
                 ],
@@ -226,7 +302,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
 
   Future<void> getAllPreventivi() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/preventivo/ordered');
+      var apiUrl = Uri.parse('${ipaddress}/api/preventivo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -236,7 +312,8 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
         }
         setState(() {
           preventiviList = preventivi;
-          originalPreventiviList = List.from(preventivi); // Salva la lista originale
+          originalPreventiviList =
+              List.from(preventivi); // Salva la lista originale
         });
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -248,7 +325,8 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Errore di connessione'),
-            content: Text('Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            content: Text(
+                'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -275,14 +353,24 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
           final pendente = preventivo.pendente ?? false;
 
           return cliente.toLowerCase().contains(query.toLowerCase()) ||
-              accettato.toString().toLowerCase().contains(query.toLowerCase()) ||
-              rifiutato.toString().toLowerCase().contains(query.toLowerCase()) ||
+              accettato
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
+              rifiutato
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
               attesa.toString().toLowerCase().contains(query.toLowerCase()) ||
-              consegnato.toString().toLowerCase().contains(query.toLowerCase()) ||
+              consegnato
+                  .toString()
+                  .toLowerCase()
+                  .contains(query.toLowerCase()) ||
               pendente.toString().toLowerCase().contains(query.toLowerCase());
         }).toList();
       } else {
-        preventiviList = List.from(originalPreventiviList); // Ripristina la lista originale
+        preventiviList =
+            List.from(originalPreventiviList); // Ripristina la lista originale
       }
     });
   }
@@ -291,7 +379,8 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => DettaglioPreventivoAmministrazionePage(preventivo: preventivo, onNavigateBack: getAllPreventivi),
+        builder: (context) => DettaglioPreventivoAmministrazionePage(
+            preventivo: preventivo, onNavigateBack: getAllPreventivi),
       ),
     );
   }
@@ -321,19 +410,29 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
                 _filterValue = newValue;
                 if (newValue != null) {
                   if (newValue == 'Filtra per consegnato') {
-                    preventiviList = originalPreventiviList.where((preventivo) => preventivo.consegnato ?? false).toList();
+                    preventiviList = originalPreventiviList
+                        .where((preventivo) => preventivo.consegnato ?? false)
+                        .toList();
                   } else if (newValue == 'Filtra per accettato') {
-                    preventiviList = originalPreventiviList.where((preventivo) => preventivo.accettato ?? false).toList();
+                    preventiviList = originalPreventiviList
+                        .where((preventivo) => preventivo.accettato ?? false)
+                        .toList();
                   } else if (newValue == 'Filtra per rifiutato') {
-                    preventiviList = originalPreventiviList.where((preventivo) => preventivo.rifiutato ?? false).toList();
+                    preventiviList = originalPreventiviList
+                        .where((preventivo) => preventivo.rifiutato ?? false)
+                        .toList();
                   } else if (newValue == 'Filtra per attesa') {
-                    preventiviList = originalPreventiviList.where((preventivo) => preventivo.attesa ?? false).toList();
-                  } else if (newValue == 'Rimuovi tutti i filtri') { // Rimuovi tutti i filtri e ripristina la lista originale
+                    preventiviList = originalPreventiviList
+                        .where((preventivo) => preventivo.attesa ?? false)
+                        .toList();
+                  } else if (newValue == 'Rimuovi tutti i filtri') {
+                    // Rimuovi tutti i filtri e ripristina la lista originale
                     preventiviList = List.from(originalPreventiviList);
                     _filterValue = null;
                   }
                 } else {
-                  preventiviList = List.from(originalPreventiviList); // Ripristina la lista originale
+                  preventiviList = List.from(
+                      originalPreventiviList); // Ripristina la lista originale
                 }
               });
               Navigator.of(context).pop();
@@ -400,9 +499,15 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
         preventivo.attesa ?? false ? 'SI' : 'NO',
         preventivo.pendente ?? false ? 'SI' : 'NO',
         preventivo.consegnato ?? false ? 'SI' : 'NO',
-        preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!) : 'N/A',
-        preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_accettazione!) : 'N/A',
-        preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_consegna!) : 'Non consegnato',
+        preventivo.data_creazione != null
+            ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!)
+            : 'N/A',
+        preventivo.data_accettazione != null
+            ? DateFormat('yyyy-MM-dd').format(preventivo.data_accettazione!)
+            : 'N/A',
+        preventivo.data_consegna != null
+            ? DateFormat('yyyy-MM-dd').format(preventivo.data_consegna!)
+            : 'Non consegnato',
       ]);
     }
 
@@ -411,7 +516,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
       late String filePath;
       if (Platform.isWindows) {
         // Percorso di salvataggio su Windows
-        String appDocumentsPath = 'C:\\Users\\Utente1\\Documents';
+        String appDocumentsPath = 'C:\\ReportPreventivi';
         filePath = '$appDocumentsPath\\report_preventivi.xlsx';
       } else if (Platform.isAndroid) {
         // Percorso di salvataggio su Android
@@ -430,7 +535,8 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
           file.writeAsBytesSync(excelBytes);
         });
         // Notifica all'utente che il file è stato salvato con successo
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Excel salvato in $filePath')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Excel salvato in $filePath')));
       } else {
         // Gestisci il caso in cui excel.encode() restituisce null
         print('Errore durante la codifica del file Excel');

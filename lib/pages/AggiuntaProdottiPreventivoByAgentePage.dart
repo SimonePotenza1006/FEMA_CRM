@@ -10,24 +10,30 @@ import 'ModificaSelezioneProdottiPreventivoPage.dart';
 class AggiuntaProdottoPreventivoByAgentePage extends StatefulWidget {
   final PreventivoModel preventivo;
 
-  const AggiuntaProdottoPreventivoByAgentePage({Key? key, required this.preventivo}) : super(key: key);
+  const AggiuntaProdottoPreventivoByAgentePage(
+      {Key? key, required this.preventivo})
+      : super(key: key);
 
   @override
-  _AggiuntaProdottoPreventivoByAgentePageState createState() => _AggiuntaProdottoPreventivoByAgentePageState();
+  _AggiuntaProdottoPreventivoByAgentePageState createState() =>
+      _AggiuntaProdottoPreventivoByAgentePageState();
 }
 
-class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdottoPreventivoByAgentePage> {
+class _AggiuntaProdottoPreventivoByAgentePageState
+    extends State<AggiuntaProdottoPreventivoByAgentePage> {
   bool isSearching = false;
   late TextEditingController searchController;
   List<ProdottoModel> prodottiList = [];
   List<ProdottoModel> filteredProdottiList = [];
   Set<ProdottoModel> selectedProducts = {};
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
     print("Id preventivo:" + widget.preventivo.id.toString());
     print("Provvigioni preventivo:" + widget.preventivo.listino.toString());
-    print("Provvigioni agente:" + widget.preventivo.agente!.categoria_provvigione.toString());
+    print("Provvigioni agente:" +
+        widget.preventivo.agente!.categoria_provvigione.toString());
     super.initState();
     searchController = TextEditingController();
     getAllProdotti();
@@ -37,10 +43,14 @@ class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdott
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: isSearching ? _buildSearchField() : Text(
-          'Aggiunta prodotti al preventivo',
-          style: TextStyle(color: Colors.white), // Imposta il colore del testo su bianco
-        ),
+        title: isSearching
+            ? _buildSearchField()
+            : Text(
+                'Aggiunta prodotti al preventivo',
+                style: TextStyle(
+                    color:
+                        Colors.white), // Imposta il colore del testo su bianco
+              ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: _buildActions(),
@@ -125,6 +135,12 @@ class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdott
     );
   }
 
+  double calculatePriceWithPercentageIncrease(double originalPrice) {
+    double increasePercentage = double.parse(widget.preventivo.listino!.replaceAll('%', '')) / 100;
+    double increasedPrice = originalPrice * (1 + increasePercentage);
+    return double.parse((increasedPrice).toStringAsFixed(2));
+  }
+
 
   Widget _buildFilteredProductList() {
     return ListView.builder(
@@ -132,10 +148,9 @@ class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdott
       itemBuilder: (context, index) {
         final prodotto = filteredProdottiList[index];
         final isSelected = selectedProducts.contains(prodotto);
-
         return ListTile(
           title: Text(prodotto.descrizione ?? ''),
-          subtitle: Text('Prezzo: ${prodotto.prezzo_fornitore}'),
+          subtitle: Text('Prezzo: ${prodotto.prezzo_fornitore != null ? calculatePriceWithPercentageIncrease(prodotto.prezzo_fornitore!) : 'Prezzo non disponibile'}'),
           leading: Checkbox(
             value: isSelected,
             onChanged: (value) {
@@ -193,7 +208,7 @@ class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdott
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("http://192.168.1.52:8080/api/prodotto");
+      var apiUrl = Uri.parse("${ipaddress}/api/prodotto");
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -208,8 +223,7 @@ class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdott
           filteredProdottiList = prodotti;
         });
       } else {
-        throw Exception(
-            'Failed to load data from API: ${response.statusCode}');
+        throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
@@ -244,7 +258,10 @@ class _AggiuntaProdottoPreventivoByAgentePageState extends State<AggiuntaProdott
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ModificaSelezioneProdottiPreventivoByAgentePage(prodottiSelezionati: selectedProducts.toList(), preventivo: widget.preventivo),
+              builder: (context) =>
+                  ModificaSelezioneProdottiPreventivoByAgentePage(
+                      prodottiSelezionati: selectedProducts.toList(),
+                      preventivo: widget.preventivo),
             ),
           );
         },

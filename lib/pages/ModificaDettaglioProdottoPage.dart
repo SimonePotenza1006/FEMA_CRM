@@ -7,23 +7,30 @@ import 'dart:convert';
 class ModificaDettaglioProdottoPage extends StatefulWidget {
   final ProdottoModel prodotto;
 
-  ModificaDettaglioProdottoPage({Key? key, required this.prodotto}) : super(key: key);
+  ModificaDettaglioProdottoPage({Key? key, required this.prodotto})
+      : super(key: key);
 
   @override
-  _ModificaDettaglioProdottoPageState createState() => _ModificaDettaglioProdottoPageState();
+  _ModificaDettaglioProdottoPageState createState() =>
+      _ModificaDettaglioProdottoPageState();
 }
 
-class _ModificaDettaglioProdottoPageState extends State<ModificaDettaglioProdottoPage> {
+class _ModificaDettaglioProdottoPageState
+    extends State<ModificaDettaglioProdottoPage> {
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _tipologiaController = TextEditingController();
   final TextEditingController _categoriaController = TextEditingController();
-  final TextEditingController _sottocategoriaController = TextEditingController();
+  final TextEditingController _sottocategoriaController =
+      TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _fornitoreController = TextEditingController();
   final TextEditingController _codFornitoreController = TextEditingController();
-  final TextEditingController _codProdFornitoreController = TextEditingController();
+  final TextEditingController _codProdFornitoreController =
+      TextEditingController();
   final TextEditingController _qtaGiacenzaController = TextEditingController();
-  final TextEditingController _ultimoCostoAcquistoController = TextEditingController();
+  final TextEditingController _ultimoCostoAcquistoController =
+      TextEditingController();
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -36,8 +43,10 @@ class _ModificaDettaglioProdottoPageState extends State<ModificaDettaglioProdott
     _fornitoreController.text = widget.prodotto.fornitore ?? '';
     _codFornitoreController.text = widget.prodotto.cod_fornitore ?? '';
     _codProdFornitoreController.text = widget.prodotto.cod_prod_forn ?? '';
-    _qtaGiacenzaController.text = widget.prodotto.qta_giacenza?.toString() ?? '';
-    _ultimoCostoAcquistoController.text = widget.prodotto.ultimo_costo_acquisto?.toString() ?? '';
+    _qtaGiacenzaController.text =
+        widget.prodotto.qta_giacenza?.toString() ?? '';
+    _ultimoCostoAcquistoController.text =
+        widget.prodotto.ultimo_costo_acquisto?.toString() ?? '';
 
     // Controllo se il valore è null e imposto il placeholder a "0.0" in caso positivo
     if (_qtaGiacenzaController.text.isEmpty) {
@@ -52,7 +61,7 @@ class _ModificaDettaglioProdottoPageState extends State<ModificaDettaglioProdott
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('http://192.168.1.52:8080/api/prodotto'),
+        Uri.parse('${ipaddress}/api/prodotto'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -70,13 +79,14 @@ class _ModificaDettaglioProdottoPageState extends State<ModificaDettaglioProdott
           'cod_barre_danea': widget.prodotto.cod_barre_danea,
           'produttore': widget.prodotto.produttore,
           'cod_fornitore': _codFornitoreController.text.toString(),
-          'fornitore' : _fornitoreController.text.toString(),
+          'fornitore': _fornitoreController.text.toString(),
           'cod_prod_forn': _codProdFornitoreController.text.toString(),
           'prezzo_fornitore': widget.prodotto.prezzo_fornitore,
           'note_fornitura': widget.prodotto.note_fornitura,
           'qta_giacenza': double.parse(_qtaGiacenzaController.text),
           'qta_impegnata': widget.prodotto.qta_impegnata,
-          'ultimo_costo_acquisto': double.parse(_ultimoCostoAcquistoController.text),
+          'ultimo_costo_acquisto':
+              double.parse(_ultimoCostoAcquistoController.text),
           'prezzo_medio_vendita': widget.prodotto.prezzo_medio_vendita,
           'lotto_seriale': widget.prodotto.lotto_seriale,
           'preventivi': widget.prodotto.preventivi,
@@ -84,13 +94,12 @@ class _ModificaDettaglioProdottoPageState extends State<ModificaDettaglioProdott
           'relazioni_ddt': widget.prodotto.relazioni_ddt
         }),
       );
-      if(response.statusCode == 201){
+      if (response.statusCode == 201) {
         print("Prodotto modificato correttamente!");
       } else {
         print("C'è qualcosa che non va!");
       }
-    }
-    catch(e){
+    } catch (e) {
       print("Errore!!!---> ${e.toString()}");
     }
     return response;
@@ -208,10 +217,8 @@ class _ModificaDettaglioProdottoPageState extends State<ModificaDettaglioProdott
               ElevatedButton(
                 onPressed: () {
                   updateProdotto();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MagazzinoPage())
-                  );
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MagazzinoPage()));
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Colors.red,

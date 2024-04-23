@@ -18,6 +18,7 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
   bool isLoading = true;
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -36,14 +37,32 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
     });
   }
 
+
+
   void filterClienti(String query) {
     setState(() {
       filteredClienti = allClienti.where((cliente) {
         final denominazione = cliente.denominazione?.toLowerCase();
-        return denominazione!.contains(query.toLowerCase());
+        final codice_fiscale = cliente.codice_fiscale?.toLowerCase();
+        final partita_iva = cliente.partita_iva?.toLowerCase();
+        final telefono = cliente.telefono?.toLowerCase();
+        final cellulare = cliente.cellulare?.toLowerCase();
+        final citta = cliente.citta?.toLowerCase();
+        final email = cliente.email?.toLowerCase();
+        final cap = cliente.cap?.toLowerCase();
+
+        return denominazione!.contains(query.toLowerCase()) ||
+            codice_fiscale!.contains(query.toLowerCase()) ||
+            partita_iva!.contains(query.toLowerCase()) ||
+            telefono!.contains(query.toLowerCase()) ||
+            cellulare!.contains(query.toLowerCase()) ||
+            citta!.contains(query.toLowerCase()) ||
+            email!.contains(query.toLowerCase()) ||
+            cap!.contains(query.toLowerCase());
       }).toList();
     });
   }
+
 
   void startSearch() {
     setState(() {
@@ -66,23 +85,26 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
       appBar: AppBar(
         title: isSearching
             ? TextField(
-          controller: searchController,
-          onChanged: filterClienti,
-          decoration: InputDecoration(
-            hintText: 'Cerca per denominazione cliente',
-            hintStyle: TextStyle(color: Colors.white), // colore del testo dell'hint
-            border: InputBorder.none,
-          ),
-          style: TextStyle(color: Colors.white),
-        )
+                controller: searchController,
+                onChanged: filterClienti,
+                decoration: InputDecoration(
+                  hintText: 'Cerca per denominazione cliente',
+                  hintStyle: TextStyle(
+                      color: Colors.white), // colore del testo dell'hint
+                  border: InputBorder.none,
+                ),
+                style: TextStyle(color: Colors.white),
+              )
             : Text('Lista Clienti', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
           IconButton(
             icon: isSearching
-                ? Icon(Icons.cancel, color: Colors.white) // colore dell'icona di cancellazione
-                : Icon(Icons.search, color: Colors.white), // colore dell'icona di ricerca
+                ? Icon(Icons.cancel,
+                    color: Colors.white) // colore dell'icona di cancellazione
+                : Icon(Icons.search,
+                    color: Colors.white), // colore dell'icona di ricerca
             onPressed: () {
               if (isSearching) {
                 stopSearch();
@@ -96,7 +118,8 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const CreazioneClientePage()),
+                MaterialPageRoute(
+                    builder: (context) => const CreazioneClientePage()),
               );
             },
           )
@@ -105,19 +128,19 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
-        children: [
-          Expanded(
-            child: ListView.separated(
-              itemCount: filteredClienti.length,
-              separatorBuilder: (context, index) => const Divider(),
-              itemBuilder: (context, index) {
-                final cliente = filteredClienti[index];
-                return buildViewClienti(cliente);
-              },
+              children: [
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: filteredClienti.length,
+                    separatorBuilder: (context, index) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final cliente = filteredClienti[index];
+                      return buildViewClienti(cliente);
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -131,7 +154,8 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DettaglioClientePage(cliente: cliente)),
+            MaterialPageRoute(
+                builder: (context) => DettaglioClientePage(cliente: cliente)),
           );
         },
         leading: const Column(

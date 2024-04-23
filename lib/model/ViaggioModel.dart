@@ -7,26 +7,20 @@ import 'UtenteModel.dart';
 class ViaggioModel {
   String? id;
   String? destinazione;
-  DateTime? dataArrivo;
-  DateTime? dataPartenza;
+  DateTime? data_arrivo;
+  DateTime? data_partenza;
   AttivitaModel? attivita;
-  List<CartaDiCreditoModel>? carteDiCredito;
-  List<AttrezzaturaModel>? attrezzature;
-  List<UtenteModel>? utenti;
 
-  ViaggioModel(this.id, this.destinazione, this.dataArrivo, this.dataPartenza,
-      this.attivita, this.carteDiCredito, this.attrezzature, this.utenti);
+  ViaggioModel(this.id, this.destinazione, this.data_arrivo, this.data_partenza,
+      this.attivita);
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
       'destinazione': destinazione,
-      'dataArrivo': dataArrivo,
-      'dataPartenza': dataPartenza,
+      'data_arrivo': data_arrivo,
+      'data_partenza': data_partenza,
       'attivita': attivita,
-      'carteDiCredito': carteDiCredito,
-      'attrezzature': attrezzature,
-      'utenti': utenti,
     };
     return map;
   }
@@ -34,39 +28,26 @@ class ViaggioModel {
   ViaggioModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     destinazione = map['destinazione'];
-    dataArrivo = map['dataArrivo'];
-    dataPartenza = map['dataPartenza'];
+    data_arrivo = map['data_arrivo'];
+    data_partenza = map['data_partenza'];
     attivita = map['attivita'];
-    carteDiCredito = map['carteDiCredito'];
-    attrezzature = map['attrezzature'];
-    utenti = map['utenti'];
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'destinazione': destinazione,
-        'dataArrivo': dataArrivo,
-        'dataPartenza': dataArrivo,
+        'data_arrivo': data_arrivo,
+        'data_partenza': data_partenza,
         'attivita': attivita,
-        'carteDiCredito': carteDiCredito,
-        'attrezzature': attrezzature,
-        'utenti': utenti,
       };
 
   factory ViaggioModel.fromJson(Map<String, dynamic> json) {
     return ViaggioModel(
       json['id']?.toString(),
       json['destinazione']?.toString(),
-      json['dataArrivo'],
-      json['dataPartenza'],
+      json['data_arrivo'],
+      json['data_partenza'],
       AttivitaModel.fromJson(json),
-      json['carteDiCredito']
-          ?.map((data) => CartaDiCreditoModel.fromJson(data))
-          .toList(),
-      json['attrezzature']
-          ?.map((data) => AttrezzaturaModel.fromJson(data))
-          .toList(),
-      json['utenti']?.map((data) => UtenteModel.fromJson(data)).toList(),
     );
   }
 }

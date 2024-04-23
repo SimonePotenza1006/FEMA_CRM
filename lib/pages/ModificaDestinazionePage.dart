@@ -9,13 +9,15 @@ import '../model/DestinazioneModel.dart';
 class ModificaDestinazionePage extends StatefulWidget {
   final DestinazioneModel destinazione;
 
-  const ModificaDestinazionePage({Key? key, required this.destinazione}) : super(key:key);
+  const ModificaDestinazionePage({Key? key, required this.destinazione})
+      : super(key: key);
 
   @override
-  _ModificaDestinazionePageState createState() => _ModificaDestinazionePageState();
+  _ModificaDestinazionePageState createState() =>
+      _ModificaDestinazionePageState();
 }
 
-class _ModificaDestinazionePageState extends State<ModificaDestinazionePage>{
+class _ModificaDestinazionePageState extends State<ModificaDestinazionePage> {
   late TextEditingController _denominazioneController;
   late TextEditingController _indirizzoController;
   late TextEditingController _capController;
@@ -25,23 +27,31 @@ class _ModificaDestinazionePageState extends State<ModificaDestinazionePage>{
   late TextEditingController _partitaIvaController;
   late TextEditingController _telefonoController;
   late TextEditingController _cellulareController;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
     super.initState();
-    _denominazioneController = TextEditingController(text: widget.destinazione.denominazione);
-    _indirizzoController = TextEditingController(text: widget.destinazione.indirizzo);
+    _denominazioneController =
+        TextEditingController(text: widget.destinazione.denominazione);
+    _indirizzoController =
+        TextEditingController(text: widget.destinazione.indirizzo);
     _capController = TextEditingController(text: widget.destinazione.cap);
     _cittaController = TextEditingController(text: widget.destinazione.citta);
-    _provinciaController = TextEditingController(text: widget.destinazione.provincia);
-    _codiceFiscaleController = TextEditingController(text: widget.destinazione.codice_fiscale);
-    _partitaIvaController = TextEditingController(text: widget.destinazione.partita_iva);
-    _telefonoController = TextEditingController(text: widget.destinazione.telefono);
-    _cellulareController = TextEditingController(text: widget.destinazione.cellulare);
+    _provinciaController =
+        TextEditingController(text: widget.destinazione.provincia);
+    _codiceFiscaleController =
+        TextEditingController(text: widget.destinazione.codice_fiscale);
+    _partitaIvaController =
+        TextEditingController(text: widget.destinazione.partita_iva);
+    _telefonoController =
+        TextEditingController(text: widget.destinazione.telefono);
+    _cellulareController =
+        TextEditingController(text: widget.destinazione.cellulare);
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _denominazioneController.dispose();
     _indirizzoController.dispose();
     _capController.dispose();
@@ -114,37 +124,34 @@ class _ModificaDestinazionePageState extends State<ModificaDestinazionePage>{
 
   Future<http.Response> updateDestinazione() async {
     late http.Response response;
-    try{
+    try {
       print('${widget.destinazione.toJson()}');
-      response = await http.put(
-        Uri.parse('http://192.168.1.52:8080/api/destinazione'),
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        },
-        body: json.encode({
-          'id': widget.destinazione.id,
-          'denominazione': _denominazioneController.text.toString(),
-          'indirizzo': _indirizzoController.text.toString(),
-          'cap': _capController.text.toString(),
-          'citta': _cittaController.text.toString(),
-          'provincia': _provinciaController.text.toString(),
-          'codice_fiscale': _codiceFiscaleController.text.toString(),
-          'partita_iva': _partitaIvaController.text.toString(),
-          'telefono' : _telefonoController.text.toString(),
-          'cellulare': _cellulareController.text.toString(),
-          'cliente': widget.destinazione.cliente?.toJson(),
-        })
-      );
-      if(response.statusCode == 200){
+      response = await http.put(Uri.parse('${ipaddress}/api/destinazione'),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: json.encode({
+            'id': widget.destinazione.id,
+            'denominazione': _denominazioneController.text.toString(),
+            'indirizzo': _indirizzoController.text.toString(),
+            'cap': _capController.text.toString(),
+            'citta': _cittaController.text.toString(),
+            'provincia': _provinciaController.text.toString(),
+            'codice_fiscale': _codiceFiscaleController.text.toString(),
+            'partita_iva': _partitaIvaController.text.toString(),
+            'telefono': _telefonoController.text.toString(),
+            'cellulare': _cellulareController.text.toString(),
+            'cliente': widget.destinazione.cliente?.toJson(),
+          }));
+      if (response.statusCode == 200) {
         print("Destinazione modificata correttamente!");
       } else {
         print("Hai toppato!!");
         print("${widget.destinazione.cliente?.toJson()}");
         print(response.toString());
       }
-    }
-    catch(e) {
+    } catch (e) {
       print(e.toString());
     }
     return response;

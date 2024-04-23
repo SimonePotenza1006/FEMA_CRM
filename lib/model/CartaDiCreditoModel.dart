@@ -6,18 +6,16 @@ import 'ViaggioModel.dart';
 class CartaDiCreditoModel {
   String? id;
   String? descrizione;
-  TipologiaCartaModel? tipologiaCarta;
-  List<ViaggioModel>? viaggi;
+  TipologiaCartaModel? tipologia_carta;
 
   CartaDiCreditoModel(
-      this.id, this.descrizione, this.tipologiaCarta, this.viaggi);
+      this.id, this.descrizione, this.tipologia_carta);
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
       'descrizione': descrizione,
-      'tipologiaCarta': tipologiaCarta,
-      'viaggi': viaggi,
+      'tipologia_carta': tipologia_carta,
     };
     return map;
   }
@@ -25,15 +23,13 @@ class CartaDiCreditoModel {
   CartaDiCreditoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     descrizione = map['descrizione'];
-    tipologiaCarta = map['tipologiaCarta'];
-    viaggi = ViaggioModel.fromMap(map) as List<ViaggioModel>;
+    tipologia_carta = map['tipologia_carta'];
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'descrizione': descrizione,
-        'tipologiaCarta': tipologiaCarta,
-        'viaggi': viaggi,
+        'tipologia_carta': tipologia_carta,
       };
 
   factory CartaDiCreditoModel.fromJson(Map<String, dynamic> json) {
@@ -41,6 +37,6 @@ class CartaDiCreditoModel {
         json['id']?.toString(),
         json['descrizione']?.toString(),
         TipologiaCartaModel.fromJson(json),
-        json['viaggi']?.map((data) => ViaggioModel.fromJson(data)).toList());
+        );
   }
 }

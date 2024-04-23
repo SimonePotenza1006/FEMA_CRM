@@ -1,18 +1,28 @@
-// Importiamo le librerie necessarie
+import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import '../model/InterventoModel.dart';
-
+import 'package:flutter/services.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Definiamo il widget per la generazione del PDF
 class PDFInterventoPage extends StatefulWidget {
   final InterventoModel intervento;
+  final String descrizione;
+  final String importo;
 
-  PDFInterventoPage({required this.intervento});
+  PDFInterventoPage(
+      {required this.intervento,
+      required this.descrizione,
+      required this.importo});
 
   @override
   _PDFInterventoPageState createState() => _PDFInterventoPageState();
@@ -20,6 +30,7 @@ class PDFInterventoPage extends StatefulWidget {
 
 class _PDFInterventoPageState extends State<PDFInterventoPage> {
   late Future<Uint8List> _pdfFuture;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -45,7 +56,96 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
           }
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Mostra il dialog quando viene premuto il FAB
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Confermare il preventivo?'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      // Chiudi il dialog
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('No'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await _generateAndSendPDF();
+                    },
+                    child: Text('Si'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        backgroundColor: Colors.red,
+        child: Icon(Icons.arrow_forward, color: Colors.white),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
     );
+  }
+
+  Future<void> _generateAndSendPDF() async {
+    try {
+      // Genera il PDF
+      final Uint8List pdfBytes = await _generatePDF();
+
+      // Crea un file temporaneo
+      final tempDir = await getTemporaryDirectory();
+      final tempFilePath = '${tempDir.path}/rapportino.pdf';
+      final File tempFile = File(tempFilePath);
+      await tempFile.writeAsBytes(pdfBytes);
+
+      // Prepara i dati per l'email
+      final String smtpServerHost = 'mail.femasistemi.it';
+      final String subject =
+          '(INTERVENTO) n ${widget.intervento.id} del ${widget.intervento.data}';
+      final String body =
+          'In allegato il PDF del rapportino d\'intervento del cliente ${widget.intervento.cliente?.denominazione}';
+      final String username =
+          'noreply@femasistemi.it'; // Inserisci il tuo indirizzo email
+      final String password = 'WGnr18@59.'; // Inserisci la tua password
+      final int smtpServerPort = 465;
+      final String recipient = 'info@femasistemi.it';
+
+      // Configura il server SMTP
+      final smtpServer = SmtpServer(
+        smtpServerHost,
+        port: smtpServerPort,
+        username: username,
+        password: password,
+        ssl: true, // Utilizza SSL/TLS per la connessione SMTP
+      );
+
+      // Crea il messaggio email con allegato
+      final message = Message()
+        ..from = Address(username, 'App FEMA')
+        ..recipients.add(recipient)
+        ..subject = subject
+        ..text = body
+        ..attachments.add(FileAttachment(
+          tempFile,
+          fileName: 'rapportino.pdf',
+        ));
+
+      // Invia l'email
+      final sendReport = await send(message, smtpServer);
+      print('Email inviata con successo: $sendReport');
+
+      // Elimina il file temporaneo
+      await tempFile.delete();
+    } catch (e) {
+      print('Errore durante l\'invio dell\'email: $e');
+    }
   }
 
   // Metodo per generare il PDF
@@ -54,7 +154,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
     const IconData euro_symbol = IconData(0xe23c, fontFamily: 'MaterialIcons');
     pdf.addPage(
       pw.Page(
-        margin: pw.EdgeInsets.symmetric(horizontal: 20), // Aggiungi margine a destra e sinistra
+        margin: pw.EdgeInsets.symmetric(
+            horizontal: 20), // Aggiungi margine a destra e sinistra
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -204,7 +305,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'DENOMINAZIONE',
                                     style: pw.TextStyle(fontSize: 9),
@@ -213,7 +315,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 pw.Padding(
                                   padding: pw.EdgeInsets.only(right: 3),
                                   child: pw.Text(
-                                    widget.intervento.cliente?.denominazione ?? '',
+                                    widget.intervento.cliente?.denominazione ??
+                                        '',
                                     style: pw.TextStyle(fontSize: 9),
                                   ),
                                 ),
@@ -222,7 +325,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'INDIRIZZO',
                                     style: pw.TextStyle(fontSize: 9),
@@ -240,7 +344,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'CAP',
                                     style: pw.TextStyle(fontSize: 9),
@@ -254,7 +359,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                   ),
                                 ),
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 30, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 30, right: 3),
                                   child: pw.Text(
                                     'CITTÀ',
                                     style: pw.TextStyle(fontSize: 9),
@@ -268,7 +374,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                   ),
                                 ),
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 45, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 45, right: 3),
                                   child: pw.Text(
                                     '(${widget.intervento.cliente?.provincia})',
                                     style: pw.TextStyle(fontSize: 9),
@@ -279,7 +386,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'C.F./P.Iva',
                                     style: pw.TextStyle(fontSize: 9),
@@ -288,9 +396,15 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 pw.Padding(
                                   padding: pw.EdgeInsets.only(right: 3),
                                   child: pw.Text(
-                                    (widget.intervento.cliente?.codice_fiscale ?? '') != ''
-                                        ? widget.intervento.cliente!.codice_fiscale!
-                                        : widget.intervento.cliente?.partita_iva ?? '',
+                                    (widget.intervento.cliente
+                                                    ?.codice_fiscale ??
+                                                '') !=
+                                            ''
+                                        ? widget
+                                            .intervento.cliente!.codice_fiscale!
+                                        : widget.intervento.cliente
+                                                ?.partita_iva ??
+                                            '',
                                     style: pw.TextStyle(fontSize: 9),
                                   ),
                                 ),
@@ -299,7 +413,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'Tel.',
                                     style: pw.TextStyle(fontSize: 9),
@@ -313,7 +428,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                   ),
                                 ),
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 40, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 40, right: 3),
                                   child: pw.Text(
                                     'Cell.',
                                     style: pw.TextStyle(fontSize: 9),
@@ -360,7 +476,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'DENOMINAZIONE',
                                     style: pw.TextStyle(fontSize: 9),
@@ -369,7 +486,9 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 pw.Padding(
                                   padding: pw.EdgeInsets.only(right: 3),
                                   child: pw.Text(
-                                    widget.intervento.destinazione?.denominazione ?? '',
+                                    widget.intervento.destinazione
+                                            ?.denominazione ??
+                                        '',
                                     style: pw.TextStyle(fontSize: 9),
                                   ),
                                 ),
@@ -378,7 +497,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'INDIRIZZO',
                                     style: pw.TextStyle(fontSize: 9),
@@ -387,7 +507,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 pw.Padding(
                                   padding: pw.EdgeInsets.only(right: 3),
                                   child: pw.Text(
-                                    widget.intervento.destinazione?.indirizzo ?? '',
+                                    widget.intervento.destinazione?.indirizzo ??
+                                        '',
                                     style: pw.TextStyle(fontSize: 9),
                                   ),
                                 ),
@@ -396,7 +517,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'CAP',
                                     style: pw.TextStyle(fontSize: 9),
@@ -410,7 +532,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                   ),
                                 ),
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 30, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 30, right: 3),
                                   child: pw.Text(
                                     'CITTÀ',
                                     style: pw.TextStyle(fontSize: 9),
@@ -424,7 +547,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                   ),
                                 ),
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 45, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 45, right: 3),
                                   child: pw.Text(
                                     '(${widget.intervento.destinazione?.provincia})',
                                     style: pw.TextStyle(fontSize: 9),
@@ -435,7 +559,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'C.F./P.Iva',
                                     style: pw.TextStyle(fontSize: 9),
@@ -444,9 +569,15 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 pw.Padding(
                                   padding: pw.EdgeInsets.only(right: 3),
                                   child: pw.Text(
-                                    (widget.intervento.destinazione?.codice_fiscale ?? '') != ''
-                                        ? widget.intervento.destinazione!.codice_fiscale!
-                                        : widget.intervento.destinazione?.partita_iva ?? '',
+                                    (widget.intervento.destinazione
+                                                    ?.codice_fiscale ??
+                                                '') !=
+                                            ''
+                                        ? widget.intervento.destinazione!
+                                            .codice_fiscale!
+                                        : widget.intervento.destinazione
+                                                ?.partita_iva ??
+                                            '',
                                     style: pw.TextStyle(fontSize: 9),
                                   ),
                                 ),
@@ -455,7 +586,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             pw.Row(
                               children: [
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 3, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 3, right: 3),
                                   child: pw.Text(
                                     'Tel.',
                                     style: pw.TextStyle(fontSize: 9),
@@ -464,12 +596,14 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 pw.Padding(
                                   padding: pw.EdgeInsets.only(right: 3),
                                   child: pw.Text(
-                                    widget.intervento.destinazione?.telefono ?? '',
+                                    widget.intervento.destinazione?.telefono ??
+                                        '',
                                     style: pw.TextStyle(fontSize: 9),
                                   ),
                                 ),
                                 pw.Padding(
-                                  padding: pw.EdgeInsets.only(left: 40, right: 3),
+                                  padding:
+                                      pw.EdgeInsets.only(left: 40, right: 3),
                                   child: pw.Text(
                                     'Cell.',
                                     style: pw.TextStyle(fontSize: 9),
@@ -478,7 +612,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                 pw.Padding(
                                   padding: pw.EdgeInsets.only(right: 3),
                                   child: pw.Text(
-                                    widget.intervento.destinazione?.cellulare ?? '',
+                                    widget.intervento.destinazione?.cellulare ??
+                                        '',
                                     style: pw.TextStyle(fontSize: 9),
                                   ),
                                 ),
@@ -611,7 +746,10 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                 ),
               ),
               // Aggiungo la row richiesta
-              pw.SizedBox(height: 10),
+              pw.SizedBox(height: 30),
+              pw.Text('${widget.descrizione}',
+                  style: pw.TextStyle(fontSize: 10)),
+              pw.SizedBox(height: 120),
               pw.Container(
                 height: PdfPageFormat.cm * 3.5,
                 child: pw.Row(
@@ -621,9 +759,12 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                       child: pw.Container(
                         decoration: pw.BoxDecoration(
                           border: pw.Border(
-                            top: pw.BorderSide(color: PdfColors.black, width: 1),
-                            bottom: pw.BorderSide(color: PdfColors.black, width: 1),
-                            right: pw.BorderSide(color: PdfColors.black, width: 1),
+                            top:
+                                pw.BorderSide(color: PdfColors.black, width: 1),
+                            bottom:
+                                pw.BorderSide(color: PdfColors.black, width: 1),
+                            right:
+                                pw.BorderSide(color: PdfColors.black, width: 1),
                           ),
                         ),
                         child: pw.Column(
@@ -631,7 +772,8 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                           children: [
                             // Testo "Pagamento" con valore di widget.intervento?.tipologiaPagamento.descrizione
                             pw.Padding(
-                              padding: pw.EdgeInsets.only(top: 8, left: 8, right: 8),
+                              padding:
+                                  pw.EdgeInsets.only(top: 8, left: 8, right: 8),
                               child: pw.Text(
                                 'Pagamento: ${widget.intervento.tipologia_pagamento?.descrizione.toString()}',
                                 style: pw.TextStyle(
@@ -656,120 +798,134 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                     pw.Expanded(
                       flex: 1,
                       child: pw.Container(
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border(
-                            top: pw.BorderSide(color: PdfColors.black, width: 1),
-                            bottom: pw.BorderSide(color: PdfColors.black, width: 1),
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border(
+                              top: pw.BorderSide(
+                                  color: PdfColors.black, width: 1),
+                              bottom: pw.BorderSide(
+                                  color: PdfColors.black, width: 1),
+                            ),
                           ),
-                        ),
-                        child:
-                        pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children:[
-                            pw.Padding(
-                              padding: pw.EdgeInsets.only(top: 8, left: 8, right: 8),
-                              child: pw.Text(
-                                'Tot. imponibile:',
-                                style: pw.TextStyle(
-                                  fontSize: 9
+                          child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Padding(
+                                  padding: pw.EdgeInsets.only(
+                                      top: 8, left: 8, right: 8),
+                                  child: pw.Text(
+                                    'Tot. imponibile:',
+                                    style: pw.TextStyle(fontSize: 9),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            pw.SizedBox(height: 2),
-                            pw.Padding(
-                              padding: pw.EdgeInsets.only(left: 8, right: 8),
-                              child: pw.Text(
-                                'Tot. Iva:',
-                                style: pw.TextStyle(
-                                    fontSize: 9
+                                pw.SizedBox(height: 2),
+                                pw.Padding(
+                                  padding:
+                                      pw.EdgeInsets.only(left: 8, right: 8),
+                                  child: pw.Text(
+                                    'Tot. Iva:',
+                                    style: pw.TextStyle(fontSize: 9),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            pw.SizedBox(height:10),
-                            pw.Padding(
-                              padding: pw.EdgeInsets.only(left: 8, right: 8),
-                              child: pw.Row(
-                                children: [
-                                  pw.Text(
-                                    'Tot. documento: ' + String.fromCharCode(128),
-                                    style: pw.TextStyle(
-                                      fontWeight: pw.FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            pw.SizedBox(height: 2),
-                            pw.Container(
-                              width: PdfPageFormat.cm * 7.5,
-                              height: 1,
-                              color: PdfColors.black,
-                            ),
-                            pw.SizedBox(height:2),
-                            pw.Padding(
-                              padding: pw.EdgeInsets.only(left: 8),
-                              child:
-                              pw.Row(
-                                children: [
-                                  pw.SizedBox(height: 30),
-                                  pw.Text('SALDATO:'),
-                                  pw.Padding(
-                                    padding: const pw.EdgeInsets.only(left: 8.0),
-                                    child: pw.Container(
-                                      decoration: pw.BoxDecoration(
-                                        border: pw.Border.all(color: PdfColors.black, width: 1.0),
+                                pw.SizedBox(height: 10),
+                                pw.Padding(
+                                  padding:
+                                      pw.EdgeInsets.only(left: 8, right: 8),
+                                  child: pw.Row(
+                                    children: [
+                                      pw.Text(
+                                        'Tot. documento: ${widget.importo}' +
+                                            String.fromCharCode(128),
+                                        style: pw.TextStyle(
+                                          fontWeight: pw.FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                      padding: const pw.EdgeInsets.all(4.0),
-                                      child: pw.Row(
-                                        children: [
-                                          pw.Checkbox(
-                                            value: widget.intervento.saldato == true, // Imposta il valore della checkbox "SI" in base a widget.intervento.saldato
-                                            name: '',
-                                          ), // Checkbox "SI" se widget.intervento.saldato è true, altrimenti "NO"
-                                          pw.Container(
-                                            padding: const pw.EdgeInsets.symmetric(horizontal: 4.0),
-                                            child: pw.FittedBox(
-                                              fit: pw.BoxFit.scaleDown,
-                                              alignment: pw.Alignment.center,
-                                              child: pw.Text('SI'),
-                                            ),
+                                    ],
+                                  ),
+                                ),
+                                pw.SizedBox(height: 2),
+                                pw.Container(
+                                  width: PdfPageFormat.cm * 7.5,
+                                  height: 1,
+                                  color: PdfColors.black,
+                                ),
+                                pw.SizedBox(height: 2),
+                                pw.Padding(
+                                  padding: pw.EdgeInsets.only(left: 8),
+                                  child: pw.Row(
+                                    children: [
+                                      pw.SizedBox(height: 30),
+                                      pw.Text('SALDATO:'),
+                                      pw.Padding(
+                                        padding:
+                                            const pw.EdgeInsets.only(left: 8.0),
+                                        child: pw.Container(
+                                          decoration: pw.BoxDecoration(
+                                            border: pw.Border.all(
+                                                color: PdfColors.black,
+                                                width: 1.0),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  pw.Padding(
-                                    padding: const pw.EdgeInsets.only(left: 8.0),
-                                    child: pw.Container(
-                                      decoration: pw.BoxDecoration(
-                                        border: pw.Border.all(color: PdfColors.black, width: 1.0),
-                                      ),
-                                      padding: const pw.EdgeInsets.all(4.0),
-                                      child: pw.Row(
-                                        children: [
-                                          pw.Checkbox(
-                                            value: widget.intervento.saldato == false, // Imposta il valore della checkbox "NO" in base a widget.intervento.saldato
-                                            name: '',
-                                          ), // Checkbox "NO" se widget.intervento.saldato è true, altrimenti "SI"
-                                          pw.Container(
-                                            padding: const pw.EdgeInsets.symmetric(horizontal: 2.0),
-                                            child: pw.FittedBox(
-                                              fit: pw.BoxFit.scaleDown,
-                                              alignment: pw.Alignment.center,
-                                              child: pw.Text('NO'),
-                                            ),
+                                          padding: const pw.EdgeInsets.all(4.0),
+                                          child: pw.Row(
+                                            children: [
+                                              pw.Checkbox(
+                                                value: widget
+                                                        .intervento.saldato ==
+                                                    true, // Imposta il valore della checkbox "SI" in base a widget.intervento.saldato
+                                                name: '',
+                                              ), // Checkbox "SI" se widget.intervento.saldato è true, altrimenti "NO"
+                                              pw.Container(
+                                                padding: const pw
+                                                    .EdgeInsets.symmetric(
+                                                    horizontal: 4.0),
+                                                child: pw.FittedBox(
+                                                  fit: pw.BoxFit.scaleDown,
+                                                  alignment:
+                                                      pw.Alignment.center,
+                                                  child: pw.Text('SI'),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
+                                      pw.Padding(
+                                        padding:
+                                            const pw.EdgeInsets.only(left: 8.0),
+                                        child: pw.Container(
+                                          decoration: pw.BoxDecoration(
+                                            border: pw.Border.all(
+                                                color: PdfColors.black,
+                                                width: 1.0),
+                                          ),
+                                          padding: const pw.EdgeInsets.all(4.0),
+                                          child: pw.Row(
+                                            children: [
+                                              pw.Checkbox(
+                                                value: widget
+                                                        .intervento.saldato ==
+                                                    false, // Imposta il valore della checkbox "NO" in base a widget.intervento.saldato
+                                                name: '',
+                                              ), // Checkbox "NO" se widget.intervento.saldato è true, altrimenti "SI"
+                                              pw.Container(
+                                                padding: const pw
+                                                    .EdgeInsets.symmetric(
+                                                    horizontal: 2.0),
+                                                child: pw.FittedBox(
+                                                  fit: pw.BoxFit.scaleDown,
+                                                  alignment:
+                                                      pw.Alignment.center,
+                                                  child: pw.Text('NO'),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ]
-                        )
-                      ),
+                                ),
+                              ])),
                     ),
                   ],
                 ),

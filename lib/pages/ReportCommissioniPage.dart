@@ -14,6 +14,7 @@ class ReportCommissioniPage extends StatefulWidget {
 
 class _ReportCommissioniPageState extends State<ReportCommissioniPage> {
   List<CommissioneModel> allCommissioni = [];
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -52,28 +53,37 @@ class _ReportCommissioniPageState extends State<ReportCommissioniPage> {
                 }),
                 cells: [
                   DataCell(Text(
-                    DateFormat('dd/MM/yyyy').format(commissione.data_creazione!),
-                    style: TextStyle(color: _getTextColor(commissione.concluso!)),
+                    DateFormat('dd/MM/yyyy')
+                        .format(commissione.data_creazione!),
+                    style:
+                        TextStyle(color: _getTextColor(commissione.concluso!)),
                   )),
                   DataCell(Text(
                     DateFormat('dd/MM/yyyy HH:mm').format(commissione.data!),
-                    style: TextStyle(color: _getTextColor(commissione.concluso!)),
+                    style:
+                        TextStyle(color: _getTextColor(commissione.concluso!)),
                   )),
                   DataCell(Text(
                     commissione.descrizione!,
-                    style: TextStyle(color: _getTextColor(commissione.concluso!)),
+                    style:
+                        TextStyle(color: _getTextColor(commissione.concluso!)),
                   )),
                   DataCell(Text(
                     commissione.concluso! ? 'Si' : 'No',
-                    style: TextStyle(color: _getTextColor(commissione.concluso!)),
+                    style:
+                        TextStyle(color: _getTextColor(commissione.concluso!)),
                   )),
                   DataCell(Text(
                     commissione.note!,
-                    style: TextStyle(color: _getTextColor(commissione.concluso!)),
+                    style:
+                        TextStyle(color: _getTextColor(commissione.concluso!)),
                   )),
                   DataCell(Text(
-                    commissione.utente!.nome! + ' ' + commissione.utente!.cognome!,
-                    style: TextStyle(color: _getTextColor(commissione.concluso!)),
+                    commissione.utente!.nome! +
+                        ' ' +
+                        commissione.utente!.cognome!,
+                    style:
+                        TextStyle(color: _getTextColor(commissione.concluso!)),
                   )),
                 ],
               );
@@ -102,7 +112,7 @@ class _ReportCommissioniPageState extends State<ReportCommissioniPage> {
 
   Future<void> getAllCommissioni() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/commissione/ordered');
+      var apiUrl = Uri.parse('${ipaddress}/api/commissione/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

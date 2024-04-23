@@ -11,17 +11,22 @@ import 'DettaglioPreventivoByTecnicoPage.dart';
 class ListaPreventiviTecnicoPage extends StatefulWidget {
   final UtenteModel utente;
 
-  const ListaPreventiviTecnicoPage({Key? key, required this.utente}) : super(key: key);
+  const ListaPreventiviTecnicoPage({Key? key, required this.utente})
+      : super(key: key);
 
   @override
-  _ListaPreventiviTecnicoPageState createState() => _ListaPreventiviTecnicoPageState();
+  _ListaPreventiviTecnicoPageState createState() =>
+      _ListaPreventiviTecnicoPageState();
 }
 
-class _ListaPreventiviTecnicoPageState extends State<ListaPreventiviTecnicoPage> {
+class _ListaPreventiviTecnicoPageState
+    extends State<ListaPreventiviTecnicoPage> {
   AgenteModel? agente;
   List<AgenteModel> agentiList = [];
   List<PreventivoModel> preventiviList = [];
   bool isLoading = true;
+  double totalCommission = 0.0;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -43,85 +48,122 @@ class _ListaPreventiviTecnicoPageState extends State<ListaPreventiviTecnicoPage>
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Totale preventivi emessi: ${preventiviList.length}',
-              style: TextStyle(fontSize: 18),
-            ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SingleChildScrollView(
-                child: DataTable(
-                  columns: [
-                    DataColumn(label: Text('Data Creazione')),
-                    DataColumn(label: Text('Azienda')),
-                    DataColumn(label: Text('Cliente')),
-                    DataColumn(label: Text('Importo')),
-                    DataColumn(label: Text('Accettato')),
-                    DataColumn(label: Text('Rifiutato')),
-                    DataColumn(label: Text('Attesa')),
-                    DataColumn(label: Text('Pendente')),
-                    DataColumn(label: Text('Consegnato')),
-                  ],
-                  rows: preventiviList.map((preventivo) {
-                    Color? backgroundColor;
-                    Color? textColor;
-
-                    if (preventivo.accettato ?? false) {
-                      backgroundColor = Colors.yellow;
-                    } else if (preventivo.rifiutato ?? false) {
-                      backgroundColor = Colors.red;
-                    } else if (preventivo.attesa ?? false) {
-                      backgroundColor = Colors.white;
-                    } else if (preventivo.consegnato ?? false) {
-                      backgroundColor = Colors.green;
-                    } else if (preventivo.pendente ?? false) {
-                      backgroundColor = Colors.orangeAccent;
-                    }
-
-                    if (backgroundColor == Colors.red || backgroundColor == Colors.green) {
-                      textColor = Colors.white;
-                    }
-
-                    return DataRow(
-                      color: MaterialStateColor.resolveWith((states) => backgroundColor ?? Colors.transparent),
-                      cells: [
-                        DataCell(
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DettaglioPreventivoByTecnicoPage(preventivo: preventivo),
-                                ),
-                              );
-                            },
-                            child: Text(preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!) : ''),
-                          ),
-                        ),
-                        DataCell(Text(preventivo.azienda?.nome ?? '')),
-                        DataCell(Text(preventivo.cliente?.denominazione ?? '')),
-                        DataCell(Text(preventivo.importo?.toStringAsFixed(2) ?? '')),
-                        DataCell(Text(preventivo.accettato != null ? (preventivo.accettato! ? 'Si' : 'No') : '')),
-                        DataCell(Text(preventivo.rifiutato != null ? (preventivo.rifiutato! ? 'Si' : 'No') : '')),
-                        DataCell(Text(preventivo.attesa != null ? (preventivo.attesa! ? 'Si' : 'No') : '')),
-                        DataCell(Text(preventivo.pendente != null ? (preventivo.pendente! ? 'Si' : 'No') : '')),
-                        DataCell(Text(preventivo.consegnato != null ? (preventivo.consegnato! ? 'Si' : 'No') : '')),
-                      ],
-                    );
-                  }).toList(),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Totale preventivi emessi: ${preventiviList.length}',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Totale provvigioni: ${totalCommission.toStringAsFixed(2)}',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        columns: [
+                          DataColumn(label: Text('Data Creazione')),
+                          DataColumn(label: Text('Azienda')),
+                          DataColumn(label: Text('Cliente')),
+                          DataColumn(label: Text('Importo')),
+                          DataColumn(label: Text('Accettato')),
+                          DataColumn(label: Text('Rifiutato')),
+                          DataColumn(label: Text('Attesa')),
+                          DataColumn(label: Text('Pendente')),
+                          DataColumn(label: Text('Consegnato')),
+                        ],
+                        rows: preventiviList.map((preventivo) {
+                          Color? backgroundColor;
+                          Color? textColor;
+
+                          if (preventivo.accettato ?? false) {
+                            backgroundColor = Colors.yellow;
+                          } else if (preventivo.rifiutato ?? false) {
+                            backgroundColor = Colors.red;
+                          } else if (preventivo.attesa ?? false) {
+                            backgroundColor = Colors.white;
+                          } else if (preventivo.consegnato ?? false) {
+                            backgroundColor = Colors.green;
+                          } else if (preventivo.pendente ?? false) {
+                            backgroundColor = Colors.orangeAccent;
+                          }
+
+                          if (backgroundColor == Colors.red ||
+                              backgroundColor == Colors.green) {
+                            textColor = Colors.white;
+                          }
+
+                          return DataRow(
+                            color: MaterialStateColor.resolveWith((states) =>
+                                backgroundColor ?? Colors.transparent),
+                            cells: [
+                              DataCell(
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DettaglioPreventivoByTecnicoPage(
+                                                preventivo: preventivo),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(preventivo.data_creazione != null
+                                      ? DateFormat('yyyy-MM-dd')
+                                          .format(preventivo.data_creazione!)
+                                      : ''),
+                                ),
+                              ),
+                              DataCell(Text(preventivo.azienda?.nome ?? '')),
+                              DataCell(Text(
+                                  preventivo.cliente?.denominazione ?? '')),
+                              DataCell(Text(
+                                  preventivo.importo?.toStringAsFixed(2) ??
+                                      '')),
+                              DataCell(Text(preventivo.accettato != null
+                                  ? (preventivo.accettato! ? 'Si' : 'No')
+                                  : '')),
+                              DataCell(Text(preventivo.rifiutato != null
+                                  ? (preventivo.rifiutato! ? 'Si' : 'No')
+                                  : '')),
+                              DataCell(Text(preventivo.attesa != null
+                                  ? (preventivo.attesa! ? 'Si' : 'No')
+                                  : '')),
+                              DataCell(Text(preventivo.pendente != null
+                                  ? (preventivo.pendente! ? 'Si' : 'No')
+                                  : '')),
+                              DataCell(Text(preventivo.consegnato != null
+                                  ? (preventivo.consegnato! ? 'Si' : 'No')
+                                  : '')),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
+  }
+
+  Future<void> calculateTotalCommission() async {
+    double total = 0.0;
+    for (var preventivo in preventiviList) {
+      total += preventivo.provvigioni ?? 0.0;
+    }
+    setState(() {
+      totalCommission = total;
+    });
   }
 
   Future<void> getPreventiviByAgente() async {
@@ -129,7 +171,8 @@ class _ListaPreventiviTecnicoPageState extends State<ListaPreventiviTecnicoPage>
       await getAllAgenti();
       await findAgente();
       String? agenteId = agente?.id;
-      http.Response response = await http.get(Uri.parse('http://192.168.1.52:8080/api/preventivo/agente/$agenteId'));
+      http.Response response = await http
+          .get(Uri.parse('${ipaddress}/api/preventivo/agente/$agenteId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<PreventivoModel> allPreventiviByAgente = [];
@@ -140,6 +183,7 @@ class _ListaPreventiviTecnicoPageState extends State<ListaPreventiviTecnicoPage>
         setState(() {
           preventiviList = allPreventiviByAgente;
           isLoading = false;
+          calculateTotalCommission();
         });
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -155,7 +199,7 @@ class _ListaPreventiviTecnicoPageState extends State<ListaPreventiviTecnicoPage>
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('http://192.168.1.52:8080/api/agente');
+      var apiUrl = Uri.parse('${ipaddress}/api/agente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -179,7 +223,8 @@ class _ListaPreventiviTecnicoPageState extends State<ListaPreventiviTecnicoPage>
   Future<void> findAgente() async {
     try {
       for (var agente in agentiList) {
-        if (agente.nome == widget.utente.nome && agente.cognome == widget.utente.cognome) {
+        if (agente.nome == widget.utente.nome &&
+            agente.cognome == widget.utente.cognome) {
           setState(() {
             this.agente = agente;
           });
@@ -198,11 +243,13 @@ class _ListaPreventiviTecnicoPageState extends State<ListaPreventiviTecnicoPage>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Errore di connessione'),
-          content: Text('Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+          title: Text('Errore'),
+          content: Text(
+              'La tua utenza non è riconosciuta come un agente'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
+                Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
               child: Text('OK'),

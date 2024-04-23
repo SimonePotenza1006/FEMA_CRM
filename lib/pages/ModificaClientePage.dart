@@ -5,18 +5,17 @@ import 'package:http/http.dart' as http;
 
 import '../model/ClienteModel.dart';
 
-
 class ModificaClientePage extends StatefulWidget {
   final ClienteModel cliente;
 
-  const ModificaClientePage({Key? key, required this.cliente}) : super(key: key);
+  const ModificaClientePage({Key? key, required this.cliente})
+      : super(key: key);
 
   @override
   _ModificaClientePageState createState() => _ModificaClientePageState();
 }
 
 class _ModificaClientePageState extends State<ModificaClientePage> {
-
   late TextEditingController _codiceFiscaleController;
   late TextEditingController _partitaIvaController;
   late TextEditingController _denominazioneController;
@@ -34,25 +33,34 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
   late TextEditingController _emailController;
   late TextEditingController _pecController;
   late TextEditingController _noteController;
-
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
     super.initState();
-    _codiceFiscaleController = TextEditingController(text: widget.cliente.codice_fiscale);
-    _partitaIvaController = TextEditingController(text: widget.cliente.partita_iva);
-    _denominazioneController = TextEditingController(text: widget.cliente.denominazione);
-    _indirizzoController = TextEditingController(text: widget.cliente.indirizzo);
+    _codiceFiscaleController =
+        TextEditingController(text: widget.cliente.codice_fiscale);
+    _partitaIvaController =
+        TextEditingController(text: widget.cliente.partita_iva);
+    _denominazioneController =
+        TextEditingController(text: widget.cliente.denominazione);
+    _indirizzoController =
+        TextEditingController(text: widget.cliente.indirizzo);
     _capController = TextEditingController(text: widget.cliente.cap);
     _cittaController = TextEditingController(text: widget.cliente.citta);
-    _provinciaController = TextEditingController(text: widget.cliente.provincia);
+    _provinciaController =
+        TextEditingController(text: widget.cliente.provincia);
     _nazioneController = TextEditingController(text: widget.cliente.nazione);
-    _fatturazioneElettronicaController = TextEditingController(text: widget.cliente.recapito_fatturazione_elettronica);
-    _riferimentoAmministrativoController = TextEditingController(text: widget.cliente.riferimento_amministrativo);
-    _referenteController = TextEditingController(text: widget.cliente.referente);
+    _fatturazioneElettronicaController = TextEditingController(
+        text: widget.cliente.recapito_fatturazione_elettronica);
+    _riferimentoAmministrativoController =
+        TextEditingController(text: widget.cliente.riferimento_amministrativo);
+    _referenteController =
+        TextEditingController(text: widget.cliente.referente);
     _faxController = TextEditingController(text: widget.cliente.fax);
     _telefonoController = TextEditingController(text: widget.cliente.telefono);
-    _cellulareController = TextEditingController(text: widget.cliente.cellulare);
+    _cellulareController =
+        TextEditingController(text: widget.cliente.cellulare);
     _emailController = TextEditingController(text: widget.cliente.email);
     _pecController = TextEditingController(text: widget.cliente.pec);
     _noteController = TextEditingController(text: widget.cliente.note);
@@ -125,11 +133,13 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
             ),
             TextField(
               controller: _fatturazioneElettronicaController,
-              decoration: const InputDecoration(labelText: 'Recapito fatturazione Elettronica'),
+              decoration: const InputDecoration(
+                  labelText: 'Recapito fatturazione Elettronica'),
             ),
             TextField(
               controller: _riferimentoAmministrativoController,
-              decoration: const InputDecoration(labelText: 'Riferimento Amministrativo'),
+              decoration: const InputDecoration(
+                  labelText: 'Riferimento Amministrativo'),
             ),
             TextField(
               controller: _referenteController,
@@ -159,7 +169,6 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
               controller: _noteController,
               decoration: const InputDecoration(labelText: 'Note'),
             ),
-
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: updateCliente,
@@ -171,12 +180,11 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
     );
   }
 
- 
-Future<http.Response> updateCliente() async {
+  Future<http.Response> updateCliente() async {
     late http.Response response;
-    try{
+    try {
       response = await http.put(
-        Uri.parse('http://192.168.1.52:8080/api/cliente/${widget.cliente.id}'),
+        Uri.parse('${ipaddress}/api/cliente/${widget.cliente.id}'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -191,8 +199,10 @@ Future<http.Response> updateCliente() async {
           'citta': _cittaController.text.toString(),
           'provincia': _provinciaController.text.toString(),
           'nazione': _nazioneController.text.toString(),
-          'recapito_fatturazione_elettronica': _fatturazioneElettronicaController.text.toString(),
-          'riferimento_amministrativo': _riferimentoAmministrativoController.text.toString(),
+          'recapito_fatturazione_elettronica':
+              _fatturazioneElettronicaController.text.toString(),
+          'riferimento_amministrativo':
+              _riferimentoAmministrativoController.text.toString(),
           'referente': _referenteController.text.toString(),
           'fax': _faxController.text.toString(),
           'telefono': _telefonoController.text.toString(),
@@ -203,16 +213,15 @@ Future<http.Response> updateCliente() async {
           'tipologie_interventi': widget.cliente.tipologie_interventi,
         }),
       );
-      if (response.statusCode == 201){
+      if (response.statusCode == 201) {
         print("Cliente modificato correttamente!");
       } else {
         print("Hai toppato :(");
         print(response.toString());
       }
-    }
-    catch(e) {
+    } catch (e) {
       print(e.toString());
     }
     return response;
-}
+  }
 }

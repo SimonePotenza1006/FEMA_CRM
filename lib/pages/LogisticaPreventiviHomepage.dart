@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/pages/ReportPreventiviPage.dart';
 
+import 'CreazioneClientePage.dart';
 import 'RegistrazioneAgentePage.dart';
 import 'RegistrazioneAziendaPage.dart';
 import 'RegistrazionePreventivoAmministrazionePage.dart';
@@ -24,6 +25,18 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
         title: const Text('Logistica e Preventivi', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person_add_alt_1, size: 40, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const CreazioneClientePage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(

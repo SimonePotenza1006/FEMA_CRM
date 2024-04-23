@@ -1,4 +1,3 @@
-import '';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,13 +5,23 @@ import 'package:fema_crm/pages/HomeFormAmministrazione.dart';
 import 'package:fema_crm/pages/HomeFormTecnico.dart';
 import 'databaseHandler/DbHelper.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-
+import 'package:permission_handler/permission_handler.dart';
 import 'model/UtenteModel.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  await _requestLocationPermission();
+  initializeDateFormatting('it_IT', null).then((_) {
+    runApp(const MyApp());
+  });
+}
+
+Future<void> _requestLocationPermission() async {
+  PermissionStatus status = await Permission.location.request();
+  if (status.isDenied) {
+    // Il permesso è stato negato dall'utente, gestire di conseguenza
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -53,11 +62,12 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void initState() {
-    dbHelper = DbHelper();
     super.initState();
+    dbHelper = DbHelper();
+    _loadSavedCredentials();
   }
 
-  Future setSP(UtenteModel user) async {
+  Future<void> setSP(UtenteModel user) async {
     final SharedPreferences sp = await _pref;
     sp.setString('id', user.id!);
     sp.setString('nome', user.nome!);
@@ -68,42 +78,43 @@ class _LoginFormState extends State<LoginForm> {
     _futureAlbum = dbHelper.getUtentebyId(user.id!);
   }
 
-  login() async {
+  Future<void> login() async {
     String uid = _conUserId.text.trim();
     String passwd = _conPassword.text;
 
-    if (false) {
-      print("ERROR FALSE");
-    } else {
-      print('Ooook!');
-      print("AOOOOOO");
+    // Qui potresti fare eventuali controlli sull'username e la password
 
-      await dbHelper.getLoginUser(uid, passwd).then((userData) {
-        print('$uid, $passwd');
-        print("Checking userData!");
-        if (userData != null) {
-          print("PROVA!@");
-          setSP(userData).whenComplete(() {
-            print("PROVA3");
-            print("userdata: $userData");
-            TextInput.finishAutofillContext();
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (_) => userData.ruolo.descrizione == "Developer" ||
-                    userData.ruolo.descrizione == "Tecnico"
-                    ? HomeFormTecnico(userData: userData)
-                    : HomeFormAmministrazione(userData: userData),
-              ),
-                  (Route<dynamic> route) => false,
-            );
-          });
-        }
-      });
+    await dbHelper.getLoginUser(uid, passwd).then((userData) {
+      if (userData != null) {
+        setSP(userData).then((_) {
+          TextInput.finishAutofillContext();
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (_) => userData.ruolo.descrizione == "Developer" ||
+                  userData.ruolo.descrizione == "Tecnico"
+                  ? HomeFormTecnico(userData: userData)
+                  : HomeFormAmministrazione(userData: userData),
+            ),
+                (Route<dynamic> route) => false,
+          );
+        });
+      }
+    });
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final SharedPreferences sp = await _pref;
+    String? savedUsername = sp.getString('username');
+    String? savedPassword = sp.getString('password');
+
+    if (savedUsername != null && savedPassword != null) {
+      _conUserId.text = savedUsername;
+      _conPassword.text = savedPassword;
     }
   }
 
-  reset() {
+  void reset() {
     _conUserId.text = '';
     _conPassword.text = '';
   }
@@ -142,6 +153,7 @@ class _LoginFormState extends State<LoginForm> {
                   labelText: 'Username',
                   hintText: 'Inserisci il tuo username',
                 ),
+                autofillHints: [AutofillHints.username],
               ),
             ),
             SizedBox(height: 15),
@@ -159,6 +171,7 @@ class _LoginFormState extends State<LoginForm> {
                   labelText: 'Password',
                   hintText: 'Inserisci la password',
                 ),
+                autofillHints: [AutofillHints.password],
               ),
             ),
             SizedBox(height: 30),

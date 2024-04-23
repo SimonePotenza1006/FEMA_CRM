@@ -34,7 +34,8 @@ class MarcaTempoModel {
     return map;
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         'id': id,
         'name': name,
         'type': type,
@@ -54,10 +55,11 @@ class MarcaTempoModel {
         json['type'],
         json['gps'],
         json['gpsu'],
-        json['data'],
-        json['datau'],
+        json['data'] != null ? DateTime.parse(json['data']) : null,
+        json['datau'] != null ? DateTime.parse(json['datau']) : null,
         json['imageData'],
-        UtenteModel.fromJson(json),
-        ViaggioModel.fromJson(json));
+        json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
+        json['viaggio'] != null ? ViaggioModel.fromJson(json['viaggio']) : null
+    );
   }
 }

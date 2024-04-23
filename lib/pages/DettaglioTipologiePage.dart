@@ -7,21 +7,23 @@ import 'package:http/http.dart' as http;
 import '../databaseHandler/DbHelper.dart';
 import '../model/CategoriaInterventoSpecificoModel.dart';
 import 'DettaglioListinoPage.dart';
+import 'NuovaCategoriaPage.dart';
 
 class DettaglioTipologiePage extends StatefulWidget {
   final TipologiaInterventoModel tipologia;
 
-  const DettaglioTipologiePage({Key? key, required this.tipologia}) : super(key: key);
+  const DettaglioTipologiePage({Key? key, required this.tipologia})
+      : super(key: key);
 
   @override
   _DettaglioTipologiePageState createState() => _DettaglioTipologiePageState();
 }
 
 class _DettaglioTipologiePageState extends State<DettaglioTipologiePage> {
-
   DbHelper? dbHelper;
-  List<CategoriaInterventoSpecificoModel> allCategorieForTipologia =[];
+  List<CategoriaInterventoSpecificoModel> allCategorieForTipologia = [];
   bool isLoading = true;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
@@ -32,42 +34,60 @@ class _DettaglioTipologiePageState extends State<DettaglioTipologiePage> {
   }
 
   Future<void> init() async {
-    print("Provo a tirare giù le categorie specifiche data una determinata tipologia");
+    print(
+        "Provo a tirare giù le categorie specifiche data una determinata tipologia");
     await getAllCategorieForTipologia();
-    print("Numero totale di categorie data la tipologia: ${allCategorieForTipologia.length}");
+    print(
+        "Numero totale di categorie data la tipologia: ${allCategorieForTipologia.length}");
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text('Management Listini',
-              style: TextStyle(color: Colors.white)
-          ),
+              style: TextStyle(color: Colors.white)),
           centerTitle: true,
           backgroundColor: Colors.red,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.add,
+                size: 40,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          NuovaCategoriaPage(tipologia: widget.tipologia),
+                    ));
+              },
+            )
+          ],
         ),
-
         body: isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView.builder(
-            itemCount: allCategorieForTipologia.length,
-            itemBuilder: (context, index){
-              final categoria = allCategorieForTipologia[index];
-              return buildViewCategorie(categoria);
-            }
-        )
-    );
+                itemCount: allCategorieForTipologia.length,
+                itemBuilder: (context, index) {
+                  final categoria = allCategorieForTipologia[index];
+                  return buildViewCategorie(categoria);
+                }));
   }
 
-  Future<void>getAllCategorieForTipologia() async {
+  Future<void> getAllCategorieForTipologia() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.52:8080/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
+      final response = await http.get(Uri.parse(
+          '${ipaddress}/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
-          allCategorieForTipologia = responseData.map((data) => CategoriaInterventoSpecificoModel.fromJson(data)).toList();
+          allCategorieForTipologia = responseData
+              .map((data) => CategoriaInterventoSpecificoModel.fromJson(data))
+              .toList();
           isLoading = false;
         });
       } else {
@@ -88,23 +108,23 @@ class _DettaglioTipologiePageState extends State<DettaglioTipologiePage> {
         child: ListTile(
           minLeadingWidth: 12,
           visualDensity: const VisualDensity(horizontal: 0, vertical: 4),
-          onTap:(){
+          onTap: () {
             Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DettaglioListinoPage(categoria: categoria),)
-            );
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      DettaglioListinoPage(categoria: categoria),
+                ));
           },
           leading: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[Icon(Icons.category, size:40)],
+            children: <Widget>[Icon(Icons.category, size: 40)],
           ),
           title: Text(
             '${categoria.descrizione}',
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 25),
           ),
-        )
-    );
+        ));
   }
 }

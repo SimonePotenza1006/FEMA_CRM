@@ -1,24 +1,28 @@
 class RuoloUtenteModel {
   String? id;
   String? descrizione;
+  bool? capogruppo;
 
-  RuoloUtenteModel(this.id, this.descrizione);
+  RuoloUtenteModel(this.id, this.descrizione, this.capogruppo);
 
   Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{'id': id, 'descrizione': descrizione};
+    var map = <String, dynamic>{'id': id, 'descrizione': descrizione, 'capogruppo' : capogruppo};
     return map;
   }
 
   factory RuoloUtenteModel.fromMap(Map<String, dynamic> map) {
     return RuoloUtenteModel(
         map['id']?.toString(),
-        map['descrizione']?.toString());
+        map['descrizione']?.toString(),
+        map['capogruppo']
+    );
   }
 
   factory RuoloUtenteModel.fromJson(Map<String, dynamic> json) {
     return RuoloUtenteModel(
       json['id']?.toString(),
       json['descrizione']?.toString(),
+      json['capogruppo']
     );
   }
 
@@ -32,6 +36,7 @@ class RuoloUtenteModel {
     return {
       'id': id.toString(),
       'descrizione': descrizione.toString(),
+      'capogruppo': capogruppo
     };
   }
 }

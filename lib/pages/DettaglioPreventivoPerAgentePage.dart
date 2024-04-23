@@ -19,6 +19,7 @@ class DettaglioPreventivoPerAgentePage extends StatefulWidget {
 class _DettaglioPreventivoPerAgentePageState
     extends State<DettaglioPreventivoPerAgentePage> {
   List<RelazionePreventivoProdottiModel> allProdotti = [];
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   bool isLoading = true;
 
   @override
@@ -70,8 +71,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Categoria Merceologica:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.categoria_merceologica ?? 'N/A'}',
+              Text('${widget.preventivo.categoria_merceologica ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildDarkDivider(), // Riga divisoria grigia scura
@@ -89,8 +89,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Descrizione:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.descrizione ?? 'N/A'}',
+              Text('${widget.preventivo.descrizione ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildDarkDivider(), // Riga divisoria grigia scura
@@ -109,8 +108,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Cliente:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.cliente?.denominazione ?? 'N/A'}',
+              Text('${widget.preventivo.cliente?.denominazione ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildDarkDivider(), // Riga divisoria grigia scura
@@ -119,8 +117,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Accettato:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.accettato ?? false ? 'SI' : 'NO'}',
+              Text('${widget.preventivo.accettato ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildLightDivider(), // Riga divisoria grigia chiara
@@ -129,8 +126,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Rifiutato:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.rifiutato ?? false ? 'SI' : 'NO'}',
+              Text('${widget.preventivo.rifiutato ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildDarkDivider(), // Riga divisoria grigia scura
@@ -139,8 +135,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Attesa:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.attesa ?? false ? 'SI' : 'NO'}',
+              Text('${widget.preventivo.attesa ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildLightDivider(), // Riga divisoria grigia chiara
@@ -149,8 +144,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Pendente:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.pendente ?? false ? 'SI' : 'NO'}',
+              Text('${widget.preventivo.pendente ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildDarkDivider(), // Riga divisoria grigia scura
@@ -159,8 +153,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Consegnato:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.consegnato ?? false ? 'SI' : 'NO'}',
+              Text('${widget.preventivo.consegnato ?? false ? 'SI' : 'NO'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildLightDivider(), // Riga divisoria grigia chiara
@@ -199,8 +192,7 @@ class _DettaglioPreventivoPerAgentePageState
                 'Utente:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.utente?.nome ?? 'N/A'}',
+              Text('${widget.preventivo.utente?.nome ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
               buildLightDivider(), // Riga divisoria grigia chiara
@@ -209,13 +201,10 @@ class _DettaglioPreventivoPerAgentePageState
                 'Agente:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(
-                  '${widget.preventivo.agente?.nome ?? 'N/A'}',
+              Text('${widget.preventivo.agente?.nome ?? 'N/A'}',
                   style: TextStyle(fontSize: 16)),
               SizedBox(height: 20),
-              isLoading
-                  ? CircularProgressIndicator()
-                  : buildProdottiList(),
+              isLoading ? CircularProgressIndicator() : buildProdottiList(),
             ],
           ),
         ),
@@ -239,9 +228,13 @@ class _DettaglioPreventivoPerAgentePageState
             shrinkWrap: true,
             itemCount: allProdotti.length,
             itemBuilder: (context, index) {
-              final prezzoFornitore = allProdotti[index].prodotto?.prezzo_fornitore ?? 0;
-              final listino = widget.preventivo.listino != null && widget.preventivo.listino!.length >= 2
-                  ? double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0
+              final prezzoFornitore =
+                  allProdotti[index].prodotto?.prezzo_fornitore ?? 0;
+              final listino = widget.preventivo.listino != null &&
+                      widget.preventivo.listino!.length >= 2
+                  ? double.tryParse(
+                          widget.preventivo.listino!.substring(0, 2)) ??
+                      0
                   : 0;
               final prezzoVendita = prezzoFornitore * (1 + listino / 100);
               return ListTile(
@@ -266,7 +259,8 @@ class _DettaglioPreventivoPerAgentePageState
                         ),
                       ),
                       TextSpan(
-                        text: '(Prezzo fornitore) + ${listino.toStringAsFixed(2)}% = ',
+                        text:
+                            '(Prezzo fornitore) + ${listino.toStringAsFixed(2)}% = ',
                       ),
                       TextSpan(
                         text: '${prezzoVendita.toStringAsFixed(2)} €',
@@ -293,7 +287,7 @@ class _DettaglioPreventivoPerAgentePageState
     });
     try {
       var apiUrl = Uri.parse(
-          'http://192.168.1.52:8080/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '${ipaddress}/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -308,9 +302,7 @@ class _DettaglioPreventivoPerAgentePageState
           isLoading = false;
         });
       } else {
-        throw Exception(
-            'Failed to load data from API: ${response.statusCode}'
-        );
+        throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
