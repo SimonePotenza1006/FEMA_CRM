@@ -201,24 +201,27 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
           contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Lista degli utenti recuperati tramite la chiamata API
-                Column(
-                  children: allUtenti.map((utente) {
-                    return ListTile(
-                      title: Text('${utente.nome} ${utente.cognome}'),
-                      onTap: () {
-                        // Imposta l'utente selezionato come _selectedUtente
-                        setState(() {
-                          responsabile = utente;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Lista degli utenti recuperati tramite la chiamata API
+                  Column(
+                    children: allUtenti.map((utente) {
+                      return ListTile(
+                        title: Text('${utente.nome} ${utente.cognome}'),
+                        onTap: () {
+                          // Imposta l'utente selezionato come _selectedUtente
+                          setState(() {
+                            responsabile = utente;
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
             ),
           ),
         );

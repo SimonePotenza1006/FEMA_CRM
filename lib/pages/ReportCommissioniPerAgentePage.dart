@@ -65,6 +65,16 @@ class _ReportCommissioniPerAgentePageState
               );
             },
           ),
+          IconButton(
+            icon: Icon(
+              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              // Funzione per ricaricare la pagina
+              setState(() {});
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(

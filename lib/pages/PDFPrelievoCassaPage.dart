@@ -22,6 +22,7 @@ class PDFPrelievoCassaPage extends StatefulWidget {
   final UtenteModel? incaricato;
   final DateTime? data;
   final String? importo;
+  final TipoMovimentazione tipoMovimentazione;
   final Uint8List? firmaCassa;
   final Uint8List? firmaIncaricato;
 
@@ -31,6 +32,7 @@ class PDFPrelievoCassaPage extends StatefulWidget {
     required this.incaricato,
     required this.data,
     required this.importo,
+    required this.tipoMovimentazione,
     required this.firmaCassa,
     required this.firmaIncaricato,
   });
@@ -69,10 +71,10 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
 
         for (var item in jsonData) {
           MovimentiModel movimento = MovimentiModel.fromJson(item);
-          if (movimento.tipo_movimentazione == TipoMovimentazione.Prelievo &&
-              movimento.data != null &&
-              movimento.data!.isAfter(startOfWeek) &&
-              movimento.data!.isBefore(endOfWeek)) {
+          if ((movimento.tipo_movimentazione == TipoMovimentazione.Entrata || movimento.tipo_movimentazione == TipoMovimentazione.Uscita) &&
+              movimento.dataCreazione != null &&
+              movimento.dataCreazione!.isAfter(startOfWeek) &&
+              movimento.dataCreazione!.isBefore(endOfWeek)) {
             movimenti.add(movimento);
           }
         }
@@ -94,7 +96,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
           return pw.Container(
             margin: pw.EdgeInsets.only(bottom: 5),
             child: pw.Text(
-              '${DateFormat('dd/MM/yyyy').format(prelievo.data!)} - ${prelievo.descrizione} - ${prelievo.importo?.toStringAsFixed(2)} ${String.fromCharCode(128)}',
+              '${DateFormat('dd/MM/yyyy').format(prelievo.dataCreazione!)} - ${prelievo.descrizione} - ${prelievo.importo?.toStringAsFixed(2)} ${String.fromCharCode(128)}',
             ),
           );
         }).toList(),
@@ -143,7 +145,29 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  _generateAndSendPDF();
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Inviare pdf via mail?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _generateAndSendPDF();
+                            },
+                            child: Text("Si"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text("No"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Colors.red,
@@ -164,7 +188,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
     try {
       final Uint8List pdfBytes = await _generatePDF();
       final tempDir = await getTemporaryDirectory();
-      final tempFilePath = '${tempDir.path}/preventivo.pdf';
+      final tempFilePath = '${tempDir.path}/${widget.tipoMovimentazione.toString().substring(19)}.pdf';
       final tempFile = File(tempFilePath);
 
       await tempFile.writeAsBytes(pdfBytes);
@@ -176,9 +200,9 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
       final String recipient = 'info@femasistemi.it';
 
       final String subject =
-          '(PRELIEVO) Prelievo in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, utente: ${widget.utente?.nome} ${widget.utente?.cognome}, incaricato ${widget.incaricato?.nome} ${widget.incaricato?.cognome}';
+          '(MOVIMENTOCASSA) ${widget.tipoMovimentazione.toString().substring(19)} in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, utente: ${widget.utente?.nome} ${widget.utente?.cognome}, incaricato ${widget.incaricato?.nome} ${widget.incaricato?.cognome}';
       final String body =
-          'In allegato il PDF riepilogativo del prelievo dalla cassa pari a ${widget.importo}, con descrizione ${widget.descrizione}';
+          'In allegato il PDF riepilogativo della movimentazione in ${widget.tipoMovimentazione.toString().substring(19)}  dalla cassa pari a ${widget.importo}, con descrizione ${widget.descrizione}';
 
       final smtpServer = SmtpServer(
         smtpServerHost,
@@ -195,7 +219,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
         ..text = body
         ..attachments.add(FileAttachment(
           tempFile,
-          fileName: 'Prelievo ${DateFormat('dd-MM-yyyy').format(widget.data!)}.pdf',
+          fileName: 'Movimento ${widget.tipoMovimentazione.toString().substring(19)} ${DateFormat('dd-MM-yyyy').format(widget.data!)}.pdf',
         ));
 
       final sendReport = await send(message, smtpServer);
@@ -221,12 +245,12 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                 children: [
                   pw.SizedBox(height: 20),
                   pw.Text(
-                    "Documento relativo al prelievo in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}",
+                    "Documento relativo alla movimentazione in ${widget.tipoMovimentazione.toString().substring(19)} in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}",
                     style: pw.TextStyle(fontSize: 17, fontStyle: pw.FontStyle.italic),
                   ),
                   pw.SizedBox(height: 20),
                   pw.Text(
-                    "Si attesta che, in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, l'utente ${widget.incaricato?.cognome} ${widget.incaricato?.nome} ha prelevato dal fondocassa aziendale un importo pari a ${widget.importo}. Tale movimentazione è dovuta a: \' ${widget.descrizione} \' ",
+                    "Si attesta che, in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, l'utente ${widget.incaricato?.cognome} ${widget.incaricato?.nome} ha effettuato un movimento di ${widget.tipoMovimentazione.toString().substring(19)} dal fondocassa aziendale un importo pari a ${widget.importo}. Tale movimentazione è dovuta a: \' ${widget.descrizione} \' ",
                   ),
                   pw.SizedBox(height: 60),
                   pw.Row(
@@ -262,7 +286,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                   ),
                   pw.SizedBox(height: 40),
                   pw.Text(
-                    'Elenco dei Prelievi:',
+                    'Elenco delle movimenti:',
                     style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                   pw.SizedBox(height: 10),
@@ -271,7 +295,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                     pw.Container(
                       margin: pw.EdgeInsets.only(bottom: 5),
                       child: pw.Text(
-                        '${DateFormat('dd/MM/yyyy').format(prelievo.data!)} - ${prelievo.descrizione} - ${prelievo.importo}',
+                        '${DateFormat('dd/MM/yyyy').format(prelievo.dataCreazione!)} - ${prelievo.descrizione} - ${prelievo.importo}',
                       ),
                     ),
                 ],

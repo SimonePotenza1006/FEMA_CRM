@@ -4,10 +4,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fema_crm/pages/HomeFormAmministrazione.dart';
 import 'package:fema_crm/pages/HomeFormTecnico.dart';
 import 'databaseHandler/DbHelper.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'model/RuoloUtenteModel.dart';
+import 'model/TipologiaInterventoModel.dart';
 import 'model/UtenteModel.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +36,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: [GlobalMaterialLocalizations.delegate],
       theme: myThemeData(),
       home: const LoginForm(),
     );
@@ -39,7 +45,7 @@ class MyApp extends StatelessWidget {
 
 ThemeData myThemeData() {
   return ThemeData(
-    fontFamily: GoogleFonts.aldrich().fontFamily,
+    fontFamily: GoogleFonts.robotoFlex().fontFamily,
   );
 }
 
@@ -54,7 +60,7 @@ class _LoginFormState extends State<LoginForm> {
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
 
   final _formKey = GlobalKey<FormState>();
-
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   final _conUserId = TextEditingController();
   final _conPassword = TextEditingController();
   late Future<UtenteModel> _futureAlbum;
@@ -78,21 +84,62 @@ class _LoginFormState extends State<LoginForm> {
     _futureAlbum = dbHelper.getUtentebyId(user.id!);
   }
 
+  Future<UtenteModel> getLoginUser(String email, String password) async {
+    try {
+      http.Response response = await http.post(
+          Uri.parse('$ipaddress/api/utente/ulogin'),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: json.encode({
+            'email': email,
+            'password': password
+          }),
+          encoding: Encoding.getByName('utf-8')
+      );
+      if(response.statusCode == 200){
+        var responseData = jsonDecode(response.body.toString());
+        UtenteModel utente = UtenteModel(
+          responseData['id'].toString(),
+          responseData['attivo'],
+          responseData['nome'].toString(),
+          responseData['cognome'].toString(),
+          responseData['email'].toString(),
+          responseData['password'].toString(),
+          responseData['cellulare'].toString(),
+          responseData['codice_fiscale'].toString(),
+          responseData['iban'].toString(),
+          RuoloUtenteModel.fromJson(responseData['ruolo']),
+          TipologiaInterventoModel.fromJson(responseData['tipologia_intervento']),
+        );
+        return utente;
+      }else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Le credenziali sono errate, riprova!'),
+          ),
+        );
+        throw Exception('Login Failed ${response.statusCode}');
+      }
+    } catch(e){
+      throw Exception('$e');
+    }
+  }
+
   Future<void> login() async {
     String uid = _conUserId.text.trim();
     String passwd = _conPassword.text;
 
-    // Qui potresti fare eventuali controlli sull'username e la password
-
-    await dbHelper.getLoginUser(uid, passwd).then((userData) {
+    await getLoginUser(uid, passwd).then((userData) {
       if (userData != null) {
         setSP(userData).then((_) {
           TextInput.finishAutofillContext();
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (_) => userData.ruolo.descrizione == "Developer" ||
-                  userData.ruolo.descrizione == "Tecnico"
+              builder: (_) => userData.ruolo?.descrizione == "Developer" ||
+                  userData.ruolo?.descrizione == "Tecnico"
                   ? HomeFormTecnico(userData: userData)
                   : HomeFormAmministrazione(userData: userData),
             ),

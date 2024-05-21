@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fema_crm/pages/NuovaDestinazionePage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -141,40 +142,30 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
         backgroundColor: Colors.red,
       ),
       body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(width: 8),
-                    Text(
-                      "Orario inizio intervento",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ],
+                SizedBox(height: 12),
+                Text(
+                  'Le informazioni attuali sulla destinazione sono:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
-                Center(
-                  child: InkWell(
-                    onTap: () => _selectTime(context),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.access_time),
-                        SizedBox(width: 8),
-                        Text(
-                          _selectedTime.format(context),
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
+                Text(
+                  'Indirizzo: ${widget.intervento.destinazione?.indirizzo}', style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 30),
+                Text(
+                  'Città: ${widget.intervento.destinazione?.citta}', style: TextStyle(fontSize: 20),
+                ),
+                Text(
+                  'Provincia: ${widget.intervento.destinazione?.provincia}', style: TextStyle(fontSize: 20),
+                ),
+                Text(
+                  'Cap: ${widget.intervento.destinazione?.cap}', style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 15),
                 Text(
                   "La tua posizione corrente è:",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -192,7 +183,10 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
                 SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () {
-                    // Aggiungi qui la logica per gestire il tap del pulsante
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => NuovaDestinazionePage(cliente: widget.intervento.cliente!)),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red, // Colore di sfondo rosso
@@ -260,6 +254,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
+                    SizedBox(height: 60),
                   ],
                 ),
               ],
@@ -288,7 +283,6 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
   Future<void> saveIntervento() async {
     try {
       final now = DateTime.now();
-      final orarioInizio = DateTime(now.year, now.month, now.day, _selectedTime.hour, _selectedTime.minute);
 
       final response = await http.post(
         Uri.parse('$ipaddress/api/intervento'),
@@ -296,22 +290,26 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
         body: jsonEncode({
           'id': widget.intervento.id,
           'data': widget.intervento.data?.toIso8601String(),
-          'orario_inizio': timeOfDayToIso8601String(_selectedTime),
-          'orario_fine': widget.intervento.orario_fine,
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'orario_inizio': DateTime.now().toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': widget.intervento.importo_intervento,
           'assegnato': widget.intervento.assegnato,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
           'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
           'utente': widget.intervento.utente?.toMap(),
           'cliente': widget.intervento.cliente?.toMap(),
           'veicolo': widget.intervento.veicolo?.toMap(),
-          'tipologia': widget.intervento.tipologia,
-          'categoria': widget.intervento.categoria_intervento_specifico,
-          'tipologia_pagamento': widget.intervento.tipologia_pagamento,
-          'destinazione': widget.intervento.destinazione
+          'merce' : widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap(),
         }),
       );
 

@@ -96,26 +96,8 @@ class DbHelper{
     }
   }
 
-  void getUser()async {
-    http.Response? response;
-    try{
-      http.Response response = await http.get(
-          Uri.parse('$ipaddress/api/utente/1'),
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-          });
-      return print('$response');
-    } catch(e){
-      throw Exception(e);
-    }
-  }
-
-
   Future<UtenteModel> getLoginUser(String email, String password) async {
-    print("PROVA!");
     try {
-      print('AIUTO');
       http.Response response = await http.post(
           Uri.parse('$ipaddress/api/utente/ulogin'),
           headers: {
@@ -130,7 +112,6 @@ class DbHelper{
       );
 
       if(response.statusCode == 200){
-        print("OK!");
         var responseData = jsonDecode(response.body.toString());
         print('$responseData');
         UtenteModel utente = UtenteModel(
@@ -147,7 +128,6 @@ class DbHelper{
           TipologiaInterventoModel.fromJson(responseData['tipologia_intervento']),
 
         );
-        print('Login done successfully!');
         return utente;
       }else {
         throw Exception('Login Failed ${response.statusCode}');
@@ -181,5 +161,11 @@ class DbHelper{
     } else {
       throw Exception('Failed to load utente');
     }
+  }
+}
+
+extension DateTimeExtension on DateTime {
+  bool isSameDay(DateTime other) {
+    return this.year == other.year && this.month == other.month && this.day == other.day;
   }
 }

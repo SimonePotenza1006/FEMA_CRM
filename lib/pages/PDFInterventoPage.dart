@@ -746,10 +746,21 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                 ),
               ),
               // Aggiungo la row richiesta
+
               pw.SizedBox(height: 30),
               pw.Text('${widget.descrizione}',
                   style: pw.TextStyle(fontSize: 10)),
               pw.SizedBox(height: 120),
+              if(widget.intervento.conclusione_parziale == false)
+                pw.Padding(
+                  padding: pw.EdgeInsets.symmetric(horizontal: 8),
+                  child: pw.Text(
+                    'INTERVENTO NON CONCLUSO',
+                    style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ),
               pw.Container(
                 height: PdfPageFormat.cm * 3.5,
                 child: pw.Row(

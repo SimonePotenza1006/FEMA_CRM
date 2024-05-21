@@ -57,6 +57,16 @@ class _ReportMerceInRiparazionePageState extends State<ReportMerceInRiparazioneP
         backgroundColor: Colors.red,
         actions: [
           IconButton(
+            icon: Icon(
+              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              // Funzione per ricaricare la pagina
+              setState(() {});
+            },
+          ),
+          IconButton(
             icon: _isSearchActive ? Icon(Icons.clear) : Icon(Icons.search),
             color: Colors.white,
             onPressed: () {

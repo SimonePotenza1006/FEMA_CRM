@@ -25,7 +25,11 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   TimeOfDay _orarioInizio = TimeOfDay.now();
   TimeOfDay _orarioFine = TimeOfDay.now();
   VeicoloModel? selectedVeicolo;
-  String _descrizione = '';
+  String? _relazione = null;
+  String? _descrizione = null;
+  String? _nota = null;
+  TextEditingController _notaController = TextEditingController();
+  TextEditingController _relazioneController = TextEditingController();
   bool _interventoConcluso = false;
   ClienteModel? selectedCliente;
   DestinazioneModel? selectedDestinazione;
@@ -257,6 +261,16 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     child: Text('Orario Fine: ${_orarioFine.format(context)}',
                         style: TextStyle(color: Colors.white)),
                   ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _relazioneController,
+                    decoration: const InputDecoration(labelText: 'Rapportino'),
+                    onChanged: (value) {
+                      setState(() {
+                        _relazione = value;
+                      });
+                    },
+                  ),
                 ],
               ),
             const SizedBox(height: 20.0),
@@ -266,6 +280,16 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
               onChanged: (value) {
                 setState(() {
                   _descrizione = value;
+                });
+              },
+            ),
+            SizedBox(height: 15),
+            TextFormField(
+              controller: _notaController,
+              decoration: const InputDecoration(labelText: 'Nota'),
+              onChanged: (value) {
+                setState(() {
+                  _nota = value;
                 });
               },
             ),
@@ -387,9 +411,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                       children: filteredClientiList.map((cliente) {
                         return ListTile(
                           leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione! +
-                              ", " +
-                              cliente.indirizzo!),
+                          title: Text(cliente.denominazione!),
                           onTap: () {
                             setState(() {
                               selectedCliente = cliente;
@@ -462,6 +484,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       // Inizializziamo le variabili per i valori da inviare
       DateTime? orarioInizioSalvato;
       DateTime? orarioFineSalvato;
+      bool conclusioneParzialeValue = false;
       bool assegnatoValue = false;
       bool conclusoValue = false;
       Map<String, dynamic>? veicolo;
@@ -485,6 +508,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           _orarioFine.hour,
           _orarioFine.minute,
         );
+        conclusioneParzialeValue = true;
         assegnatoValue = true;
         conclusoValue = true;
         veicolo = selectedVeicolo?.toMap();
@@ -497,15 +521,17 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
+          'orario_appuntamento' : null,
           'orario_inizio': orarioInizioSalvato?.toIso8601String(),
           'orario_fine': orarioFineSalvato?.toIso8601String(),
-          'descrizione': _descrizioneController.text,
+          'descrizione': _descrizione,
           'importo_intervento': null,
           'assegnato': assegnatoValue,
-          'conclusione_parziale': false,
+          'conclusione_parziale': conclusioneParzialeValue,
           'concluso': conclusoValue,
           'saldato': false,
-          'note': null,
+          'note': _nota,
+          'relazione_tecnico': _relazione,
           'firma_cliente': null,
           'utente': utente,
           'cliente': selectedCliente?.toMap(),

@@ -46,7 +46,7 @@ class _MenuMerceInRiparazionePageState extends State<MenuMerceInRiparazionePage>
                 SizedBox(height: 10),
                 buildMenuButton(
                   icon: Icons.playlist_add_outlined,
-                  text: 'Registra nuova merce in riparazione',
+                  text: 'Registra nuova riparazione',
                   onPressed: () {
                     Navigator.push(
                       context,

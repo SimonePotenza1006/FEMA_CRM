@@ -18,6 +18,8 @@ import 'InterventoTecnicoForm.dart';
 import 'InizializzazionePreventivoByTecnicoPage.dart';
 import 'ListaPreventiviTecnicoPage.dart';
 import 'SopralluogoTecnicoForm.dart';
+import '../databaseHandler/DbHelper.dart';
+
 
 class HomeFormTecnico extends StatefulWidget {
   final UtenteModel? userData;
@@ -29,6 +31,7 @@ class HomeFormTecnico extends StatefulWidget {
 }
 
 class _HomeFormTecnicoState extends State<HomeFormTecnico> {
+  DateTime selectedDate = DateTime.now();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
 
@@ -108,7 +111,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
     }
   }
 
-  Future<List<RelazioneUtentiInterventiModel>> getAllRelazioniByUtente(String userId) async{
+  Future<List<RelazioneUtentiInterventiModel>> getAllRelazioniByUtente(String userId, DateTime date) async {
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
@@ -132,7 +135,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
     }
   }
 
-  Future<List<InterventoModel>> getAllInterventiByUtente(String userId) async {
+  Future<List<InterventoModel>> getAllInterventiByUtente(String userId, DateTime date) async {
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
@@ -174,7 +177,6 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
               color: Colors.white,
             ),
             onPressed: () {
-              // Funzione per ricaricare la pagina
               setState(() {});
             },
           ),
@@ -389,15 +391,37 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
               ),
             ),
             Center(
-              child: Text(
-                'Interventi',
-                style: TextStyle(
-                    fontSize: 30.0, fontWeight: FontWeight.bold),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Interventi',
+                    style: TextStyle(
+                        fontSize: 30.0, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 15),
+                  IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null && pickedDate != selectedDate) {
+                        setState(() {
+                          selectedDate = pickedDate;
+                        });
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 10.0),
             FutureBuilder<List<InterventoModel>>(
-              future: getAllInterventiByUtente(widget.userData!.id.toString()),
+              future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -405,6 +429,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                   return Center(child: Text('Errore: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
                   List<InterventoModel> interventi = snapshot.data!;
+                  interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -413,16 +438,29 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                       InterventoModel intervento = interventi[index];
                       return ListTile(
                         title: Text(
-                            '${intervento.cliente?.denominazione.toString()}'),
-                        subtitle: Text(intervento.descrizione ?? ''),
-                        trailing: Text(
-                          // Formatta la data secondo il tuo formato desiderato
-                          intervento.data != null
-                              ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                              : 'Data non disponibile',
-                          style: TextStyle(
-                              fontSize: 16), // Stile opzionale per la data
+                            '${intervento.descrizione.toString()}'),
+                        subtitle: Text(intervento.cliente?.denominazione ?? ''),
+                        trailing: Column(
+                          children: [
+                            Text(
+                              // Formatta la data secondo il tuo formato desiderato
+                              intervento.data != null
+                                  ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                  : 'Data non disponibile',
+                              style: TextStyle(
+                                  fontSize: 16), // Stile opzionale per la data
+                            ),
+                            Text(
+                              intervento.orario_appuntamento != null
+                                  ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                  : 'Nessun orario di appuntamento',
+                              style: TextStyle(
+                                fontSize: 16
+                              ),
+                            )
+                          ],
                         ),
+
                         onTap: () {
                           Navigator.push(
                             context,
@@ -443,7 +481,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
               },
             ),
             FutureBuilder<List<RelazioneUtentiInterventiModel>>(
-              future: getAllRelazioniByUtente(widget.userData!.id.toString()),
+              future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -451,6 +489,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                   return Center(child: Text('Errore: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
                   List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
+                  relazioni = relazioni.where((relazione) => relazione.intervento!.data!.isSameDay(selectedDate)).toList();
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -459,15 +498,27 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                       RelazioneUtentiInterventiModel relazione = relazioni[index];
                       return ListTile(
                         title: Text(
-                            '${relazione.intervento?.cliente?.denominazione.toString()}'),
-                        subtitle: Text(relazione.intervento?.descrizione ?? ''),
-                        trailing: Text(
-                          // Formatta la data secondo il tuo formato desiderato
-                          relazione.intervento?.data != null
-                              ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
-                              : 'Data non disponibile',
-                          style: TextStyle(
-                              fontSize: 16), // Stile opzionale per la data
+                            '${relazione.intervento?.descrizione}'),
+                        subtitle: Text(relazione.intervento?.cliente?.denominazione.toString()?? ''),
+                        trailing: Column(
+                          children: [
+                            Text(
+                              // Formatta la data secondo il tuo formato desiderato
+                              relazione.intervento?.data != null
+                                  ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
+                                  : 'Data non disponibile',
+                              style: TextStyle(
+                                  fontSize: 16), // Stile opzionale per la data
+                            ),
+                              Text(
+                                relazione.intervento?.orario_appuntamento != null
+                                    ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                    : 'Nessun orario di appuntamento',
+                                style: TextStyle(
+                                  fontSize: 16
+                                ),
+                              ),
+                          ],
                         ),
                         onTap: () {
                           Navigator.push(
@@ -544,3 +595,5 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
     );
   }
 }
+
+

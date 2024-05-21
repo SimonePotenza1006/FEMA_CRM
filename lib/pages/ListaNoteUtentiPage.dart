@@ -113,7 +113,20 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage>{
             : Text('Lista Note dei tecnici', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
+          actions : [
+            IconButton(
+              icon: Icon(
+                Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+                color: Colors.white,
+              ),
+              onPressed: () {
+                // Funzione per ricaricare la pagina
+                setState(() {});
+              },
+            ),
+          ]
       ),
+
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(

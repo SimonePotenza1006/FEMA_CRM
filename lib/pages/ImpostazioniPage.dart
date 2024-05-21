@@ -7,7 +7,9 @@ import 'CreazioneNuovaCartaPage.dart';
 import 'CreazioneNuovoUtentePage.dart';
 import 'CreazioneNuovoVeicoloPage.dart';
 import 'ListaUtentiPage.dart';
+import 'ListaVeicoliPage.dart';
 import 'ReportSpeseVeicoloPage.dart';
+import 'StoricoMerciUtentiPage.dart';
 
 class ImpostazioniPage extends StatefulWidget {
   final UtenteModel userData;
@@ -57,12 +59,12 @@ class _ImpostazioniPageState extends State<ImpostazioniPage> {
                 ),
                 SizedBox(height: 10),
                 buildMenuButton(
-                  icon: Icons.car_crash_outlined,
-                  text: 'Aggiungi veicolo',
+                  icon: Icons.car_rental_outlined,
+                  text: 'Management veicoli',
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => CreazioneNuovoVeicoloPage()),
+                      MaterialPageRoute(builder: (context) => ListaVeicoliPage()),
                     );
                   },
                 ),
@@ -89,6 +91,17 @@ class _ImpostazioniPageState extends State<ImpostazioniPage> {
                       );
                     },
                   ),
+                SizedBox(height:10),
+                if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti")
+                  buildMenuButton(
+                      icon: Icons.ballot_outlined,
+                      text: 'Storico merci degli utenti',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => StoricoMerciUtentiPage()),
+                        );
+                      }),
                 SizedBox(height: 10),
                 if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti")
                   buildMenuButton(

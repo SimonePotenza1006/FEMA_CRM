@@ -92,89 +92,60 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modifica Cliente'),
+        title: const Text('Modifica Cliente', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _codiceFiscaleController,
-              decoration: const InputDecoration(labelText: 'Codice Fiscale'),
-            ),
-            TextField(
-              controller: _partitaIvaController,
-              decoration: const InputDecoration(labelText: 'Partita IVA'),
-            ),
-            TextField(
-              controller: _denominazioneController,
-              decoration: const InputDecoration(labelText: 'Denominazione'),
-            ),
-            TextField(
-              controller: _indirizzoController,
-              decoration: const InputDecoration(labelText: 'Indirizzo'),
-            ),
-            TextField(
-              controller: _capController,
-              decoration: const InputDecoration(labelText: 'Cap'),
-            ),
-            TextField(
-              controller: _cittaController,
-              decoration: const InputDecoration(labelText: 'Città'),
-            ),
-            TextField(
-              controller: _provinciaController,
-              decoration: const InputDecoration(labelText: 'Provincia'),
-            ),
-            TextField(
-              controller: _nazioneController,
-              decoration: const InputDecoration(labelText: 'Nazione'),
-            ),
-            TextField(
-              controller: _fatturazioneElettronicaController,
-              decoration: const InputDecoration(
-                  labelText: 'Recapito fatturazione Elettronica'),
-            ),
-            TextField(
-              controller: _riferimentoAmministrativoController,
-              decoration: const InputDecoration(
-                  labelText: 'Riferimento Amministrativo'),
-            ),
-            TextField(
-              controller: _referenteController,
-              decoration: const InputDecoration(labelText: 'Referente'),
-            ),
-            TextField(
-              controller: _faxController,
-              decoration: const InputDecoration(labelText: 'Fax'),
-            ),
-            TextField(
-              controller: _telefonoController,
-              decoration: const InputDecoration(labelText: 'Telefono'),
-            ),
-            TextField(
-              controller: _cellulareController,
-              decoration: const InputDecoration(labelText: 'Cellulare'),
-            ),
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: _pecController,
-              decoration: const InputDecoration(labelText: 'Pec'),
-            ),
-            TextField(
-              controller: _noteController,
-              decoration: const InputDecoration(labelText: 'Note'),
-            ),
+            _buildTextField('Codice Fiscale', _codiceFiscaleController),
+            _buildTextField('Partita IVA', _partitaIvaController),
+            _buildTextField('Denominazione', _denominazioneController),
+            _buildTextField('Indirizzo', _indirizzoController),
+            _buildTextField('Cap', _capController),
+            _buildTextField('Città', _cittaController),
+            _buildTextField('Provincia', _provinciaController),
+            _buildTextField('Nazione', _nazioneController),
+            _buildTextField('Recapito fatturazione Elettronica', _fatturazioneElettronicaController),
+            _buildTextField('Riferimento Amministrativo', _riferimentoAmministrativoController),
+            _buildTextField('Referente', _referenteController),
+            _buildTextField('Fax', _faxController),
+            _buildTextField('Telefono', _telefonoController),
+            _buildTextField('Cellulare', _cellulareController),
+            _buildTextField('Email', _emailController),
+            _buildTextField('Pec', _pecController),
+            _buildTextField('Note', _noteController),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: updateCliente,
               child: const Text('Salva Modifiche'),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.red,
+                onPrimary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
     );
@@ -200,9 +171,9 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
           'provincia': _provinciaController.text.toString(),
           'nazione': _nazioneController.text.toString(),
           'recapito_fatturazione_elettronica':
-              _fatturazioneElettronicaController.text.toString(),
+          _fatturazioneElettronicaController.text.toString(),
           'riferimento_amministrativo':
-              _riferimentoAmministrativoController.text.toString(),
+          _riferimentoAmministrativoController.text.toString(),
           'referente': _referenteController.text.toString(),
           'fax': _faxController.text.toString(),
           'telefono': _telefonoController.text.toString(),
@@ -215,6 +186,8 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
       );
       if (response.statusCode == 201) {
         print("Cliente modificato correttamente!");
+        Navigator.pop(context);
+        Navigator.pop(context);
       } else {
         print("Hai toppato :(");
         print(response.toString());

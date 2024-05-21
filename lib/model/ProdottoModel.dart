@@ -23,6 +23,7 @@ class ProdottoModel {
   String? cod_prod_forn;
   double? prezzo_fornitore;
   String? note_fornitura;
+  double? quantita; //aggiunto solo per lo scarico prodotti
   double? qta_giacenza;
   double? qta_impegnata;
   double? costo_medio_acquisto;

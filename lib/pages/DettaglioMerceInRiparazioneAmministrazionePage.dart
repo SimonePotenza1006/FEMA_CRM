@@ -241,17 +241,17 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
             buildLightDivider(),
 
 
-// Aggiungi il pulsante per salvare l'importo finale
-            ElevatedButton(
-              onPressed: () {
-                saveImportoFinale(); // Funzione da implementare per salvare l'importo finale
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red,
-                onPrimary: Colors.white,
-              ),
-              child: Text('Salva importo finale'),
-            ),
+
+            // ElevatedButton(
+            //   onPressed: () {
+            //     saveImportoFinale(); // Funzione da implementare per salvare l'importo finale
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     primary: Colors.red,
+            //     onPrimary: Colors.white,
+            //   ),
+            //   child: Text('Salva importo finale'),
+            // ),
             SizedBox(height: 60.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -97,7 +97,7 @@ class _NuovaDestinazionePageState extends State<NuovaDestinazionePage> {
                   ),
                   TextFormField(
                     controller: _provinciaController,
-                    decoration: InputDecoration(labelText: 'Provincia'),
+                    decoration: InputDecoration(labelText: 'Provincia(sigla)'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Inserisci una provincia';

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:fema_crm/model/SopralluogoModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -27,10 +28,51 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
   List<TipologiaInterventoModel> tipologieList = [];
   List<ClienteModel> filteredClientiList = [];
   ClienteModel? selectedCliente;
+  List<XFile> pickedImages =  [];
   TipologiaInterventoModel? selectedTipologia;
   final TextEditingController indirizzoController = TextEditingController(); // Aggiunto controller per il campo indirizzo
   final TextEditingController descrizioneController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+
+  Future<void> takePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      setState(() {
+        pickedImages.add(pickedFile);
+      });
+    }
+  }
+
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    setState(() {
+                      pickedImages.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   Future<String> getAddressFromCoordinates(
       double latitude, double longitude) async {
@@ -66,7 +108,6 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
     getAllClienti();
     getAllTipologie();
   }
-
 
 
   @override
@@ -163,14 +204,23 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 15,),
+                  ElevatedButton(
+                    onPressed: takePicture,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      onPrimary: Colors.white,
+                    ),
+                    child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                  ),
+                  _buildImagePreview(),
                   Container(
                     alignment: Alignment.center,
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     child: ElevatedButton(
                       onPressed: () {
-                        saveSopralluogo();
+                        saveSopralluogoPlusPics();
                       },
                       style: ButtonStyle(
                         backgroundColor:
@@ -194,9 +244,58 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
     );
   }
 
-  Future<void> saveSopralluogo() async {
+  Future<void> saveSopralluogoPlusPics() async {
+    final data = await saveSopralluogo();
     try {
-      final response =
+      if(data == null){
+        throw Exception('Dati del sopralluogo non disponibili.');
+      }
+      final sopralluogo = SopralluogoModel.fromJson(jsonDecode(data.body));
+      try{
+        for (var image in pickedImages) {
+          if (image.path != null && image.path.isNotEmpty) {
+            print('Percorso del file: ${image.path}');
+            var request = http.MultipartRequest(
+              'POST',
+              Uri.parse('$ipaddress/api/immagine/sopralluogo/${int.parse(sopralluogo.id!.toString())}'),
+            );
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'sopralluogo', // Field name
+                image.path, // File path
+                contentType: MediaType('image', 'jpeg'),
+              ),
+            );
+            var response = await request.send();
+            if (response.statusCode == 200) {
+              print('File inviato con successo');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Sopralluogo registrato!'),
+                ),
+              );
+            } else {
+              print('Errore durante l\'invio del file: ${response.statusCode}');
+            }
+          } else {
+            // Gestisci il caso in cui il percorso del file non è valido
+            print('Errore: Il percorso del file non è valido');
+          }
+        }
+        pickedImages.clear();
+        Navigator.pop(context);
+      } catch (e) {
+        print('Errore durante l\'invio del file: $e');
+      }
+    } catch (e) {
+      print('Errore durante l\'invio del file: $e');
+    }
+  }
+
+  Future<http.Response?> saveSopralluogo() async {
+    late http.Response response;
+    try {
+      response =
       await http.post(Uri.parse('${ipaddress}/api/sopralluogo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
@@ -206,7 +305,9 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
             'posizione' : indirizzoController.text, // Utilizza il valore del controller per il campo indirizzo
             'cliente': selectedCliente?.toMap(),
             'tipologia': selectedTipologia?.toMap()
-          }));
+          })
+      );
+      return response;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -216,6 +317,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
     } catch (e) {
       print('Errore durante il salvataggio del sopralluogo');
     }
+    return null;
   }
 
   Future<void> getAllTipologie() async {
@@ -301,9 +403,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                       children: filteredClientiList.map((cliente) {
                         return ListTile(
                           leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione! +
-                              ", " +
-                              cliente.indirizzo!),
+                          title: Text(cliente.denominazione!),
                           onTap: () {
                             setState(() {
                               selectedCliente = cliente;

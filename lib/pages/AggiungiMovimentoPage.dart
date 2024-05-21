@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
+import '../model/ClienteModel.dart';
+import '../model/InterventoModel.dart';
 import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
 import 'HomeFormAmministrazione.dart';
+import 'PDFPagamentoAccontoPage.dart';
 import 'PDFPrelievoCassaPage.dart';
 
 class AggiungiMovimentoPage extends StatefulWidget {
@@ -31,13 +34,159 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   Uint8List? signatureBytes;
   GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  ClienteModel? selectedCliente;
+  List<ClienteModel> clientiList = [];
+  List<ClienteModel> filteredClientiList = [];
+  List<InterventoModel> interventi = [];
+  InterventoModel? selectedIntervento;
 
   @override
   void initState() {
     super.initState();
     getAllUtenti();
+    getAllClienti();
     _signaturePadKey = GlobalKey<SfSignaturePadState>();
     selectedDate = DateTime.now(); // Inizializza la data selezionata con la data corrente
+  }
+
+  void _showInterventiDialog() {
+    var importo = selectedIntervento?.importo_intervento?.toStringAsFixed(2) ?? 'Importo non inserito';
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Seleziona l\'intervento', textAlign: TextAlign.center),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: interventi.map((intervento) {
+                        return ListTile(
+                          leading: const Icon(Icons.settings),
+                          title: Text('${intervento.descrizione!}, importo: ${importo}'),
+                          subtitle: Text(intervento.saldato! ? 'Saldato' : 'Non saldato'),
+                          onTap: () {
+                            setState(() {
+                              selectedIntervento = intervento;
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showClientiDialog() {
+    TextEditingController searchController = TextEditingController(); // Aggiungi un controller
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) { // Usa StatefulBuilder per aggiornare lo stato del dialogo
+            return AlertDialog(
+              title: const Text('Seleziona Cliente', textAlign: TextAlign.center),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController, // Aggiungi il controller
+                      onChanged: (value) {
+                        setState(() {
+                          filteredClientiList = clientiList
+                              .where((cliente) => cliente.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Cerca Cliente',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: filteredClientiList.map((cliente) {
+                            return ListTile(
+                              leading: const Icon(Icons.contact_page_outlined),
+                              title: Text(
+                                  '${cliente.denominazione}, ${cliente.indirizzo}'),
+                              onTap: () {
+                                setState(() {
+                                  selectedCliente = cliente;
+                                  getAllInterventiByCliente(cliente.id!);
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> getAllInterventiByCliente(String clientId) async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/intervento/cliente/$clientId'));
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = json.decode(response.body);
+        setState(() {
+          interventi = responseData.map((data) => InterventoModel.fromJson(data)).toList();
+        });
+      } else {
+        throw Exception('Failed to load Destinazioni per cliente');
+      }
+    } catch (e) {
+      print('Errore durante la richiesta HTTP: $e');
+    }
+  }
+
+  Future<void> getAllClienti() async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<ClienteModel> clienti = [];
+        for (var item in jsonData) {
+          clienti.add(ClienteModel.fromJson(item));
+        }
+        setState(() {
+          clientiList = clienti;
+          filteredClientiList = clienti;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
   }
 
   @override
@@ -84,7 +233,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   onChanged: (TipoMovimentazione? newValue) {
                     setState(() {
                       _selectedTipoMovimentazione = newValue;
-                      if (_selectedTipoMovimentazione == TipoMovimentazione.Prelievo) {
+                      if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento) {
                         _selectUtente();
                       } else {
                         selectedUtente = null;
@@ -97,8 +246,10 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       label = 'Entrata';
                     } else if (value == TipoMovimentazione.Uscita) {
                       label = 'Uscita';
+                    } else if(value == TipoMovimentazione.Acconto){
+                      label = 'Acconto';
                     } else {
-                      label = 'Prelievo';
+                      label = 'Pagamento';
                     }
                     return DropdownMenuItem<TipoMovimentazione>(
                       value: value,
@@ -115,7 +266,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     return null;
                   },
                 ),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Prelievo && selectedUtente != null)
+                if ((_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento) && selectedUtente != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
@@ -123,8 +274,8 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       style: TextStyle(color: Colors.black),
                     ),
                   ),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Prelievo) SizedBox(height: 10),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Prelievo)
+                  SizedBox(height: 40),
+                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -184,9 +335,9 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       ),
                     ),
                   ),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Prelievo)
+                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
                   SizedBox(height: 20),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Prelievo)
+                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -246,7 +397,42 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       ),
                     ),
                   ),
-
+                if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
+                  Container(
+                    child: GestureDetector(
+                      onTap: () {
+                        _showClientiDialog();
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                            const Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
+                  Container(
+                    child: GestureDetector(
+                      onTap: () {
+                        _showInterventiDialog();
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(selectedIntervento?.descrizione ?? 'Seleziona l\'intervento', style: const TextStyle(fontSize: 16)),
+                            const Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 SizedBox(height: 30),
                 Center(
                   child: ElevatedButton(
@@ -274,17 +460,26 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_validateInputs()) {
-                        if(_selectedTipoMovimentazione == TipoMovimentazione.Prelievo){
+                        if(_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita){
                           addMovimento();
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => PDFPrelievoCassaPage(utente: widget.userData, data: selectedDate, incaricato:selectedUtente, descrizione : _descrizioneController.text, importo : _importoController.text, firmaCassa : signatureBytes, firmaIncaricato: signatureBytesIncaricato)),
+                            MaterialPageRoute(builder: (context) => PDFPrelievoCassaPage(utente: widget.userData, data: selectedDate, incaricato:selectedUtente, descrizione : _descrizioneController.text, importo : _importoController.text, firmaCassa : signatureBytes, firmaIncaricato: signatureBytesIncaricato, tipoMovimentazione: _selectedTipoMovimentazione!)),
                           );
-                        } else{
+                        } else if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
+                          saveStatusInterventoPagamento();
+                          addMovimento();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
+                          );
+                        } else {
+                          saveStatusInterventoAcconto();
+                          saveNotaAcconto();
                           addMovimento();
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => HomeFormAmministrazione(userData: widget.userData)),
+                            MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
                           );
                         }
                       }
@@ -305,7 +500,6 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       ),
     );
   }
-
 
 
   Future<void> _selectDate(BuildContext context) async {
@@ -372,18 +566,129 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
     }
   }
 
+  Future<void> saveNotaAcconto() async{
+    try{
+      final now = DateTime.now().toIso8601String();
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/noteTecnico'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data': now,
+          'utente': widget.userData.toMap(),
+          'nota': "Ricevuto un acconto di ${_importoController.text} ",
+          'cliente' : selectedCliente?.toMap(),
+          'intervento' : selectedIntervento?.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        print('EVVAIIIIIIII2');
+      }
+    } catch(e){
+      print('Errore: $e');
+    }
+  }
+
+  Future<void> saveStatusInterventoAcconto() async{
+    try{
+      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': selectedIntervento?.id,
+          'data': selectedIntervento?.data?.toIso8601String(),
+          'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
+          'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),
+          'orario_fine': selectedIntervento?.orario_fine?.toIso8601String(),
+          'descrizione': selectedIntervento?.descrizione,
+          'importo_intervento': selectedIntervento?.importo_intervento,
+          'acconto' : _importoController.text,
+          'assegnato': selectedIntervento?.assegnato,
+          'conclusione_parziale' : selectedIntervento?.conclusione_parziale,
+          'concluso': selectedIntervento?.concluso,
+          'saldato': false,
+          'note': selectedIntervento?.note,
+          'relazione_tecnico' : selectedIntervento?.relazione_tecnico,
+          'firma_cliente': selectedIntervento?.firma_cliente,
+          'utente': selectedIntervento?.utente?.toMap(),
+          'cliente': selectedIntervento?.cliente?.toMap(),
+          'veicolo': selectedIntervento?.veicolo?.toMap(),
+          'merce': selectedIntervento?.merce?.toMap(),
+          'tipologia': selectedIntervento?.tipologia?.toMap(),
+          'categoria': selectedIntervento?.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': selectedIntervento?.tipologia_pagamento?.toMap(),
+          'destinazione': selectedIntervento?.destinazione?.toMap(),
+          'gruppo': selectedIntervento?.gruppo?.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        print('EVVAIIIIIIII');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lo stato dell\'intervento è stato salvato correttamente!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch(e){
+      print('Errore: $e');
+    }
+  }
+
+  Future<void> saveStatusInterventoPagamento() async{
+    try{
+      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+          headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': selectedIntervento?.id,
+          'data': selectedIntervento?.data?.toIso8601String(),
+          'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
+          'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),
+          'orario_fine': selectedIntervento?.orario_fine?.toIso8601String(),
+          'descrizione': selectedIntervento?.descrizione,
+          'importo_intervento': selectedIntervento?.importo_intervento,
+          'acconto' : double.parse(_importoController.text.toString()),
+          'assegnato': selectedIntervento?.assegnato,
+          'conclusione_parziale' : selectedIntervento?.conclusione_parziale,
+          'concluso': selectedIntervento?.concluso,
+          'saldato': true,
+          'note': selectedIntervento?.note,
+          'relazione_tecnico' : selectedIntervento?.relazione_tecnico,
+          'firma_cliente': selectedIntervento?.firma_cliente,
+          'utente': selectedIntervento?.utente?.toMap(),
+          'cliente': selectedIntervento?.cliente?.toMap(),
+          'veicolo': selectedIntervento?.veicolo?.toMap(),
+          'merce': selectedIntervento?.merce?.toMap(),
+          'tipologia': selectedIntervento?.tipologia?.toMap(),
+          'categoria': selectedIntervento?.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': selectedIntervento?.tipologia_pagamento?.toMap(),
+          'destinazione': selectedIntervento?.destinazione?.toMap(),
+          'gruppo': selectedIntervento?.gruppo?.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        print('EVVAIIIIIIII');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lo stato dell\'intervento è stato salvato correttamente!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch(e){
+      print('Errore: $e');
+    }
+  }
+
   Future<void> addMovimento() async {
     String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss").format(selectedDate.toUtc());
     String tipoMovimentazioneString = _selectedTipoMovimentazione.toString().split('.').last; // Otteniamo solo il nome dell'opzione
     Map<String, dynamic> body = {
       'id': null,
-      'data': DateTime.now().toIso8601String(),
+      'data': selectedDate.toIso8601String(),
       'descrizione': _descrizioneController.text,
       'tipo_movimentazione': tipoMovimentazioneString,
       'importo': double.parse(_importoController.text.toString()),
       'utente': widget.userData.toMap(),
     };
-
     try {
       debugPrint("Body della richiesta: ${body.toString()}");
       final response = await http.post(
@@ -423,7 +728,6 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       }
     }
   }
-
 
   Future<void> _selectUtente() async {
     selectedUtente = await showDialog<UtenteModel>(

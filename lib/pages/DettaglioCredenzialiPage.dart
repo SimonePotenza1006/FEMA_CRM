@@ -32,12 +32,19 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
               'Cliente: ${widget.credenziale.cliente?.denominazione}',
               style: const TextStyle(fontSize: 20),
             ),
+            SizedBox(height: 15),
             Text(
               'Utente incaricato: ${widget.credenziale.utente?.cognome}',
               style: const TextStyle(fontSize: 20),
             ),
+            SizedBox(height: 15),
             Text(
-              'Credenziali: ${widget.credenziale.descrizione}',
+              'Descrizione: ${widget.credenziale.descrizione}',
+              style: const TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 15),
+            Text(
+              'Credenziali: ${widget.credenziale.credenziali}',
               style: const TextStyle(fontSize: 20),
             )
           ],

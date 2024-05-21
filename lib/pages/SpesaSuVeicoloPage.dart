@@ -189,6 +189,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                 ElevatedButton(
                   onPressed: () {
                     if (pickedImage != null) {
+                      checkScadenze();
                       saveSpesa();
                     }
                   },
@@ -296,8 +297,247 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         print('Errore durante il salvataggio del file Excel: $error');
       }
     }
+  }
 
+  Future<http.Response?> saveNewInfoVeicolo() async{
+    if(selectedTipologia?.descrizione == "Tagliando"){
+      try{
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/veicolo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': selectedVeicolo?.id,
+            'descrizione' : selectedVeicolo?.descrizione,
+            'proprietario' : selectedVeicolo?.proprietario,
+            'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
+            'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
+            'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
+            'data_tagliando' : DateTime.now().toIso8601String(),
+            'chilometraggio_ultimo_tagliando' : int.parse(_kmController.text.toString()),
+            'soglia_tagliando' : selectedVeicolo?.soglia_tagliando,
+            'data_revisione' : selectedVeicolo?.data_revisione?.toIso8601String(),
+            'data_inversione_gomme' : selectedVeicolo?.data_inversione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_inversione' : selectedVeicolo?.chilometraggio_ultima_inversione,
+            'soglia_inversione' : selectedVeicolo?.soglia_inversione,
+            'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+          }),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Record relativi al tagliando salvati correttamente!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+        return response;
+      } catch(e){
+        print('Qualcosa non va con il salvataggio dei dati del tagliando: $e');
+        return null;
+      }
+    } else if(selectedTipologia?.descrizione == "Inversione gomme") {
+      try{
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/veicolo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': selectedVeicolo?.id,
+            'descrizione' : selectedVeicolo?.descrizione,
+            'proprietario' : selectedVeicolo?.proprietario,
+            'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
+            'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
+            'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
+            'data_tagliando' : selectedVeicolo?.data_tagliando?.toIso8601String(),
+            'chilometraggio_ultimo_tagliando' : selectedVeicolo?.chilometraggio_ultimo_tagliando,
+            'soglia_tagliando' : selectedVeicolo?.soglia_tagliando,
+            'data_revisione' : selectedVeicolo?.data_revisione?.toIso8601String(),
+            'data_inversione_gomme' : DateTime.now().toIso8601String(),
+            'chilometraggio_ultima_inversione' : int.parse(_kmController.text.toString()),
+            'soglia_inversione' : selectedVeicolo?.soglia_inversione,
+            'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+          }),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Record relativi all\'inversione delle gomme salvati correttamente!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+        return response;
+      } catch(e){
+        print('Qualcosa non va con il salvataggio dei dati dell\'inversione: $e');
+        return null;
+      }
+    } else if(selectedTipologia?.descrizione == "Sostituzione gomme"){
+      try{
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/veicolo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': selectedVeicolo?.id,
+            'descrizione' : selectedVeicolo?.descrizione,
+            'proprietario' : selectedVeicolo?.proprietario,
+            'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
+            'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
+            'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
+            'data_tagliando' : selectedVeicolo?.data_tagliando?.toIso8601String(),
+            'chilometraggio_ultimo_tagliando' : selectedVeicolo?.chilometraggio_ultimo_tagliando,
+            'soglia_tagliando' : selectedVeicolo?.soglia_tagliando,
+            'data_revisione' : selectedVeicolo?.data_revisione?.toIso8601String(),
+            'data_inversione_gomme' : selectedVeicolo?.data_inversione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_inversione' : selectedVeicolo?.chilometraggio_ultima_inversione,
+            'soglia_inversione' : selectedVeicolo?.soglia_inversione,
+            'data_sostituzione_gomme' : DateTime.now().toIso8601String(),
+            'chilometraggio_ultima_sostituzione' : int.parse(_kmController.text.toString()),
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+          }),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Record relativi alla sostituzione delle gomme salvati correttamente!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+        return response;
+      } catch(e){
+        print('Qualcosa non va con il salvataggio dei dati della sostituzione: $e');
+        return null;
+      }
+    } else if (selectedTipologia?.descrizione == "Revisione"){
+      try{
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/veicolo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': selectedVeicolo?.id,
+            'descrizione' : selectedVeicolo?.descrizione,
+            'proprietario' : selectedVeicolo?.proprietario,
+            'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
+            'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
+            'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
+            'data_tagliando' : selectedVeicolo?.data_tagliando?.toIso8601String(),
+            'chilometraggio_ultimo_tagliando' : selectedVeicolo?.chilometraggio_ultimo_tagliando,
+            'soglia_tagliando' : selectedVeicolo?.soglia_tagliando,
+            'data_revisione' : DateTime.now().toIso8601String(),
+            'data_inversione_gomme' : selectedVeicolo?.data_inversione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_inversione' : selectedVeicolo?.chilometraggio_ultima_inversione,
+            'soglia_inversione' : selectedVeicolo?.soglia_inversione,
+            'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+          }),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Record relativi alla revisione del veicolo salvati correttamente!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+        return response;
+      } catch(e){
+        print('Qualcosa non va con il salvataggio dei dati della revisione: $e');
+        return null;
+      }
+    } else {
+      try{
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/veicolo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': selectedVeicolo?.id,
+            'descrizione' : selectedVeicolo?.descrizione,
+            'proprietario' : selectedVeicolo?.proprietario,
+            'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
+            'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
+            'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
+            'data_tagliando' : selectedVeicolo?.data_tagliando?.toIso8601String(),
+            'chilometraggio_ultimo_tagliando' : selectedVeicolo?.chilometraggio_ultimo_tagliando,
+            'soglia_tagliando' : selectedVeicolo?.soglia_tagliando,
+            'data_revisione' : selectedVeicolo?.data_revisione?.toIso8601String(),
+            'data_inversione_gomme' : selectedVeicolo?.data_inversione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_inversione' : selectedVeicolo?.chilometraggio_ultima_inversione,
+            'soglia_inversione' : selectedVeicolo?.soglia_inversione,
+            'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+          }),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Record del veicolo aggiornati correttamente!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+        return response;
+      } catch(e){
+        print('Qualcosa non va con il salvataggio dei dati della revisione: $e');
+        return null;
+      }
+    }
+  }
 
+  Future<void> checkScadenze() async{
+    final data = await saveNewInfoVeicolo();
+    try {
+      if(data == null){
+        throw Exception('Dati del veicolo non disponibili.');
+      } else {
+        final veicolo = VeicoloModel.fromJson(jsonDecode(data.body));
+        var differenza_sostituzione_gomme = int.parse(veicolo.chilometraggio_attuale.toString()) - int.parse(veicolo.chilometraggio_ultima_sostituzione.toString());
+        var differenza_inversione_gomme = int.parse(veicolo.chilometraggio_attuale.toString()) - int.parse(veicolo.chilometraggio_ultima_inversione.toString());
+        var differenza_tagliando = int.parse(veicolo.chilometraggio_attuale.toString()) - int.parse(veicolo.chilometraggio_ultimo_tagliando.toString());
+        if(differenza_sostituzione_gomme >= (int.parse(veicolo.soglia_sostituzione.toString()) - 100)){
+          try{
+            final response = await http.post(
+              Uri.parse('$ipaddress/api/noteTecnico'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'utente' : widget.utente.toMap(),
+                'data' : DateTime.now().toIso8601String(),
+                'nota' : "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima sostituzione gomme!",
+              }),
+            );
+            print("Nota sostituzione gomme creata!");
+          } catch(e){
+            print("Errore nota sostituzione : $e");
+          }
+        } else if(differenza_inversione_gomme >= (int.parse(veicolo.soglia_inversione.toString()) - 100)){
+          try{
+            final response = await http.post(
+              Uri.parse('$ipaddress/api/noteTecnico'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'utente' : widget.utente.toMap(),
+                'data' : DateTime.now().toIso8601String(),
+                'nota' : "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima inversione gomme!",
+              }),
+            );
+            print("Nota inversione gomme creata!");
+          } catch(e){
+            print("Errore nota inversione : $e");
+          }
+        } else if(differenza_tagliando >= (int.parse(veicolo.soglia_tagliando.toString()) - 100)){
+          try{
+            final response = await http.post(
+              Uri.parse('$ipaddress/api/noteTecnico'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'utente' : widget.utente.toMap(),
+                'data' : DateTime.now().toIso8601String(),
+                'nota' : "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima del prossimo tagliando!",
+              }),
+            );
+            print("Nota tagliando gomme creata!");
+          } catch(e){
+            print("Errore nota tagliando : $e");
+          }
+        }
+      }
+    } catch(e){
+      print('Erroreee: $e');
+    }
   }
 
   Future<void> saveSpesa() async {

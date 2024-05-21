@@ -1,54 +1,55 @@
 import 'package:fema_crm/model/NotaTecnicoModel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-class DettaglioNotaPage extends StatefulWidget{
+class DettaglioNotaPage extends StatefulWidget {
   final NotaTecnicoModel nota;
 
   const DettaglioNotaPage({Key? key, required this.nota})
-      : super(key : key);
+      : super(key: key);
 
   @override
   _DettaglioNotaPageState createState() => _DettaglioNotaPageState();
 }
 
-class _DettaglioNotaPageState extends State<DettaglioNotaPage>{
+class _DettaglioNotaPageState extends State<DettaglioNotaPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dettaglio nota n°${widget.nota.id}',
-            style: const TextStyle(color: Colors.white)
-        ),
+            style: const TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
+        elevation: 0, // remove shadow
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Column(
-                    children: [
-                      _buildInfoText('Data = ${widget.nota.data}'),
-                      _buildInfoText('Utente = ${widget.nota.utente?.nomeCompleto()}'),
-                      _buildInfoText('Nota = ${widget.nota.nota}'),
-                      if(widget.nota.intervento != null)
-                        _buildInfoText('Id intervento = ${widget.nota.intervento?.id}'),
-                      if(widget.nota.cliente != null)
-                        _buildInfoText('Cliente = ${widget.nota.cliente?.denominazione}'),
-                      if(widget.nota.destinazione != null)
-                        _buildInfoText('Destinazione = ${widget.nota.destinazione?.denominazione}, ID ${widget.nota.destinazione?.id}'),
-                      if(widget.nota.sopralluogo !=null)
-                        _buildInfoText('Id sopralluogo = ${widget.nota.sopralluogo?.id}')
-                    ],
-                  ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    _buildInfoCard('Data', DateFormat('dd/MM/yyyy, HH:mm').format(widget.nota.data!)),
+                    _buildInfoCard('Utente', widget.nota.utente?.nomeCompleto()?? 'Unknown'),
+                    _buildInfoCard('Nota', widget.nota.nota ?? '/'),
+                    if (widget.nota.intervento!= null)
+                      _buildInfoCard('Id intervento', widget.nota.intervento?.id.toString() ?? '/'),
+                    if (widget.nota.cliente!= null)
+                      _buildInfoCard('Cliente', widget.nota.cliente?.denominazione ?? 'N/A'),
+                    if (widget.nota.destinazione!= null)
+                      _buildInfoCard('Destinazione', '${widget.nota.destinazione?.denominazione}, ID ${widget.nota.destinazione?.id}'),
+                    if (widget.nota.sopralluogo!= null)
+                      _buildInfoCard('Id sopralluogo', widget.nota.sopralluogo?.id.toString() ?? 'N/A'),
+                  ],
                 ),
-              ],
+              ),
+            ],
           ),
         ),
       ),
@@ -91,42 +92,31 @@ class _DettaglioNotaPageState extends State<DettaglioNotaPage>{
     }
   }
 
-  Widget _buildInfoText(String text) {
-    // Divide il testo in due parti: etichetta e dato
-    final parts = text.split('=');
-    final labelText = parts[0];
-    final dataText = parts[1];
-
-    // Formatta la data se è presente nella parte di dato
-    String formattedData = dataText.trim();
-    if (labelText.contains('Data')) {
-      final dateTime = DateTime.tryParse(dataText.trim());
-      if (dateTime != null) {
-        formattedData = '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
-      }
-    }
-
-    return Column(
-      children: [
-        Row(
+  Widget _buildInfoCard(String label, String data) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
           children: [
             Text(
-              '$labelText: ',
+              label,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
-              formattedData,
-              style: TextStyle(
-                fontSize: 20,
+            SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                data,
+                style: TextStyle(
+                  fontSize: 18,
+                ),
               ),
             ),
           ],
         ),
-        Divider(color: Colors.grey[300], thickness: 0.5),
-      ],
+      ),
     );
   }
 
@@ -164,6 +154,4 @@ class _DettaglioNotaPageState extends State<DettaglioNotaPage>{
       ),
     );
   }
-
 }
-

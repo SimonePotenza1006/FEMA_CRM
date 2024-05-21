@@ -31,13 +31,14 @@ class _CompilazioneRapportinoPageState
     extends State<CompilazioneRapportinoPage> {
   List<VeicoloModel> allVeicoli = [];
   List<CategoriaPrezzoListinoModel> allListini = [];
-  XFile? pickedImage;
+  List<XFile> pickedImages =  [];
   GlobalKey<SfSignaturePadState> _signaturePadKey =
       GlobalKey<SfSignaturePadState>();
   Uint8List? signatureBytes;
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController noteController = TextEditingController();
+  TextEditingController _descrizioneCredenzialiController = TextEditingController();
   late DateTime selectedDate;
   late TimeOfDay selectedStartTime;
   VeicoloModel? selectedVeicolo;
@@ -93,273 +94,275 @@ class _CompilazioneRapportinoPageState
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Compilazione Rapportino',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-          centerTitle: true,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
               children: [
-                Text(
-                  'Dettagli Intervento:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Text('Data: ${DateFormat('dd/MM/yyyy').format(selectedDate)}'),
-                SizedBox(height: 10),
-                Text(
-                  'Seleziona il veicolo:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                DropdownButton<VeicoloModel>(
-                  value: selectedVeicolo,
-                  onChanged: (VeicoloModel? newValue) {
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
                     setState(() {
-                      selectedVeicolo = newValue;
+                      pickedImages.removeAt(index);
                     });
                   },
-                  items: allVeicoli.map((VeicoloModel veicolo) {
-                    return DropdownMenuItem<VeicoloModel>(
-                      value: veicolo,
-                      child: Text(veicolo
-                          .descrizione!), // Sostituisci 'nome' con il campo appropriato del tuo modello VeicoloModel
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    _showDestinazioniDialog();
-                  },
-                  child: SizedBox(
-                    height: 50,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
-                        const Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Compila il rapportino:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                TextFormField(
-                  controller: noteController,
-                  maxLines: null,
-                  onChanged: (value) {},
-                  decoration: InputDecoration(
-                    hintText: 'Inserisci qui il rapportino...',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: widget.intervento.conclusione_parziale ?? false,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          widget.intervento.conclusione_parziale = value;
-                        });
-                      },
-                    ),
-                    Text('L\'intervento è terminato?'),
-                  ],
-                ),
-                SizedBox(height: 30),
-                Text(
-                  'Inserisci la firma del cliente:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          content: Container(
-                            width: 700,
-                            height: 250,
-                            child: SfSignaturePad(
-                              key: _signaturePadKey,
-                              backgroundColor: Colors.white,
-                              strokeColor: Colors.black,
-                              minimumStrokeWidth: 2.0,
-                              maximumStrokeWidth: 4.0,
-                            ),
-                          ),
-                          actions: <Widget>[
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Chiudi'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                final signatureImage = await _signaturePadKey
-                                    .currentState!
-                                    .toImage(pixelRatio: 3.0);
-                                final data = await signatureImage.toByteData(
-                                    format: ui.ImageByteFormat.png);
-                                setState(() {
-                                  signatureBytes = data!.buffer.asUint8List();
-                                });
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('Salva'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: Center(
-                      child: signatureBytes != null
-                          ? Image.memory(signatureBytes!)
-                          : Text(
-                              'Tocca per aggiungere la firma',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Scatta una foto:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.camera_alt),
-                      onPressed: () {
-                        takePicture();
-                      },
-                    ),
-                    if (pickedImage != null)
-                      Container(
-                        width: 50,
-                        height: 50,
-                        child: InkWell(
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Container(
-                                  child: Image.file(
-                                    File(pickedImage!.path),
-                                    fit: BoxFit.contain,
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          child: Image.file(File(pickedImage!.path)),
-                        ),
-                      ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Credenziali cliente:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  child: TextFormField(
-                    controller: usernameController,
-                    decoration: InputDecoration(
-                      hintText:
-                          'Inserisci le credenziali del cliente (Username)',
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (value) {},
-                  ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  child: TextFormField(
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                      hintText:
-                          'Inserisci le credenziali del cliente (Password)',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          saveIntervento();
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Rapportino compilato con successo'),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
-                          onPrimary: Colors.white,
-                          textStyle: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        child: Text('Salva Rapportino'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (pickedImage != null) {
-                            saveImageIntervento(File(pickedImage!.path));
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
-                          onPrimary: Colors.white,
-                          textStyle: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        child: Text('Salva Foto'),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),
-          ),
-        ));
+          );
+        },
+      ),
+    );
   }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Compilazione Rapportino',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.red,
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Dettagli Intervento:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text('Data: ${DateFormat('dd/MM/yyyy').format(selectedDate)}'),
+              SizedBox(height: 10),
+              Text(
+                'Seleziona il veicolo:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              DropdownButton<VeicoloModel>(
+                value: selectedVeicolo,
+                onChanged: (VeicoloModel? newValue) {
+                  setState(() {
+                    selectedVeicolo = newValue;
+                  });
+                },
+                items: allVeicoli.map((VeicoloModel veicolo) {
+                  return DropdownMenuItem<VeicoloModel>(
+                    value: veicolo,
+                    child: Text(veicolo.descrizione!), // Sostituisci 'nome' con il campo appropriato del tuo modello VeicoloModel
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  _showDestinazioniDialog();
+                },
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
+                      const Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Compila il rapportino:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                controller: noteController,
+                maxLines: null,
+                onChanged: (value) {},
+                decoration: InputDecoration(
+                  hintText: 'Inserisci qui il rapportino...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Checkbox(
+                    value: widget.intervento.conclusione_parziale ?? false,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        widget.intervento.conclusione_parziale = value;
+                        print(widget.intervento.conclusione_parziale);
+                      });
+                    },
+                  ),
+                  Text('L\'intervento è terminato?'),
+                ],
+              ),
+              SizedBox(height: 30),
+              Text(
+                'Inserisci la firma del cliente:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Container(
+                          width: 700,
+                          height: 250,
+                          child: SfSignaturePad(
+                            key: _signaturePadKey,
+                            backgroundColor: Colors.white,
+                            strokeColor: Colors.black,
+                            minimumStrokeWidth: 2.0,
+                            maximumStrokeWidth: 4.0,
+                          ),
+                        ),
+                        actions: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Chiudi'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final signatureImage = await _signaturePadKey.currentState!.toImage(pixelRatio: 3.0);
+                              final data = await signatureImage.toByteData(format: ui.ImageByteFormat.png);
+                              setState(() {
+                                signatureBytes = data!.buffer.asUint8List();
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Salva'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: Center(
+                    child: signatureBytes != null
+                        ? Image.memory(signatureBytes!)
+                        : Text(
+                      'Tocca per aggiungere la firma',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: takePicture,
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                  onPrimary: Colors.white,
+                ),
+                child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+              ),
+              _buildImagePreview(),
+              SizedBox(height: 20),
+              Text(
+                'Credenziali cliente:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                child: TextFormField(
+                  controller: _descrizioneCredenzialiController,
+                  decoration: InputDecoration(
+                    hintText: 'A cosa si riferiscono le credenziali?',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (value) {},
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                child: TextFormField(
+                  controller: usernameController,
+                  decoration: InputDecoration(
+                    hintText: 'Inserisci le credenziali del cliente (Username)',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (value) {},
+                ),
+              ),
+              SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                child: TextFormField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    hintText: 'Inserisci le credenziali del cliente (Password)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        if(pickedImages.isNotEmpty){
+                          saveImageIntervento();
+                        } else {
+                          saveIntervento();
+                          Navigator.pop(context);
+                          Navigator.pop(context);ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Rapportino registrato!'),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        onPrimary: Colors.white,
+                        textStyle: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      child: Text('Salva Rapportino'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 
   String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
     final now = DateTime.now();
@@ -374,7 +377,8 @@ class _CompilazioneRapportinoPageState
           await http.post(Uri.parse('${ipaddress}/api/credenziali'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
-                'descrizione':
+                'descrizione' : _descrizioneCredenzialiController.text,
+                'credenziali':
                     "Username:${usernameController.text}, Password:${passwordController.text}",
                 'cliente': widget.intervento.cliente,
                 'utente': widget.intervento.utente
@@ -383,7 +387,7 @@ class _CompilazioneRapportinoPageState
         print("EVVIVAAAAAAAA");
       }
     } catch (e) {
-      print('Errore durante il salvataggio del preventivo');
+      print('Errore: $e');
     }
   }
 
@@ -394,6 +398,7 @@ class _CompilazioneRapportinoPageState
           body: jsonEncode({
             'id': widget.intervento.id,
             'data': widget.intervento.data?.toIso8601String(),
+            'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
             'orario_fine': DateTime.now().toIso8601String(),
             'descrizione': widget.intervento.descrizione,
@@ -402,7 +407,8 @@ class _CompilazioneRapportinoPageState
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': true,
             'saldato': false,
-            'note': noteController.text,
+            'note': widget.intervento.note,
+            'relazione_tecnico' : noteController.text,
             'firma_cliente': signatureBytes,
             'utente': widget.intervento.utente?.toMap(),
             'cliente': widget.intervento.cliente?.toMap(),
@@ -412,6 +418,7 @@ class _CompilazioneRapportinoPageState
             'categoria': widget.intervento.categoria_intervento_specifico,
             'tipologia_pagamento': widget.intervento.tipologia_pagamento,
             'destinazione': selectedDestinazione?.toMap(),
+            'gruppo' : widget.intervento.gruppo?.toMap(),
           }));
       if (response.statusCode == 201) {
         print('EVVAIIIIIIII');
@@ -427,38 +434,51 @@ class _CompilazioneRapportinoPageState
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile =
-        await _picker.pickImage(source: ImageSource.camera);
-
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       setState(() {
-        pickedImage = pickedFile;
+        pickedImages.add(pickedFile);
       });
     }
   }
 
-  Future<void> saveImageIntervento(File imageFile) async {
+  Future<void> saveImageIntervento() async {
+    await saveIntervento();
+    final intervento = widget.intervento.id;
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('$ipaddress/api/immagine/${widget.intervento.id}'));
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'intervento',
-          imageFile.path,
-          contentType: MediaType('image', 'jpeg'),
-        ),
-      );
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        print('Immagine salvata con successo');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Foto salvata con successo!'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      } else {
-        print('Errore durante il salvataggio dell\'immagine: ${response.statusCode}');
+      for (var image in pickedImages)  {
+        if (image.path != null && image.path.isNotEmpty) {
+          print('Percorso del file: ${image.path}');
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddress/api/immagine/${intervento}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'intervento', // Field name
+              image.path, // File path
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Rapportino registrato!'),
+              ),
+            );
+            Navigator.pop(context);
+            Navigator.pop(context);
+          } else {
+            print('Errore durante l\'invio del file: ${response.statusCode}');
+          }
+        } else {
+          // Gestisci il caso in cui il percorso del file non è valido
+          print('Errore: Il percorso del file non è valido');
+        }
       }
+      pickedImages.clear();
     } catch (e) {
       print('Errore durante la chiamata HTTP: $e');
     }

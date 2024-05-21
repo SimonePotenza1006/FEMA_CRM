@@ -29,15 +29,14 @@ class _CompilazioneDDTByTecnicoPageState
   bool isLoading = true;
   late DDTModel ddt;
   late List<TextEditingController> quantityControllers;
-  bool isSaveDDTPressed =
-      false; // Stato locale per gestire la visibilità del pulsante "Genera PDF"
+  bool isSaveDDTPressed = false;
   List<AziendaModel> aziendeList = [];
   AziendaModel? selectedAzienda;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/azienda');
+      var apiUrl = Uri.parse('$ipaddress/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -58,62 +57,26 @@ class _CompilazioneDDTByTecnicoPageState
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    for (var controller in quantityControllers) {
+      controller.dispose();
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     getDdtByIntervento();
     getAllAziende();
+    quantityControllers = List.generate(
+      widget.prodotti.length,
+          (index) => TextEditingController(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    quantityControllers = List.generate(
-      widget.prodotti.length,
-      (index) => TextEditingController(),
-    );
-
-    Future<void> createRelazioni(
-        List<ProdottoModel> prodotti, DDTModel? ddt) async {
-      late http.Response response;
-      for (int i = 0; i < prodotti.length; i++) {
-        final prodotto = prodotti[i];
-        final controller = quantityControllers[
-            i]; // Ottieni il controller del TextFormField corrispondente
-        final quantita = double.tryParse(controller.text) ??
-            1; // Ottieni il valore del TextFormField, se non è un numero usa 1 come valore predefinito
-        try {
-          response = await http.post(
-            Uri.parse('${ipaddress}/api/relazioneDDTProdotto'),
-            headers: {
-              "Accept": "application/json",
-              "Content-Type": "application/json"
-            },
-            body: json.encode({
-              'prodotto': prodotto.toJson(),
-              'ddt': ddt?.toJson(),
-              'quantita': quantita, // Utilizza il valore della quantità
-              'assegnato': true,
-              'scaricato': false,
-              'pendente': true,
-            }),
-          );
-          if (response.statusCode == 201) {
-            print(
-                "Relazione DDT-prodotto aggiornata con successo per il prodotto ${prodotto.id}");
-          } else {
-            print(
-                "Errore durante l'aggiornamento della relazione DDT-prodotto per il prodotto ${prodotto.id}");
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('DDT aggiornato con successo'),
-                duration: Duration(seconds: 2), // Durata dello Snackbar
-              ),
-            );
-          }
-        } catch (e) {
-          print("Errore durante l'aggiornamento del preventivo: $e");
-        }
-      }
-    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -127,149 +90,156 @@ class _CompilazioneDDTByTecnicoPageState
         padding: const EdgeInsets.all(12.0),
         child: isLoading
             ? Center(
-                child: CircularProgressIndicator(),
-              )
+          child: CircularProgressIndicator(),
+        )
             : ddt != null
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Numero DDT: ${ddt!.id}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      Text(
-                        'Data DDT: ${ddt!.data != null ? DateFormat('dd/MM/yyyy').format(ddt!.data!) : 'N/D'}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      Text(
-                        'Cliente: ${ddt!.cliente?.denominazione ?? "N/D"}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      Text(
-                        'Destinazione: ${ddt!.destinazione?.denominazione ?? "N/D"}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(height: 20),
-                      DropdownButtonFormField<AziendaModel>(
-                        value: selectedAzienda,
-                        onChanged: (azienda) {
-                          setState(() {
-                            selectedAzienda = azienda;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Azienda',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                        ),
-                        items: aziendeList.map((azienda) {
-                          return DropdownMenuItem<AziendaModel>(
-                            value: azienda,
-                            child: Text(azienda.nome!),
-                          );
-                        }).toList(),
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Prodotti:',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'Quantità:',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: widget.prodotti.length,
-                          itemBuilder: (context, index) {
-                            return buildProdottoItem(index);
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              isSaveDDTPressed = true;
-                            });
-                            createRelazioni(widget.prodotti, ddt);
-                          },
-                          child: Text(
-                            'Salva DDT',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible: isSaveDDTPressed,
-                        child: SizedBox(height: 20),
-                      ),
-                      Visibility(
-                        visible: isSaveDDTPressed,
-                        child: Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PDFDDTPage(
-                                      ddt: ddt, azienda: selectedAzienda!),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'Genera PDF',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Center(
-                    child: Text('DDT non trovato'),
+            ? Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Numero DDT: ${ddt.id}',
+              style: TextStyle(fontSize: 18),
+            ),
+            Text(
+              'Data DDT: ${ddt.data != null ? DateFormat('dd/MM/yyyy').format(ddt.data!) : 'N/D'}',
+              style: TextStyle(fontSize: 18),
+            ),
+            Text(
+              'Cliente: ${ddt.cliente?.denominazione ?? "N/D"}',
+              style: TextStyle(fontSize: 18),
+            ),
+            Text(
+              'Destinazione: ${ddt.destinazione?.denominazione ?? "N/D"}',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 20),
+            DropdownButtonFormField<AziendaModel>(
+              value: selectedAzienda,
+              onChanged: (azienda) {
+                setState(() {
+                  selectedAzienda = azienda;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Azienda',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.red),
+                ),
+              ),
+              items: aziendeList.map((azienda) {
+                return DropdownMenuItem<AziendaModel>(
+                  value: azienda,
+                  child: Text(azienda.nome!),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Prodotti:',
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Quantità:',
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: widget.prodotti.length,
+                itemBuilder: (context, index) {
+                  return buildProdottoItem(index);
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: TextButton(
+                onPressed: () {
+                  //saveRelationsProdottiUtente(widget.prodotti);
+                  createRelazioni(widget.prodotti, ddt);
+                  setState(() {
+                    isSaveDDTPressed = true;
+                  });
+                },
+                child: Text(
+                  'Salva DDT',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
                   ),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: isSaveDDTPressed,
+              child: SizedBox(height: 20),
+            ),
+            Visibility(
+              visible: isSaveDDTPressed,
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    if(selectedAzienda != null)
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PDFDDTPage(
+                              ddt: ddt, azienda: selectedAzienda!),
+                        ),
+                      );
+                    else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Devi scegliere un\'azienda per cui emettere il DDT!'),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    'Genera PDF',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        )
+            : Center(
+          child: Text('DDT non trovato'),
+        ),
       ),
     );
   }
 
   Widget buildProdottoItem(int index) {
     final prodotto = widget.prodotti[index];
-    final controller = quantityControllers[index];
-    controller.text = '1';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -284,7 +254,7 @@ class _CompilazioneDDTByTecnicoPageState
           SizedBox(
             width: 50,
             child: TextFormField(
-              controller: controller,
+              controller: quantityControllers[index],
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               onChanged: (value) {
@@ -300,7 +270,7 @@ class _CompilazioneDDTByTecnicoPageState
   Future<void> getDdtByIntervento() async {
     try {
       final response = await http.get(
-          Uri.parse('${ipaddress}/api/ddt/intervento/${widget.intervento.id}'));
+          Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         setState(() {
@@ -315,6 +285,76 @@ class _CompilazioneDDTByTecnicoPageState
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  // Future<void> saveRelationsProdottiUtente(List<ProdottoModel> prodotti) async {
+  //   try {
+  //     for (int i = 0; i < prodotti.length; i++) {
+  //       final prodotto = prodotti[i];
+  //       final controller = quantityControllers[i]; // Ottieni il controller del TextFormField corrispondente
+  //       final quantita = double.tryParse(controller.text) ?? 1;
+  //       final response = await http.post(
+  //         Uri.parse('$ipaddress/api/relazioneUtentiProdotti'),
+  //         headers: {
+  //           "Accept": "application/json",
+  //           "Content-Type": "application/json"
+  //         },
+  //         body: json.encode({
+  //           'prodotto': prodotto.toMap(),
+  //           'utente': ddt.utente?.toMap(),
+  //           'ddt': ddt.toMap(),
+  //           'quantita': quantita,
+  //           'assegnato': true
+  //         }),
+  //       );
+  //       if (response.statusCode == 200) {
+  //         print('Prodotto $i assegnato all\'utente');
+  //       } else {
+  //         print('Errore durante il salvataggio del prodotto: ${response.statusCode}');
+  //       }
+  //     }
+  //     print('Finito');
+  //   } catch (e) {
+  //     print('Errore durante il salvataggio dei prodotti: $e');
+  //   }
+  // }
+
+  Future<void> createRelazioni(List<ProdottoModel> prodotti, DDTModel? ddt) async {
+    try {
+      for (int i = 0; i < prodotti.length; i++) {
+        final prodotto = prodotti[i];
+        final controller = quantityControllers[i]; // Ottieni il controller del TextFormField corrispondente
+        final quantita = double.tryParse(controller.text) ?? 1;
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/relazioneDDTProdotto'),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: json.encode({
+            'prodotto': prodotto.toJson(),
+            'ddt': ddt?.toJson(),
+            'quantita': quantita,
+            'assegnato': true,
+            'scaricato': false,
+            'pendente': true,
+          }),
+        );
+        if (response.statusCode == 200) {
+          print('Relazione DDT-prodotto aggiornata con successo per il prodotto ${prodotto.id}');
+        } else {
+          print('Errore durante l\'aggiornamento della relazione DDT-prodotto per il prodotto ${prodotto.id}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Errore durante l\'aggiornamento della relazione DDT-prodotto'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Errore durante la creazione delle relazioni: $e');
     }
   }
 }

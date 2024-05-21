@@ -82,6 +82,11 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
                       // 1. Chiudi il Dialog
                       Navigator.of(context).pop();
                       await _generateAndSendPDF();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('DDT salvato con successo!'),
+                        ),
+                      );
                     },
                     child: Text('Si'),
                   ),
@@ -104,13 +109,11 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
     try {
       // Genera il PDF
       final Uint8List pdfBytes = await _generatePDF();
-
       // Crea un file temporaneo
       final tempDir = await getTemporaryDirectory();
       final tempFilePath = '${tempDir.path}/ddt${widget.ddt.id}.pdf';
       final File tempFile = File(tempFilePath);
       await tempFile.writeAsBytes(pdfBytes);
-
       // Prepara i dati per l'email
       final String smtpServerHost = 'mail.femasistemi.it';
       final String subject =
@@ -122,7 +125,6 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
       final String password = 'WGnr18@59.'; // Inserisci la tua password
       final int smtpServerPort = 465;
       final String recipient = 'info@femasistemi.it';
-
       // Configura il server SMTP
       final smtpServer = SmtpServer(
         smtpServerHost,
@@ -131,7 +133,6 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
         password: password,
         ssl: true, // Utilizza SSL/TLS per la connessione SMTP
       );
-
       // Crea il messaggio email con allegato
       final message = Message()
         ..from = Address(username, 'App FEMA')
@@ -142,11 +143,9 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
           tempFile,
           fileName: 'ddt_${widget.ddt.id}.pdf',
         ));
-
       // Invia l'email
       final sendReport = await send(message, smtpServer);
       print('Email inviata con successo: $sendReport');
-
       // Elimina il file temporaneo
       await tempFile.delete();
     } catch (e) {
@@ -157,9 +156,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   Future<Uint8List> _generatePDF() async {
     try {
       await getProdotti();
-
       final pdf = pw.Document();
-
       pdf.addPage(
         pw.Page(
           margin: pw.EdgeInsets.zero, // Rimuove tutti i margini
@@ -208,7 +205,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
                   ),
                   pw.SizedBox(height: 20),
                   pw.Text(
-                    "Doc. di trasporto",
+                    "DDT",
                     style: pw.TextStyle(
                         fontSize: 20, fontStyle: pw.FontStyle.italic),
                   ),
@@ -235,7 +232,6 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
           },
         ),
       );
-
       // Restituisci il PDF come byte array
       return pdf.save();
     } catch (e) {
@@ -611,21 +607,17 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
     final headers = ['Codice', 'Descrizione', 'Quantità'];
     final List<List<dynamic>> data = relazione.map((relazione) {
       double? prezzo = relazione.prodotto?.prezzo_fornitore ?? 0;
-
       String unitaMisura = relazione.prodotto?.unita_misura ?? '';
       bool isPezzi = unitaMisura == 'pz' || unitaMisura == 'PZ';
-
       String formattedQuantita = isPezzi
           ? relazione.quantita!.toInt().toString()
           : relazione.quantita!.toStringAsFixed(2);
-
       return [
         relazione.prodotto?.codice_danea ?? 'N/A',
         relazione.prodotto?.descrizione,
         formattedQuantita,
       ];
     }).toList();
-
     // Imposta la larghezza fissa per ogni colonna
     final List<pw.TableColumnWidth> columnWidths = [
       pw.FixedColumnWidth(60),
@@ -635,13 +627,11 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
       pw.FixedColumnWidth(50),
       // Quantità
     ];
-
     // Calcolare il totale dell'imponibile e dell'IVA
     // Calcolare il totale dell'imponibile e dell'IVA
     num totaleImponibile = data.fold<num>(
         0, (previous, current) => previous + (double.parse(current[2]) ?? 0));
     num totaleDocumento = totaleImponibile;
-
     return pw.Column(
       children: [
         pw.Table.fromTextArray(
@@ -659,7 +649,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
           columnWidths: Map.fromIterables(
               Iterable<int>.generate(headers.length, (i) => i), columnWidths),
         ),
-        pw.SizedBox(height: 20),
+        pw.SizedBox(height: 150),
         pw.Container(
           height: 1, // Altezza della riga nera
           color: PdfColors.black, // Colore della riga nera

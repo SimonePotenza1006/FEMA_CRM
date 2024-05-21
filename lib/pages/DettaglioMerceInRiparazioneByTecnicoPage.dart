@@ -152,6 +152,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
         body: jsonEncode({
           'id': widget.intervento.id,
           'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
@@ -161,6 +162,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
           'concluso': true,
           'saldato': false,
           'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente' : widget.intervento.firma_cliente,
           'utente': widget.intervento.utente?.toMap(),
           'cliente': widget.intervento.cliente?.toMap(),

@@ -78,9 +78,11 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
       filteredCredenziali = allCredenziali.where((credenziale) {
         final utenteCognome = credenziale.utente?.cognome?.toLowerCase() ?? '';
         final utenteNome = credenziale.utente?.nome?.toLowerCase() ?? '';
+        final cliente = credenziale.cliente?.denominazione?.toLowerCase() ?? '';
         final searchQuery = query.toLowerCase();
         return utenteCognome.contains(searchQuery) ||
-            utenteNome.contains(searchQuery);
+            utenteNome.contains(searchQuery) ||
+            cliente.contains(searchQuery);
       }).toList();
     });
   }
@@ -171,7 +173,7 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          'Utente incaricato: ${credenziale.utente?.cognome}',
+          'Descrizione: ${credenziale.credenziali} , utente incaricato: ${credenziale.utente?.cognome}',
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),

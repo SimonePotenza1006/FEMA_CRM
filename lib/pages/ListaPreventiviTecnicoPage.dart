@@ -83,7 +83,6 @@ class _ListaPreventiviTecnicoPageState
                         rows: preventiviList.map((preventivo) {
                           Color? backgroundColor;
                           Color? textColor;
-
                           if (preventivo.accettato ?? false) {
                             backgroundColor = Colors.yellow;
                           } else if (preventivo.rifiutato ?? false) {
@@ -95,12 +94,10 @@ class _ListaPreventiviTecnicoPageState
                           } else if (preventivo.pendente ?? false) {
                             backgroundColor = Colors.orangeAccent;
                           }
-
                           if (backgroundColor == Colors.red ||
                               backgroundColor == Colors.green) {
                             textColor = Colors.white;
                           }
-
                           return DataRow(
                             color: MaterialStateColor.resolveWith((states) =>
                                 backgroundColor ?? Colors.transparent),
@@ -123,27 +120,132 @@ class _ListaPreventiviTecnicoPageState
                                       : ''),
                                 ),
                               ),
-                              DataCell(Text(preventivo.azienda?.nome ?? '')),
-                              DataCell(Text(
-                                  preventivo.cliente?.denominazione ?? '')),
-                              DataCell(Text(
-                                  preventivo.importo?.toStringAsFixed(2) ??
-                                      '')),
-                              DataCell(Text(preventivo.accettato != null
-                                  ? (preventivo.accettato! ? 'Si' : 'No')
-                                  : '')),
-                              DataCell(Text(preventivo.rifiutato != null
-                                  ? (preventivo.rifiutato! ? 'Si' : 'No')
-                                  : '')),
-                              DataCell(Text(preventivo.attesa != null
-                                  ? (preventivo.attesa! ? 'Si' : 'No')
-                                  : '')),
-                              DataCell(Text(preventivo.pendente != null
-                                  ? (preventivo.pendente! ? 'Si' : 'No')
-                                  : '')),
-                              DataCell(Text(preventivo.consegnato != null
-                                  ? (preventivo.consegnato! ? 'Si' : 'No')
-                                  : '')),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child:
+                                    Text(preventivo.azienda?.nome ?? '')),
+                                  ),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                        preventivo.cliente?.denominazione ?? '')),
+                                  ),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                        preventivo.importo?.toStringAsFixed(2) ??
+                                            '')),
+                                  ),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child:                                   Text(preventivo.accettato != null
+                                        ? (preventivo.accettato! ? 'Si' : 'No')
+                                        : '')),
+                                  ),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(preventivo.rifiutato != null
+                                        ? (preventivo.rifiutato! ? 'Si' : 'No')
+                                        : '')),
+                                  ),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(preventivo.attesa != null
+                                        ? (preventivo.attesa! ? 'Si' : 'No')
+                                        : '')),
+                                  ),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(preventivo.pendente != null
+                                        ? (preventivo.pendente! ? 'Si' : 'No')
+                                        : '')),
+                                  ),
+                              DataCell(
+                                  GestureDetector(
+                                    onTap: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioPreventivoByTecnicoPage(
+                                                  preventivo: preventivo),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(preventivo.consegnato != null
+                                        ? (preventivo.consegnato! ? 'Si' : 'No')
+                                        : '')),
+                                  ),
                             ],
                           );
                         }).toList(),
@@ -172,13 +274,15 @@ class _ListaPreventiviTecnicoPageState
       await findAgente();
       String? agenteId = agente?.id;
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/preventivo/agente/$agenteId'));
+          .get(Uri.parse('${ipaddress}/api/preventivo/ordered'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<PreventivoModel> allPreventiviByAgente = [];
         for (var preventivoJson in responseData) {
           PreventivoModel preventivo = PreventivoModel.fromJson(preventivoJson);
-          allPreventiviByAgente.add(preventivo);
+          if(preventivo.agente?.id == agenteId){
+            allPreventiviByAgente.add(preventivo);
+          }
         }
         setState(() {
           preventiviList = allPreventiviByAgente;
@@ -201,7 +305,6 @@ class _ListaPreventiviTecnicoPageState
     try {
       var apiUrl = Uri.parse('${ipaddress}/api/agente');
       var response = await http.get(apiUrl);
-
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<AgenteModel> agenti = [];

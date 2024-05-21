@@ -389,9 +389,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                       children: filteredClientiList.map((cliente) {
                         return ListTile(
                           leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione! +
-                              ", " +
-                              cliente.indirizzo!),
+                          title: Text(cliente.denominazione!),
                           onTap: () {
                             setState(() {
                               selectedCliente = cliente;

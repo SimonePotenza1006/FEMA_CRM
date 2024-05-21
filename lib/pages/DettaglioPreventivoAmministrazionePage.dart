@@ -32,7 +32,6 @@ class _DettaglioPreventivoAmministrazionePageState
   @override
   void initState() {
     super.initState();
-    // Chiamata all'API
     getProdotti();
   }
 

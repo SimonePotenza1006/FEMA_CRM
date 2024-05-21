@@ -34,6 +34,19 @@ class MarcaTempoModel {
     return map;
   }
 
+  MarcaTempoModel.fromMap(Map<String, dynamic> map){
+    id = map['id']?.toString();
+    name = map['name']?.toString();
+    type = map['type']?.toString();
+    gps = map['gps']?.toString();
+    gpsu =map['gpsu']?.toString();
+    map['data'] != null ? DateTime.parse(map['data']) : null;
+    map['datau'] != null? DateTime.parse(map['datau']) : null;
+    imageData = map['imageData'];
+    utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
+    viaggio = map['viaggio'] != null? ViaggioModel.fromMap(map['viaggio']) : null;
+  }
+
   Map<String, dynamic> toJson() =>
       {
         'id': id,

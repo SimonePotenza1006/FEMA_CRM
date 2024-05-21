@@ -57,6 +57,16 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
         backgroundColor: Colors.red,
         actions: [
           IconButton(
+            icon: Icon(
+              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              // Funzione per ricaricare la pagina
+              setState(() {});
+            },
+          ),
+          IconButton(
             icon: _isSearchActive ? Icon(Icons.clear) : Icon(Icons.search),
             color: Colors.white,
             onPressed: () {
@@ -76,12 +86,21 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
-            columnSpacing: 20,
             columns: [
               DataColumn(
                 label: SizedBox(
                   width: MediaQuery.of(context).size.width /
                       3, // Larghezza 1/3 dello schermo
+                  child: Center(
+                    child: Text(
+                      'Data',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: SizedBox(
                   child: Center(
                     child: Text(
                       'Tipologia',
@@ -92,8 +111,6 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
               ),
               DataColumn(
                 label: SizedBox(
-                  width: MediaQuery.of(context).size.width /
-                      3, // Larghezza 1/3 dello schermo
                   child: Center(
                     child: Text(
                       'Cliente',
@@ -104,8 +121,6 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
               ),
               DataColumn(
                 label: SizedBox(
-                  width: MediaQuery.of(context).size.width /
-                      3, // Larghezza 1/3 dello schermo
                   child: Center(
                     child: Text(
                       'Descrizione',
@@ -117,6 +132,11 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
             ],
             rows: sopralluoghiList.map((sopralluogo) {
               return DataRow(cells: [
+                DataCell(
+                  Center(
+                      child: Text(DateFormat('dd/MM/yyyy').format(sopralluogo.data ?? DateTime.now())),),
+                  onTap: () => _navigateToDetailsPage(sopralluogo),
+                ),
                 DataCell(
                   Center(
                       child: Text(
@@ -162,8 +182,14 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
       if (query.isNotEmpty) {
         sopralluoghiList = originalSopralluoghiList.where((sopralluogo) {
           final cliente = sopralluogo.cliente?.denominazione ?? '';
+          final tipologia = sopralluogo.tipologia?.descrizione ?? '';
+          final posizione = sopralluogo.posizione ?? '';
+          final descrizione = sopralluogo.descrizione ?? '';
 
-          return cliente.toLowerCase().contains(query.toLowerCase());
+          return cliente.toLowerCase().contains(query.toLowerCase()) ||
+                tipologia.toLowerCase().contains(query.toLowerCase()) ||
+                posizione.toLowerCase().contains(query.toLowerCase()) ||
+                descrizione.toLowerCase().contains(query.toLowerCase());
         }).toList();
       } else {
         sopralluoghiList = List.from(originalSopralluoghiList);

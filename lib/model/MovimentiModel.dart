@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 class MovimentiModel {
   String? id;
   DateTime? data;
+  DateTime? dataCreazione;
   String? descrizione;
   TipoMovimentazione? tipo_movimentazione;
   double? importo;
@@ -14,6 +15,7 @@ class MovimentiModel {
   MovimentiModel(
     this.id,
     this.data,
+    this.dataCreazione,
     this.descrizione,
     this.tipo_movimentazione,
     this.importo,
@@ -23,6 +25,7 @@ class MovimentiModel {
   MovimentiModel.fromMap(Map<String, dynamic> map) {
     id = map['id'].toString();
     data = map['data'] != null ? DateTime.parse(map['data']) : null;
+    dataCreazione = map['dataCreazione'] != null ? DateTime.parse(map['dataCreazione']) : null;
     descrizione = map['descrizione'].toString();
     tipo_movimentazione = TipoMovimentazione.values.firstWhere(
             (type) => type.toString() == 'tipo_movimentazione.${map['tipo_movimentazione']}');
@@ -34,6 +37,7 @@ class MovimentiModel {
     var map = <String, dynamic> {
       'id': id,
       'data': data != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(data!) : null,
+      'dataCreazione': dataCreazione != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(dataCreazione!) : null,
       'descrizione': descrizione.toString(),
       'tipo_movimentazione': tipo_movimentazione.toString(),
       'importo': importo,
@@ -45,6 +49,7 @@ class MovimentiModel {
   Map<String, dynamic> toJson() => {
       'id': id,
       'data': data != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(data!) : null,
+      'dataCreazione' : dataCreazione != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(dataCreazione!) : null,
       'descrizione': descrizione.toString(),
       'tipo_movimentazione': tipo_movimentazione,
       'importo': importo,
@@ -57,6 +62,7 @@ class MovimentiModel {
     return MovimentiModel(
       json['id']?.toString(),
       json['data'] != null ? DateTime.parse(json['data']) : null,
+      json['dataCreazione'] != null ? DateTime.parse(json['dataCreazione']) : null,
       json['descrizione']?.toString(),
         _getTipoMovimentazioneFromString(json['tipo_movimentazione']),
       json['importo'] != null ? double.parse(json['importo'].toString()) : null,
@@ -65,12 +71,15 @@ class MovimentiModel {
   }
 
   static TipoMovimentazione _getTipoMovimentazioneFromString(String? tipoMovimentazione) {
+    print(tipoMovimentazione);
     if (tipoMovimentazione == 'Entrata') {
       return TipoMovimentazione.Entrata;
     } else if (tipoMovimentazione == 'Uscita') {
       return TipoMovimentazione.Uscita;
-    } else if (tipoMovimentazione == 'Prelievo') {
-      return TipoMovimentazione.Prelievo;
+    } else if (tipoMovimentazione == 'Pagamento') {
+      return TipoMovimentazione.Pagamento;
+    } else if (tipoMovimentazione == 'Acconto') {
+      return TipoMovimentazione.Acconto;
     } else {
       throw Exception('Valore non valido per TipoMovimentazione: $tipoMovimentazione');
     }
@@ -82,5 +91,6 @@ class MovimentiModel {
 enum TipoMovimentazione {
   Entrata,
   Uscita,
-  Prelievo
+  Acconto,
+  Pagamento
 }
