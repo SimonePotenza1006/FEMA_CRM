@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -50,7 +51,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   }
 
   void _showInterventiDialog() {
-    var importo = selectedIntervento?.importo_intervento?.toStringAsFixed(2) ?? 'Importo non inserito';
+    var importo = selectedIntervento?.importo_intervento?.toStringAsFixed(2) ?? 'N/A';
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -218,6 +219,9 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                 TextFormField(
                   controller: _importoController,
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                  ],
                   decoration: InputDecoration(
                     labelText: 'Importo',
                   ),
@@ -233,7 +237,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   onChanged: (TipoMovimentazione? newValue) {
                     setState(() {
                       _selectedTipoMovimentazione = newValue;
-                      if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento) {
+                      if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento || _selectedTipoMovimentazione == TipoMovimentazione.Prelievo) {
                         _selectUtente();
                       } else {
                         selectedUtente = null;
@@ -248,8 +252,10 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       label = 'Uscita';
                     } else if(value == TipoMovimentazione.Acconto){
                       label = 'Acconto';
-                    } else {
+                    } else if (value == TipoMovimentazione.Pagamento){
                       label = 'Pagamento';
+                    } else {
+                      label = 'Prelievo';
                     }
                     return DropdownMenuItem<TipoMovimentazione>(
                       value: value,
@@ -266,7 +272,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     return null;
                   },
                 ),
-                if ((_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento) && selectedUtente != null)
+                if ((_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo) && selectedUtente != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
@@ -275,7 +281,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     ),
                   ),
                   SizedBox(height: 40),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
+                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo)
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -335,9 +341,9 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       ),
                     ),
                   ),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
+                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo)
                   SizedBox(height: 20),
-                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
+                if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo)
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -460,7 +466,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_validateInputs()) {
-                        if(_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita){
+                        if(_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo){
                           addMovimento();
                           Navigator.pushReplacement(
                             context,
@@ -600,7 +606,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           'orario_fine': selectedIntervento?.orario_fine?.toIso8601String(),
           'descrizione': selectedIntervento?.descrizione,
           'importo_intervento': selectedIntervento?.importo_intervento,
-          'acconto' : _importoController.text,
+          'acconto' : double.parse(_importoController.text),
           'assegnato': selectedIntervento?.assegnato,
           'conclusione_parziale' : selectedIntervento?.conclusione_parziale,
           'concluso': selectedIntervento?.concluso,

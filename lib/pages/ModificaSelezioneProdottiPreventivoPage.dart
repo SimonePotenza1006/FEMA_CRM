@@ -31,6 +31,8 @@ class _ModificaSelezioneProdottiPreventivoPageState
   late Timer _debounce;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   List<RelazionePreventivoProdottiModel> allProdotti = [];
+  List<PreventivoModel> allPreventivi = [];
+  List<RelazionePreventivoProdottiModel> pastProdotti = [];
 
   @override
   void initState() {
@@ -47,6 +49,20 @@ class _ModificaSelezioneProdottiPreventivoPageState
     }
     _debounce = Timer(Duration(milliseconds: 500), () {});
     getProdotti(); // Inizializzazione del timer debounce
+    getPreventiviByCliente().then((value) => getAllProdottiFromPastPreventivi(allPreventivi, int.parse(widget.preventivo.id!)));
+  }
+
+  double? getLastPrice(int productId) {
+    double? lastPrice;
+    DateTime lastDate = DateTime.now();
+
+    for (var relazione in allProdotti) {
+      if (relazione.prodotto?.id == productId && relazione.preventivo!.data_creazione!.isAfter(lastDate)) {
+        lastPrice = relazione.prezzo;
+        lastDate = relazione.preventivo!.data_creazione!;
+      }
+    }
+    return lastPrice;
   }
 
   @override
@@ -151,7 +167,8 @@ class _ModificaSelezioneProdottiPreventivoPageState
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
+            child:
+            ListView.builder(
               itemCount: widget.prodottiSelezionati.length + allProdotti.length,
               itemBuilder: (context, index) {
                 if (index < widget.prodottiSelezionati.length) {
@@ -164,20 +181,26 @@ class _ModificaSelezioneProdottiPreventivoPageState
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text('Quantità:'),
-                          SizedBox(width: 5),
-                          SizedBox(
-                            width:
-                            50, // Imposta una larghezza fissa per il TextField
-                            child: TextField(
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              controller: quantityControllers[index],
-                              onChanged: (value) {
-                                _onQuantityChanged(value, index);
-                              },
-                            ),
-                          ),
+                          Row(
+                            children: [
+                              Text('${getLastPrice(int.parse(prodotto.id!))} €', style: TextStyle(color: Colors.black),),
+                              Text('Quantità:'),
+                              SizedBox(width: 5),
+                              SizedBox(
+                                width:
+                                50, // Imposta una larghezza fissa per il TextField
+                                child: TextField(
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
+                                  controller: quantityControllers[index],
+                                  onChanged: (value) {
+                                    _onQuantityChanged(value, index);
+                                  },
+                                ),
+                              ),
+                            ],
+                          )
+
                         ],
                       ),
                     ),
@@ -216,6 +239,9 @@ class _ModificaSelezioneProdottiPreventivoPageState
                 }
               },
             ),
+
+
+
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -341,6 +367,55 @@ class _ModificaSelezioneProdottiPreventivoPageState
     );
   }
 
+  Future<void> getAllProdottiFromPastPreventivi(List<PreventivoModel> preventivi, int excludeId) async{
+    try{
+      for(var preventivo in preventivi){
+        if(preventivo.id != excludeId){
+          try{
+            var apiUrl = Uri.parse('$ipaddress/api/relazionePreventivoProdotto/preventivo/${preventivo.id}');
+            var response = await http.get(apiUrl);
+            if(response.statusCode == 200){
+              var jsonData = jsonDecode(response.body);
+              List<RelazionePreventivoProdottiModel> prodotti = [];
+              for(var item in jsonData){
+                prodotti.add(RelazionePreventivoProdottiModel.fromJson(item));
+              }
+              setState(() {
+                pastProdotti = prodotti;
+              });
+            }
+          } catch(e){
+            print('1 error: $e');
+          }
+        }
+    }
+    }catch(e){
+      print('2 error: $e');
+    }
+  }
+
+  Future<http.Response?> getPreventiviByCliente() async{
+    try{
+      var apiUrl = Uri.parse('${ipaddress}/api/preventivo/cliente/${widget.preventivo.cliente?.id}');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<PreventivoModel> preventivi = [];
+        for(var item in jsonData){
+          preventivi.add(PreventivoModel.fromJson(item));
+        }
+        setState(() {
+          allPreventivi = preventivi;
+        });
+        return response;
+      }
+    } catch(e){
+      print('Errore nel recupero dei preventivi: $e');
+      return null;
+    }
+    return null;
+  }
+
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
@@ -418,7 +493,6 @@ class _ModificaSelezioneProdottiPreventivoPageState
           widget.preventivo.data_accettazione?.toIso8601String(),
           'utente': widget.preventivo.utente?.toJson(),
           'agente': widget.preventivo.agente?.toJson(),
-          'prodotti': widget.preventivo.prodotti
         }),
       );
 

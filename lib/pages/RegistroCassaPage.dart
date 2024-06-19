@@ -8,6 +8,7 @@ import 'dart:io';
 import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
 import 'AggiungiMovimentoPage.dart';
+import 'ModificaMovimentazionePage.dart';
 
 class RegistroCassaPage extends StatefulWidget {
   final UtenteModel userData;
@@ -20,15 +21,19 @@ class RegistroCassaPage extends StatefulWidget {
 
 class _RegistroCassaPageState extends State<RegistroCassaPage> {
   List<MovimentiModel> movimentiList = [];
+  List<MovimentiModel> movimentiList2 = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   double? fondoCassaSettimana1;
   double? fondoCassaSettimana2;
   double? fondoCassaSettimana3;
+  final ScrollController _scrollController = ScrollController();
+
 
   @override
   void initState() {
     super.initState();
     getAllMovimentazioni();
+    getAllMovimentazioniExcel();
   }
 
   @override
@@ -45,17 +50,17 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
-          actions : [
-            IconButton(
-              icon: Icon(
-                Icons.refresh,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                getAllMovimentazioni();
-              },
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.white,
             ),
-          ],
+            onPressed: () {
+              getAllMovimentazioni();
+            },
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       floatingActionButton: Column(
@@ -115,25 +120,27 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     ),
                   ),
                   Text(
-                    '€$fondoCassa',
+                    '€${fondoCassa.toStringAsFixed(2)}',
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 20),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                width: MediaQuery.of(context).size.width, // Fai in modo che la larghezza del container sia uguale alla larghezza dello schermo
+            Scrollbar(
+              controller: _scrollController,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                controller: _scrollController,
                 child: DataTable(
                   columns: [
-                    DataColumn(label: Text('Data creazione', style: TextStyle(fontWeight: FontWeight.bold),)),
+                    DataColumn(label: Text('Data creazione', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Data di riferimento', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Descrizione', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Tipo', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Importo', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Utente', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('')),
                     DataColumn(label: Text('')),
                   ],
                   rows: movimentiList.map((movimento) {
@@ -146,32 +153,45 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                         DataCell(Text(movimento.importo != null ? movimento.importo!.toStringAsFixed(2) + '€' : '')),
                         DataCell(Text(movimento.utente != null ? movimento.utente!.cognome ?? '' : '')),
                         DataCell(
-                          Center(
-                            child: IconButton(
-                              onPressed: (){
-                                showDialog(context: context,
-                                    builder: (BuildContext context){
-                                      return AlertDialog(
-                                        title: Text('Eliminare la movimentazione di ${movimento.importo!.toStringAsFixed(2)}€?'),
-                                        actions: [
-                                          TextButton(onPressed: (){
-                                            deleteMovimentazione(movimento);
-                                          },
+                            Center(
+                              child: IconButton(
+                                onPressed: (){
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => ModificaMovimentazionePage(movimento : movimento))
+                                  );
+                                },
+                                icon: Icon(Icons.mode_edit_outline_outlined, color: Colors.grey),
+                              ),
+                            )
+                        ),
+                        DataCell(
+                            Center(
+                              child: IconButton(
+                                onPressed: (){
+                                  showDialog(context: context,
+                                      builder: (BuildContext context){
+                                        return AlertDialog(
+                                          title: Text('Eliminare la movimentazione di ${movimento.importo!.toStringAsFixed(2)}€?'),
+                                          actions: [
+                                            TextButton(onPressed: (){
+                                              deleteMovimentazione(movimento);
+                                            },
                                               child: Text('Si'),
-                                          ),
-                                          TextButton(onPressed: (){
-                                            Navigator.pop(context);
-                                          },
-                                            child: Text('No'),
-                                          ),
-                                        ],
-                                      );
-                                    });
-                              },
-                              icon: Icon(Icons.delete_forever, color: Colors.grey),
-                            ),
-                          )
-                        )
+                                            ),
+                                            TextButton(onPressed: (){
+                                              Navigator.pop(context);
+                                            },
+                                              child: Text('No'),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                },
+                                icon: Icon(Icons.delete_forever, color: Colors.grey),
+                              ),
+                            )
+                        ),
                       ],
                     );
                   }).toList(),
@@ -213,17 +233,50 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       'Descrizione',
       'Utente',
     ]);
-    for(var spesa in movimentiList){
+
+    double total = 0;
+    for (var spesa in movimentiList2) {
+      if (spesa.importo!= null) {
+        if (spesa.tipo_movimentazione == TipoMovimentazione.Uscita || spesa.tipo_movimentazione == TipoMovimentazione.Prelievo) {
+          total -= spesa.importo!;
+        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto || spesa.tipo_movimentazione == TipoMovimentazione.Pagamento || spesa.tipo_movimentazione == TipoMovimentazione.Entrata) {
+          total += spesa.importo!;
+        }
+      }
+    }
+
+    for (var spesa in movimentiList2) {
+      String importoFormatted;
+      if (spesa.importo!= null) {
+        if (spesa.tipo_movimentazione == TipoMovimentazione.Uscita || spesa.tipo_movimentazione == TipoMovimentazione.Prelievo) {
+          importoFormatted = '-${spesa.importo!.toStringAsFixed(2)}';
+        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto || spesa.tipo_movimentazione == TipoMovimentazione.Pagamento || spesa.tipo_movimentazione == TipoMovimentazione.Entrata) {
+          importoFormatted = '+${spesa.importo!.toStringAsFixed(2)}';
+        } else {
+          importoFormatted = spesa.importo!.toStringAsFixed(2);
+        }
+      } else {
+        importoFormatted = 'N/A';
+      }
+
       sheetObject.appendRow([
-        spesa.data != null
-            ? DateFormat('yyyy-MM-dd').format(spesa.data!)
-            : 'N/A',
-        spesa.tipo_movimentazione.toString() ?? 'N/A',
-        spesa.importo?.toStringAsFixed(2) ?? 'N/A',
-        spesa.descrizione ?? 'N/A',
-        spesa.utente?.cognome ?? 'N/A'
+        spesa.data!= null? DateFormat('yyyy-MM-dd').format(spesa.data!) : 'N/A',
+        spesa.tipo_movimentazione.toString()?? 'N/A',
+        importoFormatted,
+        spesa.descrizione?? 'N/A',
+        spesa.utente?.cognome?? 'N/A'
       ]);
     }
+
+    sheetObject.appendRow([
+      'Totale',
+      '',
+      total.toStringAsFixed(2),
+      '',
+      ''
+    ]);
+
+
     try {
       late String filePath;
       if (Platform.isWindows) {
@@ -264,6 +317,8 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       return 'Pagamento';
     } else if (tipoMovimentazione == TipoMovimentazione.Acconto){
       return 'Acconto';
+    } else if (tipoMovimentazione == TipoMovimentazione.Prelievo){
+      return 'Prelievo';
     } else {
       return 'Informazione non disponibile';
     }
@@ -274,34 +329,53 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     for (var movimento in movimenti) {
       if (movimento.tipo_movimentazione == TipoMovimentazione.Entrata || movimento.tipo_movimentazione == TipoMovimentazione.Pagamento || movimento.tipo_movimentazione == TipoMovimentazione.Acconto) {
         fondoCassa += movimento.importo ?? 0;
-      } else if (movimento.tipo_movimentazione == TipoMovimentazione.Uscita) {
+      } else if (movimento.tipo_movimentazione == TipoMovimentazione.Uscita || movimento.tipo_movimentazione == TipoMovimentazione.Prelievo) {
         fondoCassa -= movimento.importo ?? 0;
       }
     }
     return fondoCassa;
   }
 
-  Future<void> getAllMovimentazioni() async {
-    try {
-      print('ciao');
-      var apiUrl = Uri.parse('${ipaddress}/api/movimenti/ordered');
+  Future<void> getAllMovimentazioniExcel() async{
+    try{
+      var apiUrl = Uri.parse('${ipaddress}/api/movimenti');
       var response = await http.get(apiUrl);
-      if (response.statusCode == 200) {
-        print('ciao2');
+      if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
         List<MovimentiModel> movimenti = [];
-        for (var item in jsonData) {
-          print('ciao3');
+        for(var item in jsonData){
           MovimentiModel movimento = MovimentiModel.fromJson(item);
-          print(movimento.toMap());
-          // Controllo se la data dell'oggetto movimento è nella settimana corrente
           DateTime now = DateTime.now();
           DateTime startOfWeek = DateTime(now.year, now.month, now.day - now.weekday + 1);
           DateTime endOfWeek = startOfWeek.add(Duration(days: 7));
           if (movimento.dataCreazione!.isAfter(startOfWeek) && movimento.dataCreazione!.isBefore(endOfWeek)) {
             movimenti.add(movimento);
           }
-          // Controllo se la data dell'oggetto movimento è nelle settimane precedenti
+        }
+        setState(() {
+          movimentiList2 = movimenti;
+        });
+      }
+    } catch(e){
+      print('Error $e');
+    }
+  }
+
+  Future<void> getAllMovimentazioni() async {
+    try {
+      var apiUrl = Uri.parse('${ipaddress}/api/movimenti/ordered');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<MovimentiModel> movimenti = [];
+        for (var item in jsonData) {
+          MovimentiModel movimento = MovimentiModel.fromJson(item);
+          DateTime now = DateTime.now();
+          DateTime startOfWeek = DateTime(now.year, now.month, now.day - now.weekday + 1);
+          DateTime endOfWeek = startOfWeek.add(Duration(days: 7));
+          if (movimento.dataCreazione!.isAfter(startOfWeek) && movimento.dataCreazione!.isBefore(endOfWeek)) {
+            movimenti.add(movimento);
+          }
           DateTime startOfPreviousWeek1 = startOfWeek.subtract(Duration(days: 7));
           DateTime endOfPreviousWeek1 = startOfWeek;
           DateTime startOfPreviousWeek2 = startOfWeek.subtract(Duration(days: 14));

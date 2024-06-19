@@ -11,9 +11,11 @@ import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
+import 'CalendarioUtentePage.dart';
 import 'DettaglioCommissioneTecnicoPage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
 import 'DettaglioMerceInRiparazioneByTecnicoPage.dart';
+import 'FormOrdineFornitorePage.dart';
 import 'InterventoTecnicoForm.dart';
 import 'InizializzazionePreventivoByTecnicoPage.dart';
 import 'ListaPreventiviTecnicoPage.dart';
@@ -121,9 +123,9 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
         for(var item in responseData){
           RelazioneUtentiInterventiModel relazione = RelazioneUtentiInterventiModel.fromJson(item);
-          if(relazione.intervento?.concluso == false){
+
             allRelazioniByUtente.add(relazione);
-          }
+
         }
         return allRelazioniByUtente;
       }else {
@@ -146,9 +148,9 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
         for (var interventoJson in responseData) {
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           // Aggiungi il filtro per interventi non conclusi
-          if (intervento.concluso == false) {
+
             allInterventiByUtente.add(intervento);
-          }
+
         }
         return allInterventiByUtente;
       } else {
@@ -268,6 +270,62 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                       icon: Icon(Icons.build, size: 30, color: Colors.white),
                       label: Text(
                         'Intervento',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton.icon(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CalendarioUtentePage(utente : widget.userData)),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      icon: Icon(Icons.calendar_month,
+                            size: 30, color: Colors.white),
+                      label: Text(
+                        'Calendario',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height:20
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => FormOrdineFornitorePage(utente: widget.userData!)),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      icon: Icon(Icons.business_center,
+                          size: 30, color: Colors.white),
+                      label: Text(
+                        'Richiesta d\'ordine',
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                     ),
@@ -436,42 +494,64 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                     itemCount: interventi.length,
                     itemBuilder: (context, index) {
                       InterventoModel intervento = interventi[index];
-                      return ListTile(
-                        title: Text(
-                            '${intervento.descrizione.toString()}'),
-                        subtitle: Text(intervento.cliente?.denominazione ?? ''),
-                        trailing: Column(
-                          children: [
-                            Text(
-                              // Formatta la data secondo il tuo formato desiderato
-                              intervento.data != null
-                                  ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                  : 'Data non disponibile',
-                              style: TextStyle(
-                                  fontSize: 16), // Stile opzionale per la data
-                            ),
-                            Text(
-                              intervento.orario_appuntamento != null
-                                  ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                  : 'Nessun orario di appuntamento',
-                              style: TextStyle(
-                                fontSize: 16
-                              ),
-                            )
-                          ],
-                        ),
+                      Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
+                      TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
 
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  DettaglioInterventoByTecnicoPage(
-                                    utente: widget.userData,
-                                      intervento: intervento),
-                            ),
-                          );
-                        },
+                      return Card(
+                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // aggiungi padding orizzontale
+                        elevation: 4, // aggiungi ombreggiatura
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        // aggiungi bordi arrotondati
+                        child: ListTile(
+                          title: Text(
+                            '${intervento.descrizione}',
+                            style: textStyle,
+                          ),
+                          subtitle: Text(
+                            intervento.cliente?.denominazione.toString()?? '',
+                            style: textStyle,
+                          ),
+                          trailing: Column(
+                            children: [
+                              Text(
+                                // Formatta la data secondo il tuo formato desiderato
+                                intervento.data!= null
+                                    ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                    : 'Data non disponibile',
+                                style: TextStyle(
+                                  fontSize: 16, // Stile opzionale per la data
+                                  color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              Text(
+                                intervento.orario_appuntamento!= null
+                                    ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                    : 'Nessun orario di appuntamento',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DettaglioInterventoByTecnicoPage(
+                                      utente: widget.userData,
+                                      intervento: intervento,
+                                    ),
+                              ),
+                            );
+                          },
+                          tileColor: backgroundColor,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       );
                     },
                   );
@@ -480,6 +560,8 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                 }
               },
             ),
+
+
             FutureBuilder<List<RelazioneUtentiInterventiModel>>(
               future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
               builder: (context, snapshot) {
@@ -496,28 +578,38 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                     itemCount: relazioni.length,
                     itemBuilder: (context, index) {
                       RelazioneUtentiInterventiModel relazione = relazioni[index];
+                      Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
+                      TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
                       return ListTile(
                         title: Text(
-                            '${relazione.intervento?.descrizione}'),
-                        subtitle: Text(relazione.intervento?.cliente?.denominazione.toString()?? ''),
+                          '${relazione.intervento?.descrizione}',
+                          style: textStyle,
+                        ),
+                        subtitle: Text(
+                          relazione.intervento?.cliente?.denominazione.toString()?? '',
+                          style: textStyle,
+                        ),
                         trailing: Column(
                           children: [
                             Text(
                               // Formatta la data secondo il tuo formato desiderato
-                              relazione.intervento?.data != null
+                              relazione.intervento?.data!= null
                                   ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
                                   : 'Data non disponibile',
                               style: TextStyle(
-                                  fontSize: 16), // Stile opzionale per la data
-                            ),
-                              Text(
-                                relazione.intervento?.orario_appuntamento != null
-                                    ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
-                                    : 'Nessun orario di appuntamento',
-                                style: TextStyle(
-                                  fontSize: 16
-                                ),
+                                fontSize: 16, // Stile opzionale per la data
+                                color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
                               ),
+                            ),
+                            Text(
+                              relazione.intervento?.orario_appuntamento!= null
+                                  ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                  : 'Nessun orario di appuntamento',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                              ),
+                            ),
                           ],
                         ),
                         onTap: () {
@@ -527,10 +619,12 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                               builder: (context) =>
                                   DettaglioInterventoByTecnicoPage(
                                     utente: widget.userData,
-                                      intervento: relazione.intervento!),
+                                    intervento: relazione.intervento!,
+                                  ),
                             ),
                           );
                         },
+                        tileColor: backgroundColor,
                       );
                     },
                   );
@@ -539,6 +633,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                 }
               },
             ),
+
             const SizedBox(height: 50.0),
             const Text(
               'Agenda Commissioni',

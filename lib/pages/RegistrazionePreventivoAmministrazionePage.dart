@@ -9,6 +9,7 @@ import 'package:fema_crm/model/ClienteModel.dart';
 import 'package:fema_crm/model/DestinazioneModel.dart';
 
 import '../model/AgenteModel.dart';
+import '../model/PreventivoModel.dart';
 
 class RegistrazionePreventivoAmministrazionePage extends StatefulWidget {
   final UtenteModel userData;
@@ -32,18 +33,24 @@ class _RegistrazionePreventivoAmministrazionePageState
   String? selectedListino;
   ClienteModel? selectedCliente;
   DestinazioneModel? selectedDestinazione;
-
   List<AziendaModel> aziendeList = [];
   List<ClienteModel> clientiList = [];
   List<AgenteModel> agentiList = [];
   List<ClienteModel> filteredClientiList = [];
   List<DestinazioneModel> allDestinazioniByCliente = [];
+  List<PreventivoModel> allPreventiviByCliente = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
 
   @override
   void initState() {
     super.initState();
-    getAllAziende();
+    getAllAziende().then((_) {
+      if (aziendeList.isNotEmpty) {
+        setState(() {
+          selectedAzienda = aziendeList.firstWhere((azienda) => azienda.id == 3.toString());
+        });
+      }
+    });
     getAllAgenti();
     getAllClienti();
   }
@@ -107,6 +114,45 @@ class _RegistrazionePreventivoAmministrazionePageState
                     ),
                   ),
                   SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      _showClientiDialog();
+                    },
+                    child: SizedBox(
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            selectedCliente?.denominazione ??
+                                'Seleziona Cliente',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Icon(Icons.arrow_drop_down),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      _showDestinazioniDialog();
+                    },
+                    child: SizedBox(
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            selectedDestinazione?.denominazione ??
+                                'Seleziona Destinazione',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Icon(Icons.arrow_drop_down),
+                        ],
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 50,
                     child: DropdownButton<String>(
@@ -160,45 +206,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                     ),
                   ),
                   SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () {
-                      _showClientiDialog();
-                    },
-                    child: SizedBox(
-                      height: 50,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedCliente?.denominazione ??
-                                'Seleziona Cliente',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Icon(Icons.arrow_drop_down),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () {
-                      _showDestinazioniDialog();
-                    },
-                    child: SizedBox(
-                      height: 50,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedDestinazione?.denominazione ??
-                                'Seleziona Destinazione',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Icon(Icons.arrow_drop_down),
-                        ],
-                      ),
-                    ),
-                  ),
+
                   SizedBox(height: 16),
                   Container(
                     alignment: Alignment.center,
@@ -221,6 +229,13 @@ class _RegistrazionePreventivoAmministrazionePageState
                       ),
                     ),
                   ),
+                  if(selectedCliente != null && allPreventiviByCliente.isEmpty)
+                    Text('Nessun preventivo associato a ${selectedCliente?.denominazione!} presente nel database.'),
+                  if(selectedCliente != null && allPreventiviByCliente.isNotEmpty)
+                    for(var preventivo in allPreventiviByCliente)
+                      Text(
+                          'Preventivo creato in data ${preventivo.data_creazione?.day}/${preventivo.data_creazione?.month}/${preventivo.data_creazione?.day}, listino:${preventivo.listino}'
+                      ),
                 ],
               ),
             ),
@@ -333,6 +348,24 @@ class _RegistrazionePreventivoAmministrazionePageState
     }
   }
 
+  Future<void> getAllPreventiviByCliente(String clienteId) async {
+    try{
+      final response = await http.get(Uri.parse('$ipaddress/api/preventivo/cliente/$clienteId'));
+      if(response.statusCode == 200){
+        final List<dynamic> responseData = json.decode(response.body);
+        setState(() {
+          allPreventiviByCliente = responseData
+              .map((data) => PreventivoModel.fromJson(data))
+              .toList();
+        });
+      } else {
+        throw Exception('Failed to load Preventivi per cliente');
+      }
+    } catch(e){
+      print('Errore durante la richiesta HTTP: $e');
+    }
+  }
+
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
       final response = await http
@@ -394,6 +427,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                             setState(() {
                               selectedCliente = cliente;
                               getAllDestinazioniByCliente(cliente.id!);
+                              getAllPreventiviByCliente(cliente.id!);
                             });
                             Navigator.of(context).pop();
                           },

@@ -1,4 +1,4 @@
-import 'package:fema_crm/pages/PDFRendicontoInterventiPage.dart';
+ import 'package:fema_crm/pages/PDFRendicontoInterventiPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
@@ -334,6 +334,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
         final cellulare = intervento.cliente?.cellulare?.toLowerCase() ?? '';
         final cellulareD = intervento.destinazione?.cellulare?.toLowerCase() ?? '';
         final tipologia = intervento.tipologia?.descrizione?.toLowerCase() ?? '';
+        final descrizione = intervento.descrizione?.toLowerCase() ?? '';
 
         final containsQuery = cliente.contains(query.toLowerCase()) ||
             indirizzo.contains(query.toLowerCase()) ||
@@ -347,6 +348,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
             telefono.contains(query.toLowerCase()) ||
             telefonoD.contains(query.toLowerCase()) ||
             cellulare.contains(query.toLowerCase()) ||
+            descrizione.contains(query.toLowerCase()) ||
             cellulareD.contains(query.toLowerCase()) ||
             tipologia.contains(query.toLowerCase());
 
@@ -451,14 +453,20 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
+                  //GRUPPI DI INTERVENTO NON CONCLUSI
+
                   SizedBox(height: 16),
-                  Text('  Gruppi di intervento non conclusi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  Text('  Gruppi di intervento non conclusi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20)),
                   Text('  Numero di gruppi non conclusi: ${allGruppiNonConclusi.length}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   SizedBox(height: 12),
                   GruppiTableWidget(gruppiNonConclusi: allGruppiNonConclusi, allInterventi: allInterventi, context: context, setState: () {  },),
-                  Divider(),
-                  SizedBox(height: 16),
-                  Text('  Interventi non assegnati', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  const Divider(),
+
+                  //INTERVENTI NON ASSEGNATI
+
+                  SizedBox(height: 40),
+                  const Text('  Interventi non assegnati', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20)),
                   Text('  Numero di interventi non assegnati: ${filteredInterventi
                       .where((intervento) =>!intervento.assegnato!).length}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   SizedBox(height: 12),
@@ -642,9 +650,9 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                                                 border: OutlineInputBorder(),
                                               ),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.digitsOnly, // allow only digits
+                                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
                                               ],
-                                              keyboardType: TextInputType.number, // show number keyboard
+                                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                                             ),
                                             TextButton(
                                               onPressed: () {
@@ -686,14 +694,10 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                     ),
                   ),
 
+                  //INTERVENTI NON CONCLUSI
 
-
-
-
-
-
-                  SizedBox(height: 16),
-                  Text('  Interventi non conclusi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  SizedBox(height: 40),
+                  Text('  Interventi non conclusi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20)),
                   Text('  Numero di interventi non conclusi: ${filteredInterventi
                       .where((intervento) =>!intervento.concluso! &&!intervento.saldato! && intervento.assegnato!).length}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   SizedBox(height: 12),
@@ -877,9 +881,9 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                                                 border: OutlineInputBorder(),
                                               ),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.digitsOnly, // allow only digits
+                                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
                                               ],
-                                              keyboardType: TextInputType.number, // show number keyboard
+                                              keyboardType: TextInputType.numberWithOptions(decimal: true), // show number keyboard
                                             ),
                                             TextButton(
                                               onPressed: () {
@@ -922,7 +926,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                   ),
                   Divider(), // separator between sectors
                   SizedBox(height: 16),
-                  Text('  Interventi conclusi e non saldati', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  Text('  Interventi conclusi e non saldati', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20)),
                   Text('  Numero di interventi conclusi e non saldati: ${filteredInterventi
                       .where((intervento) =>intervento.concluso! &&!intervento.saldato!).length}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   SizedBox(height: 12),
@@ -1117,9 +1121,9 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                                                 border: OutlineInputBorder(),
                                               ),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.digitsOnly, // allow only digits
+                                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
                                               ],
-                                              keyboardType: TextInputType.number, // show number keyboard
+                                              keyboardType: TextInputType.numberWithOptions(decimal: true), // show number keyboard
                                             ),
                                             TextButton(
                                               onPressed: () {
@@ -1160,15 +1164,15 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                       }).toList(),
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text('  Gruppi di intervento conclusi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  SizedBox(height: 40),
+                  Text('  Gruppi di intervento conclusi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20)),
                   Text('  Numero di gruppi conclusi: ${allGruppiConclusi.length}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   SizedBox(height: 12),
                   GruppiConcTableWidget(gruppiConclusi: allGruppiConclusi, allInterventi: allInterventi, context: context, setState: () {  },),
                   // Sector 3: Interventi conclusi e saldati
                   Divider(),
-                  SizedBox(height: 16),
-                  Text('  Interventi conclusi e saldati', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                  SizedBox(height: 40),
+                  Text('  Interventi conclusi e saldati', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20)),
                   Text('  Numero di interventi conclusi e saldati: ${filteredInterventi
                       .where((intervento) =>intervento.concluso! && intervento.saldato!).length}', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                   SizedBox(height: 12),
@@ -1362,9 +1366,9 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                                                 border: OutlineInputBorder(),
                                               ),
                                               inputFormatters: [
-                                                FilteringTextInputFormatter.digitsOnly, // allow only digits
+                                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
                                               ],
-                                              keyboardType: TextInputType.number, // show number keyboard
+                                              keyboardType: TextInputType.numberWithOptions(decimal: true), // show number keyboard
                                             ),
                                             TextButton(
                                               onPressed: () {
@@ -1405,7 +1409,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
                       }).toList(),
                     ),
                   ),
-                  SizedBox(height: 25),
+                  SizedBox(height: 50),
                 ],
               ),
             ),
@@ -1676,9 +1680,9 @@ class GruppiConcTableWidget extends StatelessWidget {
                                 border: OutlineInputBorder(),
                               ),
                               inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly, // permetti solo i numeri
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
                               ],
-                              keyboardType: TextInputType.number, // mostra la tastiera numerica
+                              keyboardType: TextInputType.numberWithOptions(decimal: true), // mostra la tastiera numerica
                             ),
                             TextButton(
                               onPressed: () {
@@ -1827,9 +1831,9 @@ class GruppiTableWidget extends StatelessWidget {
                                 border: OutlineInputBorder(),
                               ),
                               inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly, // allow only digits
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
                               ],
-                              keyboardType: TextInputType.number, // show number keyboard
+                              keyboardType: TextInputType.numberWithOptions(decimal: true), // show number keyboard
                             ),
                             TextButton(
                               onPressed: () {

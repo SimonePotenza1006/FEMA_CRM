@@ -68,7 +68,13 @@ class _CompilazioneDDTByTecnicoPageState
   void initState() {
     super.initState();
     getDdtByIntervento();
-    getAllAziende();
+    getAllAziende().then((_) {
+      if (aziendeList.isNotEmpty) {
+        setState(() {
+          selectedAzienda = aziendeList.firstWhere((azienda) => azienda.id == 3.toString());
+        });
+      }
+    });
     quantityControllers = List.generate(
       widget.prodotti.length,
           (index) => TextEditingController(),

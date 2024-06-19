@@ -3,7 +3,7 @@ import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/model/VeicoloModel.dart';
 
 class SpesaVeicoloModel {
-  String? id;
+  String? idSpesaVeicolo;
   DateTime? data;
   String? km;
   String? importo;
@@ -13,7 +13,7 @@ class SpesaVeicoloModel {
   UtenteModel? utente;
 
   SpesaVeicoloModel(
-      this.id,
+      this.idSpesaVeicolo,
       this.data,
       this.km,
       this.importo,
@@ -25,7 +25,7 @@ class SpesaVeicoloModel {
 
   Map<String, dynamic> toMap(){
     var map = <String, dynamic>{
-      'id' : id,
+      'idSpesaVeicolo' : idSpesaVeicolo,
       'data' : data,
       'km' : km,
       'importo' : importo,
@@ -38,7 +38,7 @@ class SpesaVeicoloModel {
   }
 
   SpesaVeicoloModel.fromMap(Map<String, dynamic> map) {
-    id = map['id'];
+    idSpesaVeicolo = map['idSpesaVeicolo'];
     map['data'] != null? DateTime.parse(map['data']) : null;
     km = map['km'];
     importo = map['importo'];
@@ -49,7 +49,7 @@ class SpesaVeicoloModel {
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    'idSpesaVeicolo': idSpesaVeicolo,
     'data': data?.toIso8601String(),
     'km' : km,
     'importo' : importo,
@@ -61,7 +61,7 @@ class SpesaVeicoloModel {
 
   factory SpesaVeicoloModel.fromJson(Map<String, dynamic> json){
     return SpesaVeicoloModel(
-      json['id'].toString(),
+      json['idSpesaVeicolo'].toString(),
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['km'].toString(),
       json['importo'].toString(),

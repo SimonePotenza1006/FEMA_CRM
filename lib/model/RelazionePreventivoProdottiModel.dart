@@ -6,12 +6,14 @@ class RelazionePreventivoProdottiModel {
   ProdottoModel? prodotto;
   PreventivoModel? preventivo;
   double? quantita;
+  double? prezzo;
 
   RelazionePreventivoProdottiModel({
    this.id,
    this.prodotto,
    this.preventivo,
-   this.quantita
+   this.quantita,
+    this.prezzo
 });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +22,7 @@ class RelazionePreventivoProdottiModel {
       'prodotto': prodotto?.toMap(),
       'preventivo': preventivo?.toMap(),
       'quantita' : quantita,
+      'prezzo' : prezzo
     };
   }
 
@@ -28,7 +31,8 @@ class RelazionePreventivoProdottiModel {
       id: map['id'],
       prodotto: ProdottoModel.fromMap(map['prodotto']),
       preventivo: PreventivoModel.fromMap(map['preventivo']),
-      quantita: map['quantita']
+      quantita: map['quantita'],
+      prezzo: map['prezzo']
     );
   }
 
@@ -37,6 +41,7 @@ class RelazionePreventivoProdottiModel {
     'prodotto': prodotto?.toJson(),
     'preventivo' : preventivo?.toJson(),
     'quantita': quantita,
+    'prezzo' : prezzo,
   };
 
   factory RelazionePreventivoProdottiModel.fromJson(Map<String, dynamic> json) {
@@ -45,6 +50,7 @@ class RelazionePreventivoProdottiModel {
       prodotto: ProdottoModel.fromJson(json['prodotto']),
       preventivo: PreventivoModel.fromJson(json['preventivo']),
       quantita: json['quantita'],
+      prezzo: json['prezzo']
     );
   }
 }

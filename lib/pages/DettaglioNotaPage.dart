@@ -88,7 +88,7 @@ class _DettaglioNotaPageState extends State<DettaglioNotaPage> {
         );
       }
     } catch (e) {
-      print('Errore durante l\'eliminazione del cliente: $e');
+      print('Errore durante l\'eliminazione della nota: $e');
     }
   }
 

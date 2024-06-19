@@ -367,7 +367,6 @@ class _ConsegnaMaterialePreventivoPageState
                 widget.preventivo.data_accettazione?.toIso8601String(),
             'utente': widget.preventivo.utente?.toJson(),
             'agente': widget.preventivo.agente?.toJson(),
-            'prodotti': widget.preventivo.prodotti
           }),
         );
         if (response.statusCode == 201) {

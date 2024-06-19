@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,8 +19,51 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _requestLocationPermission();
   initializeDateFormatting('it_IT', null).then((_) {
-    runApp(const MyApp());
+    runApp(MyApp());
   });
+}
+
+class CustomLocalizations {
+  CustomLocalizations(this.locale);
+
+  final Locale locale;
+
+  static CustomLocalizations of(BuildContext context) {
+    return Localizations.of<CustomLocalizations>(context, CustomLocalizations)!;
+  }
+
+  static Map<String, Map<String, String>> _localizedValues = {
+    'it': {
+      'sun': 'Dom',
+      'mon': 'Lun',
+      'tue': 'Mar',
+      'wed': 'Mer',
+      'thu': 'Gio',
+      'fri': 'Ven',
+      'sat': 'Sab',
+    },
+  };
+
+  String getDayName(String day) {
+    return _localizedValues[locale.languageCode]![day] ?? day;
+  }
+}
+
+class CustomLocalizationsDelegate extends LocalizationsDelegate<CustomLocalizations> {
+  const CustomLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) {
+    return ['en', 'it'].contains(locale.languageCode);
+  }
+
+  @override
+  Future<CustomLocalizations> load(Locale locale) {
+    return SynchronousFuture<CustomLocalizations>(CustomLocalizations(locale));
+  }
+
+  @override
+  bool shouldReload(CustomLocalizationsDelegate old) => false;
 }
 
 Future<void> _requestLocationPermission() async {
@@ -30,15 +74,21 @@ Future<void> _requestLocationPermission() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: [GlobalMaterialLocalizations.delegate],
-      theme: myThemeData(),
-      home: const LoginForm(),
+      locale: Locale('it', 'IT'),
+      localizationsDelegates: [
+        const CustomLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('it', 'IT'),
+      ],
+      home: LoginForm(),
     );
   }
 }
@@ -50,7 +100,7 @@ ThemeData myThemeData() {
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key});
+  LoginForm({Key? key});
 
   @override
   _LoginFormState createState() => _LoginFormState();

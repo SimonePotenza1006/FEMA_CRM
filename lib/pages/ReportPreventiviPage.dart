@@ -109,7 +109,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
             ),
             onPressed: () {
               // Funzione per ricaricare la pagina
-              setState(() {});
+              getAllPreventivi();
             },
           ),
         ],

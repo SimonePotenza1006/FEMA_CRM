@@ -17,6 +17,7 @@ import 'AggiuntaManualeProdottiDDTPage.dart';
 import 'AggiuntaNotaByTecnicoPage.dart';
 import 'CompilazionePreventivoMerceInRiparazionePage.dart';
 import 'InizioInterventoPage.dart';
+import 'ModificaRelazioneRapportinoPage.dart';
 import 'ScannerBarCodePage.dart';
 import 'ScannerQrCodePage.dart';
 import 'CompilazioneRapportinoPage.dart'; // Importa il pacchetto per il formato delle date
@@ -26,8 +27,7 @@ import 'ScannerQrCodeTecnicoPage.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'VerificaMaterialeAssegnatoPage.dart';
+import 'VerificaMaterialeNewPage.dart';
 
 
 class DettaglioInterventoByTecnicoPage extends StatefulWidget {
@@ -171,22 +171,172 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
       print('Error fetching ingressi data from API $e');
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.red,
-          title: Text(
-            'Dettaglio Intervento',
-            style: TextStyle(color: Colors.white),
-          ),
+      appBar: AppBar(
+        backgroundColor: Colors.red,
+        title: Text(
+          'Dettaglio Intervento',
+          style: TextStyle(color: Colors.white),
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Informazioni di base',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  buildInfoRow(
+                    title: 'ID intervento',
+                    value: widget.intervento.id!,
+                  ),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                    title: 'Data creazione',
+                    value: formatDate(widget.intervento.data_apertura_intervento),
+                  ),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                    title: 'Data accordata',
+                    value: formatDate(widget.intervento.data),
+                  ),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                      title: 'Orario appuntamento',
+                      value: formatTime(widget.intervento.orario_appuntamento)
+                  ),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                    title: 'Orario Inizio',
+                    value: formatTime(widget.intervento.orario_inizio),
+                  ),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                    title: 'Orario Fine',
+                    value: formatTime(widget.intervento.orario_fine),
+                  ),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                      title: 'Cliente',
+                      value: widget.intervento.cliente?.denominazione?? 'N/A'),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                    title: 'Descrizione',
+                    value: widget.intervento.descrizione?? 'N/A',
+                  ),
+                  SizedBox(height : 15),
+                  buildInfoRow(
+                    title: 'Indirizzo destinazione',
+                    value: widget.intervento.destinazione?.indirizzo?? 'N/A',
+                  ),
+                  SizedBox(height : 15),
+                  buildInfoRow(
+                    title: 'Cellulare destinazione',
+                    value: widget.intervento.destinazione?.cellulare?? 'N/A',
+                  ),
+                  SizedBox(height : 15),
+                  buildInfoRow(
+                    title: 'Telefono destinazione',
+                    value: widget.intervento.destinazione?.telefono?? 'N/A',
+                  ),
+                  SizedBox(height : 15),
+                  buildInfoRow(
+                    title: 'Indirizzo cliente',
+                    value: widget.intervento.cliente?.indirizzo?? 'N/A',
+                  ),
+                  SizedBox(height : 15),
+                  buildInfoRow(
+                    title: 'Telefono cliente',
+                    value: widget.intervento.cliente?.telefono?? 'N/A',
+                  ),
+                  SizedBox(height : 15),
+                  buildInfoRow(
+                    title: 'Cellulare cliente',
+                    value: widget.intervento.cliente?.cellulare?? 'N/A',
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Container(
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Informazioni sull\'intervento',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  if (widget.intervento.utente == null)
+                    ElevatedButton(
+                      onPressed: () {
+                        //_showUtentiModal(snapshot.data!);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        textStyle: TextStyle(fontSize: 20),
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        'Assegna',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  buildInfoRow(
+                    title: 'Utente incaricato',
+                    value: '${widget.intervento.utente?.nome.toString()} ${widget.intervento.utente?.cognome.toString()}'?? "Non assegnato",
+                  ),
+                  if (otherUtenti.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Altri utenti:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        ...otherUtenti.map((relazione) => buildInfoRow(
+                          title: 'Utente',
+                          value: '${relazione.utente?.nome} ${relazione.utente?.cognome}',
+                        )),
+                      ],
+                    ),
+                  SizedBox(height: 15),
+                  buildInfoRow(
+                    title: 'Note',
+                    value: widget.intervento.note?? 'N/A',
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 15),
+            if(widget.intervento.merce!= null)
               Container(
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -197,7 +347,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Informazioni di base',
+                      'Informazioni sulla merce in riparazione',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -205,358 +355,204 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                     ),
                     SizedBox(height: 10),
                     buildInfoRow(
-                      title: 'ID intervento',
-                      value: widget.intervento.id!,
+                      title: 'Articolo',
+                      value: widget.intervento.merce?.articolo?? 'N/A',
                     ),
                     SizedBox(height: 15),
                     buildInfoRow(
-                      title: 'Data creazione',
-                      value: formatDate(widget.intervento.data_apertura_intervento),
+                      title: 'Accessori',
+                      value: widget.intervento.merce?.accessori?? 'N/A',
                     ),
                     SizedBox(height: 15),
                     buildInfoRow(
-                      title: 'Data accordata',
-                      value: formatDate(widget.intervento.data),
+                      title: 'Difetto riscontrato',
+                      value: widget.intervento.merce?.difetto_riscontrato?? 'N/A',
                     ),
                     SizedBox(height: 15),
                     buildInfoRow(
-                        title: 'Orario appuntamento',
-                        value: formatTime(widget.intervento.orario_appuntamento)
+                      title: 'Diagnosi',
+                      value: widget.intervento.merce?.diagnosi?? 'N/A',
                     ),
                     SizedBox(height: 15),
                     buildInfoRow(
-                      title: 'Orario Inizio',
-                      value: formatTime(widget.intervento.orario_inizio),
+                      title: 'Richiesta di preventivo',
+                      value: booleanToString(widget.intervento.merce?.preventivo?? false),
                     ),
                     SizedBox(height: 15),
                     buildInfoRow(
-                      title: 'Orario Fine',
-                      value: formatTime(widget.intervento.orario_fine),
+                      title: 'Importo preventivato',
+                      value: widget.intervento.merce?.importo_preventivato.toString()?? 'N/A',
                     ),
                     SizedBox(height: 15),
                     buildInfoRow(
-                        title: 'Cliente',
-                        value: widget.intervento.cliente?.denominazione ?? 'N/A'),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Descrizione',
-                      value: widget.intervento.descrizione ?? 'N/A',
-                    ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                        title: 'Indirizzo destinazione',
-                        value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
-                    ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Cellulare destinazione',
-                      value: widget.intervento.destinazione?.cellulare ?? 'N/A',
-                    ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Telefono destinazione',
-                      value: widget.intervento.destinazione?.telefono ?? 'N/A',
-                    ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Indirizzo cliente',
-                      value: widget.intervento.cliente?.indirizzo ?? 'N/A',
-                    ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Telefono cliente',
-                      value: widget.intervento.cliente?.telefono ?? 'N/A',
-                    ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Cellulare cliente',
-                      value: widget.intervento.cliente?.cellulare ?? 'N/A',
-                    ),
-                    // Container(
-                    //   child: ListView.builder(
-                    //     shrinkWrap: true,
-                    //     itemCount: prodotti.length,
-                    //     itemBuilder: (context, index) {
-                    //       return buildProdottoItem(index);
-                    //     },
-                    //   ),
-                    // ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16.0),
-              Container(
-                padding: EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Informazioni sull\'intervento',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      title: 'Password',
+                      value: widget.intervento.merce?.password?? 'N/A',
                     ),
                     SizedBox(height: 15),
-                    if (widget.intervento.utente == null)
-                      ElevatedButton(
-                        onPressed: () {
-                          //_showUtentiModal(snapshot.data!);
-                        },
-                        child: Text(
-                          'Assegna',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
                     buildInfoRow(
-                      title: 'Utente incaricato',
-                      value: '${widget.intervento.utente?.nome.toString()} ${widget.intervento.utente?.cognome.toString()}' ?? "Non assegnato",
-                    ),
-                    if (otherUtenti.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Altri utenti:',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          ...otherUtenti.map((relazione) => buildInfoRow(
-                            title: 'Utente',
-                            value: '${relazione.utente?.nome} ${relazione.utente?.cognome}',
-                          )),
-                        ],
-                      ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Note',
-                      value: widget.intervento.note ?? 'N/A',
+                      title: 'Dati',
+                      value: widget.intervento.merce?.dati?? 'N/A',
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 15),
-
-              if(widget.intervento.merce != null)
-                Container(
-                  padding: EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10),
+            if (allNote.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Note dei tecnici:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Informazioni sulla merce in riparazione',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 10),
-                      buildInfoRow(
-                        title: 'Articolo',
-                        value: widget.intervento.merce?.articolo ?? 'N/A',
-                      ),
-                      SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Accessori',
-                        value: widget.intervento.merce?.accessori ?? 'N/A',
-                      ),
-                      SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Difetto riscontrato',
-                        value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
-                      ),
-                      SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Diagnosi',
-                        value: widget.intervento.merce?.diagnosi ?? 'N/A',
-                      ),
-                      SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Richiesta di preventivo',
-                        value: booleanToString(widget.intervento.merce?.preventivo ?? false),
-                      ),
-                      SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Importo preventivato',
-                        value: widget.intervento.merce?.importo_preventivato.toString() ?? 'N/A',
-                      ),
-                      SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Password',
-                        value: widget.intervento.merce?.password ?? 'N/A',
-                      ),
-                      SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Dati',
-                        value: widget.intervento.merce?.dati ?? 'N/A',
-                      ),
-                    ],
-                  ),
-                ),
-              if (allNote.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Note dei tecnici:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    ...allNote.map((nota) => ListTile(
-                      title: Text('${nota.utente?.nome} ${nota.utente?.cognome}'),
-                      subtitle: Text('${nota.nota}'),
-                    )),
-                  ],
-                ),
-              SizedBox(height: 40),
-              // Pulsanti
-              if(widget.intervento.merce == null)
-                Center(
-                  child: Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ScannerQrCodeTecnicoPage(intervento: widget.intervento)),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                          textStyle: TextStyle(fontSize: 20),
-                          primary: Colors.red,
-                        ),
-                        child: Text(
-                          'Scannerizza QrCode',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AggiuntaManualeProdottiDDTPage(intervento: widget.intervento)),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                          textStyle: TextStyle(fontSize: 18),
-                          primary: Colors.red,
-                        ),
-                        child: Text(
-                          'Aggiungi prodotti manualmente',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AggiuntaNotaByTecnicoPage(intervento: widget.intervento, utente: widget.utente!)),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                          textStyle: TextStyle(fontSize: 20),
-                          primary: Colors.red,
-                        ),
-                        child: Text(
-                          'Lascia una nota',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      if(widget.intervento.utente?.id == widget.utente?.id)
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => InizioInterventoPage(intervento: widget.intervento, utente: widget.utente!)),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                            textStyle: TextStyle(fontSize: 20),
-                            primary: Colors.red,
-                          ),
-                          child: Text(
-                            'Inizia intervento',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => CompilazioneRapportinoPage(intervento: widget.intervento)),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                            textStyle: TextStyle(fontSize: 20),
-                            primary: Colors.red,
-                          ),
-                          child: Text(
-                            'Compila rapportino',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      SizedBox(height: 8),
-                      if(prodotti.isNotEmpty)
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => VerificaMaterialeAssegnatoPage(intervento: widget.intervento, utente: widget.utente!, relazioni:prodotti, ddt: finalDdt! )),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                            textStyle: TextStyle(fontSize: 20),
-                            primary: Colors.red,
-                          ),
-                          child: Text(
-                            'Materiale assegnato',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              if(widget.intervento.merce != null)
-                if(widget.intervento.merce?.preventivo == true)
-                  Center(
-                    child: ElevatedButton(
+                  ...allNote.map((nota) => ListTile(
+                    title: Text('${nota.utente?.nome} ${nota.utente?.cognome}'),
+                    subtitle: Text('${nota.nota}'),
+                  )),
+                ],
+              ),
+            SizedBox(height: 40),
+            Center(
+              child: Wrap(
+                spacing: 25,
+                runSpacing: 16,
+                children: [
+                  if (widget.intervento.merce == null)
+                    ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => CompilazionePreventivoMerceInRiparazionePage(merce: widget.intervento.merce!)),
+                          MaterialPageRoute(builder: (context) => ScannerQrCodeTecnicoPage(intervento: widget.intervento)),
                         );
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                         textStyle: TextStyle(fontSize: 20),
                         primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       child: Text(
-                        'Compila preventivo',
+                        'Scannerizza QrCode',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                  ),
-                SizedBox(height: 20),
-                if(widget.intervento.merce != null)
-                  Center(
-                    child: ElevatedButton(
+                  if (widget.intervento.merce == null)
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AggiuntaNotaByTecnicoPage(intervento: widget.intervento, utente: widget.utente!)),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        textStyle: TextStyle(fontSize: 20),
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        'Lascia una nota',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  if (widget.intervento.utente?.id == widget.utente?.id)
+                    if (widget.intervento.orario_inizio == null)
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => InizioInterventoPage(intervento: widget.intervento, utente: widget.utente!)),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          textStyle: TextStyle(fontSize: 20),
+                          primary: Colors.red,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Text(
+                          'Inizia intervento',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                  if(widget.intervento.concluso == false && widget.intervento.orario_inizio != null)
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CompilazioneRapportinoPage(intervento: widget.intervento)),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        textStyle: TextStyle(fontSize: 20),
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        'Compila rapportino',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  if (widget.intervento.concluso == true &&
+                      DateTime.now().difference(widget.intervento.orario_fine!).inHours < 24)
+                    ElevatedButton(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ModificaRelazioneRapportinoPage(intervento: widget.intervento)),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        textStyle: TextStyle(fontSize: 20),
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        'Modifica Rapportino',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => VerificaMaterialeNewPage(intervento: widget.intervento, utente: widget.utente! )),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        textStyle: TextStyle(fontSize: 20),
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: Text(
+                        'Materiale utilizzato',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  if(widget.intervento.merce!= null)
+                    if(widget.intervento.merce?.preventivo == true)
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CompilazionePreventivoMerceInRiparazionePage(merce: widget.intervento.merce!)),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          textStyle: TextStyle(fontSize: 20),
+                          primary: Colors.red,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Text(
+                          'Compila preventivo',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                  if(widget.intervento.merce!= null)
+                    ElevatedButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -567,18 +563,20 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                         padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                         textStyle: TextStyle(fontSize: 20),
                         primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       child: Text(
                         'Compilazione rapportino merce in riparazione',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                  )
-
-            ],
-          ),
+                ],
+              ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   Widget buildInfoRow({required String title, required String value}) {

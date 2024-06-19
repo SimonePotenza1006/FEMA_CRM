@@ -8,14 +8,18 @@ class RelazioneProdottiInterventoModel{
   DDTModel? ddt;
   InterventoModel? intervento;
   double? quantita;
+  bool? presenza_storico_utente;
+  String? seriale;
 
-  RelazioneProdottiInterventoModel({
+  RelazioneProdottiInterventoModel(
     this.id,
     this.prodotto,
     this.ddt,
     this.intervento,
-    this.quantita
-  });
+    this.quantita,
+    this.presenza_storico_utente,
+    this.seriale
+  );
 
   Map<String, dynamic> toMap(){
     return{
@@ -23,18 +27,20 @@ class RelazioneProdottiInterventoModel{
       'prodotto' : prodotto?.toMap(),
       'ddt': ddt?.toMap(),
       'intervento' : intervento?.toMap(),
-      'quantita' : quantita
+      'quantita' : quantita,
+      'presenza_storico_utente' : presenza_storico_utente,
+      'seriale' : seriale
     };
   }
 
-  factory RelazioneProdottiInterventoModel.fromMap(Map<String, dynamic> map){
-    return RelazioneProdottiInterventoModel(
-      id: map['id'],
-      prodotto: ProdottoModel.fromMap(map['prodotto']),
-      ddt: DDTModel.fromMap(map['ddt']),
-      intervento: InterventoModel.fromMap(map['intervento']),
-      quantita: map['quantita'],
-    );
+  RelazioneProdottiInterventoModel.fromMap(Map<String, dynamic> map){
+      id = map['id'];
+      map['prodotto'] != null ? ProdottoModel.fromMap(map['prodotto']) : null;
+      map['ddt'] != null ? DDTModel.fromMap(map['ddt']) : null;
+      map['intervento'] != null ? InterventoModel.fromMap(map['intervento']) : null;
+      quantita = map['quantita'];
+      presenza_storico_utente = map['presenza_storico_utente'];
+      seriale = map['seriale'];
   }
 
   Map<String, dynamic> toJson() =>{
@@ -42,16 +48,20 @@ class RelazioneProdottiInterventoModel{
     'prodotto' : prodotto?.toJson(),
     'ddt' : ddt?.toJson(),
     'intervento' : intervento?.toJson(),
-    'quantita' : quantita
+    'quantita' : quantita,
+    'presenza_storico_utente' : presenza_storico_utente,
+    'seriale' : seriale
   };
 
   factory RelazioneProdottiInterventoModel.fromJson(Map<String, dynamic> json){
     return RelazioneProdottiInterventoModel(
-      id : json['id'],
-      prodotto: ProdottoModel.fromJson(json['prodotto']),
-      ddt : DDTModel.fromJson(json['ddt']),
-      intervento: InterventoModel.fromJson(json['intervento']),
-      quantita: json['quantita']
+      json['id'],
+      json['prodotto'] != null ? ProdottoModel.fromJson(json['prodotto']) : null,
+      json['ddt'] != null ? DDTModel.fromJson(json['ddt']) : null,
+      json['intervento'] != null ? InterventoModel.fromJson(json['intervento']) : null,
+      json['quanita'],
+      json['presenza_storico_utente'],
+      json['seriale']
     );
   }
 }

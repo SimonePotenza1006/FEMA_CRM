@@ -473,7 +473,6 @@ class _DettaglioPreventivoByTecnicoPageState
           'data_accettazione': DateTime.now().toIso8601String(),
           'utente': widget.preventivo.utente?.toJson(),
           'agente': widget.preventivo.agente?.toJson(),
-          'prodotti': widget.preventivo.prodotti
         }),
       );
       if (response.statusCode == 201) {
@@ -517,7 +516,6 @@ class _DettaglioPreventivoByTecnicoPageState
               widget.preventivo.data_accettazione?.toIso8601String(),
           'utente': widget.preventivo.utente?.toJson(),
           'agente': widget.preventivo.agente?.toJson(),
-          'prodotti': widget.preventivo.prodotti
         }),
       );
       if (response.statusCode == 201) {

@@ -53,13 +53,24 @@ class _AggiuntaProdottoPreventivoPageState
         backgroundColor: Colors.red,
         actions: _buildActions(),
       ),
-      body: Column(
-        children: [
-          _buildSelectedProductsList(),
-          Expanded(
-            child: isSearching ? _buildFilteredProductList() : SizedBox(),
-          ),
-        ],
+      body:FutureBuilder(
+        future: Future.value(null),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Column(
+              children: [
+                _buildSelectedProductsList(),
+                Expanded( // or Flexible
+                  child: _buildFilteredProductList(),
+                ),
+              ],
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
       floatingActionButton: _buildFloatingActionButton(),
     );

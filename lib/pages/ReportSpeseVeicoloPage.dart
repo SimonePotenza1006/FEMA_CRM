@@ -5,6 +5,8 @@ import 'dart:convert';
 
 import '../model/SpesaVeicoloModel.dart';
 import '../model/TipologiaSpesaVeicoloModel.dart';
+import 'DettaglioSpesaVeicoloPage.dart';
+
 
 class ReportSpeseVeicoloPage extends StatefulWidget {
   const ReportSpeseVeicoloPage({Key? key}) : super(key: key);
@@ -22,6 +24,7 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
   bool _isSearchActive = false;
   String? _filterValue;
   bool _isFilterButtonPressed = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -51,25 +54,12 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
           ),
         )
             : Text(
-          'Report spese su veicolo',
+          'REPORT SPESE',
           style: TextStyle(color: Colors.white, fontSize: 20),
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
-          IconButton(
-            icon: _isSearchActive ? Icon(Icons.clear) : Icon(Icons.search),
-            color: Colors.white,
-            onPressed: () {
-              setState(() {
-                _isSearchActive = !_isSearchActive;
-                if (!_isSearchActive) {
-                  _searchController.clear();
-                  filterSpese('');
-                }
-              });
-            },
-          ),
           IconButton(
             icon: Icon(
               Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -82,82 +72,110 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+      body: Scrollbar(
+        thumbVisibility: true,
+        trackVisibility: true,
+        controller: _scrollController,
         child: SingleChildScrollView(
-          child: DataTable(
-            columnSpacing: 20,
-            columns: [
-              DataColumn(
-                  label: Text('Data', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(
-                  label: Text('Veicolo', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(
-                  label: Text('Tipologia spesa', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(
-                  label: Text('Fornitore carburante', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(
-                  label: Text('Importo', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(
-                  label: Text('Chilometraggio', style: TextStyle(fontWeight: FontWeight.bold))),
-              DataColumn(
-                  label: Text('Utente', style: TextStyle(fontWeight: FontWeight.bold))),
-            ],
-            rows: speseList.map((spesa) {
-              return DataRow(cells: [
-                DataCell(
-                    Center(
-                      child: Text(
-                        spesa.data != null
-                            ? DateFormat('yyyy-MM-dd').format(spesa.data!)
-                            : 'N/A',
-                      ),
-                    )
-                ),
-                DataCell(
-                    Center(
-                      child: Text(
-                        spesa.veicolo?.descrizione.toString() ?? 'N/A',
-                      ),
-                    )
-                ),
-                DataCell(
-                    Center(
-                      child: Text(
-                        spesa.tipologia_spesa?.descrizione.toString() ?? 'N/A',
-                      ),
-                    )
-                ),
-                DataCell(
-                    Center(
-                      child: Text(
-                        spesa.fornitore_carburante.toString() ?? 'N/A',
-                      ),
-                    )
-                ),
-                DataCell(
-                    Center(
-                      child: Text(
-                        spesa.importo.toString() + "€" ?? 'N/A',
-                      ),
-                    )
-                ),
-                DataCell(
-                    Center(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: DataTable(
+              columnSpacing: 20,
+              columns: [
+                DataColumn(
+                    label: Text('Data', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Veicolo', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Tipologia spesa', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Fornitore carburante', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Importo', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Chilometraggio', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(
+                    label: Text('Utente', style: TextStyle(fontWeight: FontWeight.bold))),
+              ],
+              rows: speseList.map((spesa) {
+                return DataRow(cells: [
+                  DataCell(
+                    InkWell(
+                      onTap: () => _handleRowTap(spesa),
+                      child: Center(
                         child: Text(
-                          spesa.km.toString() ?? 'N/A',
-                        )
-                    )
-                ),
-                DataCell(
-                    Center(
-                      child: Text(
-                          spesa.utente?.cognome.toString() ?? 'N/A'
+                          spesa.data != null
+                              ? DateFormat('yyyy-MM-dd').format(spesa.data!)
+                              : 'N/A',
+                        ),
                       ),
-                    )
-                ),
-              ]);
-            }).toList(),
+                    ),
+                  ),
+                  DataCell(
+                    InkWell(
+                      onTap: () => _handleRowTap(spesa),
+                      child: Center(
+                        child: Text(
+                          spesa.veicolo?.descrizione.toString() ?? 'N/A',
+                        ),
+                      ),
+                    ),
+                  ),
+                  DataCell(
+                      InkWell(
+                        onTap:  () => _handleRowTap(spesa),
+                        child: Center(
+                          child: Text(
+                            spesa.tipologia_spesa?.descrizione.toString() ?? 'N/A',
+                          ),
+                        ),
+                      )
+                  ),
+                  DataCell(
+                      InkWell(
+                        onTap:  () => _handleRowTap(spesa),
+                        child: Center(
+                          child: Text(
+                            spesa.fornitore_carburante.toString() ?? 'N/A',
+                          ),
+                        ),
+                      )
+                  ),
+                  DataCell(
+                      InkWell(
+                        onTap:  () => _handleRowTap(spesa),
+                        child: Center(
+                          child: Text(
+                            spesa.importo.toString() + "€" ?? 'N/A',
+                          ),
+                        ),
+                      )
+                  ),
+                  DataCell(
+                      InkWell(
+                          onTap:  () => _handleRowTap(spesa),
+                          child: Center(
+                              child: Text(
+                                spesa.km.toString() + " Km"?? 'N/A',
+                              )
+                          )
+                      )
+                  ),
+                  DataCell(
+                      InkWell(
+                          onTap:  () => _handleRowTap(spesa),
+                          child: Center(
+                            child: Text(
+                                spesa?.utente?.cognome.toString() ?? 'N/A'
+                            ),
+                          )
+                      )
+                  ),
+                ]);
+              }).toList(),
+            ),
           ),
         ),
       ),
@@ -257,9 +275,9 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
     setState(() {
       if (query.isNotEmpty) {
         speseList = originalSpeseList.where((spesa) {
-          final veicolo = spesa.veicolo?.descrizione ?? '';
-          final tipologia_spesa = spesa.tipologia_spesa?.descrizione ?? '';
-          final utente = spesa.utente?.nome ?? '';
+          final veicolo = spesa?.veicolo?.descrizione ?? '';
+          final tipologia_spesa = spesa?.tipologia_spesa?.descrizione ?? '';
+          final utente = spesa?.utente?.nome ?? '';
 
           return veicolo.toLowerCase().contains(query.toLowerCase()) ||
               tipologia_spesa.toLowerCase().contains(query.toLowerCase()) ||
@@ -275,32 +293,43 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              'Sommatoria degli importi per tipologia di spesa:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: tipologieList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final tipologia = tipologieList[index];
-                  final importoTotale = _calculateTotalAmount(tipologia.id != null ? int.parse(tipologia.id!) : 0); // Ensure id is converted to int and provide a default value if null
-                  return ListTile(
-                    title: Text(tipologia.descrizione ?? ''),
-                    subtitle: Text('Importo totale: $importoTotale €'),
-                  );
-                },
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 20),
+              Text(
+                'Sommatoria degli importi per tipologia di spesa:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-            ),
-          ],
+              SizedBox(height: 10),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: tipologieList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final tipologia = tipologieList[index];
+                    final importoTotale = _calculateTotalAmount(tipologia.id != null ? int.parse(tipologia.id!) : 0); // Ensure id is converted to int and provide a default value if null
+                    return ListTile(
+                      title: Text(tipologia.descrizione ?? ''),
+                      subtitle: Text('Importo totale: $importoTotale €'),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         );
       },
+    );
+  }
+
+  void _handleRowTap(SpesaVeicoloModel spesa) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DettaglioSpesaVeicoloPage(spesa: spesa),
+      ),
     );
   }
 

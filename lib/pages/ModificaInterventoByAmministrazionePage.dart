@@ -14,8 +14,6 @@ class ModificaInterventoByAmministrazionePage extends StatefulWidget{
 
 class _ModificaInterventoByAmministrazionePageState extends State<ModificaInterventoByAmministrazionePage> {
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold();

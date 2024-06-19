@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import '../model/RelazioneUtentiProdottiModel.dart';
 import '../model/UtenteModel.dart';
 import 'AggiuntaMerceStoricoUtentePage.dart';
@@ -72,18 +71,26 @@ class _DettaglioStoricoMerceUtentePageState extends State<DettaglioStoricoMerceU
             return Card(
               child: ListTile(
                 title: Text(
-                  allRelazioni[index].prodotto?.descrizione?.substring(0, 40)?? 'N/A',
+                  (allRelazioni[index].prodotto?.descrizione?.length ?? 0) > 50
+                      ? allRelazioni[index].prodotto!.descrizione!.substring(0, 50)
+                      : allRelazioni[index].prodotto?.descrizione ?? 'N/A',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Materiale: ${allRelazioni[index].materiale?? 'N/A'}'),
+                    Text('Materiale: ${allRelazioni[index].materiale ?? 'N/A'}'),
                     Text(
-                      'DDT: ${allRelazioni[index].ddt?.id?? 'N/A'}, data: ${DateFormat('dd/MM/yyyy').format(allRelazioni[index].data_creazione!)}',
+                      'DDT: ${allRelazioni[index].ddt?.id ?? 'N/A'}, data: ${DateFormat('dd/MM/yyyy').format(allRelazioni[index].data_creazione!)}',
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   ],
+                ),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    deleteRelazione(allRelazioni[index].id);
+                  },
                 ),
               ),
             );
@@ -91,6 +98,20 @@ class _DettaglioStoricoMerceUtentePageState extends State<DettaglioStoricoMerceU
         ),
       ),
     );
+  }
+
+  Future<void> deleteRelazione(String? id) async{
+    try{
+      final response = await http.delete(Uri.parse('$ipaddress/api/relazioneUtentiProdotti/$id'));
+      if(response.statusCode == 200){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nota eliminata con successo!')),
+        );
+        getRelazioni();
+      }
+    } catch(e){
+      print('Errore durante l\'eliminazione del prodotto: $e');
+    }
   }
 
   Future<void> getRelazioni() async {

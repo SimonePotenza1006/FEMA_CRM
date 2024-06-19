@@ -1,18 +1,15 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart'; // Importo il pacchetto per formattare le date
+import 'package:intl/intl.dart';
 import 'package:fema_crm/model/CommissioneModel.dart';
-
 import 'HomeFormAmministrazione.dart';
 import 'HomeFormTecnico.dart';
 
 class DettaglioCommissioneAmministrazionePage extends StatefulWidget {
   final CommissioneModel commissione;
 
-  const DettaglioCommissioneAmministrazionePage(
-      {Key? key, required this.commissione})
+  DettaglioCommissioneAmministrazionePage({Key? key, required this.commissione})
       : super(key: key);
 
   @override
@@ -26,75 +23,97 @@ class _DettaglioCommissioneAmministrazionePageState
 
   @override
   Widget build(BuildContext context) {
-    // Formattazione delle date
-    String formattedDataCreazione = widget.commissione.data_creazione != null
-        ? DateFormat('dd/MM/yyyy HH:mm')
-            .format(widget.commissione.data_creazione!)
-        : 'N/D';
-    String formattedData = widget.commissione.data != null
-        ? DateFormat('dd/MM/yyyy HH:mm').format(widget.commissione.data!)
-        : 'N/D';
+    String formattedDataCreazione = DateFormat('dd/MM/yyyy HH:mm')
+        .format(widget.commissione.data_creazione ?? DateTime.now());
+    String formattedData = DateFormat('dd/MM/yyyy HH:mm')
+        .format(widget.commissione.data ?? DateTime.now());
+    String? descrizione = widget.commissione.descrizione != null
+        ? widget.commissione.descrizione
+        : 'NESSUNA DESCRIZIONE DISPONIBILE';
+    String? nota = widget.commissione.note != null
+        ? widget.commissione.note
+        : 'NESSUNA NOTA DISPONIBILE';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dettaglio commissione',
-            style: const TextStyle(color: Colors.white)),
+        title: Text(
+          'Dettaglio commissione',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
-            Text(
-              'Data creazione: $formattedDataCreazione',
-              style: const TextStyle(fontSize: 20),
+            Card(
+              child: ListTile(
+                title: Text(
+                  'Data creazione:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  formattedDataCreazione,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
             ),
-            Text(
-              'Data: $formattedData',
-              style: const TextStyle(fontSize: 20),
+            SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                title: Text(
+                  'Data:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  formattedData,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
             ),
-            Text(
-              'Descrizione: ${widget.commissione.descrizione}',
-              style: const TextStyle(fontSize: 20),
+            SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                title: Text(
+                  'Descrizione:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  descrizione.toString(),
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
             ),
-            Text(
-              'Note: ${widget.commissione.note}',
-              style: const TextStyle(fontSize: 20),
-            )
+            SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                title: Text(
+                  'Note:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  nota.toString(),
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: () {
-            concludiCommissione();
-          },
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red, // Colore di sfondo rosso
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0), // Bordi arrotondati
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(17.0),
-            child: Text(
-              'Commissione conclusa',
-              style: TextStyle(
-                color: Colors.white, // Testo bianco
-                fontSize: 18.0,
-              ),
-            ),
-          ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: concludiCommissione,
+        backgroundColor: Colors.red,
+        child: Icon(
+          Icons.check,
+          color: Colors.white,
         ),
       ),
     );
   }
 
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('${ipaddress}/api/commissione');
+    final url = Uri.parse('$ipaddress/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
@@ -104,17 +123,17 @@ class _DettaglioCommissioneAmministrazionePageState
       'note': widget.commissione.note,
       'utente': widget.commissione.utente
     });
+
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
+
       if (response.statusCode == 201) {
         print('Commissione completata!');
-        // Torna alla pagina precedente
         Navigator.pop(context);
-        // Aggiorna le commissioni chiamando il metodo getAllCommissioniByUtente
         String userId = widget.commissione.utente.toString();
         Navigator.pushReplacement(
           context,

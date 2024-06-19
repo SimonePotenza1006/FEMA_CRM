@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/model/OrdinePerInterventoModel.dart';
 import 'package:fema_crm/pages/ReportMerceInRiparazionePage.dart';
 import 'package:fema_crm/pages/TimbraturaPage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,6 +17,8 @@ import '../model/InterventoModel.dart';
 import '../model/NotaTecnicoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
+import '../model/VeicoloModel.dart';
+import 'CalendarioPage.dart';
 import 'DettaglioCommissioneAmministrazionePage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
 import 'ImpostazioniPage.dart';
@@ -28,6 +32,7 @@ import 'ListiniPage.dart';
 import 'MagazzinoPage.dart';
 import 'MenuCommissioniPage.dart';
 import 'MenuMerceInRiparazionePage.dart';
+import 'MenuOrdiniFornitorePage.dart';
 import 'MenuSopralluoghiPage.dart';
 import 'RegistroCassaPage.dart';
 import 'ScannerQrCodeAmministrazionePage.dart';
@@ -49,8 +54,12 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(
       DateTime.now());
   List<NotaTecnicoModel> allNote = [];
+  List<VeicoloModel> allVeicoli = [];
   bool ingressoSaved = false;
   DateTime selectedDate = DateTime.now();
+  DateTime today = DateTime.now();
+  Map<String, bool> _publishedNotes = {};
+  List<OrdinePerInterventoModel> allOrdini = [];
 
   @override
   void didChangeDependencies() {
@@ -61,8 +70,166 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
   @override
   void initState() {
     super.initState();
-    saveIngresso();
-    getNote();
+    getAllVeicoli().then((_) {
+      checkScadenzeVeicoli().then((_) {
+        getNote();
+      });
+    });
+    getAllOrdini();
+    _scheduleGetAllOrdini();
+  }
+
+  Future<void> getAllOrdini() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddress/api/ordine');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<OrdinePerInterventoModel> ordini = [];
+        for(var item in jsonData){
+          var ordine = OrdinePerInterventoModel.fromJson(item);
+          if(ordine.presa_visione == false && ordine.ordinato == false && ordine.arrivato == false && ordine.consegnato == false){
+            ordini.add(ordine);
+          }
+          setState(() {
+            allOrdini = ordini;
+          });
+        }
+      }
+    } catch(e){
+      print('Errore getAllOrdini: $e');
+    }
+  }
+
+  void _scheduleGetAllOrdini() {
+    Timer.periodic(Duration(minutes: 10), (timer) {
+      getAllOrdini();
+    });
+  }
+
+  Future<void> getAllVeicoli() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<VeicoloModel> veicoli = [];
+        for (var item in jsonData) {
+          veicoli.add(VeicoloModel.fromJson(item));
+        }
+        setState(() {
+          allVeicoli = veicoli;
+        });
+      } else {
+        throw Exception('Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching agenti data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text('Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> checkScadenzeVeicoli() async {
+    for (var veicolo in allVeicoli) {
+      await checkScadenzeDate(veicolo);
+    }
+  }
+
+  Future<void> checkScadenzeDate(VeicoloModel veicolo) async {
+    // Controllo scadenza bollo
+    if (veicolo.data_scadenza_bollo!= null) {
+      final differenceBollo = veicolo.data_scadenza_bollo!.difference(today).inDays;
+      if (differenceBollo <= 30) {
+        final noteKey = '${veicolo.id}_bollo_${today.toIso8601String()}';
+        if (_publishedNotes.containsKey(noteKey)) {
+          return; // Note has already been published today
+        }
+        try {
+          final response = await http.post(
+            Uri.parse('$ipaddress/api/noteTecnico'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'utente': widget.userData.toMap(),
+              'data': DateTime.now().toIso8601String(),
+              'nota': "Il veicolo ${veicolo.descrizione} ha il bollo in scadenza tra ${differenceBollo} giorni!",
+            }),
+          );
+          print("Nota scadenza bollo creata!");
+          // Mark note as published today
+          _publishedNotes[noteKey] = true;
+        } catch (e) {
+          print("Errore nota scadenza bollo: $e");
+        }
+      }
+    }
+    // Controllo scadenza polizza
+    if (veicolo.data_scadenza_polizza!= null) {
+      final differencePolizza = veicolo.data_scadenza_polizza!.difference(today).inDays;
+      if (differencePolizza <= 30) {
+        final noteKey = '${veicolo.id}_polizza_${today.toIso8601String()}';
+        if (_publishedNotes.containsKey(noteKey)) {
+          return; // Note has already been published today
+        }
+        try {
+          final response = await http.post(
+            Uri.parse('$ipaddress/api/noteTecnico'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'utente': widget.userData.toMap(),
+              'data': DateTime.now().toIso8601String(),
+              'nota': "Il veicolo ${veicolo.descrizione} ha la polizza in scadenza tra ${differencePolizza} giorni!",
+            }),
+          );
+          print("Nota scadenza polizza creata!");
+          // Mark note as published today
+          _publishedNotes[noteKey] = true;
+        } catch (e) {
+          print("Errore nota scadenza polizza: $e");
+        }
+      }
+    }
+    // Controllo scadenza tagliando
+    if (veicolo.data_tagliando!= null) {
+      final differenceTagliando = today.difference(veicolo.data_tagliando!).inDays;
+      if (differenceTagliando >= 700) {
+        final noteKey = '${veicolo.id}_tagliando_${today.toIso8601String()}';
+        if (_publishedNotes.containsKey(noteKey)) {
+          return; // Note has already been published today
+        }
+        try {
+          final response = await http.post(
+            Uri.parse('$ipaddress/api/noteTecnico'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'utente': widget.userData.toMap(),
+              'data': DateTime.now().toIso8601String(),
+              'nota': "Il veicolo ${veicolo.descrizione} ha superato i 700 giorni dall'ultimo tagliando!",
+            }),
+          );
+          print("Nota promemoria tagliando creata!");
+          // Mark note as published today
+          _publishedNotes[noteKey] = true;
+        } catch (e) {
+          print("Errore nota promemoria tagliando: $e");
+        }
+      }
+    }
   }
 
   Future<List<CommissioneModel>> getAllCommissioniByUtente(
@@ -150,9 +317,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
         for (var interventoJson in responseData) {
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           // Aggiungi il filtro per interventi non conclusi
-          if (intervento.concluso == false) {
             allInterventiByUtente.add(intervento);
-          }
         }
         return allInterventiByUtente;
       } else {
@@ -323,6 +488,38 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                       }
                     },
                   ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    buildButton(
+                      icon: Icons.calendar_month_outlined,
+                      text: 'Calendario',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  CalendarioPage()),
+                        );
+                      },
+                    ),
+                    SizedBox(width: 20),
+                    buildButton(
+                      icon: Icons.snippet_folder_outlined,
+                      text: 'Ordini fornitore',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MenuOrdiniFornitorePage(utente: widget.userData),
+                          ),
+                        );
+                      },
+                      showBadge: true, // Add this parameter
+                    )
+                  ],
                 ),
                 SizedBox(height: 25),
                 Row(
@@ -525,18 +722,9 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                       },
                     ),
                     SizedBox(width: 20),
-                    buildButton(
-                      icon: Icons.snippet_folder_outlined,
-                      text : 'Ordini fornitore',
-                      onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) =>
-                        //       const MenuOrdiniFornitorePage()),
-                        // );
-                      }
-                    )
+                    //
+                    //
+                    //
                   ],
                 ),
                 SizedBox(height: 25),
@@ -570,6 +758,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 10.0),
                 FutureBuilder<List<InterventoModel>>(
                   future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
                   builder: (context, snapshot) {
@@ -586,41 +775,64 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                         itemCount: interventi.length,
                         itemBuilder: (context, index) {
                           InterventoModel intervento = interventi[index];
-                          return ListTile(
-                            title: Text(
-                                '${intervento.descrizione.toString()}'),
-                            subtitle: Text(intervento.cliente?.denominazione ?? ''),
-                            trailing: Column(
-                              children: [
-                                Text(
-                                  // Formatta la data secondo il tuo formato desiderato
-                                  intervento.data != null
-                                      ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                      : 'Data non disponibile',
-                                  style: TextStyle(
-                                      fontSize: 16), // Stile opzionale per la data
-                                ),
-                                Text(
-                                  intervento.orario_appuntamento != null
-                                      ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                      : 'Nessun orario di appuntamento',
-                                  style: TextStyle(
-                                      fontSize: 16
+                          Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
+                          TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+
+                          return Card(
+                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // aggiungi padding orizzontale
+                            elevation: 4, // aggiungi ombreggiatura
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            // aggiungi bordi arrotondati
+                            child: ListTile(
+                              title: Text(
+                                '${intervento.descrizione}',
+                                style: textStyle,
+                              ),
+                              subtitle: Text(
+                                intervento.cliente?.denominazione.toString()?? '',
+                                style: textStyle,
+                              ),
+                              trailing: Column(
+                                children: [
+                                  Text(
+                                    // Formatta la data secondo il tuo formato desiderato
+                                    intervento.data!= null
+                                        ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                        : 'Data non disponibile',
+                                    style: TextStyle(
+                                      fontSize: 16, // Stile opzionale per la data
+                                      color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      DettaglioInterventoByTecnicoPage(
+                                  Text(
+                                    intervento.orario_appuntamento!= null
+                                        ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                        : 'Nessun orario di appuntamento',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        DettaglioInterventoByTecnicoPage(
                                           utente: widget.userData,
-                                          intervento: intervento),
-                                ),
-                              );
-                            },
+                                          intervento: intervento,
+                                        ),
+                                  ),
+                                );
+                              },
+                              tileColor: backgroundColor,
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
                           );
                         },
                       );
@@ -629,6 +841,8 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     }
                   },
                 ),
+
+
                 FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                   future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                   builder: (context, snapshot) {
@@ -645,26 +859,36 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                         itemCount: relazioni.length,
                         itemBuilder: (context, index) {
                           RelazioneUtentiInterventiModel relazione = relazioni[index];
+                          Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
+                          TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
                           return ListTile(
                             title: Text(
-                                '${relazione.intervento?.descrizione}'),
-                            subtitle: Text(relazione.intervento?.cliente?.denominazione.toString()?? ''),
+                              '${relazione.intervento?.descrizione}',
+                              style: textStyle,
+                            ),
+                            subtitle: Text(
+                              relazione.intervento?.cliente?.denominazione.toString()?? '',
+                              style: textStyle,
+                            ),
                             trailing: Column(
                               children: [
                                 Text(
                                   // Formatta la data secondo il tuo formato desiderato
-                                  relazione.intervento?.data != null
+                                  relazione.intervento?.data!= null
                                       ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
                                       : 'Data non disponibile',
                                   style: TextStyle(
-                                      fontSize: 16), // Stile opzionale per la data
+                                    fontSize: 16, // Stile opzionale per la data
+                                    color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                  ),
                                 ),
                                 Text(
-                                  relazione.intervento?.orario_appuntamento != null
+                                  relazione.intervento?.orario_appuntamento!= null
                                       ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
                                       : 'Nessun orario di appuntamento',
                                   style: TextStyle(
-                                      fontSize: 16
+                                    fontSize: 16,
+                                    color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
                                   ),
                                 ),
                               ],
@@ -675,11 +899,13 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       DettaglioInterventoByTecnicoPage(
-                                          utente: widget.userData,
-                                          intervento: relazione.intervento!),
+                                        utente: widget.userData,
+                                        intervento: relazione.intervento!,
+                                      ),
                                 ),
                               );
                             },
+                            tileColor: backgroundColor,
                           );
                         },
                       );
@@ -688,6 +914,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     }
                   },
                 ),
+
                 const SizedBox(height: 50.0),
                 Center(
                   child: Text(
@@ -758,51 +985,67 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
     required IconData icon,
     required String text,
     required VoidCallback onPressed,
+    bool showBadge = false,
   }) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double textSize = screenWidth > 700 ? 26 : 12;
+    double textSize = 20; // Fissa dimensione del testo
+
     return Expanded(
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          primary: Colors.red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+      child: Card(
+        color: Colors.red,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
-        child: Padding(padding: EdgeInsets.all(1),
-        child:Column(
-          children: [
-            SizedBox(height: 25.h),
-            // Utilizzo di ScreenUtil per rendere l'intervallo responsive
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+        elevation: 10, // aggiungi ombreggiatura
+        child: InkWell(
+          onTap: onPressed,
+          child: Padding(
+            padding: EdgeInsets.all(8.0), // Aumenta il padding per evitare tagli
+            child: Column(
               children: [
-                Icon(
-                  icon,
-                  color: Colors.white,
-                  size: textSize,
-                ),
-                SizedBox(width: 2.w),
-                // Utilizzo di ScreenUtil per rendere lo spazio tra l'icona e il testo responsive
-                Text(
-                  text,
-                  style: TextStyle(
+                SizedBox(height: 25.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
                       color: Colors.white,
-                      fontSize: textSize // Rendi il testo responsive utilizzando ScreenUtil
-                  ),
+                      size: textSize,
+                    ),
+                    SizedBox(width: 10.0), // Aumenta la distanza tra icona e testo
+                    Text(
+                      text,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: textSize,
+                      ),
+                    ),
+                    // Add the badge only if showBadge is true
+                    if (showBadge && allOrdini.isNotEmpty)
+                      Container(
+                        margin: EdgeInsets.only(left: 15.0),
+                        padding: EdgeInsets.all(6.0),
+                        decoration: BoxDecoration(
+                          color: Colors.red[900],
+                          shape: BoxShape.circle,
+
+                        ),
+                        child: Text(
+                          allOrdini.length.toString(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
+                SizedBox(height: 25.h),
               ],
             ),
-            SizedBox(height: 25.h),
-            // Utilizzo di ScreenUtil per rendere l'intervallo responsive
-          ],
-        ),
+          ),
         ),
       ),
     );
   }
 }
-
-

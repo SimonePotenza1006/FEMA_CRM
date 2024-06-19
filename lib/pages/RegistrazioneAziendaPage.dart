@@ -92,196 +92,199 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                'Inserisci i dati richiesti per la registrazione di una nuova azienda',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: denominazioneController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'Denominazione',
-                hintText: 'Inserisci la denominazione',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  'Inserisci i dati richiesti per la registrazione di una nuova azienda',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: luogoLavoroController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'Luogo di lavoro',
-                hintText: 'Inserisci il luogo di lavoro',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: partitaIVAController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'Partita IVA',
-                hintText: 'Inserisci la partita IVA',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: denominazioneController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'Denominazione',
+                  hintText: 'Inserisci la denominazione',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: pecController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'PEC',
-                hintText: 'Inserisci l\'indirizzo PEC',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: recapitoFatturazioneController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'Recapito fatturazione elettronica',
-                hintText: 'Inserisci il recapito di fatturazione elettronica',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: luogoLavoroController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'Luogo di lavoro',
+                  hintText: 'Inserisci il luogo di lavoro',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: emailController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'Email',
-                hintText: 'Inserisci l\'indirizzo email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: telefonoController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'Telefono',
-                hintText: 'Inserisci il numero di telefono',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: partitaIVAController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'Partita IVA',
+                  hintText: 'Inserisci la partita IVA',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: sitoController,
-              onChanged: (_) => _updateAreFieldsFilled(),
-              decoration: InputDecoration(
-                labelText: 'Sito',
-                hintText: 'Inserisci il sito web',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(color: Colors.red),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: pecController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'PEC',
+                  hintText: 'Inserisci l\'indirizzo PEC',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Azione da eseguire quando viene premuto il pulsante "Reset"
-                    setState(() {
-                      denominazioneController.clear();
-                      luogoLavoroController.clear();
-                      partitaIVAController.clear();
-                      pecController.clear();
-                      recapitoFatturazioneController.clear();
-                      emailController.clear();
-                      sitoController.clear();
-                      _updateAreFieldsFilled();
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: recapitoFatturazioneController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'Recapito fatturazione elettronica',
+                  hintText: 'Inserisci il recapito di fatturazione elettronica',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: emailController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Inserisci l\'indirizzo email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: telefonoController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'Telefono',
+                  hintText: 'Inserisci il numero di telefono',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: sitoController,
+                onChanged: (_) => _updateAreFieldsFilled(),
+                decoration: InputDecoration(
+                  labelText: 'Sito',
+                  hintText: 'Inserisci il sito web',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      // Azione da eseguire quando viene premuto il pulsante "Reset"
+                      setState(() {
+                        denominazioneController.clear();
+                        luogoLavoroController.clear();
+                        partitaIVAController.clear();
+                        pecController.clear();
+                        recapitoFatturazioneController.clear();
+                        emailController.clear();
+                        sitoController.clear();
+                        _updateAreFieldsFilled();
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'Reset',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
-                  child: Text(
-                    'Reset',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: _areFieldsFilled ? () => createAzienda() : null,
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                  ElevatedButton(
+                    onPressed: _areFieldsFilled ? () => createAzienda() : null,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'Salva azienda',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
-                  child: Text(
-                    'Salva azienda',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

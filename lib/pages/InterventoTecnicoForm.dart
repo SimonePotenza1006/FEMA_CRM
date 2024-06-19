@@ -1,9 +1,16 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:fema_crm/model/InterventoModel.dart';
+import 'package:fema_crm/pages/VerificaMaterialeNewPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import '../model/CategoriaInterventoSpecificoModel.dart';
 import '../model/ClienteModel.dart';
+import '../model/DDTModel.dart';
 import '../model/DestinazioneModel.dart';
+import '../model/RelazioneDdtProdottiModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
@@ -41,6 +48,9 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   TextEditingController _descrizioneController = TextEditingController();
   TipologiaInterventoModel? _selectedTipologia;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  GlobalKey<SfSignaturePadState> _signaturePadKey =
+  GlobalKey<SfSignaturePadState>();
+  Uint8List? signatureBytes;
 
   @override
   void initState() {
@@ -146,214 +156,241 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inserimento Intervento Tecnico',
-            style: TextStyle(color: Colors.white)),
+        title: const Text('Inserimento Intervento Tecnico', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: Colors.red, // Imposta il colore di sfondo
+        backgroundColor: Colors.red,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-                'Data: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
-            ElevatedButton(
-              onPressed: _selezionaData,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red, // Imposta il colore di sfondo
+        child: SingleChildScrollView(  // Aggiunto SingleChildScrollView
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Data: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
+              ElevatedButton(
+                onPressed: _selezionaData,
+                style: ElevatedButton.styleFrom(primary: Colors.red),
+                child: const Text('Seleziona Data', style: TextStyle(color: Colors.white)),
               ),
-              child: const Text('Seleziona Data',
-                  style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(height: 20.0),
-            Row(
-              children: [
-                const Text('Intervento Concluso:',
-                    style: TextStyle(color: Colors.black)),
-                Checkbox(
-                  value: _interventoConcluso,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _interventoConcluso = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            DropdownButton<TipologiaInterventoModel>(
-              value: _selectedTipologia,
-              hint:
-                  Text('Seleziona tipologia di intervento'), // Testo di default
-              onChanged: (TipologiaInterventoModel? newValue) {
-                setState(() {
-                  _selectedTipologia = newValue;
-                  getCategoriaByTipologia(); // Carica le categorie di intervento specifiche
-                });
-              },
-              items: allTipologie
-                  .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                      (TipologiaInterventoModel value) {
-                return DropdownMenuItem<TipologiaInterventoModel>(
-                  value: value,
-                  child: Text(value.descrizione!),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-            // Dropdown per selezionare la categoria di intervento
-            DropdownButton<CategoriaInterventoSpecificoModel>(
-              value: selectedCategoria,
-              hint:
-                  Text('Seleziona categoria di intervento'), // Testo di default
-              onChanged: (CategoriaInterventoSpecificoModel? newValue) {
-                setState(() {
-                  selectedCategoria = newValue;
-                });
-              },
-              items: allCategorieByTipologia
-                  .map<DropdownMenuItem<CategoriaInterventoSpecificoModel>>(
-                      (CategoriaInterventoSpecificoModel value) {
-                return DropdownMenuItem<CategoriaInterventoSpecificoModel>(
-                  value: value,
-                  child: Text(value.descrizione!),
-                );
-              }).toList(),
-            ),
-            if (_interventoConcluso) // Mostra i bottoni solo se l'intervento è concluso
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              TextFormField(
+                controller: _descrizioneController,
+                decoration: const InputDecoration(labelText: 'Descrizione'),
+                onChanged: (value) {
+                  setState(() {
+                    _descrizione = value;
+                  });
+                },
+              ),
+              SizedBox(height: 15),
+              const SizedBox(height: 20.0),
+              Row(
                 children: [
-                  // Dropdown per selezionare il veicolo
-                  DropdownButton<VeicoloModel>(
-                    value: _selectedVeicolo,
-                    hint: Text('Seleziona veicolo'), // Testo di default
-                    onChanged: (VeicoloModel? newValue) {
+                  const Text('Intervento Concluso:', style: TextStyle(color: Colors.black)),
+                  Checkbox(
+                    value: _interventoConcluso,
+                    onChanged: (bool? value) {
                       setState(() {
-                        _selectedVeicolo = newValue;
-                      });
-                    },
-                    items: veicoliList.map<DropdownMenuItem<VeicoloModel>>(
-                        (VeicoloModel value) {
-                      return DropdownMenuItem<VeicoloModel>(
-                        value: value,
-                        child: Text(value.descrizione!),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _selezionaOrarioInizio,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red, // Imposta il colore di sfondo
-                    ),
-                    child: Text(
-                        'Orario Inizio: ${_orarioInizio.format(context)}',
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _selezionaOrarioFine,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red, // Imposta il colore di sfondo
-                    ),
-                    child: Text('Orario Fine: ${_orarioFine.format(context)}',
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    controller: _relazioneController,
-                    decoration: const InputDecoration(labelText: 'Rapportino'),
-                    onChanged: (value) {
-                      setState(() {
-                        _relazione = value;
+                        _interventoConcluso = value!;
                       });
                     },
                   ),
                 ],
               ),
-            const SizedBox(height: 20.0),
-            TextFormField(
-              controller: _descrizioneController,
-              decoration: const InputDecoration(labelText: 'Descrizione'),
-              onChanged: (value) {
-                setState(() {
-                  _descrizione = value;
-                });
-              },
-            ),
-            SizedBox(height: 15),
-            TextFormField(
-              controller: _notaController,
-              decoration: const InputDecoration(labelText: 'Nota'),
-              onChanged: (value) {
-                setState(() {
-                  _nota = value;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                _showClientiDialog();
-              },
-              child: SizedBox(
-                height: 50,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              SizedBox(height: 20),
+              DropdownButton<TipologiaInterventoModel>(
+                value: _selectedTipologia,
+                hint: Text('Seleziona tipologia di intervento'),
+                onChanged: (TipologiaInterventoModel? newValue) {
+                  setState(() {
+                    _selectedTipologia = newValue;
+                    getCategoriaByTipologia();
+                  });
+                },
+                items: allTipologie.map<DropdownMenuItem<TipologiaInterventoModel>>((TipologiaInterventoModel value) {
+                  return DropdownMenuItem<TipologiaInterventoModel>(
+                    value: value,
+                    child: Text(value.descrizione!),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 20),
+              if (_interventoConcluso)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      selectedCliente?.denominazione ?? 'Seleziona Cliente',
-                      style: TextStyle(fontSize: 16),
+                    DropdownButton<VeicoloModel>(
+                      value: _selectedVeicolo,
+                      hint: Text('Seleziona veicolo'),
+                      onChanged: (VeicoloModel? newValue) {
+                        setState(() {
+                          _selectedVeicolo = newValue;
+                        });
+                      },
+                      items: veicoliList.map<DropdownMenuItem<VeicoloModel>>((VeicoloModel value) {
+                        return DropdownMenuItem<VeicoloModel>(
+                          value: value,
+                          child: Text(value.descrizione!),
+                        );
+                      }).toList(),
                     ),
-                    Icon(Icons.arrow_drop_down),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _selezionaOrarioInizio,
+                      style: ElevatedButton.styleFrom(primary: Colors.red),
+                      child: Text('Orario Inizio: ${_orarioInizio.format(context)}', style: TextStyle(color: Colors.white)),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _selezionaOrarioFine,
+                      style: ElevatedButton.styleFrom(primary: Colors.red),
+                      child: Text('Orario Fine: ${_orarioFine.format(context)}', style: TextStyle(color: Colors.white)),
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _relazioneController,
+                      maxLines: null, // aggiungi questo parametro
+                      decoration: const InputDecoration(labelText: 'Rapportino'),
+                      onChanged: (value) {
+                        setState(() {
+                          _relazione = value;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 30),
+                    Text(
+                      'Inserisci la firma del cliente:',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Container(
+                                width: 700,
+                                height: 250,
+                                child: SfSignaturePad(
+                                  key: _signaturePadKey,
+                                  backgroundColor: Colors.white,
+                                  strokeColor: Colors.black,
+                                  minimumStrokeWidth: 2.0,
+                                  maximumStrokeWidth: 4.0,
+                                ),
+                              ),
+                              actions: <Widget>[
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Chiudi'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    final signatureImage = await _signaturePadKey.currentState!.toImage(pixelRatio: 3.0);
+                                    final data = await signatureImage.toByteData(format: ui.ImageByteFormat.png);
+                                    setState(() {
+                                      signatureBytes = data!.buffer.asUint8List();
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Salva'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: Center(
+                          child: signatureBytes != null
+                              ? Image.memory(signatureBytes!)
+                              : Text(
+                            'Tocca per aggiungere la firma',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
+              const SizedBox(height: 20.0),
+              TextFormField(
+                controller: _notaController,
+                decoration: const InputDecoration(labelText: 'Nota'),
+                onChanged: (value) {
+                  setState(() {
+                    _nota = value;
+                  });
+                },
               ),
-            ),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                _showDestinazioniDialog();
-              },
-              child: SizedBox(
-                height: 50,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      selectedDestinazione?.denominazione ??
-                          'Seleziona Destinazione',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Icon(Icons.arrow_drop_down),
-                  ],
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  _showClientiDialog();
+                },
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            Expanded(
-              child: Container(
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  _showDestinazioniDialog();
+                },
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedDestinazione?.denominazione ?? 'Seleziona Destinazione',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20.0),
+              Container(
                 alignment: Alignment.bottomCenter,
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    saveIntervento();
+                    if(_interventoConcluso == true){
+                      saveAndRedirect();
+                    } else {
+                      saveIntervento();
+                    }
                   },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // Imposta il colore di sfondo
-                  ),
-                  child: const Text('Salva Intervento',
-                      style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  child: const Text('Salva Intervento', style: TextStyle(color: Colors.white)),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
@@ -479,7 +516,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
   }
 
-  Future<void> saveIntervento() async {
+  Future<http.Response?> saveInterventoConcluso() async {
     try {
       // Inizializziamo le variabili per i valori da inviare
       DateTime? orarioInizioSalvato;
@@ -532,15 +569,71 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           'saldato': false,
           'note': _nota,
           'relazione_tecnico': _relazione,
-          'firma_cliente': null,
+          'firma_cliente': signatureBytes,
           'utente': utente,
           'cliente': selectedCliente?.toMap(),
           'veicolo': veicolo,
+          'merce' : null,
           'tipologia': _selectedTipologia?.toMap(),
-          'categoria_intervento_specifico': selectedCategoria?.toMap(),
+          'categoria_intervento_specifico': null,
           'tipologia_pagamento': null,
           'destinazione': selectedDestinazione?.toMap(),
+          'gruppo' : null,
         }),
+      );
+
+      // Restituiamo la risposta HTTP
+      return response;
+    } catch (e) {
+      print('Errore durante il salvataggio dell\'intervento: $e');
+      _showErrorDialog();
+      return null; // Restituiamo null in caso di errore
+    }
+  }
+
+
+  Future<void> saveAndRedirect() async {
+    final response = await saveInterventoConcluso();
+    if (response != null) {
+        final intervento = InterventoModel.fromJson(jsonDecode(response.body));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => VerificaMaterialeNewPage(intervento: intervento, utente: widget.userData)),
+        );
+      } else {
+        print('Errore durante il recupero del ddt');
+      }
+  }
+
+  Future<void> saveIntervento() async {
+    try {
+      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+        headers: {'Content-Type' : 'application/json'},
+        body: jsonEncode({
+          'data' : _dataOdierna.toIso8601String(),
+          'orario_appuntamento' : null,
+          'orario_inizio': null,
+          'orario_fine': null,
+          'descrizione' : _descrizioneController.text,
+          'importo_intervento': null,
+          'acconto' : null,
+          'assegnato': false,
+          'conclusione_parziale' : false,
+          'concluso' : false,
+          'saldato' : false,
+          'note' : _notaController.text,
+          'relazione_tecnico' : null,
+          'firma_cliente' : null,
+          'utente' : null,
+          'cliente' : selectedCliente?.toMap(),
+          'veicolo' : null,
+          'merce' : null,
+          'tipologia' : _selectedTipologia?.toMap(),
+          'categoria' : null,
+          'tipologia_pagamento' : null,
+          'destinazione' : selectedDestinazione?.toMap(),
+          'gruppo' : null,
+        })
       );
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -548,7 +641,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           content: Text('Intervento registrato con successo!'),
         ),
       );
-    } catch (e) {
+    } catch(e){
       print('Errore durante il salvataggio dell\'intervento: $e');
       _showErrorDialog();
     }

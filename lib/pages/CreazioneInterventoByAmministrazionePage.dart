@@ -152,11 +152,18 @@ class _CreazioneInterventoByAmministrazionePageState
       supportedLocales: [
         const Locale('it'),
       ],
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Inserimento Intervento Tecnico', style: TextStyle(color: Colors.white)),
           centerTitle: true,
           backgroundColor: Colors.red,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -232,6 +239,7 @@ class _CreazioneInterventoByAmministrazionePageState
                       const SizedBox(height: 20.0),
                       TextFormField(
                         controller: _descrizioneController,
+                        maxLines: null,
                         decoration: const InputDecoration(labelText: 'Descrizione'),
                         onChanged: (value) {
                           setState(() {
@@ -406,17 +414,6 @@ class _CreazioneInterventoByAmministrazionePageState
                 ),
               ],
             ),
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.red,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
           ),
         ),
       ),
@@ -674,6 +671,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'categoria_intervento_specifico': selectedCategoria?.toMap(),
             'tipologia_pagamento': null,
             'destinazione': selectedDestinazione?.toMap(),
+            'gruppo' : null
           }),
         );
         print("FINE PRIMO METODO: ${response.body}");

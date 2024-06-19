@@ -51,7 +51,7 @@ class MovimentiModel {
       'data': data != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(data!) : null,
       'dataCreazione' : dataCreazione != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(dataCreazione!) : null,
       'descrizione': descrizione.toString(),
-      'tipo_movimentazione': tipo_movimentazione,
+      'tipo_movimentazione': tipo_movimentazione.toString().split('.').last, // Convert enum to string
       'importo': importo,
       'utente': utente?.toJson(),
   };
@@ -80,6 +80,8 @@ class MovimentiModel {
       return TipoMovimentazione.Pagamento;
     } else if (tipoMovimentazione == 'Acconto') {
       return TipoMovimentazione.Acconto;
+    } else if (tipoMovimentazione == 'Prelievo'){
+      return TipoMovimentazione.Prelievo;
     } else {
       throw Exception('Valore non valido per TipoMovimentazione: $tipoMovimentazione');
     }
@@ -92,5 +94,6 @@ enum TipoMovimentazione {
   Entrata,
   Uscita,
   Acconto,
-  Pagamento
+  Pagamento,
+  Prelievo
 }

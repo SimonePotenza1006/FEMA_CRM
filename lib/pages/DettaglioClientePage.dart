@@ -1,5 +1,8 @@
+import 'package:fema_crm/model/PosizioneGPSModel.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:intl/intl.dart';
 import '../databaseHandler/DbHelper.dart';
 import '../model/ClienteModel.dart';
 import 'ListaDestinazioniClientePage.dart';
@@ -18,7 +21,33 @@ class DettaglioClientePage extends StatefulWidget {
 class _DettaglioClientePageState extends State<DettaglioClientePage> {
   DbHelper? dbHelper;
   List<ClienteModel> allClienti = [];
+  List<PosizioneGPSModel> allPosizioni = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+
+  @override
+  void initState() {
+    super.initState();
+    getPosizioni();
+  }
+
+  Future<void> getPosizioni() async{
+    try{
+      final response = await http.get(
+        Uri.parse('$ipaddress/api/posizioni/cliente/${widget.cliente.id}'));
+        var responseData = json.decode(response.body);
+        if(response.statusCode == 200){
+          List<PosizioneGPSModel> posizioni = [];
+          for(var item in responseData){
+            posizioni.add(PosizioneGPSModel.fromJson(item));
+          }
+          setState(() {
+            allPosizioni = posizioni;
+          });
+        }
+    } catch(e){
+      print('Errore durante il recupero delle posizioni: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +64,6 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Column(
-                  children: [
                     _buildInfoText('Indirizzo: ${widget.cliente.indirizzo}'),
                     _buildInfoText('Partita Iva: ${widget.cliente.partita_iva}'),
                     _buildInfoText('Cap: ${widget.cliente.cap}'),
@@ -53,11 +79,17 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
                     _buildInfoText('Email: ${widget.cliente.email}'),
                     _buildInfoText('PEC: ${widget.cliente.pec}'),
                     _buildInfoText('Note: ${widget.cliente.note}'),
+                    if(allPosizioni.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 12),
+                          Text('Ultime posizioni salvate dai tecnici:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          for(var posizione in allPosizioni)
+                            Text('${posizione.dataCreazione?.day}/${posizione.dataCreazione?.month}/${posizione.dataCreazione?.day} ${posizione.indirizzo}')
+                        ],
+                      )
                   ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -31,11 +32,15 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   final TextEditingController _importoController = TextEditingController();
   final TextEditingController _kmController = TextEditingController();
+  final TextEditingController _dataPolizzaController = TextEditingController();
+  final TextEditingController _dataBolloController = TextEditingController();
   VeicoloModel? selectedVeicolo;
   TipologiaSpesaVeicoloModel? selectedTipologia;
   String? selectedFornitore;
   XFile? pickedImage;
   DateTime data = DateTime.now();
+  DateTime? dataScadenzaPolizza;
+  DateTime? dataScadenzaBollo;
 
   @override
   void initState() {
@@ -67,140 +72,198 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
-        child: Form(
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
-                Text(
-                  'Compila tutti i campi per salvare la spesa',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 60),
-                DropdownButton<VeicoloModel>(
-                  value: selectedVeicolo,
-                  onChanged: (VeicoloModel? newValue) {
-                    setState(() {
-                      selectedVeicolo = newValue;
-                    });
-                  },
-                  items: allVeicoli.map((VeicoloModel veicolo) {
-                    return DropdownMenuItem<VeicoloModel>(
-                      value: veicolo,
-                      child: Text(veicolo.descrizione!), // Sostituisci 'nome' con il campo appropriato del tuo modello VeicoloModel
-                    );
-                  }).toList(),
-                  hint: Text('Veicolo'),
-                ),
-                SizedBox(height: 20),
-                DropdownButton<TipologiaSpesaVeicoloModel>(
-                  value: selectedTipologia,
-                  onChanged: (TipologiaSpesaVeicoloModel? newValue) {
-                    setState(() {
-                      selectedTipologia = newValue;
-                    });
-                  },
-                  items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
-                    return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
-                      value: tipologia,
-                      child: Text(tipologia.descrizione!),
-                    );
-                  }).toList(),
-                  hint: Text('Tipologia di spesa'),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  height: 50,
-                  child: DropdownButton<String>(
-                    value: selectedFornitore,
-                    onChanged: (newValue) {
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Form(
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20),
+                  DropdownButton<VeicoloModel>(
+                    value: selectedVeicolo,
+                    onChanged: (VeicoloModel? newValue) {
                       setState(() {
-                        selectedFornitore = newValue;
+                        selectedVeicolo = newValue;
                       });
                     },
-                    items: [
-                      'IP Via Europa',
-                      'Altro',
-                    ].map((categoria) {
-                      return DropdownMenuItem<String>(
-                        value: categoria,
-                        child: Text(categoria),
+                    items: allVeicoli.map((VeicoloModel veicolo) {
+                      return DropdownMenuItem<VeicoloModel>(
+                        value: veicolo,
+                        child: Text(veicolo.descrizione!),
                       );
                     }).toList(),
-                    hint: Text('Fornitore'),
+                    hint: Text('Veicolo'),
                   ),
-                ),
-                SizedBox(height: 20),
-                _buildTextFormField(
-                  _importoController,
-                  "Importo",
-                  "Inserisci l'importo della spesa",
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
-
-                SizedBox(height: 20),
-                _buildTextFormField(
-                  _kmController,
-                  "Chilometri",
-                  "Inserisci il chilometraggio",
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Scatta una foto:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                Center(
-                  child:
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.camera_alt),
-                        onPressed: () {
-                          takePicture();
-                        },
-                      ),
-                      if (pickedImage != null)
-                        Container(
-                          width: 50,
-                          height: 50,
-                          child: InkWell(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    child: Image.file(
-                                      File(pickedImage!.path),
-                                      fit: BoxFit.contain,
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            child: Image.file(File(pickedImage!.path)),
+                  SizedBox(height: 20),
+                  DropdownButton<TipologiaSpesaVeicoloModel>(
+                    value: selectedTipologia,
+                    onChanged: (TipologiaSpesaVeicoloModel? newValue) {
+                      setState(() {
+                        selectedTipologia = newValue;
+                      });
+                    },
+                    items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
+                      return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
+                        value: tipologia,
+                        child: Text(tipologia.descrizione!),
+                      );
+                    }).toList(),
+                    hint: Text('Tipologia di spesa'),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    height: 50,
+                    child: DropdownButton<String>(
+                      value: selectedFornitore,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedFornitore = newValue;
+                        });
+                      },
+                      items: [
+                        'IP Via Europa',
+                        'Altro',
+                      ].map((categoria) {
+                        return DropdownMenuItem<String>(
+                          value: categoria,
+                          child: Text(categoria),
+                        );
+                      }).toList(),
+                      hint: Text('Fornitore'),
+                    ),
+                  ),
+                  if (selectedTipologia?.descrizione == "Polizza")
+                    Column(
+                      children: [
+                        SizedBox(height: 20),
+                        TextFormField(
+                          controller: _dataPolizzaController,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            labelText: "Data nuova scadenza polizza",
+                            hintText: "Seleziona la nuova data di scadenza della polizza",
                           ),
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: dataScadenzaPolizza ?? DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2101),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                dataScadenzaPolizza = pickedDate;
+                                _dataPolizzaController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                              });
+                            }
+                          },
                         ),
-                    ],
+                        SizedBox(height: 20),
+
+                      ],
+                    ),
+                  if (selectedTipologia?.descrizione == "Bollo")
+                    Column(
+                      children: [
+                        SizedBox(height: 20),
+                        TextFormField(
+                          controller: _dataBolloController,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            labelText: "Data nuova scadenza bollo",
+                            hintText: "Seleziona la nuova data di scadenza del bollo",
+                          ),
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: dataScadenzaBollo ?? DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2101),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                dataScadenzaBollo = pickedDate;
+                                _dataBolloController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  SizedBox(height: 20),
+                  _buildTextFormField(
+                    _importoController,
+                    "Importo",
+                    "Inserisci l'importo della spesa",
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (pickedImage != null) {
+                  SizedBox(height: 20),
+                  if(selectedTipologia?.descrizione == "Polizza")
+                    Center(
+                      child: Text("Inserire un chilometraggio qualsiasi, il sistema recupererà il precedente record!"),
+                    ),
+                  _buildTextFormField(
+                    _kmController,
+                    "Chilometri",
+                    "Inserisci il chilometraggio",
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Scatta una foto:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Center(
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.camera_alt),
+                          onPressed: () {
+                            takePicture();
+                          },
+                        ),
+                        if (pickedImage != null)
+                          Container(
+                            width: 50,
+                            height: 50,
+                            child: InkWell(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Container(
+                                      child: Image.file(
+                                        File(pickedImage!.path),
+                                        fit: BoxFit.contain,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Image.file(File(pickedImage!.path)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      //if (pickedImage != null) {
                       checkScadenze();
-                      saveSpesa();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    onPrimary: Colors.white,
-                    textStyle: TextStyle(fontWeight: FontWeight.bold),
+                      saveImmagine();
+                      //}
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      onPrimary: Colors.white,
+                      textStyle: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    child: Text('Salva spesa'),
                   ),
-                  child: Text('Salva spesa'),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -300,6 +363,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   }
 
   Future<http.Response?> saveNewInfoVeicolo() async{
+    print("Step 2 save Info");
     if(selectedTipologia?.descrizione == "Tagliando"){
       try{
         final response = await http.post(
@@ -370,6 +434,41 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         print('Qualcosa non va con il salvataggio dei dati dell\'inversione: $e');
         return null;
       }
+    } else if(selectedTipologia?.descrizione == "Polizza") {
+      try{
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/veicolo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': selectedVeicolo?.id,
+            'descrizione' : selectedVeicolo?.descrizione,
+            'proprietario' : selectedVeicolo?.proprietario,
+            'chilometraggio_attuale' : selectedVeicolo?.chilometraggio_attuale,
+            'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
+            'data_scadenza_polizza' : dataScadenzaPolizza?.toIso8601String(),
+            'data_tagliando' : selectedVeicolo?.data_tagliando?.toIso8601String(),
+            'chilometraggio_ultimo_tagliando' : selectedVeicolo?.chilometraggio_ultimo_tagliando,
+            'soglia_tagliando' : selectedVeicolo?.soglia_tagliando,
+            'data_revisione' : selectedVeicolo?.data_revisione?.toIso8601String(),
+            'data_inversione_gomme' : DateTime.now().toIso8601String(),
+            'chilometraggio_ultima_inversione' : int.parse(_kmController.text.toString()),
+            'soglia_inversione' : selectedVeicolo?.soglia_inversione,
+            'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+          }),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Record relativi all\'inversione delle gomme salvati correttamente!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+        return response;
+      } catch(e){
+        print('Qualcosa non va con il salvataggio dei dati dell\'inversione: $e');
+        return null;
+      }
     } else if(selectedTipologia?.descrizione == "Sostituzione gomme"){
       try{
         final response = await http.post(
@@ -403,6 +502,41 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         return response;
       } catch(e){
         print('Qualcosa non va con il salvataggio dei dati della sostituzione: $e');
+        return null;
+      }
+    } else if (selectedTipologia?.descrizione == "Bollo"){
+      try{
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/veicolo'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': selectedVeicolo?.id,
+            'descrizione' : selectedVeicolo?.descrizione,
+            'proprietario' : selectedVeicolo?.proprietario,
+            'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
+            'data_scadenza_bollo' : dataScadenzaBollo?.toIso8601String(),
+            'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
+            'data_tagliando' : selectedVeicolo?.data_tagliando?.toIso8601String(),
+            'chilometraggio_ultimo_tagliando' : selectedVeicolo?.chilometraggio_ultimo_tagliando,
+            'soglia_tagliando' : selectedVeicolo?.soglia_tagliando,
+            'data_revisione' : selectedVeicolo?.data_revisione?.toIso8601String(),
+            'data_inversione_gomme' : selectedVeicolo?.data_inversione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_inversione' : selectedVeicolo?.chilometraggio_ultima_inversione,
+            'soglia_inversione' : selectedVeicolo?.soglia_inversione,
+            'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
+            'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+          }),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Record relativi alla revisione del veicolo salvati correttamente!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+        return response;
+      } catch(e){
+        print('Qualcosa non va con il salvataggio dei dati della revisione: $e');
         return null;
       }
     } else if (selectedTipologia?.descrizione == "Revisione"){
@@ -478,98 +612,97 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
     }
   }
 
-  Future<void> checkScadenze() async{
+  Future<void> checkScadenze() async {
+    print("Step 1 check");
     final data = await saveNewInfoVeicolo();
     try {
-      if(data == null){
+      print("Step 3 scadenze");
+      if (data == null) {
         throw Exception('Dati del veicolo non disponibili.');
       } else {
         final veicolo = VeicoloModel.fromJson(jsonDecode(data.body));
         var differenza_sostituzione_gomme = int.parse(veicolo.chilometraggio_attuale.toString()) - int.parse(veicolo.chilometraggio_ultima_sostituzione.toString());
         var differenza_inversione_gomme = int.parse(veicolo.chilometraggio_attuale.toString()) - int.parse(veicolo.chilometraggio_ultima_inversione.toString());
         var differenza_tagliando = int.parse(veicolo.chilometraggio_attuale.toString()) - int.parse(veicolo.chilometraggio_ultimo_tagliando.toString());
-        if(differenza_sostituzione_gomme >= (int.parse(veicolo.soglia_sostituzione.toString()) - 100)){
-          try{
+
+        if (differenza_sostituzione_gomme >= (int.parse(veicolo.soglia_sostituzione.toString()) - 100)) {
+          try {
             final response = await http.post(
               Uri.parse('$ipaddress/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
-                'utente' : widget.utente.toMap(),
-                'data' : DateTime.now().toIso8601String(),
-                'nota' : "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima sostituzione gomme!",
+                'utente': widget.utente.toMap(),
+                'data': DateTime.now().toIso8601String(),
+                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima sostituzione gomme!",
               }),
             );
             print("Nota sostituzione gomme creata!");
-          } catch(e){
+          } catch (e) {
             print("Errore nota sostituzione : $e");
           }
-        } else if(differenza_inversione_gomme >= (int.parse(veicolo.soglia_inversione.toString()) - 100)){
-          try{
+        }
+
+        if (differenza_inversione_gomme >= (int.parse(veicolo.soglia_inversione.toString()) - 100)) {
+          try {
             final response = await http.post(
               Uri.parse('$ipaddress/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
-                'utente' : widget.utente.toMap(),
-                'data' : DateTime.now().toIso8601String(),
-                'nota' : "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima inversione gomme!",
+                'utente': widget.utente.toMap(),
+                'data': DateTime.now().toIso8601String(),
+                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima inversione gomme!",
               }),
             );
             print("Nota inversione gomme creata!");
-          } catch(e){
+          } catch (e) {
             print("Errore nota inversione : $e");
           }
-        } else if(differenza_tagliando >= (int.parse(veicolo.soglia_tagliando.toString()) - 100)){
-          try{
+        }
+
+        if (differenza_tagliando >= (int.parse(veicolo.soglia_tagliando.toString()) - 100)) {
+          try {
             final response = await http.post(
               Uri.parse('$ipaddress/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
-                'utente' : widget.utente.toMap(),
-                'data' : DateTime.now().toIso8601String(),
-                'nota' : "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima del prossimo tagliando!",
+                'utente': widget.utente.toMap(),
+                'data': DateTime.now().toIso8601String(),
+                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima del prossimo tagliando!",
               }),
             );
-            print("Nota tagliando gomme creata!");
-          } catch(e){
+            print("Nota tagliando creata!");
+          } catch (e) {
             print("Errore nota tagliando : $e");
           }
         }
       }
-    } catch(e){
+    } catch (e) {
       print('Erroreee: $e');
     }
   }
 
-  Future<void> saveSpesa() async {
+  Future<http.Response?> saveSpesa() async {
+    late http.Response response;
     try {
-      if (pickedImage != null) {
-        final response = await http.post(
-          Uri.parse('$ipaddress/api/spesaVeicolo'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'data': DateTime.now().toIso8601String(),
-            'km': _kmController.text,
-            'importo': _importoController.text,
-            'fornitore_carburante': selectedFornitore,
-            'tipologia_spesa': selectedTipologia?.toMap(),
-            'veicolo': selectedVeicolo?.toMap(),
-            'utente': widget.utente.toMap(),
-          }),
-
-        );
-        print(response.body.toString());
-        if (response.statusCode == 201) {
-          if (pickedImage != null) {
-            // Converti XFile in File
-            final file = File(pickedImage!.path);
-            // Chiamata al metodo per il caricamento dell'immagine
-            saveImageSpesaVeicolo(file);
-          }
-        }
-      }
+      response = await http.post(
+        Uri.parse('$ipaddress/api/spesaVeicolo'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data': DateTime.now().toIso8601String(),
+          'km': _kmController.text,
+          'importo': _importoController.text,
+          'fornitore_carburante': selectedFornitore,
+          'tipologia_spesa': selectedTipologia?.toMap(),
+          'veicolo': selectedVeicolo?.toMap(),
+          'utente': widget.utente.toMap(),
+        }),
+      );
+      print(response.body.toString());
+      return response;
     } catch (e) {
       print('Errore durante il salvataggio della spesa: $e');
     }
+    return null;
   }
 
   Future<void> getAllSpese() async{
@@ -652,34 +785,45 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
 
 
   // Utilizzo della funzione per comprimere l'immagine prima di caricarla
-  Future<void> saveImageSpesaVeicolo(File imageFile) async {
+  Future<void> saveImmagine() async {
+    final data = await saveSpesa();
     try {
-      var request = http.MultipartRequest(
+      if(data == null){
+        throw Exception('Dati del sopralluogo non disponibili.');
+      }
+      final spesa = SpesaVeicoloModel.fromJson(jsonDecode(data.body));
+      try{
+        if (spesa.idSpesaVeicolo == null) {
+          throw Exception('Id spesa veicolo is null');
+        }
+        if (spesa.idSpesaVeicolo.toString().isEmpty ||!spesa.idSpesaVeicolo.toString().trim().contains(RegExp(r'^[0-9]+$'))) {
+          throw Exception('Id spesa veicolo is not a valid number');
+        }
+        var request = http.MultipartRequest(
           'POST',
-          Uri.parse(
-              '$ipaddress/api/immagine/veicolo/${int.parse(selectedVeicolo!.id.toString())}'));
-      // Aggiungi il file come parte della richiesta chiamata "spesa"
-      request.files.add(
+          Uri.parse('$ipaddress/api/immagine/spesa/${int.parse(spesa.idSpesaVeicolo.toString())}'),
+        );
+        request.files.add(
           await http.MultipartFile.fromPath(
-              'veicolo',
-              imageFile.path,
-              contentType: MediaType('image', 'jpeg')
-          ));
-      print('${int.parse(selectedVeicolo!.id.toString())}');
-      print('Percorso del file: ${imageFile.path}');
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        print('File inviato con successo');
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Spesa su veicolo salvata!!'),
-            duration: Duration(seconds: 3), // Durata dello Snackbar
+            'spesa', // Field name
+            pickedImage!.path, // File path
+            contentType: MediaType('image', 'jpeg'),
           ),
         );
-
-      } else {
-        print('Errore durante l\'invio del file: ${response.statusCode}');
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          print('File inviato con successo');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Spesa registrata!'),
+            ),
+          );
+        } else {
+          print('Errore durante l\'invio del file: ${response.statusCode}');
+        }
+        Navigator.pop(context);
+      } catch (e) {
+        print('Errore durante l\'invio del file: $e');
       }
     } catch (e) {
       print('Errore durante l\'invio del file: $e');

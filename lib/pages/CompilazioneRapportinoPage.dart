@@ -94,7 +94,6 @@ class _CompilazioneRapportinoPageState
     );
   }
 
-
   Widget _buildImagePreview() {
     return SizedBox(
       height: 200,
@@ -422,6 +421,12 @@ class _CompilazioneRapportinoPageState
           }));
       if (response.statusCode == 201) {
         print('EVVAIIIIIIII');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Rapportino salvato, attendere il caricamento delle foto'),
+            duration: Duration(seconds: 5),
+          ),
+        );
         if (usernameController.text.isNotEmpty &&
             passwordController.text.isNotEmpty) {
           saveCredenziali();
@@ -468,8 +473,7 @@ class _CompilazioneRapportinoPageState
                 content: Text('Rapportino registrato!'),
               ),
             );
-            Navigator.pop(context);
-            Navigator.pop(context);
+
           } else {
             print('Errore durante l\'invio del file: ${response.statusCode}');
           }
@@ -478,7 +482,8 @@ class _CompilazioneRapportinoPageState
           print('Errore: Il percorso del file non è valido');
         }
       }
-      pickedImages.clear();
+      Navigator.pop(context);
+      Navigator.pop(context);
     } catch (e) {
       print('Errore durante la chiamata HTTP: $e');
     }

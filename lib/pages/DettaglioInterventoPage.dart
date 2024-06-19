@@ -1,5 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:fema_crm/model/DDTModel.dart';
 import 'package:fema_crm/model/NotaTecnicoModel.dart';
+import 'package:fema_crm/model/RelazioneDdtProdottiModel.dart';
+import 'package:fema_crm/model/RelazioneProdottiInterventoModel.dart';
 import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -9,6 +13,8 @@ import 'package:intl/intl.dart';
 import '../model/InterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/RuoloUtenteModel.dart';
+import 'AggiuntaManualeProdottiDDTPage.dart';
+import 'GalleriaFotoInterventoPage.dart';
 import 'PDFInterventoPage.dart';
 
 class DettaglioInterventoPage extends StatefulWidget {
@@ -26,22 +32,53 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
   List<NotaTecnicoModel> allNote = [];
   List<UtenteModel> allUtenti = [];
+  List<RelazioneDdtProdottoModel> prodottiDdt = [];
   TimeOfDay _selectedTimeAppuntamento = TimeOfDay.now();
-
+  List<RelazioneProdottiInterventoModel> allProdotti = [];
   TimeOfDay _selectedTime = TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _selectedTime2 = TimeOfDay(hour: 0, minute: 0);
 
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  Future<List<Uint8List>>? _futureImages;
 
+  
+  
   @override
   void initState() {
     super.initState();
-
+    getProdottiByIntervento();
     getRelazioni();
     getNoteByIntervento();
+    getProdottiDdt();
     _fetchUtenti();
+    _futureImages = fetchImages();
+  }
+
+  Future<List<Uint8List>> fetchImages() async {
+    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    http.Response? response;
+    try {
+      response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final images = jsonData.map<Uint8List>((imageData) {
+          final base64String = imageData['imageData'];
+          final bytes = base64Decode(base64String);
+          return bytes.buffer.asUint8List();
+        }).toList();
+        return images; // no need to wrap with Future
+      } else {
+        throw Exception('Errore durante la chiamata al server: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata al server: $e');
+      if (response!= null) {
+        //print('Risposta del server: ${response.body}');
+      }
+      throw e; // rethrow the exception
+    }
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -70,6 +107,21 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime selectedDate = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        widget.intervento.data = picked;
+      });
+    }
+  }
+
   Future<void> _selectTime2(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
@@ -83,6 +135,73 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
+  Future<http.Response?> getDDTByIntervento() async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      if(response.statusCode == 200){
+        print('DDT recuperato');
+        return response;
+      } else {
+        print('DDT non presente');
+        return null;
+      }
+    } catch(e){
+      print('Errore nel recupero del DDT: $e');
+      return null;
+    }
+  }
+
+  Future<void> getProdottiDdt() async {
+    final data = await getDDTByIntervento();
+    try{
+       if(data == null){
+         throw Exception('Dati del DDT non disponibili.');
+       } else {
+         final ddt = DDTModel.fromJson(jsonDecode(data.body));
+         try{
+           final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+           var responseData = json.decode(response.body);
+           if(response.statusCode == 200){
+             List<RelazioneDdtProdottoModel> prodotti = [];
+             for(var item in responseData){
+               prodotti.add(RelazioneDdtProdottoModel.fromJson(item));
+             }
+             setState(() {
+               prodottiDdt = prodotti;
+             });
+           }
+         } catch(e){
+           print('Errore 1 nel recupero delle relazioni: $e');
+         }
+       }
+    } catch(e) {
+      print('Errore 2 nel recupero delle relazioni: $e');
+    }
+  }
+
+  Future<void> getProdottiByIntervento() async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      var responseData = json.decode(response.body);
+      if(response.statusCode == 200){
+        List<RelazioneProdottiInterventoModel> prodotti = [];
+        for(var item in responseData){
+          prodotti.add(RelazioneProdottiInterventoModel.fromJson(item));
+        }
+        setState(() {
+          allProdotti = prodotti;
+        });
+      } else {
+        throw Exception('Errore durante il recupero dei prodotti');
+      }
+    } catch(e){
+      throw Exception('Errore durante il recupero dei prodotti: $e');
+    }
+  }
+
+  late double totalePrezzoFornitore = allProdotti.fold(0.0, (sum, relazione) {
+    return sum + (relazione.prodotto?.prezzo_fornitore ?? 0.0);
+  });
 
   Future<void> getNoteByIntervento() async{
     try{
@@ -237,406 +356,554 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Wrap(
           children: [
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Informazioni di base',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  SizedBox(height: 10),
-                  buildInfoRow(
-                    title: 'ID intervento',
-                    value: widget.intervento.id!,
-                  ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Data creazione',
-                    value: formatDate(widget.intervento.data_apertura_intervento),
-                  ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Data accordata',
-                    value: formatDate(widget.intervento.data),
-                  ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                      title: 'Orario appuntamento',
-                      value: formatTime(widget.intervento.orario_appuntamento),
-                  ),
-                  SizedBox(height: 15),
-                  if(widget.intervento.orario_appuntamento == null)
-                    Container(
-                      decoration: BoxDecoration(
-
-                      ),
-                      width: 170,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          _selectTimeAppuntamento(context);
-                        },
-                        child: Text(
-                          'Inserisci orario appuntamento',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Informazioni di base',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
-                        backgroundColor: Colors.red,
-
                       ),
-                    ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Orario Inizio',
-                    value: formatTime(widget.intervento.orario_inizio),
-                  ),
-                  if(widget.intervento.orario_inizio == null)
-                    Center(
-                      child: InkWell(
-                        onTap: () => _selectTime(context),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.access_time),
-                            SizedBox(width: 8),
-                            Text(
-                              _selectedTime.format(context),
-                              style: TextStyle(fontSize: 16),
+                      SizedBox(height: 10),
+                      buildInfoRow(
+                        title: 'ID intervento',
+                        value: widget.intervento.id!,
+                      ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Data creazione',
+                        value: formatDate(widget.intervento.data_apertura_intervento),
+                      ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Data accordata',
+                        value: formatDate(widget.intervento.data),
+                      ),
+                      SizedBox(height: 15),
+                      Container(
+                        width: 170,
+                        child: FloatingActionButton(
+                          onPressed: (){
+                            _selectDate(context);
+                          },
+                          heroTag: "Tag3",
+                          child: Text(
+                            'Inserisci data intervento',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Orario appuntamento',
+                        value: formatTime(widget.intervento.orario_appuntamento),
+                      ),
+                      SizedBox(height: 15),
+                        Container(
+                          decoration: BoxDecoration(
+
+                          ),
+                          width: 170,
+                          child: FloatingActionButton(
+                            heroTag: "Tag2",
+                            onPressed: () {
+                              _selectTimeAppuntamento(context);
+                            },
+                            child: Text(
+                              'Inserisci orario appuntamento',
+                              style: TextStyle(color: Colors.white, fontSize: 12),
                             ),
+                            backgroundColor: Colors.red,
+
+                          ),
+                        ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Orario Inizio',
+                        value: formatTime(widget.intervento.orario_inizio),
+                      ),
+                      if(widget.intervento.orario_inizio == null)
+                        Center(
+                          child: InkWell(
+                            onTap: () => _selectTime(context),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.access_time),
+                                SizedBox(width: 8),
+                                Text(
+                                  _selectedTime.format(context),
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Orario Fine',
+                        value: formatTime(widget.intervento.orario_fine),
+                      ),
+                      if(widget.intervento.orario_fine == null)
+                        Center(
+                          child: InkWell(
+                            onTap: () => _selectTime2(context),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.access_time),
+                                SizedBox(width: 8),
+                                Text(
+                                  _selectedTime2.format(context),
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                          title: 'Cliente',
+                          value: widget.intervento.cliente?.denominazione ?? 'N/A'),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Descrizione',
+                        value: widget.intervento.descrizione ?? 'N/A',
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: descrizioneController,
+                        decoration: InputDecoration(
+                          labelText: 'Descrizione',
+                          hintText: 'Aggiungi una descrizione',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height : 15),
+                      buildInfoRow(
+                        title: 'Indirizzo destinazione',
+                        value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
+                      ),
+                      SizedBox(height : 15),
+                      buildInfoRow(
+                        title: 'Cellulare destinazione',
+                        value: widget.intervento.destinazione?.cellulare ?? 'N/A',
+                      ),
+                      SizedBox(height : 15),
+                      buildInfoRow(
+                        title: 'Telefono destinazione',
+                        value: widget.intervento.destinazione?.telefono ?? 'N/A',
+                      ),
+                      SizedBox(height : 15),
+                      buildInfoRow(
+                        title: 'Indirizzo cliente',
+                        value: widget.intervento.cliente?.indirizzo ?? 'N/A',
+                      ),
+                      SizedBox(height : 15),
+                      buildInfoRow(
+                        title: 'Telefono cliente',
+                        value: widget.intervento.cliente?.telefono ?? 'N/A',
+                      ),
+                      SizedBox(height : 15),
+                      buildInfoRow(
+                        title: 'Cellulare cliente',
+                        value: widget.intervento.cliente?.cellulare ?? 'N/A',
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                if(prodottiDdt.isEmpty)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AggiuntaManualeProdottiDDTPage(intervento: widget.intervento)),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                      textStyle: TextStyle(fontSize: 18),
+                      primary: Colors.red,
+                    ),
+                    child: Text(
+                      'Crea DDT',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                SizedBox(height: 16),
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Informazioni sull\'intervento',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      buildInfoRow(
+                        title: 'Importo Intervento',
+                        value: widget.intervento.importo_intervento?.toString() ?? 'N/A',
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: importoController,
+                        decoration: InputDecoration(
+                          labelText: 'Importo',
+                          hintText: 'Inserisci l\'importo',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      buildInfoRow(
+                        title: 'Assegnato',
+                        value: booleanToString(widget.intervento.assegnato ?? false),
+                      ),
+                      SizedBox(height: 15),
+                      if (widget.intervento.utente == null)
+                        FloatingActionButton(
+                          heroTag: "Tag",
+                          onPressed: () {
+                            _showUtentiModal(allUtenti);
+                          },
+                          child: Text(
+                            '  Assegna  ',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                          backgroundColor: Colors.red,
+
+                        ),
+                      SizedBox(height: 12),
+                      buildInfoRow(
+                        title: 'Utente incaricato',
+                        value: '${widget.intervento.utente?.nomeCompleto() ?? 'Non assegnato'}',
+                      ),
+                      if (otherUtenti.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Altri utenti:',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            ...otherUtenti.map((relazione) => buildInfoRow(
+                              title: 'Utente',
+                              value: '${relazione.utente?.nomeCompleto() ?? 'N/A'}',
+                            )),
                           ],
                         ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Relazione Tecnico',
+                        value: widget.intervento.relazione_tecnico ?? 'N/A',
                       ),
-                    ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Orario Fine',
-                    value: formatTime(widget.intervento.orario_fine),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Concluso',
+                        value: booleanToString(widget.intervento.concluso ?? false),
+                      ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Saldato',
+                        value: booleanToString(widget.intervento.saldato ?? false),
+                      ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Note',
+                        value: widget.intervento.note ?? 'N/A',
+                      ),
+                      SizedBox(height: 15),
+                      buildInfoRow(
+                        title: 'Metodo di pagamento',
+                        value: widget.intervento.tipologia_pagamento != null
+                            ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
+                            : 'N/A',
+                      ),
+                    ],
                   ),
-                  if(widget.intervento.orario_fine == null)
-                    Center(
-                      child: InkWell(
-                        onTap: () => _selectTime2(context),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.access_time),
-                            SizedBox(width: 8),
-                            Text(
-                              _selectedTime2.format(context),
-                              style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 15),
+                if(prodottiDdt.isNotEmpty)
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Prodotti inseriti nel DDT:',style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold)),
+                        ...prodottiDdt.map((relazione){
+                          return ListTile(
+                            title: Text(
+                                'Codice Danea: ${relazione.prodotto?.codice_danea}, ${relazione.prodotto?.descrizione}'
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                      title: 'Cliente',
-                      value: widget.intervento.cliente?.denominazione ?? 'N/A'),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Descrizione',
-                    value: widget.intervento.descrizione ?? 'N/A',
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: descrizioneController,
-                    decoration: InputDecoration(
-                      labelText: 'Descrizione',
-                      hintText: 'Aggiungi una descrizione',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                          );
+                        }),
+                      ],
                     ),
                   ),
-                  SizedBox(height : 15),
-                  buildInfoRow(
-                    title: 'Indirizzo destinazione',
-                    value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
-                  ),
-                  SizedBox(height : 15),
-                  buildInfoRow(
-                    title: 'Cellulare destinazione',
-                    value: widget.intervento.destinazione?.cellulare ?? 'N/A',
-                  ),
-                  SizedBox(height : 15),
-                  buildInfoRow(
-                    title: 'Telefono destinazione',
-                    value: widget.intervento.destinazione?.telefono ?? 'N/A',
-                  ),
-                  SizedBox(height : 15),
-                  buildInfoRow(
-                    title: 'Indirizzo cliente',
-                    value: widget.intervento.cliente?.indirizzo ?? 'N/A',
-                  ),
-                  SizedBox(height : 15),
-                  buildInfoRow(
-                    title: 'Telefono cliente',
-                    value: widget.intervento.cliente?.telefono ?? 'N/A',
-                  ),
-                  SizedBox(height : 15),
-                  buildInfoRow(
-                    title: 'Cellulare cliente',
-                    value: widget.intervento.cliente?.cellulare ?? 'N/A',
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Informazioni sull\'intervento',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                SizedBox(height: 16),
+                if(widget.intervento.merce != null)
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  buildInfoRow(
-                    title: 'Importo Intervento',
-                    value: widget.intervento.importo_intervento?.toString() ?? 'N/A',
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: importoController,
-                    decoration: InputDecoration(
-                      labelText: 'Importo',
-                      hintText: 'Inserisci l\'importo',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  buildInfoRow(
-                    title: 'Assegnato',
-                    value: booleanToString(widget.intervento.assegnato ?? false),
-                  ),
-                  SizedBox(height: 15),
-                  if (widget.intervento.utente == null)
-                    FloatingActionButton(
-                      onPressed: () {
-                        _showUtentiModal(allUtenti);
-                      },
-                      child: Text(
-                        '  Assegna  ',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                      backgroundColor: Colors.red,
-
-                    ),
-                  SizedBox(height: 12),
-                  buildInfoRow(
-                    title: 'Utente incaricato',
-                    value: '${widget.intervento.utente?.nomeCompleto() ?? 'Non assegnato'}',
-                  ),
-                  if (otherUtenti.isNotEmpty)
-                    Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Altri utenti:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          'Informazioni sulla merce in riparazione',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        ...otherUtenti.map((relazione) => buildInfoRow(
-                          title: 'Utente',
-                          value: '${relazione.utente?.nomeCompleto() ?? 'N/A'}',
-                        )),
+                        SizedBox(height: 10),
+                        buildInfoRow(
+                          title: 'Articolo',
+                          value: widget.intervento.merce?.articolo ?? 'N/A',
+                        ),
+                        SizedBox(height: 15),
+                        buildInfoRow(
+                          title: 'Accessori',
+                          value: widget.intervento.merce?.accessori ?? 'N/A',
+                        ),
+                        SizedBox(height: 15),
+                        buildInfoRow(
+                          title: 'Difetto riscontrato',
+                          value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
+                        ),
+                        SizedBox(height: 15),
+                        buildInfoRow(
+                          title: 'Diagnosi',
+                          value: widget.intervento.merce?.diagnosi ?? 'N/A',
+                        ),
+                        SizedBox(height: 15),
+                        buildInfoRow(
+                          title: 'Richiesta di preventivo',
+                          value: booleanToString(widget.intervento.merce?.preventivo ?? false),
+                        ),
+                        SizedBox(height: 15),
+                        buildInfoRow(
+                          title: 'Importo preventivato',
+                          value: widget.intervento.merce?.importo_preventivato.toString() ?? 'N/A',
+                        ),
+                        SizedBox(height: 15),
+                        buildInfoRow(
+                          title: 'Password',
+                          value: widget.intervento.merce?.password ?? 'N/A',
+                        ),
+                        SizedBox(height: 15),
+                        buildInfoRow(
+                          title: 'Dati',
+                          value: widget.intervento.merce?.dati ?? 'N/A',
+                        ),
                       ],
                     ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                      title: 'Relazione Tecnico',
-                      value: widget.intervento.relazione_tecnico ?? 'N/A',
                   ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Concluso',
-                    value: booleanToString(widget.intervento.concluso ?? false),
+                if(allProdotti.isEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Nessun prodotto utilizzato', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                    ],
                   ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Saldato',
-                    value: booleanToString(widget.intervento.saldato ?? false),
-                  ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Note',
-                    value: widget.intervento.note ?? 'N/A',
-                  ),
-                  SizedBox(height: 15),
-                  buildInfoRow(
-                    title: 'Metodo di pagamento',
-                    value: widget.intervento.tipologia_pagamento != null
-                        ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
-                        : 'N/A',
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 15),
-
-
-            if(widget.intervento.merce != null)
-              Container(
-                padding: EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Informazioni sulla merce in riparazione',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+                if (allProdotti.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Prodotti utilizzati:',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    buildInfoRow(
-                      title: 'Articolo',
-                      value: widget.intervento.merce?.articolo ?? 'N/A',
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Accessori',
-                      value: widget.intervento.merce?.accessori ?? 'N/A',
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Difetto riscontrato',
-                      value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Diagnosi',
-                      value: widget.intervento.merce?.diagnosi ?? 'N/A',
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Richiesta di preventivo',
-                      value: booleanToString(widget.intervento.merce?.preventivo ?? false),
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Importo preventivato',
-                      value: widget.intervento.merce?.importo_preventivato.toString() ?? 'N/A',
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Password',
-                      value: widget.intervento.merce?.password ?? 'N/A',
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Dati',
-                      value: widget.intervento.merce?.dati ?? 'N/A',
-                    ),
-                  ],
+                      ...allProdotti.map((relazione) {
+                        bool isInHistoricalUser = relazione.presenza_storico_utente ?? true; // Supponendo che il valore predefinito sia true
+                        bool hasDdt = relazione.ddt != null; // Controlla se ddt non è null
+                        bool hasSerial = relazione.seriale != null;
+                        bool shouldBeRed = !isInHistoricalUser && !hasDdt; // Colore rosso se isInHistoricalUser è false e se hasDdt è false
+
+                        String prezzoFornitore = relazione.prodotto?.prezzo_fornitore != null
+                            ? relazione.prodotto!.prezzo_fornitore!.toStringAsFixed(2) + "€"
+                            : "Non disponibile"; // Controlla se prezzo_fornitore è null
+
+                        return ListTile(
+                          title: Text(
+                            '${relazione.prodotto?.descrizione ?? "Descrizione non disponibile"}',
+                            style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore',
+                                style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '${relazione.seriale ?? ''}', style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      SizedBox(height: 16), // Aggiungere uno spazio tra la lista e il totale
+                      Text(
+                        'Totale prezzo fornitore: ${totalePrezzoFornitore.toStringAsFixed(2)}€',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+
+                if (allNote.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Note dei tecnici:',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      ...allNote.map((nota) => ListTile(
+                        title: Text('${nota.utente?.nome} ${nota.utente?.cognome}'),
+                        subtitle: Text('${nota.nota}'),
+                      )),
+                    ],
+                  ),
+                if(allNote.isEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 14,),
+                      Text('Nessuna nota relativa all\'intervento', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                    ],
+                  ),
+                SizedBox(height: 20),
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FutureBuilder<List<Uint8List>>(
+                        future: _futureImages,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Wrap(
+                              spacing: 16, // aumenta la spaziatura orizzontale tra le foto
+                              runSpacing: 16, // aumenta la spaziatura verticale tra le foto
+                              children: snapshot.data!.map((imageData) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PhotoViewPage(
+                                          images: snapshot.data!,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 150, // aumenta la larghezza del container
+                                    height: 170, // aumenta l'altezza del container
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 1), // aggiungi bordo al container
+                                    ),
+                                    child: Image.memory(
+                                      imageData,
+                                      fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Nessuna foto presente nel database!');
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        },
+                      ),
+                      SizedBox(height: 20,),
+                      SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () {
+                          saveModifiche();
+                        },
+                        child: Text(
+                          'Salva modifiche',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PDFInterventoPage(
+                                    intervento: widget.intervento,
+                                    //descrizione: widget.intervento.relazione_tecnico.toString(),
+                                ),
+                              ),
+                            );
+                        },
+                        icon: Icon(Icons.picture_as_pdf, color: Colors.white),
+                        label: Text('Genera PDF', style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: () {
+                          saldato();
+                        },
+                        child: Text(
+                          'Intervento saldato',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            if (allNote.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Note dei tecnici:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  ...allNote.map((nota) => ListTile(
-                    title: Text('${nota.utente?.nome} ${nota.utente?.cognome}'),
-                    subtitle: Text('${nota.nota}'),
-                  )),
-                ],
-              ),
-            SizedBox(height: 20),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      saveModifiche();
-                    },
-                    child: Text(
-                      'Salva modifiche',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      if (descrizioneController.text.isNotEmpty && importoController.text.isNotEmpty) {
-                        saveIntervento();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PDFInterventoPage(
-                              intervento: widget.intervento,
-                              descrizione: descrizioneController.text,
-                              importo: importoController.text,
-                            ),
-                          ),
-                        );
-                      } else {
-                        saveIntervento();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PDFInterventoPage(
-                              intervento: widget.intervento,
-                              descrizione: widget.intervento.relazione_tecnico.toString(),
-                              importo: widget.intervento.importo_intervento.toString()
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    icon: Icon(Icons.picture_as_pdf, color: Colors.white),
-                    label: Text('Genera PDF', style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  ElevatedButton(
-                    onPressed: () {
-                      saldato();
-                    },
-                    child: Text(
-                      'Intervento saldato',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
           ],
         ),
@@ -645,19 +912,25 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   }
 
   Widget buildInfoRow({required String title, required String value}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        Text(
-          value,
-          style: TextStyle(fontSize: 16),
-        ),
-      ],
-    );
+    return
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Expanded( // Wrap the Text with Expanded
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Spacer(),
+          Expanded( // Wrap the Text with Expanded
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      );
   }
 
   String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
@@ -711,8 +984,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             duration: Duration(seconds: 3), // Durata dello Snackbar
           ),
         );
-        Navigator.pop(context);
-        Navigator.pop(context);
       }
     } catch (e) {
       print('Errore nell\'aggiornamento dell\'intervento: $e');
@@ -737,7 +1008,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
             'descrizione': descrizioneController.text,
             'importo_intervento': double.parse(importoController.text),
-            'acconto' : widget.intervento.acconto,
+            'acconto' : double.parse(widget.intervento.acconto.toString()),
             'assegnato': true,
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': true,
@@ -759,7 +1030,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         print('EVVAIIIIIIII');
       }
     } catch (e) {
-      print('Errore durante il salvataggio del preventivo: $e');
+      print('Errore durante il salvataggio dell\'intervento: $e');
     }
   }
 

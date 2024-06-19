@@ -1,14 +1,11 @@
 import 'dart:convert';
-
-import 'package:fema_crm/pages/NuovaDestinazionePage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:fema_crm/model/InterventoModel.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-
 import '../model/UtenteModel.dart';
+
 class InizioInterventoPage extends StatefulWidget {
   final InterventoModel intervento;
   final UtenteModel utente;
@@ -23,6 +20,7 @@ class InizioInterventoPage extends StatefulWidget {
 class _InizioInterventoPageState extends State<InizioInterventoPage> {
   late String _gps;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  TextEditingController _gpsController = TextEditingController();
   TextEditingController _notaClienteController = TextEditingController();
   TextEditingController _notaDestinazioneController = TextEditingController();
   String _indirizzo = 'Ottenendo posizione...';
@@ -39,6 +37,47 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
       print(
           "Errore durante la conversione delle coordinate in indirizzo: $e");
       return "Indirizzo non disponibile";
+    }
+  }
+
+  Future<void> savePosizione() async{
+    try{
+      final response = await http.post(Uri.parse('$ipaddress/api/posizioni'),
+        headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'cliente' : widget.intervento.cliente?.toMap(),
+            'indirizzo' : _gpsController.text,
+          }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Posizione GPS salvata con successo!'),
+          ),
+        );
+        saveNotaPosizione();
+      }
+    } catch(e){
+      print('Errore durante il salvataggio della posizione: $e, ');
+    }
+  }
+
+  Future<void> saveNotaPosizione() async{
+    final now = DateTime.now().toIso8601String();
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/noteTecnico'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data': now,
+          'utente': widget.utente.toMap(),
+          'nota': "Una nuova posizione per il cliente ${widget.intervento.cliente?.denominazione} è stata registrata!",
+          'cliente' : widget.intervento.cliente?.toMap(),
+          'intervento' : widget.intervento.toMap()
+        }),
+      );
+    } catch(e){
+      print('Errore durante il salvataggio della nota $e');
     }
   }
 
@@ -126,7 +165,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation().then((value) => print('$_indirizzo'));
+    _getCurrentLocation().then((value) => _gpsController.text = _indirizzo);
   }
 
   @override
@@ -151,19 +190,24 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
               children: [
                 SizedBox(height: 12),
                 Text(
-                  'Le informazioni attuali sulla destinazione sono:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  'Le informazioni attuali sulla destinazione sono:',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Indirizzo: ${widget.intervento.destinazione?.indirizzo}', style: TextStyle(fontSize: 20),
+                  'Indirizzo: ${widget.intervento.destinazione?.indirizzo}',
+                  style: TextStyle(fontSize: 20),
                 ),
                 Text(
-                  'Città: ${widget.intervento.destinazione?.citta}', style: TextStyle(fontSize: 20),
+                  'Città: ${widget.intervento.destinazione?.citta}',
+                  style: TextStyle(fontSize: 20),
                 ),
                 Text(
-                  'Provincia: ${widget.intervento.destinazione?.provincia}', style: TextStyle(fontSize: 20),
+                  'Provincia: ${widget.intervento.destinazione?.provincia}',
+                  style: TextStyle(fontSize: 20),
                 ),
                 Text(
-                  'Cap: ${widget.intervento.destinazione?.cap}', style: TextStyle(fontSize: 20),
+                  'Cap: ${widget.intervento.destinazione?.cap}',
+                  style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: 15),
                 Text(
@@ -171,28 +215,29 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
-                Text(
-                  _indirizzo,
-                  style: TextStyle(fontSize: 16),
+                TextFormField(
+                  controller: _gpsController,
+                  decoration: InputDecoration(
+                    labelText: 'Posizione GPS',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-                SizedBox(height: 16), // Spazio aggiunto tra il testo e il pulsante
+                SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text(
-                  "Vuoi modificare la destinazione del cliente?",
+                  "Vuoi salvare la posizione GPS?",
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => NuovaDestinazionePage(cliente: widget.intervento.cliente!)),
-                    );
+                    savePosizione();
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red, // Colore di sfondo rosso
                     onPrimary: Colors.white, // Colore del testo bianco
                   ),
-                  child: Text("Compila nuova destinazione"),
+                  child: Text("Salva GPS"),
                 ),
                 SizedBox(height: 50),
                 // Spazio aggiunto tra il pulsante e il pulsante "Inizia intervento"

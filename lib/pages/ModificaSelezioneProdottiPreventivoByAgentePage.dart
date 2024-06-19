@@ -418,7 +418,6 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
           'data_accettazione': null,
           'utente': widget.preventivo.utente?.toJson(),
           'agente': widget.preventivo.agente?.toJson(),
-          'prodotti': widget.preventivo.prodotti
         }),
       );
 

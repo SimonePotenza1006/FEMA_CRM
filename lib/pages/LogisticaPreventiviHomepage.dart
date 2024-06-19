@@ -18,6 +18,7 @@ class LogisticaPreventiviHomepage extends StatefulWidget {
 }
 
 class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

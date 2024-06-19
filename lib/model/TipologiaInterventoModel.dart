@@ -6,7 +6,10 @@ class TipologiaInterventoModel {
   String? id;
   String? descrizione;
 
-  TipologiaInterventoModel(this.id, this.descrizione);
+  TipologiaInterventoModel(
+      this.id,
+      this.descrizione
+      );
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{

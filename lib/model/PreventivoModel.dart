@@ -31,7 +31,6 @@ class PreventivoModel {
   DateTime? data_accettazione;
   UtenteModel? utente;
   AgenteModel? agente;
-  List<ProdottoModel>? prodotti;
 
   PreventivoModel(
       this.id,
@@ -53,7 +52,6 @@ class PreventivoModel {
       this.data_accettazione,
       this.utente,
       this.agente,
-      this.prodotti
       );
 
   Map<String, dynamic> toMap() {
@@ -77,7 +75,6 @@ class PreventivoModel {
       'data_accettazione': data_accettazione,
       'utente': utente,
       'agente': agente,
-      'prodotti': prodotti
     };
     return map;
   }
@@ -102,7 +99,6 @@ class PreventivoModel {
     data_accettazione = map['data_accettazione'] != null ? DateTime.parse(map['data_accettazione']) : null;
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
     agente = map['agente'] != null ? AgenteModel.fromMap(map['agente']) :null;
-    prodotti = (map['prodotti'] as List<dynamic>?)?.map((data) => ProdottoModel.fromJson(data)).toList();
   }
 
   Map<String, dynamic> toJson() => {
@@ -125,7 +121,6 @@ class PreventivoModel {
     'data_accettazione' : data_accettazione != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(data_accettazione!) : null,
     'utente': utente,
     'agente': agente,
-    'prodotti': prodotti,
   };
 
   factory PreventivoModel.fromJson(Map<String, dynamic> json) {
@@ -149,7 +144,6 @@ class PreventivoModel {
       json['data_accettazione'] != null? DateTime.parse(json['data_accettazione']) : null,
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
       json['agente'] != null ? AgenteModel.fromJson(json['agente']) : null,
-      (json['prodotti'] as List<dynamic>?)?.map((data) => ProdottoModel.fromJson(data)).toList(),
     );
   }
 }
