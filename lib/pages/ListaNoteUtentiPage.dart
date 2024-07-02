@@ -4,21 +4,25 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../model/NotaTecnicoModel.dart';
+import '../model/UtenteModel.dart';
 import 'DettaglioNotaPage.dart';
 
-class ListaNoteUtentiPage extends StatefulWidget{
-  const ListaNoteUtentiPage({Key? key}) : super(key : key);
+class ListaNoteUtentiPage extends StatefulWidget {
+  const ListaNoteUtentiPage({Key? key}) : super(key: key);
 
   @override
   _ListaNoteUtentiPageState createState() => _ListaNoteUtentiPageState();
 }
 
-class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage>{
+class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   List<NotaTecnicoModel> allNote = [];
+  List<NotaTecnicoModel> allNoteByUtente = [];
+  List<UtenteModel> allUtenti = [];
   bool isSearching = false;
   List<NotaTecnicoModel> filteredNote = [];
   bool isLoading = true;
+  int? selectedUtenteId;
   TextEditingController searchController = TextEditingController();
 
   void filterNote(String query) {
@@ -53,31 +57,72 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage>{
     });
   }
 
-  Future<void> getAllNote() async{
-    try{
+  Future<void> getAllNoteByUtente(int utenteId) async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/utente/$utenteId');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        List<NotaTecnicoModel> noteByUtente = [];
+        var jsonData = jsonDecode(response.body);
+        for (var item in jsonData) {
+          noteByUtente.add(NotaTecnicoModel.fromJson(item));
+        }
+        setState(() {
+          allNoteByUtente = noteByUtente;
+          filteredNote = noteByUtente;
+        });
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
+  }
+
+  Future<void> getAllUtenti() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        List<UtenteModel> utenti = [];
+        var jsonData = jsonDecode(response.body);
+        for (var item in jsonData) {
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
+  }
+
+  Future<void> getAllNote() async {
+    try {
       var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/ordered');
       var response = await http.get(apiUrl);
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         List<NotaTecnicoModel> note = [];
         var jsonData = jsonDecode(response.body);
-        for(var item in jsonData){
+        for (var item in jsonData) {
           note.add(NotaTecnicoModel.fromJson(item));
         }
         setState(() {
           filteredNote = note;
         });
-      }else {
+      } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
-        print('Errore durante la chiamata all\'API: $e');
+      print('Errore durante la chiamata all\'API: $e');
     }
   }
 
-
   @override
-  void initState(){
+  void initState() {
     super.initState();
+    getAllUtenti();
     getAllNote();
     setState(() {
       filteredNote = allNote;
@@ -94,7 +139,7 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage>{
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -105,7 +150,8 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage>{
           decoration: InputDecoration(
             hintText: 'Filtra...',
             hintStyle: TextStyle(
-                color: Colors.white), // colore del testo dell'hint
+              color: Colors.white,
+            ),
             border: InputBorder.none,
           ),
           style: TextStyle(color: Colors.white),
@@ -113,36 +159,67 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage>{
             : Text('Lista Note dei tecnici', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
-          actions : [
-            IconButton(
-              icon: Icon(
-                Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
-                color: Colors.white,
-              ),
-              onPressed: () {
-                // Funzione per ricaricare la pagina
-                setState(() {});
-              },
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.white,
             ),
-          ]
+            onPressed: () {
+              setState(() {});
+            },
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.person,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => Container(
+                  height: 200,
+                  child: ListView.builder(
+                    itemCount: allUtenti.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(allUtenti[index].nomeCompleto().toString()),
+                        onTap: () {
+                          setState(() {
+                            setState(() {
+                              selectedUtenteId = int.parse(allUtenti[index].id!); // Assuming id is a numeric string
+                            });
+                          });
+                          Navigator.pop(context);
+                          if (selectedUtenteId != null) {
+                            getAllNoteByUtente(selectedUtenteId!);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
-
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
-              children: [
-                Expanded(
-                    child: ListView.separated(
-                        separatorBuilder: (context, index) => const Divider(),
-                        itemCount: filteredNote.length,
-                        itemBuilder: (context, index){
-                          final nota = filteredNote[index];
-                          return buildViewNote(nota);
-                        },
-                    ),
-                ),
-              ],
-      )
+        children: [
+          Expanded(
+            child: ListView.separated(
+              separatorBuilder: (context, index) => const Divider(),
+              itemCount: filteredNote.length,
+              itemBuilder: (context, index) {
+                final nota = filteredNote[index];
+                return buildViewNote(nota);
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -156,11 +233,12 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage>{
         minLeadingWidth: 12,
         visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
         onTap: () {
-           Navigator.push(
-             context,
-             MaterialPageRoute(
-                 builder: (context) => DettaglioNotaPage(nota: nota)),
-           );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DettaglioNotaPage(nota: nota),
+            ),
+          );
         },
         leading: const Column(
           mainAxisAlignment: MainAxisAlignment.center,

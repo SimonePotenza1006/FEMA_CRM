@@ -8,16 +8,14 @@ class RegistrazioneAgentePage extends StatefulWidget {
   const RegistrazioneAgentePage({Key? key}) : super(key: key);
 
   @override
-  _RegistrazioneAgentePageState createState() =>
-      _RegistrazioneAgentePageState();
+  _RegistrazioneAgentePageState createState() => _RegistrazioneAgentePageState();
 }
 
 class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController cognomeController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController riferimentoAziendaleController =
-      TextEditingController();
+  final TextEditingController riferimentoAziendaleController = TextEditingController();
   final TextEditingController cellulareController = TextEditingController();
   final TextEditingController luogoLavoroController = TextEditingController();
   final TextEditingController ibanController = TextEditingController();
@@ -42,7 +40,8 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
           emailController.text.trim().isNotEmpty &&
           cellulareController.text.trim().isNotEmpty &&
           luogoLavoroController.text.trim().isNotEmpty &&
-          ibanController.text.trim().isNotEmpty;
+          ibanController.text.trim().isNotEmpty &&
+          validateItalianIBAN(ibanController.text);
     });
   }
 
@@ -106,6 +105,31 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
       print('Errore durante la chiamata all\'API: $e');
       _showErrorDialog();
     }
+  }
+
+  bool validateItalianIBAN(String iban) {
+    // Italian IBAN format: ITxx xxxxxxx xxxxxxx xxxxx
+    const italianIBANPattern = r'^IT\d{2}[0-9A-Z]{23}$';
+    if (!RegExp(italianIBANPattern).hasMatch(iban)) {
+      return false;
+    }
+
+    // Calculate the IBAN checksum
+    String ibanWithoutCountryCode = iban.substring(4);
+    String countryCode = iban.substring(0, 2);
+    String checksum = countryCode + ibanWithoutCountryCode;
+    checksum = checksum.toUpperCase();
+    checksum = checksum.replaceAllMapped(RegExp(r'[A-Z]'), (match) {
+      int charCode = match.group(0)!.codeUnitAt(0) - 55;
+      return charCode.toString();
+    });
+    int checksumValue =int.parse(checksum);
+    checksumValue = checksumValue % 97;
+    if (checksumValue != 1) {
+      return false;
+    }
+
+    return true;
   }
 
   @override
@@ -188,7 +212,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
                 onChanged: (azienda) {
                   setState(() {
                     selectedAzienda = azienda;
-                    _updateAreFieldsFilled(); // Aggiorna lo stato dei campi compilati
+                    _updateAreFieldsFilled();
                   });
                 },
                 decoration: InputDecoration(
@@ -259,6 +283,15 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
                     borderSide: BorderSide(color: Colors.red),
                   ),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Inserisci l\'IBAN';
+                  }
+                  if (!validateItalianIBAN(value)) {
+                    return 'IBAN non valido per l\'Italia';
+                  }
+                  return null;
+                },
               ),
               SizedBox(height: 20),
               DropdownButtonFormField<String>(
@@ -291,7 +324,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
+                children:[
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -318,7 +351,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: _areFieldsFilled ? () => createAgente() : null,
+                    onPressed: _areFieldsFilled? () => createAgente() : null,
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red,
                       shape: RoundedRectangleBorder(

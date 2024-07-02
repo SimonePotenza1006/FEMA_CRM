@@ -1,5 +1,8 @@
 import 'package:fema_crm/model/CommissioneModel.dart';
 import 'package:fema_crm/model/CustomAppointmentModel.dart';
+import 'package:fema_crm/model/InterventoModel.dart';
+import 'package:fema_crm/model/TipologiaInterventoModel.dart';
+import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/pages/CreazioneInterventoByAmministrazionePage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneAmministrazionePage.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +12,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
-import '../model/InterventoModel.dart';
-import '../model/TipologiaInterventoModel.dart';
-import 'DettaglioInterventoByTecnicoPage.dart';
 import 'DettaglioInterventoPage.dart';
 
 class CalendarioPage extends StatefulWidget {
@@ -25,9 +24,11 @@ class _CalendarioPageState extends State<CalendarioPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   DateTime _selectedDate = DateTime.now();
   List<InterventoModel> allInterventi = [];
-  List<CommissioneModel> allCommissioni =[];
+  List<CommissioneModel> allCommissioni = [];
   List<CustomAppointmentModel> appointments = [];
   List<TipologiaInterventoModel> allTipologie = [];
+  List<UtenteModel> allUtenti = [];
+  UtenteModel? _selectedUser;
   final AppointmentDataSource _appointmentDataSource = AppointmentDataSource([]);
 
   @override
@@ -42,23 +43,46 @@ class _CalendarioPageState extends State<CalendarioPage> {
     await getTipologieIntervento();
     await getAllInterventi();
     await getAllCommissioni();
+    await getAllUtenti();
     combineAppointments();
   }
 
-  Future<void> getAllCommissioni() async{
-    try{
+  Future<void> getAllUtenti() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for (var item in jsonData) {
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        print('getAllUtenti: fallita con status code ${response.statusCode}');
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API getAllUtenti: $e');
+    }
+  }
+
+  Future<void> getAllCommissioni() async {
+    try {
       var apiUrl = Uri.parse('$ipaddress/api/commissione');
       var response = await http.get(apiUrl);
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<CommissioneModel> commissioni = [];
-        for(var item in jsonData){
+        for (var item in jsonData) {
           commissioni.add(CommissioneModel.fromJson(item));
         }
         setState(() {
           allCommissioni = commissioni;
         });
-      }else {
+      } else {
         print('getAllCommissioni: fallita con status code ${response.statusCode}');
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
@@ -125,17 +149,16 @@ class _CalendarioPageState extends State<CalendarioPage> {
   void combineAppointments() {
     appointments = [];
     appointments.addAll(allInterventi.map((intervento) {
-      DateTime startTime = intervento.orario_appuntamento != null ? intervento.orario_appuntamento! : intervento.data!;
+      DateTime startTime = intervento.orario_appuntamento!= null? intervento.orario_appuntamento! : intervento.data!;
       DateTime endTime = startTime.add(Duration(hours: 1));
-      String? utente = intervento.utente!= null? intervento.utente?.nomeCompleto() : 'NON ASSEGNATO';
       String? subject = "${intervento.descrizione}";
-      Color color = _getColorForTipologia(int.parse(intervento.tipologia!.id.toString())); // <--- Get color based on tipologiaId
+      Color color = _getColorForTipologia(int.parse(intervento.tipologia!.id.toString()));
       return CustomAppointmentModel(
         startTime: startTime,
         endTime: endTime,
         subject: subject,
         recurrenceId: intervento,
-        color: color, // <--- Set color
+        color: color,
         concluso: intervento.concluso,
       );
     }).toList());
@@ -147,7 +170,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
         endTime: endTime,
         subject: commissione.descrizione!,
         recurrenceId: commissione,
-        color: Colors.yellow[900]!, // <--- You can also set a default color for CommissioneModel
+        color: Colors.yellow[900]!,
         concluso: commissione.concluso,
       );
     }).toList());
@@ -183,20 +206,75 @@ class _CalendarioPageState extends State<CalendarioPage> {
     return Colors.black;
   }
 
+  void showFilterModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return FilterModal(
+          allUtenti: allUtenti,
+          onUserSelected: (selectedUser) {
+            setState(() {
+              _selectedUser = selectedUser;
+              filterAppointments();
+            });
+          },
+        );
+      },
+    );
+  }
+
+  void filterAppointments() {
+    appointments = [];
+    appointments.addAll(allInterventi
+        .where((intervento) => intervento.utente!.id == _selectedUser?.id)
+        .map((intervento) {
+      DateTime startTime = intervento.orario_appuntamento!= null
+          ? intervento.orario_appuntamento!
+          : intervento.data!;
+      DateTime endTime = startTime.add(Duration(hours: 1));
+      String? subject = "${intervento.descrizione}";
+      Color color = _getColorForTipologia(int.parse(intervento.tipologia!.id.toString()));
+      return CustomAppointmentModel(
+        startTime: startTime,
+        endTime: endTime,
+        subject: subject,
+        recurrenceId: intervento,
+        color: color,
+        concluso: intervento.concluso,
+      );
+    }).toList());
+    appointments.addAll(allCommissioni
+        .where((commissione) => commissione.utente!.id == _selectedUser?.id)
+        .map((commissione) {
+      DateTime startTime = commissione.data!;
+      DateTime endTime = startTime.add(Duration(hours: 2));
+      return CustomAppointmentModel(
+        startTime: startTime,
+        endTime: endTime,
+        subject: commissione.descrizione!,
+        recurrenceId: commissione,
+        color: Colors.yellow[900]!,
+        concluso: commissione.concluso,
+      );
+    }).toList());
+    setState(() {
+      _appointmentDataSource.updateAppointments(appointments);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('build chiamato');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       locale: Locale('it', 'IT'),
       localizationsDelegates: [
+        SfGlobalLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
-        SfGlobalLocalizations.delegate,
       ],
       supportedLocales: [
-        const Locale('it'),
+        const Locale('it', 'IT'),
       ],
       home: Scaffold(
         appBar: AppBar(
@@ -210,7 +288,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
                 firstDate: DateTime(2020),
                 lastDate: DateTime(2100),
               );
-              if (picked != null) {
+              if (picked!= null) {
                 setState(() {
                   _selectedDate = picked;
                   _calendarController.displayDate = picked;
@@ -306,7 +384,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
             ),
             Expanded(
               child: SfCalendar(
-                view: _calendarController.view ?? CalendarView.month,
+                view: _calendarController.view?? CalendarView.month,
                 controller: _calendarController,
                 dataSource: _appointmentDataSource,
                 monthViewSettings: MonthViewSettings(
@@ -383,7 +461,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
                                       size: 20,
                                     ),
                                   ),
-                                  ],
+                              ],
                             ),
                           ),
                         );
@@ -396,6 +474,14 @@ class _CalendarioPageState extends State<CalendarioPage> {
               ),
             ),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.red,
+
+          onPressed: () {
+            showFilterModal(context);
+          },
+          child: Icon(Icons.filter_list, color: Colors.white,),
         ),
       ),
     );
@@ -411,8 +497,66 @@ class AppointmentDataSource extends CalendarDataSource {
   List<dynamic> get appointments => super.appointments!;
 
   void updateAppointments(List<CustomAppointmentModel> newAppointments) {
-    print('updateAppointments chiamato');
     appointments = newAppointments;
     notifyListeners(CalendarDataSourceAction.reset, newAppointments);
+  }
+}
+
+class FilterModal extends StatefulWidget {
+  final List<UtenteModel> allUtenti;
+  final Function(UtenteModel?) onUserSelected;
+
+  FilterModal({required this.allUtenti, required this.onUserSelected});
+
+  @override
+  _FilterModalState createState() => _FilterModalState();
+}
+
+class _FilterModalState extends State<FilterModal> {
+  UtenteModel? _selectedUser;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DropdownButtonFormField<UtenteModel>(
+            decoration: InputDecoration(
+              labelText: 'Seleziona utente',
+              border: OutlineInputBorder(),
+            ),
+            value: _selectedUser,
+            onChanged: (UtenteModel? newValue) {
+              setState(() {
+                _selectedUser = newValue;
+              });
+            },
+            items: widget.allUtenti.map((utente) {
+              return DropdownMenuItem<UtenteModel>(
+                value: utente,
+                child: Text(utente.nomeCompleto().toString()),
+              );
+            }).toList(),
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor:
+              MaterialStateProperty.all<Color>(Colors.red),
+              padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+              ),
+            ),
+            onPressed: () {
+              widget.onUserSelected(_selectedUser);
+              Navigator.pop(context);
+            },
+            child: Text('Filtrare', style: TextStyle(color: Colors.white),),
+          ),
+        ],
+      ),
+    );
   }
 }

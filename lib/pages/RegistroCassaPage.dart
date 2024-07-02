@@ -39,7 +39,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   @override
   Widget build(BuildContext context) {
     double fondoCassa = calcolaFondoCassa(movimentiList);
-    fondoCassa = fondoCassa.clamp(0, 2000);
+    fondoCassa = fondoCassa.clamp(0, 10000);
     fondoCassa = double.parse(
         fondoCassa.toStringAsFixed(2));
     return Scaffold(
@@ -113,7 +113,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     width: 200,
                     height: 200,
                     child: CircularProgressIndicator(
-                      value: fondoCassa / 2000,
+                      value: fondoCassa / 10000,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                       backgroundColor: Colors.grey.withOpacity(0.3),
                       strokeWidth: 15.0,
@@ -146,7 +146,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                   rows: movimentiList.map((movimento) {
                     return DataRow(
                       cells: [
-                        DataCell(Text(DateFormat('yyyy-MM-dd').format(movimento.dataCreazione!))),
+                        DataCell(Text(DateFormat('yyyy-MM-dd HH:mm').format(movimento.dataCreazione!))),
                         DataCell(Text(DateFormat('yyyy-MM-dd').format(movimento.data!))),
                         DataCell(Text(movimento.descrizione ?? '')),
                         DataCell(Text(_getTipoMovimentazioneString(movimento.tipo_movimentazione))),

@@ -460,7 +460,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Record relativi all\'inversione delle gomme salvati correttamente!'),
+            content: Text('Record relativi alla polizza gomme salvati correttamente!'),
             duration: Duration(seconds: 3), // Durata dello Snackbar
           ),
         );
@@ -530,7 +530,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Record relativi alla revisione del veicolo salvati correttamente!'),
+            content: Text('Record relativi al bollo del veicolo salvati correttamente!'),
             duration: Duration(seconds: 3), // Durata dello Snackbar
           ),
         );

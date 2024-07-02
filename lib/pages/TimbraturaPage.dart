@@ -80,7 +80,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
     _marcatController.text = "";
     getMarcatempoOggi();
     getAllUtenti();
-    _getCurrentLocation().then((value) => print('${_indirizzo}'));
+    _getCurrentLocation();
   }
 
   void firmaTrue() {

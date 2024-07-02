@@ -1,19 +1,19 @@
+import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
+import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fema_crm/pages/HomeFormAmministrazione.dart';
-import 'package:fema_crm/pages/HomeFormTecnico.dart';
-import 'databaseHandler/DbHelper.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'model/RuoloUtenteModel.dart';
-import 'model/TipologiaInterventoModel.dart';
-import 'model/UtenteModel.dart';
+import 'databaseHandler/DbHelper.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'model/RuoloUtenteModel.dart';
+import 'model/TipologiaInterventoModel.dart';
+import 'model/UtenteModel.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -184,20 +184,29 @@ class _LoginFormState extends State<LoginForm> {
     await getLoginUser(uid, passwd).then((userData) {
       if (userData != null) {
         setSP(userData).then((_) {
-          TextInput.finishAutofillContext();
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (_) => userData.ruolo?.descrizione == "Developer" ||
-                  userData.ruolo?.descrizione == "Tecnico"
-                  ? HomeFormTecnico(userData: userData)
-                  : HomeFormAmministrazione(userData: userData),
-            ),
-                (Route<dynamic> route) => false,
-          );
+          // Save the username and password here
+          _saveCredentials(uid, passwd).then((_) {
+            TextInput.finishAutofillContext();
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => userData.ruolo?.descrizione == "Developer" ||
+                    userData.ruolo?.descrizione == "Tecnico"
+                    ? HomeFormTecnicoNewPage(userData: userData)
+                    : HomeFormAmministrazioneNewPage(userData: userData),
+              ),
+                  (Route<dynamic> route) => false,
+            );
+          });
         });
       }
     });
+  }
+
+  Future<void> _saveCredentials(String username, String password) async {
+    final SharedPreferences sp = await _pref;
+    sp.setString('username', username);
+    sp.setString('password', password);
   }
 
   Future<void> _loadSavedCredentials() async {
@@ -219,78 +228,93 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.red,
-      ),
-      body: SingleChildScrollView(
-        key: _formKey,
-        child: Column(
-          children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(top: 60.0),
-              child: Center(
-                child: SizedBox(
-                  width: 400,
-                  height: 250,
-                  child: Image(image: AssetImage('assets/images/logo.png')),
-                ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white10, Colors.red.shade500],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              // Responsive logo image
+              Image.asset(
+                'assets/images/logo_no_bg.png',
+                width: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
+                //height: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
+                fit: BoxFit.contain,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: TextFormField(
-                controller: _conUserId,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
+              SizedBox(height: 40),
+              Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
                     ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField(
+                        controller: _conUserId,
+                        decoration: InputDecoration(
+                          labelText: 'Username',
+                          hintText: 'Inserisci il tuo username',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        autofillHints: [AutofillHints.username],
+                      ),
+                      SizedBox(height: 15),
+                      TextFormField(
+                        controller: _conPassword,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Inserisci la password',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        autofillHints: [AutofillHints.password],
+                      ),
+                      SizedBox(height: 40),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        onPressed: login,
+                        child: Text(
+                          'ACCEDI',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                      ),
+                    ],
                   ),
-                  labelText: 'Username',
-                  hintText: 'Inserisci il tuo username',
-                ),
-                autofillHints: [AutofillHints.username],
-              ),
-            ),
-            SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50),
-              child: TextField(
-                controller: _conPassword,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
-                    ),
-                  ),
-                  labelText: 'Password',
-                  hintText: 'Inserisci la password',
-                ),
-                autofillHints: [AutofillHints.password],
-              ),
-            ),
-            SizedBox(height: 30),
-            Container(
-              height: 50,
-              width: 250,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: FloatingActionButton(
-                backgroundColor: Colors.red,
-                onPressed: login,
-                child: const Text(
-                  'ACCEDI',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
   }
+
 }

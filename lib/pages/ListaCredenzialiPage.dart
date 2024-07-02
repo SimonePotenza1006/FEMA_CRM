@@ -29,7 +29,6 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
   }
 
   Future<void> init() async {
-    print('Tiro giù tutte le credenziali');
     try {
       var apiUrl = Uri.parse('${ipaddress}/api/credenziali');
       var response = await http.get(apiUrl);

@@ -246,34 +246,34 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InterventoTecnicoForm(
-                                  userData: widget.userData!)),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                      icon: Icon(Icons.build, size: 30, color: Colors.white),
-                      label: Text(
-                        'Intervento',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   height: 20,
+                  // ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   height: 60,
+                  //   child: ElevatedButton.icon(
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) => InterventoTecnicoForm(
+                  //                 userData: widget.userData!)),
+                  //       );
+                  //     },
+                  //     style: ElevatedButton.styleFrom(
+                  //       primary: Colors.red,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(20.0),
+                  //       ),
+                  //     ),
+                  //     icon: Icon(Icons.build, size: 30, color: Colors.white),
+                  //     label: Text(
+                  //       'Intervento',
+                  //       style: TextStyle(color: Colors.white, fontSize: 20),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(
                     height: 20,
                   ),
@@ -389,62 +389,62 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                   SizedBox(
                     height: 20,
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  InizializzazionePreventivoByTecnicoPage(
-                                      utente: widget.userData!)),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                      icon: Icon(Icons.assignment_outlined,
-                          size: 30, color: Colors.white),
-                      label: Text(
-                        'Registrazione preventivo',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ListaPreventiviTecnicoPage(
-                                  utente: widget.userData!)),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                      ),
-                      icon: Icon(Icons.badge_outlined,
-                          size: 30, color: Colors.white),
-                      label: Text(
-                        'I tuoi preventivi',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   height: 60,
+                  //   child: ElevatedButton.icon(
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) =>
+                  //                 InizializzazionePreventivoByTecnicoPage(
+                  //                     utente: widget.userData!)),
+                  //       );
+                  //     },
+                  //     style: ElevatedButton.styleFrom(
+                  //       primary: Colors.red,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(20.0),
+                  //       ),
+                  //     ),
+                  //     icon: Icon(Icons.assignment_outlined,
+                  //         size: 30, color: Colors.white),
+                  //     label: Text(
+                  //       'Registrazione preventivo',
+                  //       style: TextStyle(color: Colors.white, fontSize: 20),
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   height: 20,
+                  // ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   height: 60,
+                  //   child: ElevatedButton.icon(
+                  //     onPressed: () {
+                  //       Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) => ListaPreventiviTecnicoPage(
+                  //                 utente: widget.userData!)),
+                  //       );
+                  //     },
+                  //     style: ElevatedButton.styleFrom(
+                  //       primary: Colors.red,
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(20.0),
+                  //       ),
+                  //     ),
+                  //     icon: Icon(Icons.badge_outlined,
+                  //         size: 30, color: Colors.white),
+                  //     label: Text(
+                  //       'I tuoi preventivi',
+                  //       style: TextStyle(color: Colors.white, fontSize: 20),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

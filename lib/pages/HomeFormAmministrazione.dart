@@ -19,24 +19,27 @@ import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
 import 'CalendarioPage.dart';
+import 'ControlloAccessiApplicazionePage.dart';
+import 'CreazioneNuovaCartaPage.dart';
+import 'CreazioneNuovoUtentePage.dart';
 import 'DettaglioCommissioneAmministrazionePage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
-import 'ImpostazioniPage.dart';
 import 'ListaClientiPage.dart';
 import 'ListaCredenzialiPage.dart';
 import 'ListaInterventiFinalPage.dart';
-import 'ListaInterventiNewPage.dart';
-import 'ListaInterventiPage.dart';
 import 'ListaNoteUtentiPage.dart';
+import 'ListaUtentiPage.dart';
+import 'ListaVeicoliPage.dart';
 import 'ListiniPage.dart';
 import 'MagazzinoPage.dart';
 import 'MenuCommissioniPage.dart';
-import 'MenuMerceInRiparazionePage.dart';
 import 'MenuOrdiniFornitorePage.dart';
 import 'MenuSopralluoghiPage.dart';
 import 'RegistroCassaPage.dart';
+import 'ReportSpeseVeicoloPage.dart';
 import 'ScannerQrCodeAmministrazionePage.dart';
 import 'SpesaSuVeicoloPage.dart';
+import 'StoricoMerciUtentiPage.dart';
 
 class HomeFormAmministrazione extends StatefulWidget {
   final UtenteModel userData;
@@ -60,6 +63,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
   DateTime today = DateTime.now();
   Map<String, bool> _publishedNotes = {};
   List<OrdinePerInterventoModel> allOrdini = [];
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void didChangeDependencies() {
@@ -351,7 +355,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'F.E.M.A. Amministrazione',
+          'F.E.M.A. AMMINISTRAZIONE',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -368,32 +372,117 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
               setState(() {});
             },
           ),
-          IconButton(
-            icon: Icon(
-              Icons.settings,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) =>
-                    ImpostazioniPage(userData: widget.userData,)),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginForm()),
-              );
-            },
-          ),
         ],
+      ),
+      drawer: Drawer(
+        backgroundColor: Colors.grey[700],
+        child: Column(
+          children: [
+            DrawerHeader(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(width: 16),
+                      Icon(Icons.settings, color: Colors.white,),
+                      SizedBox(width: 4),
+                      Text(
+                        'IMPOSTAZIONI', style: TextStyle(color: Colors.white, fontSize: 24),
+                      )
+                    ],
+                  )
+                ],
+              )
+            ),
+            Expanded(
+              child: ListView(
+                children: [
+                  ListTile(
+                    title: Text('Crea nuovo utente', style: TextStyle(color: Colors.white),),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CreazioneNuovoUtentePage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Management veicoli', style: TextStyle(color: Colors.white),),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ListaVeicoliPage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Aggiungi carta', style: TextStyle(color: Colors.white),),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const CreazioneNuovaCartaPage()),
+                      );
+                    },
+                  ),
+                  if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti")
+                    ListTile(
+                      title: Text('Controllo accessi applicazione', style: TextStyle(color: Colors.white),),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ControlloAccessiApplicazionePage()),
+                        );
+                      },
+                    ),
+                  if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti" || widget.userData.cognome! == "Zaminga")
+                    ListTile(
+                      title: Text('Storico merci utenti', style: TextStyle(color: Colors.white),),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const StoricoMerciUtentiPage()),
+                        );
+                      },
+                    ),
+                  if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti" || widget.userData.cognome! == "Zaminga")
+                    ListTile(
+                      title: Text('Credenziali utenti', style: TextStyle(color: Colors.white),),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ListaUtentiPage()),
+                        );
+                      },
+                    ),
+                  if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti" || widget.userData.cognome! == "Zaminga")
+                    ListTile(
+                      title: Text('Report spese su veicolo', style: TextStyle(color: Colors.white),),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ReportSpeseVeicoloPage()),
+                        );
+                      },
+                    ),
+
+                ],
+              ),
+            ),
+            ListTile(
+              title: Text('Logout', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginForm()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
           child: Padding(
@@ -495,7 +584,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.calendar_month_outlined,
-                      text: 'Calendario',
+                      text: 'CALENDARIO',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -508,7 +597,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     SizedBox(width: 20),
                     buildButton(
                       icon: Icons.snippet_folder_outlined,
-                      text: 'Ordini fornitore',
+                      text: 'ORDINI FORNITORE',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -527,7 +616,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.more_time,
-                      text: 'Timbratura',
+                      text: 'TIMBRATURA',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -540,7 +629,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     SizedBox(width: 20),
                     buildButton(
                       icon: Icons.build,
-                      text: 'Lista Interventi',
+                      text: 'LISTA INTERVENTI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -558,7 +647,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.rule_folder_outlined,
-                      text: 'Riparazioni',
+                      text: 'RIPARAZIONI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -571,7 +660,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     SizedBox(width: 20),
                     buildButton(
                       icon: Icons.remove_red_eye_outlined,
-                      text: 'Sopralluoghi',
+                      text: 'SOPRALLUOGHI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -590,7 +679,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.class_outlined,
-                      text: 'Commissioni',
+                      text: 'COMMISSIONI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -602,7 +691,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     SizedBox(width: 20),
                     buildButton(
                       icon: Icons.emoji_transportation_sharp,
-                      text: 'Spese su veicolo',
+                      text: 'SPESE SU VEICOLO',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -620,7 +709,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.do_disturb_rounded,
-                      text: 'Credenziali',
+                      text: 'CREDENZIALI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -633,7 +722,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     SizedBox(width: 20),
                     buildButton(
                       icon: Icons.contact_emergency_rounded,
-                      text: 'Lista Clienti',
+                      text: 'LISTA CLIENTI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -650,7 +739,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.warehouse_sharp,
-                      text: 'Magazzino',
+                      text: 'MAGAZZINO',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -662,7 +751,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     SizedBox(width: 20),
                     buildButton(
                       icon: Icons.euro_sharp,
-                      text: 'Registro Cassa',
+                      text: 'REGISTRO CASSA',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -680,7 +769,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.assignment_outlined,
-                      text: 'Listini',
+                      text: 'LISTINI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -692,7 +781,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                     SizedBox(width: 20),
                     buildButton(
                       icon: Icons.business_center_outlined,
-                      text: 'Preventivi',
+                      text: 'PREVENTIVI',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -711,7 +800,7 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                   children: [
                     buildButton(
                       icon: Icons.qr_code_2_outlined,
-                      text: 'Scanner QrCode',
+                      text: 'SCANNER QRCODE',
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -1028,7 +1117,6 @@ class _HomeFormAmministrazioneState extends State<HomeFormAmministrazione> {
                         decoration: BoxDecoration(
                           color: Colors.red[900],
                           shape: BoxShape.circle,
-
                         ),
                         child: Text(
                           allOrdini.length.toString(),
