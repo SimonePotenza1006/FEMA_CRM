@@ -235,7 +235,7 @@ class _HomeFormAmministrazioneNewPageState
   }
 
   int _calculateHoveredIndex(Offset position) {
-    final center = Offset(650 / 2, 650 / 2); // Use the same size as in CustomPaint
+    final center = Offset(500 / 2, 500 / 2); // Use the same size as in CustomPaint
     final angle = (math.atan2(position.dy - center.dy, position.dx - center.dx) + math.pi * 2) % (math.pi * 2);
     final sectorAngle = (2 * math.pi) / 14; // 14 menu items
     final hoveredIndex = (angle ~/ sectorAngle) % 14;
@@ -470,7 +470,7 @@ class _HomeFormAmministrazioneNewPageState
       case 3:
         return Colors.redAccent;
       case 4:
-        return Colors.yellowAccent;
+        return Colors.yellow;
       case 5:
         return Colors.pinkAccent;
       default:
@@ -479,10 +479,9 @@ class _HomeFormAmministrazioneNewPageState
   }
 
   Color _getTextColorForBackground(Color backgroundColor) {
-    if (backgroundColor == Colors.red ||
+    if (backgroundColor == Colors.redAccent ||
         backgroundColor == Colors.blueAccent ||
-        backgroundColor == Colors.grey ||
-        backgroundColor == Colors.yellow[900]) {
+        backgroundColor == Colors.grey) {
       return Colors.white;
     }
     return Colors.black;
@@ -664,6 +663,16 @@ class _HomeFormAmministrazioneNewPageState
                         MaterialPageRoute(
                             builder: (context) => const CreazioneNuovaCartaPage()),
                       );
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Certificazioni', style: TextStyle(color: Colors.white),),
+                    onTap: (){
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => const CertificazioniFormPage()),
+                      // );
                     },
                   ),
                   if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti")
