@@ -1,12 +1,16 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 
 
+import '../model/OrdinePerInterventoModel.dart';
 import '../model/RuoloUtenteModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/ClienteModel.dart';
+import '../model/VeicoloModel.dart';
 
 class DbHelper{
 
@@ -14,6 +18,13 @@ class DbHelper{
   String ipaddress1 = 'http://localhost:8080';
   String ipaddress3 ='http://79.10.122.110:8084';
   String ipaddress4 = 'http://10.0.2.2.8080';
+
+  List<OrdinePerInterventoModel> allOrdini = [];
+  List<VeicoloModel> allVeicoli = [];
+  List<TipologiaInterventoModel> allTipologie = [];
+  List<UtenteModel> allUtenti = [];
+
+
 
   Future<List<TipologiaInterventoModel>> getAllTipologieIntervento() async{
     try{
@@ -167,5 +178,90 @@ class DbHelper{
 extension DateTimeExtension on DateTime {
   bool isSameDay(DateTime other) {
     return this.year == other.year && this.month == other.month && this.day == other.day;
+  }
+}
+
+class DbHelper1 extends StatefulWidget{
+  const DbHelper1({Key? key}) : super(key: key);
+
+  @override
+  _DbHelper1State createState() => _DbHelper1State();
+}
+
+class _DbHelper1State extends State<DbHelper1>{
+
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
+
+  List<OrdinePerInterventoModel> allOrdini = [];
+  List<VeicoloModel> allVeicoli = [];
+  List<TipologiaInterventoModel> allTipologie = [];
+  List<UtenteModel> allUtenti = [];
+
+  @override
+  Widget build(BuildContext context){
+    return Scaffold();
+  }
+
+  Future<void> getAllVeicoli() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<VeicoloModel> veicoli = [];
+        for (var item in jsonData) {
+          veicoli.add(VeicoloModel.fromJson(item));
+        }
+        setState(() {
+          allVeicoli = veicoli;
+        });
+      } else {
+        throw Exception('Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching agenti data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text('Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> getTipologieIntervento() async {
+    print('getTipologieIntervento chiamato');
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        print('getTipologieIntervento: chiamata API riuscita');
+        var jsonData = jsonDecode(response.body);
+        List<TipologiaInterventoModel> tipologie = [];
+        for (var item in jsonData) {
+          tipologie.add(TipologiaInterventoModel.fromJson(item));
+        }
+        setState(() {
+          allTipologie = tipologie;
+        });
+      } else {
+        print('getTipologieIntervento: fallita con status code ${response.statusCode}');
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
   }
 }
