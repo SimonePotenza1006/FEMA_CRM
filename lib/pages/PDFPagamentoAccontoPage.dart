@@ -133,7 +133,7 @@ class _PDFPagamentoAccontoPageState extends State<PDFPagamentoAccontoPage>{
                           ),
                           pw.Column(
                             children: [
-                              pw.Text("Firma utente alla cassa"),
+                              pw.Text("Firma responsabile cassa"),
                               pw.SizedBox(height: 20),
                               pw.SizedBox(
                                 height: 100,

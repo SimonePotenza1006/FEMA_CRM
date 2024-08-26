@@ -211,6 +211,8 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
 
       final Uint8List logoBytes = await loadLogo(logoPath);
 
+
+
       pdf.addPage(
         pw.Page(
           margin: pw.EdgeInsets.zero, // Rimuove tutti i margini
@@ -352,6 +354,9 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
 
   // Metodo per costruire la sezione del destinatario
   pw.Widget _buildDestinatarioSection() {
+    final cliente = (widget.preventivo.cliente!.denominazione != null && widget.preventivo.cliente!.denominazione!.length > 20)
+        ? widget.preventivo.cliente!.denominazione!.substring(0, 40)
+        : widget.preventivo.cliente!.denominazione;
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -389,7 +394,7 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                   pw.Padding(
                     padding: pw.EdgeInsets.only(right: 3),
                     child: pw.Text(
-                      widget.preventivo.cliente?.denominazione ?? '',
+                      cliente.toString(),
                       style: pw.TextStyle(fontSize: 9),
                     ),
                   ),
@@ -513,6 +518,9 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
 
   // Metodo per costruire la sezione della destinazione
   pw.Widget _buildDestinazioneSection() {
+    final cliente = (widget.preventivo.destinazione!.denominazione != null && widget.preventivo.destinazione!.denominazione!.length > 20)
+        ? widget.preventivo.destinazione!.denominazione!.substring(0, 40)
+        : widget.preventivo.destinazione!.denominazione;
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -550,7 +558,7 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
                   pw.Padding(
                     padding: pw.EdgeInsets.only(right: 3),
                     child: pw.Text(
-                      widget.preventivo.destinazione?.denominazione ?? '',
+                      cliente.toString(),
                       style: pw.TextStyle(fontSize: 9),
                     ),
                   ),
@@ -756,6 +764,7 @@ class _PDFPreventivoPageState extends State<PDFPreventivoPage> {
           columnWidths: Map.fromIterables(
               Iterable<int>.generate(headers.length, (i) => i), columnWidths),
         ),
+        //pw.SizedBox(height: 100),
         pw.Container(
           height: 1, // Altezza della riga nera
           color: PdfColors.black, // Colore della riga nera

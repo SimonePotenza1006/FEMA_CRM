@@ -16,6 +16,9 @@ import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'CreazioneClientePage.dart';
+import 'NuovaDestinazionePage.dart';
+
 class CreazioneInterventoByAmministrazionePage extends StatefulWidget {
   const CreazioneInterventoByAmministrazionePage({Key? key}) : super(key: key);
 
@@ -164,255 +167,339 @@ class _CreazioneInterventoByAmministrazionePageState
               Navigator.pop(context);
             },
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+                color: Colors.white,
+              ),
+              onPressed: () {
+                // Funzione per ricaricare la pagina
+                getAllClienti();
+              },
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text('Data: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
-                      ElevatedButton(
-                        onPressed: _selezionaData,
-                        style: ElevatedButton.styleFrom(primary: Colors.red),
-                        child: const Text('Seleziona Data', style: TextStyle(color: Colors.white)),
-                      ),
-                      const SizedBox(height: 20.0),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _orarioDisponibile,
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: _selezionaData,
+                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            child: const Text('Seleziona Data', style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        if(selectedDate != null)
+                          Text('Data selezionata: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
+                        const SizedBox(height: 20.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Checkbox(
+                              value: _orarioDisponibile,
+                              onChanged: (value) {
+                                setState(() {
+                                  _orarioDisponibile = value ?? false;
+                                });
+                              },
+                            ),
+                            Text("è disponibile un orario per l'appuntamento?"),
+                          ],
+                        ),
+                        if (_orarioDisponibile)
+                          Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 12),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    _selectTime(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red, // Colore di sfondo rosso
+                                    onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                                  ),
+                                  child: Text('Seleziona Orario'),
+                                ),
+                                SizedBox(height: 12),
+                                Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}')
+                              ],
+                            ),
+                          ),
+                        SizedBox(height: 15),
+                        DropdownButton<TipologiaInterventoModel>(
+                          value: _selectedTipologia,
+                          hint: const Text('Seleziona tipologia di intervento'),
+                          onChanged: (TipologiaInterventoModel? newValue) {
+                            setState(() {
+                              _selectedTipologia = newValue;
+                            });
+                          },
+                          items: allTipologie
+                              .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                                (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
+                              value: value,
+                              child: Text(value.descrizione!),
+                            ),
+                          ).toList(),
+                        ),
+                        const SizedBox(height: 20.0),
+                        SizedBox(
+                          width: 600,
+                          child: TextFormField(
+                            controller: _descrizioneController,
+                            maxLines: null,
+                            decoration: const InputDecoration(labelText: 'Descrizione'),
                             onChanged: (value) {
                               setState(() {
-                                _orarioDisponibile = value ?? false;
+                                _descrizione = value;
                               });
                             },
                           ),
-                          Text("è disponibile un orario per l'appuntamento?"),
-                        ],
-                      ),
-                      if (_orarioDisponibile) // Mostra il TimePicker solo se la checkbox è selezionata
-                        Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: () {
-                                  _selectTime(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red, // Colore di sfondo rosso
-                                  onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: 200,
+                          child: GestureDetector(
+                            onTap: () {
+                              _showClientiDialog();
+                            },
+                            child: SizedBox(
+                              height: 50,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                                  const Icon(Icons.arrow_drop_down),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CreazioneClientePage(),
                                 ),
-                                child: Text('Seleziona Orario'),
-                              ),
-                              SizedBox(height: 12),
-                              Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}')
-                            ],
-                          ),
-                        ),
-                        
-                      SizedBox(height: 15),
-                      DropdownButton<TipologiaInterventoModel>(
-                        value: _selectedTipologia,
-                        hint: const Text('Seleziona tipologia di intervento'),
-                        onChanged: (TipologiaInterventoModel? newValue) {
-                          setState(() {
-                            _selectedTipologia = newValue;
-                          });
-                        },
-                        items: allTipologie
-                            .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                              (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                            value: value,
-                            child: Text(value.descrizione!),
-                          ),
-                        )
-                            .toList(),
-                      ),
-                      const SizedBox(height: 20.0),
-                      TextFormField(
-                        controller: _descrizioneController,
-                        maxLines: null,
-                        decoration: const InputDecoration(labelText: 'Descrizione'),
-                        onChanged: (value) {
-                          setState(() {
-                            _descrizione = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          _showClientiDialog();
-                        },
-                        child: SizedBox(
-                          height: 50,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
-                              const Icon(Icons.arrow_drop_down),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      GestureDetector(
-                        onTap: () {
-                          _showDestinazioniDialog();
-                        },
-                        child: SizedBox(
-                          height: 50,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
-                              const Icon(Icons.arrow_drop_down),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _selectedUtenti = [];
-                                responsabile = null;
-                                _finalSelectedUtenti = [];
-                                _responsabileSelezionato = null;
-                              });
-                              _showSingleUtenteDialog();
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               primary: Colors.red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20), // Bordo squadrato
-                              ),
+                              onPrimary: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                             ),
-                            child: Text(
-                              'Seleziona tecnico',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            child: Text('Crea nuovo cliente'),
                           ),
-                          SizedBox(height: 15),
-                          Text("OPPURE"),
-                          SizedBox(height: 15),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _selectedUtenti = [];
-                                responsabile = null;
-                                _finalSelectedUtenti = [];
-                                _responsabileSelezionato = null;
-                              });
-                              _showUtentiDialog();
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        SizedBox(
+                          width: 200,
+                          child: GestureDetector(
+                            onTap: () {
+                              _showDestinazioniDialog();
                             },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                            child: SizedBox(
+                              height: 50,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
+                                  const Icon(Icons.arrow_drop_down),
+                                ],
                               ),
                             ),
-                            child: Text(
-                              'Componi Squadra',
-                              style: TextStyle(color: Colors.white),
-                            ),
                           ),
-                        ],
-                      ),
-                      // Aggiungi questo sotto il pulsante per la selezione degli utenti
-                      const SizedBox(height: 20),
-                      DisplayResponsabileUtentiWidget(
-                        responsabile: responsabile,
-                        selectedUtenti: _selectedUtenti,
-                        onSelectedUtentiChanged: _handleSelectedUtentiChanged,
-                      ),
-                      if(_selectedTipologia?.descrizione == "Riparazione Merce")
-                        Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Form(
-                                  key: _formKey,
-                                  child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 15,),
-                                        _buildTextFormField(
-                                            _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
-                                        SizedBox(height: 15,),
-                                        _buildTextFormField(
-                                            _accessoriController, "Accessori", "Inserisci gli accessori se presenti"),
-                                        SizedBox(height: 15,),
-                                        _buildTextFormField(
-                                            _difettoController, "Difetto", "Inserisci il difetto riscontrato"),
-                                        SizedBox(height: 15,),
-                                        _buildTextFormField(
-                                            _passwordController, "Password", "Inserisci le password, se presenti"),
-                                        SizedBox(height: 15,),
-                                        _buildTextFormField(
-                                            _datiController, "Dati", "Inserisci i dati da salvaguardare"),
-                                        SizedBox(height: 15,),
-                                        Row(
-                                          children: [
-                                            Checkbox(
-                                              value: _preventivoRichiesto,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _preventivoRichiesto = value!;
-                                                });
-                                              },
-                                            ),
-                                            Text("è richiesto un preventivo?"),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 20),
-                                        SizedBox(height: 15,),
-                                        ElevatedButton(
-                                          onPressed: takePicture,
-                                          style: ElevatedButton.styleFrom(
-                                            primary: Colors.red,
-                                            onPrimary: Colors.white,
-                                          ),
-                                          child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                                        ),
-                                        SizedBox(height: 15,),
-                                        _buildImagePreview(),
-                                      ]
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        SizedBox(
+                          width: 210,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if(selectedCliente != null){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        NuovaDestinazionePage(cliente: selectedCliente!),
                                   ),
+                                );
+                              } else {
+                                return _showNoClienteDialog();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.red,
+                              onPrimary: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                            ),
+                            child: Text('Crea nuova destinazione'),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedUtenti = [];
+                                  responsabile = null;
+                                  _finalSelectedUtenti = [];
+                                  _responsabileSelezionato = null;
+                                });
+                                _showSingleUtenteDialog();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20), // Bordo squadrato
                                 ),
-                              )
-                            ]
+                              ),
+                              child: Text(
+                                'Seleziona tecnico',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            Text("OPPURE"),
+                            SizedBox(height: 15),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedUtenti = [];
+                                  responsabile = null;
+                                  _finalSelectedUtenti = [];
+                                  _responsabileSelezionato = null;
+                                });
+                                _showUtentiDialog();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              child: Text(
+                                'Componi Squadra',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if(_selectedTipologia?.descrizione == "Riparazione Merce"){
-                              savePics();
-                            }else{
-                              saveRelations();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(primary: Colors.red),
-                          child: const Text('Salva Intervento', style: TextStyle(color: Colors.white)),
+                        // Aggiungi questo sotto il pulsante per la selezione degli utenti
+                        const SizedBox(height: 20),
+                        DisplayResponsabileUtentiWidget(
+                          responsabile: responsabile,
+                          selectedUtenti: _selectedUtenti,
+                          onSelectedUtentiChanged: _handleSelectedUtentiChanged,
                         ),
-                      ),
-                    ],
+                        if(_selectedTipologia?.descrizione == "Riparazione Merce")
+                          Center(
+                            child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(height: 15,),
+                                            _buildTextFormField(
+                                                _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
+                                            SizedBox(height: 15,),
+                                            _buildTextFormField(
+                                                _accessoriController, "Accessori", "Inserisci gli accessori se presenti"),
+                                            SizedBox(height: 15,),
+                                            _buildTextFormField(
+                                                _difettoController, "Difetto", "Inserisci il difetto riscontrato"),
+                                            SizedBox(height: 15,),
+                                            _buildTextFormField(
+                                                _passwordController, "Password", "Inserisci le password, se presenti"),
+                                            SizedBox(height: 15,),
+                                            _buildTextFormField(
+                                                _datiController, "Dati", "Inserisci i dati da salvaguardare"),
+                                            SizedBox(height: 15,),
+                                            Center(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Checkbox(
+                                                    value: _preventivoRichiesto,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _preventivoRichiesto = value!;
+                                                      });
+                                                    },
+                                                  ),
+                                                  Text("è richiesto un preventivo?"),
+                                                ],
+                                              ),
+                                            ),
+
+                                            const SizedBox(height: 20),
+                                            SizedBox(height: 15,),
+                                            ElevatedButton(
+                                              onPressed: takePicture,
+                                              style: ElevatedButton.styleFrom(
+                                                primary: Colors.red,
+                                                onPrimary: Colors.white,
+                                              ),
+                                              child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                            ),
+                                            SizedBox(height: 15,),
+                                            _buildImagePreview(),
+                                          ]
+                                      ),
+                                    ),
+                                  )
+                                ]
+                            ),
+                          ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if(_selectedTipologia?.descrizione == "Riparazione Merce"){
+                                savePics();
+                              }else{
+                                saveRelations();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            child: const Text('Salva Intervento', style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -420,6 +507,25 @@ class _CreazioneInterventoByAmministrazionePageState
     );
   }
 
+  void _showNoClienteDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Attenzione'),
+          content: Text('Seleziona un cliente per poter creare una nuova destinazione.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<http.Response?> savePics() async{
     final data = await saveInterventoPlusMerce();
@@ -1022,24 +1128,27 @@ class _CreazioneInterventoByAmministrazionePageState
 
   Widget _buildTextFormField(
       TextEditingController controller, String label, String hintText) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.grey,
+    return SizedBox(
+      width: 300,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.grey,
+            ),
           ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.red,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.red,
+            ),
           ),
+          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
       ),
     );
   }

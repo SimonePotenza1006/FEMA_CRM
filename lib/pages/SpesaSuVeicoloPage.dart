@@ -192,23 +192,31 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       ],
                     ),
                   SizedBox(height: 20),
-                  _buildTextFormField(
-                    _importoController,
-                    "Importo",
-                    "Inserisci l'importo della spesa",
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  SizedBox(
+                    width: 200,
+                    child: _buildTextFormField(
+                      _importoController,
+                      "Importo",
+                      "Inserisci l'importo della spesa",
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                   ),
+
                   SizedBox(height: 20),
                   if(selectedTipologia?.descrizione == "Polizza")
                     Center(
                       child: Text("Inserire un chilometraggio qualsiasi, il sistema recupererà il precedente record!"),
                     ),
-                  _buildTextFormField(
-                    _kmController,
-                    "Chilometri",
-                    "Inserisci il chilometraggio",
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  SizedBox(
+                    width: 250,
+                    child: _buildTextFormField(
+                      _kmController,
+                      "Chilometri",
+                      "Inserisci il chilometraggio",
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                   ),
+
                   SizedBox(height: 20),
                   Text(
                     'Scatta una foto:',
@@ -217,6 +225,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   SizedBox(height: 10),
                   Center(
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
                           icon: Icon(Icons.camera_alt),
@@ -789,7 +798,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
     final data = await saveSpesa();
     try {
       if(data == null){
-        throw Exception('Dati del sopralluogo non disponibili.');
+        throw Exception('Dati della spesa non disponibili.');
       }
       final spesa = SpesaVeicoloModel.fromJson(jsonDecode(data.body));
       try{

@@ -50,7 +50,7 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildTextFormField(_nomeController, 'Nome', 'Inserisci il nome dell\'utente'),
                 SizedBox(height: 15),
@@ -60,48 +60,54 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
                 SizedBox(height: 15),
                 _buildTextFormField(_codiceFiscaleController, 'Codice Fiscale', 'Inserisci il codice fiscale dell\'utente'),
                 SizedBox(height: 15),
-                _buildTextFormField(_ibanController, 'Iban', 'Inserisci l\'IBAN dell\'utente'),
+                _buildTextFormField(_ibanController, 'Iban', 'Inserisci l\'IBAN dell\'utente', validator: _validateIBAN),
                 SizedBox(height: 15),
                 _buildTextFormField(_usernameController, 'Username', 'Inserisci l\'username dell\'utente'),
                 SizedBox(height: 15),
                 _buildTextFormField(_passwordController, 'Password', 'Inserisci la password che dovrà usare l\'utente'),
                 SizedBox(height: 15),
-                DropdownButton<TipologiaInterventoModel>(
-                  value: selectedTipologia,
-                  hint: Text('Seleziona tipologia di intervento'),
-                  isExpanded: true,
-                  onChanged: (TipologiaInterventoModel? newValue) {
-                    setState(() {
-                      selectedTipologia = newValue;
-                    });
-                  },
-                  items: tipologieList
-                      .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                          (TipologiaInterventoModel tipologia) {
-                        return DropdownMenuItem<TipologiaInterventoModel>(
-                          value: tipologia,
-                          child: Text(tipologia.descrizione ?? ''),
-                        );
-                      }).toList(),
+                SizedBox(
+                  width: 300,
+                  child: DropdownButton<TipologiaInterventoModel>(
+                    value: selectedTipologia,
+                    hint: Text('Seleziona tipologia di intervento'),
+                    isExpanded: true,
+                    onChanged: (TipologiaInterventoModel? newValue) {
+                      setState(() {
+                        selectedTipologia = newValue;
+                      });
+                    },
+                    items: tipologieList
+                        .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                            (TipologiaInterventoModel tipologia) {
+                          return DropdownMenuItem<TipologiaInterventoModel>(
+                            value: tipologia,
+                            child: Text(tipologia.descrizione ?? ''),
+                          );
+                        }).toList(),
+                  ),
                 ),
                 SizedBox(height: 15),
-                DropdownButton<RuoloUtenteModel>(
-                  value: selectedRuolo,
-                  hint: Text('Seleziona il ruolo dell\'utente'),
-                  isExpanded: true,
-                  onChanged: (RuoloUtenteModel? newValue) {
-                    setState(() {
-                      selectedRuolo = newValue;
-                    });
-                  },
-                  items: ruoliList
-                      .map<DropdownMenuItem<RuoloUtenteModel>>(
-                          (RuoloUtenteModel ruolo) {
-                        return DropdownMenuItem<RuoloUtenteModel>(
-                          value: ruolo,
-                          child: Text(ruolo.descrizione ?? ''),
-                        );
-                      }).toList(),
+                SizedBox(
+                  width: 300,
+                  child: DropdownButton<RuoloUtenteModel>(
+                    value: selectedRuolo,
+                    hint: Text('Seleziona il ruolo dell\'utente'),
+                    isExpanded: true,
+                    onChanged: (RuoloUtenteModel? newValue) {
+                      setState(() {
+                        selectedRuolo = newValue;
+                      });
+                    },
+                    items: ruoliList
+                        .map<DropdownMenuItem<RuoloUtenteModel>>(
+                            (RuoloUtenteModel ruolo) {
+                          return DropdownMenuItem<RuoloUtenteModel>(
+                            value: ruolo,
+                            child: Text(ruolo.descrizione ?? ''),
+                          );
+                        }).toList(),
+                  ),
                 ),
                 SizedBox(height: 50),
                 Container(
@@ -110,7 +116,9 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
                   padding: EdgeInsets.symmetric(vertical: 16),
                   child: ElevatedButton(
                     onPressed: () {
-                      saveUtente();
+                      if (_formKey.currentState!.validate()) {
+                        saveUtente();
+                      }
                     },
                     style: ButtonStyle(
                       backgroundColor:
@@ -184,6 +192,25 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
     }
   }
 
+  String? _validateIBAN(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Campo obbligatorio';
+    }
+
+    // Controllo sulla lunghezza e sul prefisso
+    if (value.length != 27 || !value.startsWith('IT')) {
+      return 'Inserisci un IBAN italiano valido';
+    }
+
+    // Controllo che gli altri caratteri siano alfanumerici
+    final ibanRegex = RegExp(r'^[A-Z0-9]+$');
+    if (!ibanRegex.hasMatch(value.substring(2))) {
+      return 'Inserisci un IBAN italiano valido';
+    }
+
+    return null; // Se tutto è corretto, non c'è errore
+  }
+
   Future<void> getAllRuoli() async {
     try {
       var apiUrl = Uri.parse('${ipaddress}/api/ruolo');
@@ -229,32 +256,30 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
   }
 
   Widget _buildTextFormField(
-      TextEditingController controller, String label, String hintText) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.grey,
+      TextEditingController controller, String label, String hintText, {String? Function(String?)? validator}) {
+    return SizedBox(
+      width: 320,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.grey,
+            ),
           ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.red,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.red,
+            ),
           ),
+          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        validator: validator, // Assegna la funzione di validazione
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Campo obbligatorio';
-        }
-        return null;
-      },
     );
   }
 }

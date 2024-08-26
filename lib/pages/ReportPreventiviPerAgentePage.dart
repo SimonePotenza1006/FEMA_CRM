@@ -48,7 +48,9 @@ class _ReportPreventiviPerAgentePageState
             ),
             onPressed: () {
               // Funzione per ricaricare la pagina
-              setState(() {});
+              setState(() {
+                getAllAgenti();
+              });
             },
           ),
           IconButton(
@@ -162,8 +164,8 @@ class _ReportPreventiviPerAgentePageState
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            PDFRendicontoMensilePreventiviPage(mese : month)
+                          builder: (context) =>
+                              PDFRendicontoMensilePreventiviPage(mese : month)
                       ),
                     );
                   },
@@ -197,7 +199,7 @@ class _ReportPreventiviPerAgentePageState
       // Calcolo delle provvigioni totali per l'agente corrente
       double totalProvvigioni = filteredPreventivi.fold<double>(
           0.0, (acc, preventivo) => acc + (preventivo.provvigioni ?? 0.0));
-
+      if (filteredPreventivi.length > 0)
       tables.add(
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -217,18 +219,21 @@ class _ReportPreventiviPerAgentePageState
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              DataTable(
-                columns: [
-                  DataColumn(label: Text('Cliente')),
-                  DataColumn(label: Text('Importo')),
-                  DataColumn(label: Text('Accettato')),
-                  DataColumn(label: Text('Rifiutato')),
-                  DataColumn(label: Text('Consegnato')),
-                  DataColumn(label: Text('Data Creazione')),
-                  DataColumn(label: Text('Data Accettazione')),
-                  DataColumn(label: Text('Data Consegna')),
-                ],
-                rows: _buildRows(filteredPreventivi, agente.id!),
+              SizedBox(
+                width: 1900,
+                child: DataTable(
+                  columns: [
+                    DataColumn(label: Text('Cliente')),
+                    DataColumn(label: Text('Importo')),
+                    DataColumn(label: Text('Accettato')),
+                    DataColumn(label: Text('Rifiutato')),
+                    DataColumn(label: Text('Consegnato')),
+                    DataColumn(label: Text('Data Creazione')),
+                    DataColumn(label: Text('Data Accettazione')),
+                    DataColumn(label: Text('Data Consegna')),
+                  ],
+                  rows: _buildRows(filteredPreventivi, agente.id!),
+                ),
               ),
             ],
           ),
@@ -409,4 +414,3 @@ class _ReportPreventiviPerAgentePageState
     }
   }
 }
-

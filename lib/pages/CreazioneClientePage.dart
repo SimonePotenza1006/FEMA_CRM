@@ -56,75 +56,78 @@ class _CreazioneClientePageState extends State<CreazioneClientePage> {
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTextFormField(_codiceFiscaleController, 'Codice Fiscale',
-                    'Inserisci un codice fiscale'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_partitaIvaController, 'Partita IVA',
-                    'Inserisci una Partita IVA'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_denominazioneController, 'Denominazione',
-                    'Inserisci una denominazione'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_indirizzoController, 'Indirizzo',
-                    'Inserisci un indirizzo'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_capController, 'CAP', 'Inserisci un CAP'),
-                SizedBox(height: 15,),
-                _buildTextFormField(
-                    _cittaController, 'Città', 'Inserisci una città'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_provinciaController, 'Provincia (Solo la sigla)',
-                    'Inserisci una provincia (Solo la sigla)'),
-                SizedBox(height: 15,),
-                _buildTextFormField(
-                    _nazioneController, 'Nazione', 'Inserisci una nazione'),
-                SizedBox(height: 15,),
-                _buildTextFormField(
-                    _recapitoFatturazioneElettronicaController,
-                    'Recapito Fatturazione Elettronica',
-                    'Inserisci un recapito per la fatturazione elettronica'),
-                SizedBox(height: 15,),
-                _buildTextFormField(
-                    _riferimentoAmministrativoController,
-                    'Riferimento Amministrativo',
-                    'Inserisci un riferimento amministrativo'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_referenteController, 'Referente',
-                    'Inserisci un referente'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_faxController, 'Fax', 'Inserisci un fax'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_telefonoController, 'Telefono',
-                    'Inserisci un numero di telefono'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_cellulareController, 'Cellulare',
-                    'Inserisci un numero di cellulare'),
-                SizedBox(height: 15,),
-                _buildTextFormField(
-                    _emailController, 'Email', 'Inserisci un indirizzo email'),
-                SizedBox(height: 15,),
-                _buildTextFormField(
-                    _pecController, 'PEC', 'Inserisci un indirizzo PEC'),
-                SizedBox(height: 15,),
-                _buildTextFormField(_noteController, 'Note', ''),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      createNewCliente();
-                    }
-                  },
-                  child: Text('Salva', style: TextStyle(color: Colors.white)),
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.red),
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                //mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildTextFormField(_codiceFiscaleController, 'Codice Fiscale',
+                      'Inserisci un codice fiscale'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_partitaIvaController, 'Partita IVA',
+                      'Inserisci una Partita IVA'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_denominazioneController, 'Denominazione',
+                      'Inserisci una denominazione'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_indirizzoController, 'Indirizzo',
+                      'Inserisci un indirizzo'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_capController, 'CAP', 'Inserisci un CAP'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(
+                      _cittaController, 'Città', 'Inserisci una città'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_provinciaController, 'Provincia (Solo la sigla)',
+                      'Inserisci una provincia (Solo la sigla)'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(
+                      _nazioneController, 'Nazione', 'Inserisci una nazione'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(
+                      _recapitoFatturazioneElettronicaController,
+                      'Recapito Fatturazione Elettronica',
+                      'Inserisci un recapito per la fatturazione elettronica'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(
+                      _riferimentoAmministrativoController,
+                      'Riferimento Amministrativo',
+                      'Inserisci un riferimento amministrativo'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_referenteController, 'Referente',
+                      'Inserisci un referente'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_faxController, 'Fax', 'Inserisci un fax'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_telefonoController, 'Telefono',
+                      'Inserisci un numero di telefono'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_cellulareController, 'Cellulare',
+                      'Inserisci un numero di cellulare'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(
+                      _emailController, 'Email', 'Inserisci un indirizzo email'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(
+                      _pecController, 'PEC', 'Inserisci un indirizzo PEC'),
+                  SizedBox(height: 15,),
+                  _buildTextFormField(_noteController, 'Note', ''),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        createNewCliente();
+                      }
+                    },
+                    child: Text('Salva', style: TextStyle(color: Colors.white)),
+                    style: ButtonStyle(
+                      backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.red),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            )
           ),
         ),
       ),
@@ -133,31 +136,34 @@ class _CreazioneClientePageState extends State<CreazioneClientePage> {
 
   Widget _buildTextFormField(
       TextEditingController controller, String label, String hintText) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.grey,
+    return SizedBox(
+      width: 500,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.grey,
+            ),
           ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.red,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.red,
+            ),
           ),
+          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Campo obbligatorio';
+          }
+          return null;
+        },
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Campo obbligatorio';
-        }
-        return null;
-      },
     );
   }
 

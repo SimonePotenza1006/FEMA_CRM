@@ -28,11 +28,23 @@ class _ModificaSelezioneProdottiPreventivoPageState
     extends State<ModificaSelezioneProdottiPreventivoPage> {
   late List<double> quantitaProdotti;
   late List<TextEditingController> quantityControllers;
+
+  late List<double> nuoviPrezzi;
+  late List<TextEditingController> prezziControllers;
+
+  late List<double> quantitaOldProdotti;
+  late List<TextEditingController> oldQuantitiesController;
+
+  late List<double> oldPrices;
+  late List<TextEditingController> oldPricesController;
+
   late Timer _debounce;
+  Map<int, double> lastPrices = {};
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   List<RelazionePreventivoProdottiModel> allProdotti = [];
   List<PreventivoModel> allPreventivi = [];
   List<RelazionePreventivoProdottiModel> pastProdotti = [];
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -47,22 +59,40 @@ class _ModificaSelezioneProdottiPreventivoPageState
     for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
       quantityControllers[i].text = '1';
     }
-    _debounce = Timer(Duration(milliseconds: 500), () {});
+
     getProdotti(); // Inizializzazione del timer debounce
-    getPreventiviByCliente().then((value) => getAllProdottiFromPastPreventivi(allPreventivi, int.parse(widget.preventivo.id!)));
+    getPreventiviByCliente().then((value) => getAllProdottiFromPastPreventivi(allPreventivi, int.parse(widget.preventivo.id!))).then((_) {
+      oldPricesController = List.generate(
+          pastProdotti.length, (index) => TextEditingController()
+      );
+      oldQuantitiesController = List.generate(
+          pastProdotti.length, (index) => TextEditingController()
+      );
+      for(int i = 0; i < pastProdotti.length; i++){
+        oldPricesController[i].text = pastProdotti[i].prezzo.toString();
+        oldQuantitiesController[i].text = pastProdotti[i].quantita.toString();
+      }
+    });
+
+
+
+    nuoviPrezzi = List.filled(widget.prodottiSelezionati.length, 1);
+    prezziControllers =List.generate(
+        widget.prodottiSelezionati.length, (index) => TextEditingController()
+    );
+    for(int i = 0; i < widget.prodottiSelezionati.length; i++){
+      double listinoPercentage = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
+      double initialPrice = widget.prodottiSelezionati[i].prezzo_fornitore != null ? widget.prodottiSelezionati[i].prezzo_fornitore! + (widget.prodottiSelezionati[i].prezzo_fornitore! * (listinoPercentage / 100)) : 0;
+      prezziControllers[i].text = initialPrice.toStringAsFixed(2);
+
+
+
+    }
+    _debounce = Timer(Duration(milliseconds: 500), () {});
   }
 
   double? getLastPrice(int productId) {
-    double? lastPrice;
-    DateTime lastDate = DateTime.now();
-
-    for (var relazione in allProdotti) {
-      if (relazione.prodotto?.id == productId && relazione.preventivo!.data_creazione!.isAfter(lastDate)) {
-        lastPrice = relazione.prezzo;
-        lastDate = relazione.preventivo!.data_creazione!;
-      }
-    }
-    return lastPrice;
+    return lastPrices[productId];
   }
 
   @override
@@ -84,72 +114,64 @@ class _ModificaSelezioneProdottiPreventivoPageState
     });
   }
 
+  void _onPriceChanged(String value, int index){
+    if (_debounce.isActive) _debounce.cancel();
+    _debounce = Timer(Duration(milliseconds: 500), () {
+      setState(() {
+        nuoviPrezzi[index] = double.tryParse(value) ?? 0;
+      });
+    });
+  }
+
+  void _onOldPriceChanged(String value, int index){
+    if(_debounce.isActive) _debounce.cancel();
+    _debounce = Timer(Duration(milliseconds: 500), (){
+      setState(() {
+        oldPrices[index] = double.tryParse(value) ?? 0;
+      });
+    });
+  }
+
+
+
   double _calculateTotalAmount() {
     double totalAmount = 0;
-
     // Calcola il totale per i prodotti selezionati
     for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
-      double productPrice = widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
-      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
+      double productPrice = double.tryParse(prezziControllers[i].text) ?? 0;
       double quantity = quantitaProdotti[i];
-
-      totalAmount += (productPrice + (productPrice * (listino / 100))) * quantity;
+      totalAmount += productPrice * quantity;
     }
 
     // Calcola il totale per i prodotti ottenuti dalla chiamata API
     for (int i = 0; i < allProdotti.length; i++) {
-      double productPrice = allProdotti[i].prodotto?.prezzo_fornitore ?? 0;
-      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
-      double quantity = 1; // Quantità fissa per i prodotti ottenuti dalla chiamata API
-
-      totalAmount += (productPrice + (productPrice * (listino / 100))) * quantity;
+      double productPrice = allProdotti[i].prezzo ?? 0;
+      double quantity = allProdotti[i].quantita!; // Quantità fissa per i prodotti ottenuti dalla chiamata API
+      totalAmount += productPrice * quantity;
     }
-
     return totalAmount;
   }
 
   double _calculateAgentCommission() {
     double totalCommission = 0;
     double agentCommissionPercentage = widget.preventivo.agente!.categoria_provvigione ?? 0;
-
     // Calcola le provvigioni per i prodotti selezionati
     for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
-      double productPrice = widget.prodottiSelezionati[i].prezzo_fornitore ?? 0;
-      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
+      double? prezzoFornitore = widget.prodottiSelezionati[i].prezzo_fornitore != null ? widget.prodottiSelezionati[i].prezzo_fornitore : 0;
+      double productPrice = double.tryParse(prezziControllers[i].text) ?? 0;
       double quantity = quantitaProdotti[i];
-
-      // Calcola il prezzo finale del prodotto con il listino applicato
-      double finalProductPrice = productPrice + (productPrice * (listino / 100));
-
-      // Calcola la differenza tra il prezzo finale e il prezzo di fornitore del prodotto, moltiplicato per la quantità
-      double priceDifference = (finalProductPrice - productPrice) * quantity;
-
-      // Calcola le provvigioni dell'agente per questo prodotto
+      double priceDifference = (productPrice * quantity) - (prezzoFornitore! * quantity) ;
       double productCommission = priceDifference * (agentCommissionPercentage / 100);
-
-      // Aggiungi le provvigioni dell'agente al totale
       totalCommission += productCommission;
     }
-
     // Calcola le provvigioni per i prodotti ottenuti dalla chiamata API
     for (int i = 0; i < allProdotti.length; i++) {
-      double productPrice = allProdotti[i].prodotto?.prezzo_fornitore ?? 0;
-      double listino = double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0;
-      double quantity = 1; // Quantità fissa per i prodotti ottenuti dalla chiamata API
-
-      // Calcola il prezzo finale del prodotto con il listino applicato
-      double finalProductPrice = productPrice + (productPrice * (listino / 100));
-
-      // Calcola la differenza tra il prezzo finale e il prezzo di fornitore del prodotto
-      double priceDifference = finalProductPrice - productPrice;
-
-      // Calcola le provvigioni dell'agente per questo prodotto
+      double productPrice = allProdotti[i].prezzo ?? 0;
+      double quantity = allProdotti[i].quantita!; // Quantità fissa per i prodotti ottenuti dalla chiamata API
+      double priceDifference = (productPrice * quantity) - (allProdotti[i].prodotto!.prezzo_fornitore!);
       double productCommission = priceDifference * (agentCommissionPercentage / 100);
-
-      // Aggiungi le provvigioni dell'agente al totale
       totalCommission += productCommission;
     }
-
     return totalCommission;
   }
 
@@ -164,232 +186,488 @@ class _ModificaSelezioneProdottiPreventivoPageState
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child:
-            ListView.builder(
-              itemCount: widget.prodottiSelezionati.length + allProdotti.length,
-              itemBuilder: (context, index) {
-                if (index < widget.prodottiSelezionati.length) {
-                  final prodotto = widget.prodottiSelezionati[index];
-                  return ListTile(
-                    title: Text(prodotto.descrizione ?? ''),
-                    subtitle: Text('Prezzo: ${prodotto.prezzo_fornitore} €'),
-                    trailing: SizedBox(
-                      width: 150, // Limita la larghezza del trailing
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Row(
-                            children: [
-                              Text('${getLastPrice(int.parse(prodotto.id!))} €', style: TextStyle(color: Colors.black),),
-                              Text('Quantità:'),
-                              SizedBox(width: 5),
-                              SizedBox(
-                                width:
-                                50, // Imposta una larghezza fissa per il TextField
-                                child: TextField(
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  controller: quantityControllers[index],
-                                  onChanged: (value) {
-                                    _onQuantityChanged(value, index);
-                                  },
-                                ),
-                              ),
-                            ],
-                          )
-
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  final prodotto =
-                  allProdotti[index - widget.prodottiSelezionati.length];
-                  return ListTile(
-                    title: Text(prodotto.prodotto?.descrizione ?? ''),
-                    subtitle:
-                    Text('Prezzo: ${prodotto.prodotto?.prezzo_fornitore} €'),
-                    trailing: SizedBox(
-                      width: 150, // Limita la larghezza del trailing
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text('Quantità:'),
-                          SizedBox(width: 5),
-                          SizedBox(
-                            width:
-                            50, // Imposta una larghezza fissa per il TextField
-                            child: TextField(
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              controller: TextEditingController(text: '1'),
-                              onChanged: (value) {
-                                // Implementa la logica di aggiornamento della quantità per i prodotti ottenuti dalla chiamata API
-                                // Suggerimento: puoi mantenere una lista separata di controller per questi prodotti se necessario
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-              },
-            ),
-
-
-
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Totale preventivo: ${_calculateTotalAmount().toStringAsFixed(2)} €',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Totale provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Dialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
+      body: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              SizedBox(height: 30),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.prodottiSelezionati.length + (allProdotti.isNotEmpty ? allProdotti.length : 0),
+                  itemBuilder: (context, index) {
+                    if (index < widget.prodottiSelezionati.length) {
+                      final prodotto = widget.prodottiSelezionati[index];
+                      final lastPrice = getLastPrice(int.parse(prodotto.id!));
+                      final prezzo = prodotto.prezzo_fornitore != null ? prodotto.prezzo_fornitore.toString() : '';
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Table(
+                          border: TableBorder.all(),
+                          columnWidths: {
+                            0: FlexColumnWidth(2),
+                            1: FlexColumnWidth(2),
+                            2: FlexColumnWidth(2),
+                            3: FlexColumnWidth(2),
+                          },
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                'Riepilogo Prodotti',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: widget.prodottiSelezionati.length,
-                              itemBuilder: (context, index) {
-                                final prodotto =
-                                widget.prodottiSelezionati[index];
-                                return ListTile(
-                                  title: Text(prodotto.descrizione ?? ''),
-                                  subtitle: Text(
-                                      'Quantità: ${quantitaProdotti[index]}'),
-                                );
-                              },
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                'Totale Preventivo: ${_calculateTotalAmount().toStringAsFixed(2)} €',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                'Totale Provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  aggiornaPreventivo();
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ReportPreventiviPage(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                  onPrimary: Colors.white,
-                                  padding: EdgeInsets.all(12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
+                            TableRow(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children : [
+                                        Text(
+                                          prodotto.descrizione ?? '',
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize:16 ),
+                                        ),
+                                        SizedBox(height: 3),
+                                            Text('Prezzo fornitore:  ${prezzo}€',
+                                              style: TextStyle(fontSize: 18),
+                                            ),
+
+                                      ]
                                   ),
                                 ),
-                                child: Text(
-                                  'Inserisci',
-                                  style: TextStyle(fontSize: 18.0),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  //mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 12,),
+                                    Text(
+                                      'Ultimo prezzo: ${lastPrice ?? 'N/A'}€',
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
-                              ),
+                                LayoutBuilder(
+                                    builder: (context, constraints){
+                                      if(constraints.maxWidth > 800){
+                                        return Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+
+                                            Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Text(
+                                                'Prezzo di vendita:',
+                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            SizedBox(
+                                              width: 158,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                  keyboardType: TextInputType.number,
+                                                  textAlign: TextAlign.center,
+                                                  controller: prezziControllers[index],
+                                                  validator: (value) {
+                                                    if (value!.isEmpty) {
+                                                      return 'Inserisci un prezzo';
+                                                    }
+                                                    double nuovoPrezzo =
+                                                        double.tryParse(value) ?? 0;
+                                                    double? prezzoFornitore =
+                                                        prodotto.prezzo_fornitore;
+                                                    if (prezzoFornitore != null &&
+                                                        nuovoPrezzo < prezzoFornitore) {
+                                                      return 'Il prezzo non può essere inferiore al prezzo fornitore';
+                                                    }
+                                                    return null;
+                                                  },
+                                                  onChanged: (value) {
+                                                    _onPriceChanged(value, index);
+                                                  },
+                                                ),
+                                              ),
+                                            )
+
+                                          ],
+                                        );
+                                      } else {
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 5,),
+                                            Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Text(
+                                                'Prezzo di vendita:',
+                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            SizedBox(
+                                              width: 158,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                  keyboardType: TextInputType.number,
+                                                  textAlign: TextAlign.center,
+                                                  controller: prezziControllers[index],
+                                                  validator: (value) {
+                                                    if (value!.isEmpty) {
+                                                      return 'Inserisci un prezzo';
+                                                    }
+                                                    double nuovoPrezzo =
+                                                        double.tryParse(value) ?? 0;
+                                                    double? prezzoFornitore =
+                                                        prodotto.prezzo_fornitore;
+                                                    if (prezzoFornitore != null &&
+                                                        nuovoPrezzo < prezzoFornitore) {
+                                                      return 'Il prezzo non può essere inferiore al prezzo fornitore';
+                                                    }
+                                                    return null;
+                                                  },
+                                                  onChanged: (value) {
+                                                    _onPriceChanged(value, index);
+                                                  },
+                                                ),
+                                              ),
+                                            )
+
+                                          ],
+                                        );
+                                      }
+                                    }
+                                ),
+                                LayoutBuilder(
+                                    builder: (context, constraints){
+                                      if(constraints.maxWidth > 800){
+                                        return Row(
+                                          crossAxisAlignment : CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Text(
+                                                'Quantità',
+                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                            SizedBox(width: 8,),
+                                            SizedBox(
+                                              width: 158,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                  keyboardType: TextInputType.number,
+                                                  textAlign: TextAlign.center,
+                                                  controller: quantityControllers[index],
+                                                  onChanged: (value) {
+                                                    _onQuantityChanged(value, index);
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        );
+                                      } else {
+                                        return Column(
+                                          crossAxisAlignment : CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 5),
+                                            Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Text(
+                                                'Quantità:',
+                                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                            SizedBox(width: 8,),
+                                            SizedBox(
+                                              width: 158,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                  keyboardType: TextInputType.number,
+                                                  textAlign: TextAlign.center,
+                                                  controller: quantityControllers[index],
+                                                  onChanged: (value) {
+                                                    _onQuantityChanged(value, index);
+                                                  },
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        );
+                                      }
+                                    }
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      // if(allProdotti.isNotEmpty){
+                      //   final prodotto = allProdotti[index - widget.prodottiSelezionati.length];
+                      //   return Padding(
+                      //     padding: const EdgeInsets.all(8.0),
+                      //     child: Column(
+                      //       children: [
+                      //         Table(
+                      //           border: TableBorder.all(),
+                      //           columnWidths: {
+                      //             0: FlexColumnWidth(2),
+                      //             1: FlexColumnWidth(2),
+                      //             2: FlexColumnWidth(2),
+                      //             3: FlexColumnWidth(2),
+                      //           },
+                      //           children: [
+                      //             TableRow(
+                      //               children: [
+                      //                 Padding(
+                      //                   padding: const EdgeInsets.all(8.0),
+                      //                   child: Text(
+                      //                     prodotto.prodotto?.descrizione ?? '',
+                      //                     style: TextStyle(fontWeight: FontWeight.bold),
+                      //                   ),
+                      //                 ),
+                      //                 Padding(
+                      //                   padding: const EdgeInsets.all(8.0),
+                      //                   child: Text(
+                      //                     'Prezzo finale: ${prodotto.prezzo ?? 'N/A'} €',
+                      //                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      //                   ),
+                      //                 ),
+                      //                 Padding(
+                      //                   padding: const EdgeInsets.all(8),
+                      //                   child: TextFormField(
+                      //                     keyboardType: TextInputType.number,
+                      //                     textAlign: TextAlign.center,
+                      //                     controller: oldPricesController[index - widget.prodottiSelezionati.length],
+                      //                     validator: (value) {
+                      //                       if (value!.isEmpty) {
+                      //                         return 'Inserisci un prezzo';
+                      //                       }
+                      //                       return null;
+                      //                     },
+                      //                     onChanged: (value) {
+                      //                       _onOldPriceChanged(value, index - widget.prodottiSelezionati.length);
+                      //                     },
+                      //                   ),
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   );
+                      // } else {
+                      //   return Container();
+                      // }
+                    }
                   },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red,
-                onPrimary: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 15.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
-              child: Text(
-                'Conferma inserimento',
-                style: TextStyle(fontSize: 18.0),
+              //SizedBox(height: 200,),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Totale preventivo: ${_calculateTotalAmount().toStringAsFixed(2)} €',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Totale provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    bool isValid = true;
+                    String errorMessage = '';
+                    int invalidProductIndex = -1;
+
+                    for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
+                      final prodotto = widget.prodottiSelezionati[i];
+                      final prezzoInserito =
+                          double.tryParse(prezziControllers[i].text) ?? 0;
+
+                      if (prezzoInserito < (prodotto.prezzo_fornitore ?? 0)) {
+                        isValid = false;
+                        errorMessage =
+                        'Il prezzo inserito per il prodotto "${prodotto.descrizione}" è inferiore al prezzo fornitore.';
+                        invalidProductIndex = i;
+                        break;
+                      }
+                    }
+
+                    if (isValid) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Dialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(
+                                      'Riepilogo Prodotti',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ),
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: widget.prodottiSelezionati.length,
+                                    itemBuilder: (context, index) {
+                                      final prodotto =
+                                      widget.prodottiSelezionati[index];
+                                      return ListTile(
+                                        title: Text(prodotto.descrizione ?? ''),
+                                        subtitle: Text(
+                                            'Quantità: ${quantitaProdotti[index]}'),
+                                      );
+                                    },
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(
+                                      'Totale Preventivo: ${_calculateTotalAmount().toStringAsFixed(2)} €',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text(
+                                      'Totale Provvigioni: ${_calculateAgentCommission().toStringAsFixed(2)} €',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        aggiornaPreventivo();
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ReportPreventiviPage(),
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red,
+                                        onPrimary: Colors.white,
+                                        padding: EdgeInsets.all(12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Inserisci',
+                                        style: TextStyle(fontSize: 18.0),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Errore di validazione'),
+                            content: Text(errorMessage),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  if (invalidProductIndex != -1) {
+                                    final prodotto = widget
+                                        .prodottiSelezionati[invalidProductIndex];
+                                    prezziControllers[invalidProductIndex].text =
+                                        prodotto.prezzo_fornitore.toString();
+                                  }
+
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.red,
+                    padding:
+                    EdgeInsets.symmetric(vertical: 16.0, horizontal: 15.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: Text(
+                    'Conferma inserimento',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
     );
   }
 
-  Future<void> getAllProdottiFromPastPreventivi(List<PreventivoModel> preventivi, int excludeId) async{
-    try{
-      for(var preventivo in preventivi){
-        if(preventivo.id != excludeId){
-          try{
+  Future<void> getAllProdottiFromPastPreventivi(List<PreventivoModel> preventivi, int excludeId) async {
+    try {
+      for (var preventivo in preventivi) {
+        if (preventivo.id != excludeId) {
+          try {
             var apiUrl = Uri.parse('$ipaddress/api/relazionePreventivoProdotto/preventivo/${preventivo.id}');
             var response = await http.get(apiUrl);
-            if(response.statusCode == 200){
+            if (response.statusCode == 200) {
               var jsonData = jsonDecode(response.body);
               List<RelazionePreventivoProdottiModel> prodotti = [];
-              for(var item in jsonData){
-                prodotti.add(RelazionePreventivoProdottiModel.fromJson(item));
+              for (var item in jsonData) {
+                var relazione = RelazionePreventivoProdottiModel.fromJson(item);
+                prodotti.add(relazione);
+                // Memorizza l'ultimo prezzo applicato per il prodotto
+                if (!lastPrices.containsKey(relazione.prodotto!.id) ||
+                    relazione.preventivo!.data_creazione!.isAfter(allProdotti.last.preventivo!.data_creazione!)) {
+                  lastPrices[int.parse(relazione.prodotto!.id!)] = relazione.prezzo!;
+                }
               }
               setState(() {
                 pastProdotti = prodotti;
               });
             }
-          } catch(e){
+          } catch (e) {
             print('1 error: $e');
           }
         }
-    }
-    }catch(e){
+      }
+    } catch (e) {
       print('2 error: $e');
     }
   }
@@ -407,6 +685,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
         setState(() {
           allPreventivi = preventivi;
         });
+        getAllProdottiFromPastPreventivi(preventivi, int.parse(widget.preventivo.id!));
         return response;
       }
     } catch(e){
@@ -503,6 +782,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
         for (int i = 0; i < widget.prodottiSelezionati.length; i++) {
           final prodotto = widget.prodottiSelezionati[i];
           final quantita = quantitaProdotti[i];
+          final prezzo = double.tryParse(prezziControllers[i].text);
 
           response = await http.post(
             Uri.parse('${ipaddress}/api/relazionePreventivoProdotto'),
@@ -514,6 +794,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
               'preventivo': widget.preventivo.toJson(),
               'prodotto': prodotto.toJson(),
               'quantita': quantita,
+              'prezzo' : prezzo,
             }),
           );
 

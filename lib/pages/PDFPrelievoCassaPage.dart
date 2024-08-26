@@ -258,7 +258,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                     children: [
                       pw.Column(
                         children: [
-                          pw.Text("Firma utente alla cassa"),
+                          pw.Text("Firma responsabile cassa"),
                           pw.SizedBox(height: 20),
                           pw.SizedBox(
                             height: 100,
@@ -271,7 +271,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                       ),
                       pw.Column(
                         children: [
-                          pw.Text("Firma utente incaricato"),
+                          pw.Text("Firma incaricato a ritiro"),
                           pw.SizedBox(height: 20),
                           pw.SizedBox(
                             height: 100,
@@ -284,7 +284,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                       ),
                     ],
                   ),
-                  pw.SizedBox(height: 40),
+                  /*pw.SizedBox(height: 40),
                   pw.Text(
                     'Elenco delle movimenti:',
                     style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
@@ -297,7 +297,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                       child: pw.Text(
                         '${DateFormat('dd/MM/yyyy').format(prelievo.dataCreazione!)} - ${prelievo.descrizione} - ${prelievo.importo}',
                       ),
-                    ),
+                    ),*/
                 ],
               ),
             );

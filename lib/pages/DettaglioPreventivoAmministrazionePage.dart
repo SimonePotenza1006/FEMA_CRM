@@ -1,13 +1,13 @@
 import 'package:fema_crm/model/RelazionePreventivoProdottiModel.dart';
+import 'package:fema_crm/pages/ModificaVecchiProdottiPreventivoPage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fema_crm/model/PreventivoModel.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import '../model/ProdottoModel.dart';
 import 'AggiuntaProdottoPreventivoPage.dart';
 import 'ConsegnaMaterialePreventivoPage.dart';
+import 'PDFPreventivoNewPage.dart';
 import 'PDFPreventivoPage.dart';
 
 class DettaglioPreventivoAmministrazionePage extends StatefulWidget {
@@ -48,351 +48,497 @@ class _DettaglioPreventivoAmministrazionePageState
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Azienda:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth > 800) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: _buildDettagliPreventivo(),
+                        ),
+                        SizedBox(width: 20),
+                        Expanded(
+                          flex: 2,
+                          child: _buildProdottiPreventivo(),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _buildActionButtons()
+                          ],
+                        )
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildDettagliPreventivo(),
+                        SizedBox(height: 20),
+                        _buildProdottiPreventivo(),
+                        SizedBox(height: 20),
+                        _buildActionButtons()
+                      ],
+                    );
+                  }
+                },
               ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.azienda?.nome.toString() ?? 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
+            ],
+          )
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDettagliPreventivo() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black, width: 1),
+      ),
+      child: DataTable(
+        showCheckboxColumn: false,
+        columns: [
+          DataColumn(
+            label: Text(
+              'Codice identificativo',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          DataColumn(label: Text('ID ${widget.preventivo.id}')),
+        ],
+        rows: [
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Azienda',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Categoria Merceologica:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              DataCell(
+                Text('${widget.preventivo.azienda?.nome ?? 'N/A'}'),
               ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.categoria_merceologica ?? 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Categoria Merceologica',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              SizedBox(height: 8.0),
-              buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Cliente:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              DataCell(
+                Text('${widget.preventivo.categoria_merceologica ?? 'N/A'}'),
               ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.cliente?.denominazione ?? 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Cliente',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Agente:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              DataCell(
+                Text('${widget.preventivo.cliente?.denominazione ?? 'N/A'}'),
               ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.agente?.nome ?? 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Agente',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              SizedBox(height: 8.0),
-              buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Utente:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              DataCell(
+                Text('${widget.preventivo.agente?.nome ?? 'N/A'}'),
               ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.utente?.cognome ?? 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Utente',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Listino:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              DataCell(
+                Text('${widget.preventivo.utente?.cognome ?? 'N/A'}'),
               ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.listino ?? 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Listino',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
-              SizedBox(height: 16.0),
-              buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Prodotti:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              DataCell(
+                Text('${widget.preventivo.listino ?? 'N/A'}'),
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.4, // Altezza massima desiderata
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: allProdotti.length,
-                  itemBuilder: (context, index) {
-                    final prezzoFornitore =
-                        allProdotti[index].prodotto?.prezzo_fornitore ?? 0;
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Importo',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.importo != null ? '${widget.preventivo.importo?.toStringAsFixed(2)} €' : 'N/A'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Provvigioni',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.provvigioni != null ? '${widget.preventivo.provvigioni?.toStringAsFixed(2)} €' : 'N/A'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Accettato',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.accettato ?? false ? 'SI' : 'NO'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Rifiutato',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.rifiutato ?? false ? 'SI' : 'NO'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Attesa',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.attesa ?? false ? 'SI' : 'NO'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Consegnato',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.consegnato ?? false ? 'SI' : 'NO'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Data Creazione',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_creazione!) : 'N/A'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Data Accettazione',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_accettazione!) : 'Non consegnato'}'),
+              ),
+            ],
+          ),
+          DataRow(
+            cells: [
+              DataCell(
+                Text(
+                  'Data Consegna',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              DataCell(
+                Text('${widget.preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_consegna!) : 'Non consegnato'}'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProdottiPreventivo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'PRODOTTI',
+          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          height: 745,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 1),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columns: const <DataColumn>[
+                  DataColumn(
+                    label: Text(
+                      'Descrizione',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'P. Fornitore',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'P. Vendita',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Quantità',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+                rows: List<DataRow>.generate(
+                  allProdotti.length,
+                      (index) {
+                    final prodotto = allProdotti[index].prodotto;
+                    final prezzoFornitore = prodotto?.prezzo_fornitore ?? 0;
+                    final prezzoNoListino = allProdotti[index].prezzo ?? 0;
                     final listino = widget.preventivo.listino != null &&
                         widget.preventivo.listino!.length >= 2
-                        ? double.tryParse(
-                        widget.preventivo.listino!.substring(0, 2)) ??
-                        0
+                        ? double.tryParse(widget.preventivo.listino!.substring(0, 2)) ?? 0
                         : 0;
-                    final prezzoVendita = prezzoFornitore * (1 + listino / 100);
-                    return ListTile(
-                      title:
-                      Text(allProdotti[index].prodotto?.descrizione ?? 'N/A'),
-                      subtitle: RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.black,
+                    final prezzoVendita = prezzoNoListino * (1 + listino / 100);
+                    final quantita = allProdotti[index].quantita!;
+
+                    return DataRow(
+                      cells: <DataCell>[
+                        DataCell(Text(prodotto?.descrizione ?? 'N/A')),
+                        DataCell(
+                          Text(
+                            '${prezzoFornitore.toStringAsFixed(2)}€',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
                           ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'Prezzo di vendita: ',
-                            ),
-                            TextSpan(
-                              text: '${prezzoFornitore.toStringAsFixed(2)} € ',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22,
-                                color: Colors.blue, // Colore blu
-                              ),
-                            ),
-                            TextSpan(
-                              text:
-                              '(Prezzo fornitore) + ${listino.toStringAsFixed(2)}% = ',
-                            ),
-                            TextSpan(
-                              text: '${prezzoVendita.toStringAsFixed(2)} €',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22,
-                                color: Colors.lightGreen[700], // Colore verde
-                              ),
-                            ),
-                          ],
                         ),
-                      ),
+                        DataCell(
+                          Text(
+                            '${prezzoNoListino.toStringAsFixed(2)}€',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Text(
+                            '${quantita}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),
               ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Importo:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.importo != null ? '${widget.preventivo.importo?.toStringAsFixed(2)} \u20AC' : 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Provvigioni:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.provvigioni != null ? '${widget.preventivo.provvigioni?.toStringAsFixed(2)} \u20AC' : 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Accettato:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.accettato ?? false ? 'SI' : 'NO'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Rifiutato:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.rifiutato ?? false ? 'SI' : 'NO'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Attesa:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.attesa ?? false ? 'SI' : 'NO'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Consegnato:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.consegnato ?? false ? 'SI' : 'NO'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Data Creazione:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.data_creazione != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_creazione!) : 'N/A'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildDarkDivider(), // Riga divisoria grigia scura
-              SizedBox(height: 8.0),
-              Text(
-                'Data Accettazione:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.data_accettazione != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_accettazione!) : 'Non consegnato'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 8.0),
-              buildLightDivider(), // Riga divisoria grigia chiara
-              SizedBox(height: 8.0),
-              Text(
-                'Data Consegna:',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4.0),
-              Text(
-                '${widget.preventivo.data_consegna != null ? DateFormat('yyyy-MM-dd').format(widget.preventivo.data_consegna!) : 'Non consegnato'}',
-                style: TextStyle(fontSize: 16.0),
-              ),
-              SizedBox(height: 16.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AggiuntaProdottoPreventivoPage(
-                              preventivo: widget.preventivo),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    ),
-                    child: Text('Aggiungi prodotto'),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 16.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      accettato();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    ),
-                    child: Text('Accettato'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      rifiutato();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    ),
-                    child: Text('Rifiutato'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ConsegnaMaterialePreventivoPage(preventivo: widget.preventivo),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    ),
-                    child: Text('Consegna'),
-                  ),
-                ],
-              ),
-              SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              PDFPreventivoPage(preventivo: widget.preventivo),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                    ),
-                    child: Text('Genera PDF'),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        //SizedBox(height: 50.0),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 43,
+        ),
+        SizedBox(
+          width: 200,
+          child: ElevatedButton(
+
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      AggiuntaProdottoPreventivoPage(
+                          preventivo: widget.preventivo),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red,
+              onPrimary: Colors.white,
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+
+            ),
+            child: Text('Aggiungi prodotto'),
+          ),
+        ),
+
+            SizedBox(height: 16.0),
+            if(allProdotti.isNotEmpty)
+              SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                  onPressed: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ModificaVecchiProdottiPreventivoPage(prodotti: allProdotti, preventivo : widget.preventivo),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    onPrimary: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                  ),
+                  child: Text('Modifica prodotti'),
+                ),
+              ),
+        SizedBox(height: 16.0),
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () {
+                  accettato();
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                ),
+                child: Text('Accettato'),
+              ),
+            ),
+        SizedBox(height: 18),
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () {
+                  rifiutato();
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                ),
+                child: Text('Rifiutato'),
+              ),
+            ),
+        SizedBox(height: 18),
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ConsegnaMaterialePreventivoPage(
+                              preventivo: widget.preventivo),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                ),
+                child: Text('Consegna'),
+              ),
+            ),
+            SizedBox(height: 18),
+            SizedBox(
+              width: 200,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PDFPreventivoPage(preventivo: widget.preventivo),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red,
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                ),
+                child: Text('Genera PDF'),
+              ),
+            ),
+      ],
     );
   }
 
@@ -528,7 +674,7 @@ class _DettaglioPreventivoAmministrazionePageState
           'provvigioni': widget.preventivo.provvigioni,
           'data_consegna': null,
           'data_accettazione':
-              null,
+          null,
           'utente': widget.preventivo.utente?.toJson(),
           'agente': widget.preventivo.agente?.toJson(),
         }),
@@ -547,49 +693,49 @@ class _DettaglioPreventivoAmministrazionePageState
     }
   }
 
-   Future<void> consegnato() async {
-     late http.Response response;
-     try {
-       response = await http.post(
-         Uri.parse('${ipaddress}/api/preventivo'),
-         headers: {
-           "Accept": "application/json",
-           "Content-Type": "application/json"
-         },
-         body: json.encode({
-           'id': widget.preventivo.id,
-           'data_creazione': widget.preventivo.data_creazione?.toIso8601String(),
-           'azienda': widget.preventivo.azienda?.toJson(),
-           'categoria_merceologica': widget.preventivo.categoria_merceologica,
-           'listino': widget.preventivo.listino,
-           'descrizione': widget.preventivo.descrizione,
-           'importo': widget.preventivo.importo,
-           'cliente': widget.preventivo.cliente?.toJson(),
-           'destinazione': widget.preventivo.destinazione?.toJson(),
-           'accettato': false,
-           'rifiutato': false,
-           'attesa': false,
-           'pendente': false,
-           'consegnato': true,
-           'provvigioni': widget.preventivo.provvigioni,
-           'data_consegna': DateTime.now().toIso8601String(),
-           'data_accettazione':
-               widget.preventivo.data_accettazione?.toIso8601String(),
-           'utente': widget.preventivo.utente?.toJson(),
-           'agente': widget.preventivo.agente?.toJson(),
-         }),
-       );
-       if (response.statusCode == 201) {
-         print("Preventivo consegnato");
-         Navigator.pop(context);
-         if (widget.onNavigateBack != null) {
-           widget.onNavigateBack!();
-         }
-       } else {
-         print("Hai toppato :(");
+  Future<void> consegnato() async {
+    late http.Response response;
+    try {
+      response = await http.post(
+        Uri.parse('${ipaddress}/api/preventivo'),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: json.encode({
+          'id': widget.preventivo.id,
+          'data_creazione': widget.preventivo.data_creazione?.toIso8601String(),
+          'azienda': widget.preventivo.azienda?.toJson(),
+          'categoria_merceologica': widget.preventivo.categoria_merceologica,
+          'listino': widget.preventivo.listino,
+          'descrizione': widget.preventivo.descrizione,
+          'importo': widget.preventivo.importo,
+          'cliente': widget.preventivo.cliente?.toJson(),
+          'destinazione': widget.preventivo.destinazione?.toJson(),
+          'accettato': false,
+          'rifiutato': false,
+          'attesa': false,
+          'pendente': false,
+          'consegnato': true,
+          'provvigioni': widget.preventivo.provvigioni,
+          'data_consegna': DateTime.now().toIso8601String(),
+          'data_accettazione':
+          widget.preventivo.data_accettazione?.toIso8601String(),
+          'utente': widget.preventivo.utente?.toJson(),
+          'agente': widget.preventivo.agente?.toJson(),
+        }),
+      );
+      if (response.statusCode == 201) {
+        print("Preventivo consegnato");
+        Navigator.pop(context);
+        if (widget.onNavigateBack != null) {
+          widget.onNavigateBack!();
+        }
+      } else {
+        print("Hai toppato :(");
       }
-     } catch (e) {
-       print(e.toString());
-     }
-   }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

@@ -207,7 +207,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                 TextFormField(
                   controller: _descrizioneController,
                   decoration: InputDecoration(
-                    labelText: 'Descrizione',
+                    labelText: 'DESCRIZIONE',
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -223,7 +223,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
                   ],
                   decoration: InputDecoration(
-                    labelText: 'Importo',
+                    labelText: 'IMPORTO',
                   ),
                   validator: (value) {
                     if (value == null || double.tryParse(value) == null) {
@@ -247,15 +247,15 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   items: TipoMovimentazione.values.map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
                     String label;
                     if (value == TipoMovimentazione.Entrata) {
-                      label = 'Entrata';
+                      label = 'ENTRATA';
                     } else if (value == TipoMovimentazione.Uscita) {
-                      label = 'Uscita';
+                      label = 'USCITA';
                     } else if(value == TipoMovimentazione.Acconto){
-                      label = 'Acconto';
-                    } else if (value == TipoMovimentazione.Pagamento){
-                      label = 'Pagamento';
+                      label = 'ACCONTO';
+                    } else if (value == TipoMovimentazione.Prelievo){
+                      label = 'PRELIEVO';
                     } else {
-                      label = 'Prelievo';
+                      label = 'PAGAMENTO';
                     }
                     return DropdownMenuItem<TipoMovimentazione>(
                       value: value,
@@ -263,7 +263,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     );
                   }).toList(),
                   decoration: InputDecoration(
-                    labelText: 'Tipo Movimentazione',
+                    labelText: 'TIPO MOVIMENTAZIONE',
                   ),
                   validator: (value) {
                     if (value == null) {
@@ -335,7 +335,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                         child: signatureBytes != null
                             ? Image.memory(signatureBytes!)
                             : Text(
-                          'Firma utente alla cassa',
+                          'Firma responsabile cassa',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -397,7 +397,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                         child: signatureBytesIncaricato != null
                             ? Image.memory(signatureBytesIncaricato!)
                             : Text(
-                          'Firma utente incaricato',
+                          'Firma incaricato a ritiro',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
@@ -440,7 +440,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     ),
                   ),
                 SizedBox(height: 30),
-                Center(
+                /*Center(
                   child: ElevatedButton(
                     onPressed: () {
                       _selectDate(context);
@@ -453,14 +453,29 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                ),
+                ),*/
                 SizedBox(height: 10),
-                Center(
-                  child: Text(
-                    'Data selezionata: ${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year.toString().substring(2)}',
+               //Center(child:
+                  Text(
+                    'Data di riferimento:',
                     style: TextStyle(color: Colors.black),
                   ),
+                //),
+                //Center(child:
+                GestureDetector(
+                    onTap: () {
+                      _selectDate(context);
+                      },
+                    child: Row(
+                      children: [
+                        Text(
+                          '${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year.toString().substring(2)} ',
+                          style: TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                        Icon(Icons.edit, size: 16),
+                      ])
                 ),
+                //),
                 SizedBox(height: 16.0),
                 Center(
                   child: ElevatedButton(

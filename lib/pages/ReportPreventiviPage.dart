@@ -72,10 +72,8 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
               });
             },
           ),
-          IconButton(
-            icon: Icon(Icons.info),
-            color: Colors.white,
-            onPressed: () {
+          MouseRegion(
+            onEnter: (event) {
               showModalBottomSheet(
                 context: context,
                 builder: (BuildContext context) {
@@ -87,20 +85,105 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
                       children: [
                         Text(
                           'Legenda colori:',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
-                        Text('Giallo: Accettato e in attesa di consegna'),
-                        Text('Rosso: Rifiutato'),
-                        Text('Verde: Consegnato'),
-                        Text('Bianco: Attesa di accettazione'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.yellow,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Accettato e in attesa di consegna'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.red,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Rifiutato'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.green,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Consegnato'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.white70,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Attesa di accettazione'),
+                          ],
+                        ),
                       ],
                     ),
                   );
                 },
               );
             },
+            child: IconButton(
+              icon: Icon(Icons.info),
+              color: Colors.white,
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Legenda colori:',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Text('Giallo: Accettato e in attesa di consegna'),
+                          Text('Rosso: Rifiutato'),
+                          Text('Verde: Consegnato'),
+                          Text('Bianco: Attesa di accettazione'),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          IconButton(
+              onPressed: (){
+                _showDateFilterDialog();
+              },
+              icon: Icon(
+                Icons.filter_alt_outlined,
+                color: Colors.white,
+              ),
           ),
           IconButton(
             icon: Icon(
@@ -355,6 +438,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
     setState(() {
       if (query.isNotEmpty) {
         preventiviList = originalPreventiviList.where((preventivo) {
+
           final cliente = preventivo.cliente?.denominazione ?? '';
           final accettato = preventivo.accettato ?? false;
           final rifiutato = preventivo.rifiutato ?? false;
@@ -556,4 +640,136 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
       print('Errore durante il salvataggio del file Excel: $error');
     }
   }
+
+  void filterByCurrentMonth() {
+    DateTime now = DateTime.now();
+    DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
+    DateTime lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
+
+    setState(() {
+      preventiviList = originalPreventiviList.where((preventivo) {
+        return preventivo.data_creazione != null &&
+            preventivo.data_creazione!.isAfter(firstDayOfMonth) &&
+            preventivo.data_creazione!.isBefore(lastDayOfMonth);
+      }).toList();
+    });
+  }
+
+  void filterByCurrentYear() {
+    DateTime now = DateTime.now();
+    DateTime firstDayOfYear = DateTime(now.year, 1, 1);
+    DateTime lastDayOfYear = DateTime(now.year, 12, 31);
+
+    setState(() {
+      preventiviList = originalPreventiviList.where((preventivo) {
+        return preventivo.data_creazione != null &&
+            preventivo.data_creazione!.isAfter(firstDayOfYear) &&
+            preventivo.data_creazione!.isBefore(lastDayOfYear);
+      }).toList();
+    });
+  }
+
+  void filterByLastYear() {
+    DateTime now = DateTime.now();
+    DateTime firstDayOfLastYear = DateTime(now.year - 1, 1, 1);
+    DateTime lastDayOfLastYear = DateTime(now.year - 1, 12, 31);
+
+    setState(() {
+      preventiviList = originalPreventiviList.where((preventivo) {
+        return preventivo.data_creazione != null &&
+            preventivo.data_creazione!.isAfter(firstDayOfLastYear) &&
+            preventivo.data_creazione!.isBefore(lastDayOfLastYear);
+      }).toList();
+    });
+  }
+
+  void filterBySpecificDate(DateTime selectedDate) {
+    setState(() {
+      preventiviList = originalPreventiviList.where((preventivo) {
+        return preventivo.data_creazione != null &&
+            DateFormat('yyyy-MM-dd').format(preventivo.data_creazione!) ==
+                DateFormat('yyyy-MM-dd').format(selectedDate);
+      }).toList();
+      if (preventiviList.isEmpty) {
+        _showNoResultsDialog();
+      }
+    });
+  }
+
+  void _showDateFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        DateTime? selectedDate;
+
+        return AlertDialog(
+          title: Text('Filtra per Data Creazione'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text('Mese Corrente'),
+                onTap: () {
+                  Navigator.pop(context);
+                  filterByCurrentMonth();
+                },
+              ),
+              ListTile(
+                title: Text('Anno Corrente'),
+                onTap: () {
+                  Navigator.pop(context);
+                  filterByCurrentYear();
+                },
+              ),
+              ListTile(
+                title: Text('Anno Precedente'),
+                onTap: () {
+                  Navigator.pop(context);
+                  filterByLastYear();
+                },
+              ),
+              ListTile(
+                title: Text('Seleziona Data Specifica'),
+                onTap: () async {
+                  selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+
+                  if (selectedDate != null) {
+                    Navigator.pop(context);
+                    filterBySpecificDate(selectedDate!);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showNoResultsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Nessun preventivo trovato'),
+          content: Text(
+              'Non è presente alcun preventivo creato in questa data.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+

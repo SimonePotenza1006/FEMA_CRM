@@ -27,6 +27,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   double? fondoCassaSettimana2;
   double? fondoCassaSettimana3;
   final ScrollController _scrollController = ScrollController();
+  double fondoCassa = 0.0;
 
 
   @override
@@ -38,8 +39,8 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   @override
   Widget build(BuildContext context) {
-    double fondoCassa = calcolaFondoCassa(movimentiList);
-    fondoCassa = fondoCassa.clamp(0, 10000);
+    //double fondoCassa = calcolaFondoCassa(movimentiList);
+    //fondoCassa = fondoCassa.clamp(0, 10000);
     fondoCassa = double.parse(
         fondoCassa.toStringAsFixed(2));
     return Scaffold(
@@ -327,10 +328,12 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   double calcolaFondoCassa(List<MovimentiModel> movimenti) {
     double fondoCassa = 0;
     for (var movimento in movimenti) {
-      if (movimento.tipo_movimentazione == TipoMovimentazione.Entrata || movimento.tipo_movimentazione == TipoMovimentazione.Pagamento || movimento.tipo_movimentazione == TipoMovimentazione.Acconto) {
-        fondoCassa += movimento.importo ?? 0;
-      } else if (movimento.tipo_movimentazione == TipoMovimentazione.Uscita || movimento.tipo_movimentazione == TipoMovimentazione.Prelievo) {
-        fondoCassa -= movimento.importo ?? 0;
+      if (movimento.importo != null) {
+        if (movimento.tipo_movimentazione == TipoMovimentazione.Entrata || movimento.tipo_movimentazione == TipoMovimentazione.Pagamento || movimento.tipo_movimentazione == TipoMovimentazione.Acconto) {
+          fondoCassa += movimento.importo!;
+        } else if (movimento.tipo_movimentazione == TipoMovimentazione.Uscita || movimento.tipo_movimentazione == TipoMovimentazione.Prelievo) {
+          fondoCassa -= movimento.importo!;
+        }
       }
     }
     return fondoCassa;
@@ -391,7 +394,8 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
           }
         }
         setState(() {
-          movimentiList = movimenti;
+          fondoCassa = calcolaFondoCassa(movimenti);
+          movimentiList = movimenti; // Calculate fondoCassa here
         });
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
