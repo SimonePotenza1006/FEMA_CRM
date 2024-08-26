@@ -160,15 +160,6 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  // SizedBox(height: 15,),
-                  // ElevatedButton(
-                  //   onPressed: takePicture,
-                  //   style: ElevatedButton.styleFrom(
-                  //     primary: Colors.red, // Imposta il colore di sfondo del tasto su rosso
-                  //     onPrimary: Colors.white, // Imposta il colore del testo su bianco
-                  //   ),
-                  //   child: Text('Scatta Foto'),
-                  //),
                   SizedBox(height: 15,),
                 ],
               ),
@@ -176,7 +167,6 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
                     onPressed: () async {
                       await createMerce();
                       Navigator.pop(context);
-                      //await saveImagesMerce();
                     },
                     child: Text('Salva'),
                     style: ElevatedButton.styleFrom(

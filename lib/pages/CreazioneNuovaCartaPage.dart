@@ -40,28 +40,34 @@ class _CreazioneNuovaCartaPageState extends State<CreazioneNuovaCartaPage>{
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: 200,),
                 _buildTextFormField(_descrizioneController, "Numero carta", "Inserisci i 4 numeri finali della carta"),
                 SizedBox(height: 15),
-                DropdownButton<TipologiaCartaModel>(
-                  value: selectedTipologiaCarta,
-                  hint: Text('Seleziona la tipologia della carta'),
-                  isExpanded: true,
-                  onChanged: (TipologiaCartaModel? newValue) {
-                    setState(() {
-                      selectedTipologiaCarta = newValue;
-                    });
-                  },
-                  items: tipologieCartaList
-                      .map<DropdownMenuItem<TipologiaCartaModel>>(
-                          (TipologiaCartaModel tipologia) {
-                        return DropdownMenuItem<TipologiaCartaModel>(
-                          value: tipologia,
-                          child: Text(tipologia.descrizione ?? ''),
-                        );
-                      }).toList(),
+                SizedBox(
+                  width: 300,
+                  child: DropdownButton<TipologiaCartaModel>(
+                    value: selectedTipologiaCarta,
+                    hint: Text('Seleziona la tipologia della carta'),
+                    isExpanded: true,
+                    onChanged: (TipologiaCartaModel? newValue) {
+                      setState(() {
+                        selectedTipologiaCarta = newValue;
+                      });
+                    },
+                    items: tipologieCartaList
+                        .map<DropdownMenuItem<TipologiaCartaModel>>(
+                            (TipologiaCartaModel tipologia) {
+                          return DropdownMenuItem<TipologiaCartaModel>(
+                            value: tipologia,
+                            child: Text(tipologia.descrizione ?? ''),
+                          );
+                        }).toList(),
+                  ),
                 ),
+
                 SizedBox(height: 50),
                 Container(
                   alignment: Alignment.center,
@@ -115,31 +121,34 @@ class _CreazioneNuovaCartaPageState extends State<CreazioneNuovaCartaPage>{
 
   Widget _buildTextFormField(
       TextEditingController controller, String label, String hintText) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.grey,
+    return SizedBox(
+      width: 300,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.grey,
+            ),
           ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(
-            color: Colors.red,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.red,
+            ),
           ),
+          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Campo obbligatorio';
+          }
+          return null;
+        },
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Campo obbligatorio';
-        }
-        return null;
-      },
     );
   }
 

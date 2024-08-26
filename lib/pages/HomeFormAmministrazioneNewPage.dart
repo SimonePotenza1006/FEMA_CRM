@@ -42,6 +42,7 @@ import 'ParentFolderPage.dart';
 import 'RegistroCassaPage.dart';
 import 'ReportSpeseVeicoloPage.dart';
 import 'StoricoMerciUtentiPage.dart';
+import 'TableInterventiPage.dart';
 
 class HomeFormAmministrazioneNewPage extends StatefulWidget {
   final UtenteModel userData;
@@ -73,10 +74,15 @@ class _HomeFormAmministrazioneNewPageState
   List<VeicoloModel> allVeicoli = [];
   List<OrdinePerInterventoModel> allOrdini = [];
   DateTime selectedDate = DateTime.now();
+  Map<int, int> _menuItemClickCount = {};
 
   @override
   void initState() {
     super.initState();
+    _menuItemClickCount.clear();
+    for (int i = 0; i < _menuItems.length; i++) {
+      _menuItemClickCount[i] = 0;
+    };
     getAllVeicoli().then((_) {
       checkScadenzeVeicoli().then((_) {
         getNote();
@@ -86,6 +92,23 @@ class _HomeFormAmministrazioneNewPageState
     _scheduleGetAllOrdini();
     fetchData();
   }
+
+  final List<MenuItem> _menuItems = [
+    MenuItem(icon: Icons.calendar_month_outlined, label: 'CALENDARIO'),
+    MenuItem(icon: Icons.snippet_folder_outlined, label: 'ORDINI FORNITORE'),
+    MenuItem(icon: Icons.more_time, label: 'TIMBRATURA'),
+    MenuItem(icon: Icons.build, label: 'LISTA INTERVENTI'),
+    MenuItem(icon: Icons.rule_folder_outlined, label: 'RIPARAZIONI'),
+    MenuItem(icon: Icons.remove_red_eye_outlined, label: 'SOPRALLUOGHI'),
+    MenuItem(icon: Icons.class_outlined, label: 'COMMISSIONI'),
+    MenuItem(icon: Icons.emoji_transportation_sharp, label: 'SPESE SU VEICOLO'),
+    MenuItem(icon: Icons.do_disturb_alt_rounded, label: 'CREDENZIALI'),
+    MenuItem(icon: Icons.contact_emergency_rounded, label: 'LISTA CLIENTI'),
+    MenuItem(icon: Icons.warehouse_rounded, label: 'MAGAZZINO'),
+    MenuItem(icon: Icons.euro_rounded, label: 'REGISTRO CASSA'),
+    MenuItem(icon: Icons.business_center_outlined, label: 'PREVENTIVI'),
+    MenuItem(icon: Icons.qr_code_2_outlined, label: 'SCANNER QRCODE'),
+  ];
 
   Future<void> fetchData() async {
     print('fetchData chiamato');
@@ -512,92 +535,117 @@ class _HomeFormAmministrazioneNewPageState
     }
   }
 
+  int _lastClickedIndex = 0;
+
   void _navigateToPage(int index) {
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => CalendarioPage()),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MenuOrdiniFornitorePage(utente: widget.userData)),
-        );
-        break;
-      case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => TimbraturaPage(utente: widget.userData)),
-        );
-        break;
-      case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ListaInterventiFinalPage()),
-        );
-        break;
-      case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MenuMerceInRiparazionePage(utente: widget.userData)),
-        );
-        break;
-      case 5:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MenuSopralluoghiPage(utente: widget.userData)),
-        );
-        break;
-      case 6:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
-        );
-        break;
-      case 7:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData)),
-        );
-        break;
-      case 8:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ListaCredenzialiPage()),
-        );
-        break;
-      case 9:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ListaClientiPage()),
-        );
-        break;
-      case 10:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MagazzinoPage()),
-        );
-        break;
-      case 11:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => RegistroCassaPage(userData: widget.userData)),
-        );
-        break;
-      case 12:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => LogisticaPreventiviHomepage(userData: widget.userData)),
-        );
-        break;
-      case 13:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ScannerQrCodeAmministrazionePage()),
-        );
-        break;
+    if (_lastClickedIndex != index) {
+      _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
+      _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
+    }
+
+    if (_menuItemClickCount.containsKey(index)) {
+      _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
+    } else {
+      _menuItemClickCount[index] = 1;
+    }
+
+    //if (_menuItemClickCount[index] % 2 == 0 && _hoveredIndex != -1) {
+    if ((_menuItemClickCount[index] ?? 0) % 2 == 0 && _hoveredIndex != -1) {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CalendarioPage()),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                MenuOrdiniFornitorePage(utente: widget.userData)),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => TimbraturaPage(utente: widget.userData)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                TableInterventiPage()), //ListaInterventiFinalPage()),
+          );
+          break;
+        case 4:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                MenuMerceInRiparazionePage(utente: widget.userData)),
+          );
+          break;
+        case 5:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                MenuSopralluoghiPage(utente: widget.userData)),
+          );
+          break;
+        case 6:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
+          );
+          break;
+        case 7:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                SpesaSuVeicoloPage(utente: widget.userData)),
+          );
+          break;
+        case 8:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ListaCredenzialiPage()),
+          );
+          break;
+        case 9:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ListaClientiPage()),
+          );
+          break;
+        case 10:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MagazzinoPage()),
+          );
+          break;
+        case 11:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                RegistroCassaPage(userData: widget.userData)),
+          );
+          break;
+        case 12:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                LogisticaPreventiviHomepage(userData: widget.userData)),
+          );
+          break;
+        case 13:
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ScannerQrCodeAmministrazionePage()),
+          );
+          break;
+      }
     }
   }
 
@@ -745,7 +793,7 @@ class _HomeFormAmministrazioneNewPageState
         padding: EdgeInsets.only(top: 85, left: 25, right: 25, bottom: 40),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 800) {
+            if (constraints.maxWidth < 1100) {
               // Tablet/Mobile layout
               return SingleChildScrollView(
                 child: Column(
@@ -803,7 +851,7 @@ class _HomeFormAmministrazioneNewPageState
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              'Note degli utenti',
+                              'NOTE DEGLI UTENTI',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -1230,7 +1278,7 @@ class _HomeFormAmministrazioneNewPageState
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
-                                      'Note degli utenti',
+                                      'NOTE DEGLI UTENTI',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -1430,7 +1478,7 @@ class _HomeFormAmministrazioneNewPageState
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Interventi',
+                            'INTERVENTI',
                             style: TextStyle(
                                 fontSize: 30.0, fontWeight: FontWeight.bold),
                           ),
@@ -1614,7 +1662,7 @@ class _HomeFormAmministrazioneNewPageState
                     const SizedBox(height: 50.0),
                     Center(
                       child: Text(
-                        'Agenda commissioni',
+                        'AGENDA COMMISSIONI',
                         style: TextStyle(
                             fontSize: 30.0, fontWeight: FontWeight.bold),
                       ),
@@ -1837,4 +1885,3 @@ class MenuItem {
 
   MenuItem({required this.icon, required this.label});
 }
-

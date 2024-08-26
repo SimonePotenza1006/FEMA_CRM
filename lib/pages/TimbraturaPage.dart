@@ -329,6 +329,24 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                               },
                               child: Text("Oggi"), //si
                             ),
+                            TextButton(
+                              onPressed: () {
+                                getAllMarcatempoToday().whenComplete(() {
+                                  if (timbratureOdierne.isNotEmpty)
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PDFOggiPage(timbrature: timbratureOdierne),
+                                      ),
+                                    ); else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Ancora nessuna timbratura in data odierna')));
+                                  }
+                                });
+                              },
+                              child: Text("Modifica"), //si
+                            ),
                           ],
                         ),
                       )
@@ -371,17 +389,20 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                   style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: 50),
-                Container(
-                  decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-                  child: SfSignaturePad(
-                      onDraw: (offset, time) {
-                        firmaTrue();
-                      },
-                      key: signatureGlobalKey,
-                      backgroundColor: Colors.white,
-                      strokeColor: Colors.black,
-                      minimumStrokeWidth: 1.0,
-                      maximumStrokeWidth: 4.0),
+                SizedBox(
+                  width: 650,
+                  child: Container(
+                    decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+                    child: SfSignaturePad(
+                        onDraw: (offset, time) {
+                          firmaTrue();
+                        },
+                        key: signatureGlobalKey,
+                        backgroundColor: Colors.white,
+                        strokeColor: Colors.black,
+                        minimumStrokeWidth: 1.0,
+                        maximumStrokeWidth: 4.0),
+                  ),
                 ),
                 SizedBox(height: 30),
                 Container(

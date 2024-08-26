@@ -45,143 +45,106 @@ class _NuovaDestinazionePageState extends State<NuovaDestinazionePage> {
           title: Text(
               'Aggiungi destinazione al cliente ${widget.cliente.denominazione}',
               style: TextStyle(color: Colors.white)),
-          centerTitle: false,
+          centerTitle: true,
           backgroundColor: Colors.red,
         ),
         body: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextFormField(
-                    controller: _denominazioneController,
-                    decoration: InputDecoration(labelText: 'Denominazione'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una denominazione';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _indirizzoController,
-                    decoration: InputDecoration(labelText: 'Indirizzo'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un indirizzo';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _capController,
-                    decoration: InputDecoration(labelText: 'CAP'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un CAP';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _cittaController,
-                    decoration: InputDecoration(labelText: 'Città'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una città';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _provinciaController,
-                    decoration: InputDecoration(labelText: 'Provincia(sigla)'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una provincia';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _codiceFiscaleController,
-                    decoration: InputDecoration(labelText: 'Codice Fiscale'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un codice fiscale';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _partitaIvaController,
-                    decoration: InputDecoration(labelText: 'Partita IVA'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una Partita IVA';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _telefonoController,
-                    decoration: InputDecoration(labelText: 'Telefono'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un numero di telefono';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _cellulareController,
-                    decoration: InputDecoration(labelText: 'Cellulare'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci un numero di cellulare';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        final denominazione = _denominazioneController.text;
-                        final indirizzo = _indirizzoController.text;
-                        final cap = _capController.text;
-                        final citta = _cittaController.text;
-                        final provincia = _provinciaController.text;
-                        final codice_fiscale = _codiceFiscaleController.text;
-                        final partita_iva = _partitaIvaController.text;
-                        final telefono = _telefonoController.text;
-                        final cellulare = _cellulareController.text;
-                        final cliente = widget.cliente;
-                        createNewDestinazione(
-                            denominazione,
-                            indirizzo,
-                            cap,
-                            citta,
-                            provincia,
-                            codice_fiscale,
-                            partita_iva,
-                            telefono,
-                            cellulare,
-                            cliente);
-                      }
-                    },
-                    child: Text('Salva',
-                    style: TextStyle(color: Colors.white)),
-                    style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all<Color>(Colors.red),
-                    ),
-                  )
-                ],
-              ),
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildTextFormField(_denominazioneController, 'Denominazione', 'Inserisci una denominazione'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_indirizzoController, 'Indirizzo', 'Inserisci un indirizzo'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_capController, 'CAP', 'Inserisci un CAP'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_cittaController, 'Città', 'Inserisci una città'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_provinciaController, 'Provincia (Solo la sigla)', 'Inserisci una provincia'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_codiceFiscaleController, 'Codice Fiscale', 'Inserisci un codice fiscale'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_partitaIvaController, 'Partita IVA', 'Inserisci una partita IVA'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_telefonoController, 'Telefono', 'Inserisci un numero di telefono'),
+                    SizedBox(height: 15,),
+                    _buildTextFormField(_cellulareController, 'Cellulare', 'Inserisci un numero di cellulare'),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          final denominazione = _denominazioneController.text;
+                          final indirizzo = _indirizzoController.text;
+                          final cap = _capController.text;
+                          final citta = _cittaController.text;
+                          final provincia = _provinciaController.text;
+                          final codice_fiscale = _codiceFiscaleController.text;
+                          final partita_iva = _partitaIvaController.text;
+                          final telefono = _telefonoController.text;
+                          final cellulare = _cellulareController.text;
+                          final cliente = widget.cliente;
+                          createNewDestinazione(
+                              denominazione,
+                              indirizzo,
+                              cap,
+                              citta,
+                              provincia,
+                              codice_fiscale,
+                              partita_iva,
+                              telefono,
+                              cellulare,
+                              cliente);
+                        }
+                      },
+                      child: Text('Salva',
+                          style: TextStyle(color: Colors.white)),
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.red),
+                      ),
+                    )
+                  ],
+                ),
+              )
             )));
+  }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText) {
+    return SizedBox(
+      width: 500,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.grey,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.red,
+            ),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Campo obbligatorio';
+          }
+          return null;
+        },
+      ),
+    );
   }
 
   Future<void> createNewDestinazione(

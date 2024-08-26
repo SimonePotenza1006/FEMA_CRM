@@ -20,6 +20,7 @@ class AggiuntaProdottoPreventivoPage extends StatefulWidget {
 class _AggiuntaProdottoPreventivoPageState
     extends State<AggiuntaProdottoPreventivoPage> {
   bool isSearching = false;
+  bool isLoading = true;  // Stato per il caricamento
   late TextEditingController searchController;
   List<ProdottoModel> prodottiList = [];
   List<ProdottoModel> filteredProdottiList = [];
@@ -30,8 +31,8 @@ class _AggiuntaProdottoPreventivoPageState
   void initState() {
     print("Id preventivo:" + widget.preventivo.id.toString());
     print("Provvigioni preventivo:" + widget.preventivo.listino.toString());
-    print("Provvigioni agente:" +
-        widget.preventivo.agente!.categoria_provvigione.toString());
+    // print("Provvigioni agente:" +
+    //     widget.preventivo.agente!.categoria_provvigione.toString());
     super.initState();
     searchController = TextEditingController();
     getAllProdotti();
@@ -44,33 +45,25 @@ class _AggiuntaProdottoPreventivoPageState
         title: isSearching
             ? _buildSearchField()
             : Text(
-                'Aggiunta prodotti al preventivo',
-                style: TextStyle(
-                    color:
-                        Colors.white), // Imposta il colore del testo su bianco
-              ),
+          'Aggiunta prodotti al preventivo',
+          style: TextStyle(
+              color: Colors.white), // Imposta il colore del testo su bianco
+        ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: _buildActions(),
       ),
-      body:FutureBuilder(
-        future: Future.value(null),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Column(
-              children: [
-                _buildSelectedProductsList(),
-                Expanded( // or Flexible
-                  child: _buildFilteredProductList(),
-                ),
-              ],
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
+      body: isLoading
+          ? Center(
+        child: CircularProgressIndicator(),
+      )
+          : Column(
+        children: [
+          _buildSelectedProductsList(),
+          Expanded( // or Flexible
+            child: _buildFilteredProductList(),
+          ),
+        ],
       ),
       floatingActionButton: _buildFloatingActionButton(),
     );
@@ -151,26 +144,108 @@ class _AggiuntaProdottoPreventivoPageState
       itemBuilder: (context, index) {
         final prodotto = filteredProdottiList[index];
         final isSelected = selectedProducts.contains(prodotto);
-
-        return ListTile(
-          title: Text(prodotto.descrizione ?? ''),
-          subtitle: Text('Prezzo: ${prodotto.prezzo_fornitore}'),
-          leading: Checkbox(
-            value: isSelected,
-            onChanged: (value) {
-              setState(() {
-                if (value!) {
-                  selectedProducts.add(prodotto);
-                } else {
-                  selectedProducts.remove(prodotto);
-                }
-              });
+        final seriale = filteredProdottiList[index].lotto_seriale != null ? 'Lotto/Seriale: ${filteredProdottiList[index].lotto_seriale}' : 'N/A';
+        final fornitore = filteredProdottiList[index].fornitore != null ? 'Fornitore: ${filteredProdottiList[index].fornitore}' : 'Nessun fornitore segnalato';
+        final prezzo = filteredProdottiList[index].prezzo_fornitore != null ? 'P. Fornitore: ${filteredProdottiList[index].prezzo_fornitore?.toStringAsFixed(2)}€' : 'Nessun prezzo fornitore presente';
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: Table(
+            border: TableBorder.all(),
+            columnWidths: {
+              0 : FlexColumnWidth(0.5),
+              1 : FlexColumnWidth(2.2),
+              2 : FlexColumnWidth(0.8),
+              3 : FlexColumnWidth(0.7),
+              4 : FlexColumnWidth(1.5),
             },
+            children: [
+              TableRow(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: isSelected,
+                          onChanged: (value) {
+                            setState(() {
+                              if (value!) {
+                                selectedProducts.add(prodotto);
+                              } else {
+                                selectedProducts.remove(prodotto);
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${prodotto.descrizione}',
+                            overflow: TextOverflow.clip,
+                            maxLines: null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            prezzo,
+                            overflow: TextOverflow.clip,
+                            maxLines: null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            seriale,
+                            overflow: TextOverflow.clip,
+                            maxLines: null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            fornitore,
+                            overflow: TextOverflow.clip,
+                            maxLines: null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ]
+              )
+            ],
           ),
-          onTap: () {
-            // Se vuoi gestire anche la selezione tramite tap sul prodotto
-            // aggiungi qui la logica
-          },
         );
       },
     );
@@ -206,7 +281,7 @@ class _AggiuntaProdottoPreventivoPageState
     setState(() {
       isSearching = false;
       searchController.clear();
-      filteredProdottiList.clear();
+      filteredProdottiList = prodottiList; // Reimposta la lista filtrata all'originale
     });
   }
 
@@ -221,17 +296,16 @@ class _AggiuntaProdottoPreventivoPageState
         for (var item in jsonData) {
           prodotti.add(ProdottoModel.fromJson(item));
         }
-
         setState(() {
           prodottiList = prodotti;
           filteredProdottiList = prodotti;
+          isLoading = false; // Indica che il caricamento è completato
         });
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -250,6 +324,9 @@ class _AggiuntaProdottoPreventivoPageState
           );
         },
       );
+      setState(() {
+        isLoading = false; // Ferma il caricamento anche in caso di errore
+      });
     }
   }
 

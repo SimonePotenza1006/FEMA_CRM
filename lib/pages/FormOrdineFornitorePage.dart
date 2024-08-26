@@ -43,26 +43,6 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
   bool isSearching = false;
   bool _prodottoNonPresente = false;
 
-  // Future<void> getAllFornitori() async {
-  //   try{
-  //     final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
-  //     if(response.statusCode == 200){
-  //       final jsonData = jsonDecode(response.body);
-  //       List<FornitoreModel> fornitori = [];
-  //       for(var item in jsonData){
-  //         fornitori.add(FornitoreModel.fromJson(item));
-  //       }
-  //       setState(() {
-  //         allFornitori = fornitori;
-  //         filteredFornitori = fornitori;
-  //       });
-  //     } else {
-  //       throw Exception('Failed to load data from API: ${response.statusCode}');
-  //     }
-  //   } catch(e){
-  //     print('Errore nello scaricare i fornitori :$e');
-  //   }
-  // }
 
   Future<void> getAllProdotti() async{
     try{
@@ -135,68 +115,6 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
       });
     }
   }
-
-  // void _showFornitoriDialog() {
-  //   TextEditingController searchController = TextEditingController();
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           return AlertDialog(
-  //             title: const Text('Seleziona fornitore', textAlign: TextAlign.center),
-  //             contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-  //             content: SizedBox(
-  //               width: MediaQuery.of(context).size.width * 0.8,
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   TextField(
-  //                     controller: searchController,
-  //                     onChanged: (value) {
-  //                       setState(() {
-  //                         filteredFornitori = allFornitori
-  //                             .where((fornitore) => fornitore.denominazione!
-  //                             .toLowerCase()
-  //                             .contains(value.toLowerCase()))
-  //                             .toList();
-  //                       });
-  //                     },
-  //                     decoration: const InputDecoration(
-  //                       labelText: 'Cerca Fornitore',
-  //                       prefixIcon: Icon(Icons.search),
-  //                     ),
-  //                   ),
-  //                   const SizedBox(height: 16),
-  //                   Expanded(
-  //                     child: SingleChildScrollView(
-  //                       child: Column(
-  //                         children: filteredFornitori.map((fornitore) {
-  //                           return ListTile(
-  //                             leading: const Icon(Icons.business_center),
-  //                             title: Text(
-  //                               '${fornitore.denominazione}, ${fornitore.indirizzo}',
-  //                             ),
-  //                             onTap: () {
-  //                               setState(() {
-  //                                 selectedFornitore = fornitore;
-  //                               });
-  //                               Navigator.pop(context); // Chiudi il dialog
-  //                             },
-  //                           );
-  //                         }).toList(),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
 
   void _showClientiDialog() {
     TextEditingController searchController = TextEditingController(); // Aggiungi un controller
@@ -286,57 +204,66 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
         padding: EdgeInsets.all(16),
         child: Form(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              TextFormField(
-                controller: _descrizioneController,
-                decoration: InputDecoration(
-                  labelText: "Descrizione ordine",
-                  hintText: "Inserire la descrizione dell'ordine",
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+              SizedBox(
+                width: 500,
+                child: TextFormField(
+                  controller: _descrizioneController,
+                  decoration: InputDecoration(
+                    labelText: "Descrizione ordine",
+                    hintText: "Inserire la descrizione dell'ordine",
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
               SizedBox(height: 20),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: GestureDetector(
-                  onTap: () {
-                    _showClientiDialog();
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          selectedCliente?.denominazione ?? 'Seleziona Cliente',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Icon(Icons.arrow_drop_down),
-                      ],
+              SizedBox(
+                width: 300,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey[300]!),
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      _showClientiDialog();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Icon(Icons.arrow_drop_down),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
               SizedBox(height: 12),
-              TextFormField(
-                controller: _noteController,
-                decoration: InputDecoration(
-                  labelText: "Note (Cliente non in elenco, informazioni aggiuntive, etc.)",
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+              SizedBox(
+                width: 500,
+                child: TextFormField(
+                  controller: _noteController,
+                  decoration: InputDecoration(
+                    labelText: "Note (Cliente non in elenco, informazioni aggiuntive, etc.)",
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
@@ -476,58 +403,39 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
                   ),
                 ),
               SizedBox(height: 24),
-              CheckboxListTile(
-                title: Text('Prodotto non presente in magazzino'),
-                value: _prodottoNonPresente,
-                onChanged: (value) {
-                  setState(() {
-                    _prodottoNonPresente = value!;
-                    if (_prodottoNonPresente) {
-                      _prodottoNonPresenteController.clear();
-                    }
-                  });
-                },
+              SizedBox(
+                width: 370,
+                child: CheckboxListTile(
+                  title: Text('Prodotto non presente in magazzino'),
+                  value: _prodottoNonPresente,
+                  onChanged: (value) {
+                    setState(() {
+                      _prodottoNonPresente = value!;
+                      if (_prodottoNonPresente) {
+                        _prodottoNonPresenteController.clear();
+                      }
+                    });
+                  },
+                ),
               ),
+
               SizedBox(height: 20),
               _prodottoNonPresente
-                  ? TextFormField(
-                controller: _prodottoNonPresenteController,
-                decoration: InputDecoration(
-                  labelText: "Inserire il prodotto",
-                  filled: true,
-                  fillColor: Colors.grey[200],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+                  ? SizedBox(
+                width: 400,
+                child: TextFormField(
+                  controller: _prodottoNonPresenteController,
+                  decoration: InputDecoration(
+                    labelText: "Inserire il prodotto",
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
-                ),
-              )
-                  : Container(),
-              // SizedBox(height: 12),
-              // Container(
-              //   decoration: BoxDecoration(
-              //     borderRadius: BorderRadius.circular(10),
-              //     border: Border.all(color: Colors.grey[300]!),
-              //   ),
-              //   child: GestureDetector(
-              //     onTap: () {
-              //       _showFornitoriDialog();
-              //     },
-              //     child: Padding(
-              //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              //       child: Row(
-              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         children: [
-              //           Text(
-              //             selectedFornitore?.denominazione ?? 'Seleziona fornitore',
-              //             style: TextStyle(fontSize: 16),
-              //           ),
-              //           Icon(Icons.arrow_drop_down),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
+                )
+              ) : Container(),
               SizedBox(height: 24),
               Center(
                 child: ElevatedButton(

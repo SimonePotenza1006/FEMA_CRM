@@ -92,61 +92,54 @@ class _DettaglioVeicoloPageState extends State<DettaglioVeicoloPage> {
     // Divide il testo in due parti: etichetta e dato
     final parts = text.split(':');
     final labelText = parts[0];
-    var dataText = parts[1].trim();
+    var dataText = parts[1];
 
-    if (dataText == 'N/A') {
-      return Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                '$labelText: ',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                dataText,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          Divider(color: Colors.grey[300], thickness: 0.5),
-        ],
-      );
-    } else {
-      // Format the date
-      if (labelText.contains('Data')) {
-        final dateFormat = DateFormat('dd/MM/yyyy');
-        final date = DateTime.parse(dataText);
-        dataText = dateFormat.format(date);
+    // Format the date
+    if (labelText.contains('Data')) {
+      if (dataText.trim().isNotEmpty) {
+        if (dataText.trim() != 'null') { // Add this check
+          final dateFormat = DateFormat('dd/MM/yyyy');
+          try {
+            final date = DateTime.parse(dataText.trim());
+            dataText = dateFormat.format(date);
+          } catch (e) {
+            dataText = 'Invalid date format';
+          }
+        } else {
+          dataText = 'Non inserita';
+        }
+      } else {
+        dataText = 'Non inserita';
       }
-
-      return Column(
-        children: [
-          Row(
-            children: [
-              Text(
-                '$labelText: ',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                dataText,
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          Divider(color: Colors.grey[300], thickness: 0.5),
-        ],
-      );
     }
+
+    return Container(
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Colors.white, // Set the background color to white
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: '$labelText: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: dataText.trim(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        )
+    );
   }
 }
