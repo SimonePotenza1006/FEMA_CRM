@@ -720,7 +720,7 @@ class _CreazioneInterventoByAmministrazionePageState
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data': selectedDate?.toIso8601String(),
-            'data_apertura_intervento' : _dataOdierna.toIso8601String(),
+            'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : orario.toIso8601String(),
             'orario_inizio': null,
             'orario_fine': null,

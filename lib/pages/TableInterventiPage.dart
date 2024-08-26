@@ -96,7 +96,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         }
         setState(() {
           _allInterventi = interventi;
-          _filteredInterventi = interventi.where((intervento) => !(intervento.concluso ?? false)).toList();
+          _filteredInterventi = interventi.where((intervento) => !(intervento.concluso ?? false)).toSet().toList(); // Modify this line
           _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap);
           print('Updated _interventoUtentiMap: $interventoUtentiMap');
         });

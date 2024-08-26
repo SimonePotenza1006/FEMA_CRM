@@ -37,14 +37,18 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   List<RelazioneProdottiInterventoModel> allProdotti = [];
   TimeOfDay _selectedTime = TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _selectedTime2 = TimeOfDay(hour: 0, minute: 0);
+  UtenteModel? responsabile;
+  UtenteModel? _responsabileSelezionato;
+  List<UtenteModel?> _selectedUtenti = [];
+  List<UtenteModel?> _finalSelectedUtenti = [];
 
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   Future<List<Uint8List>>? _futureImages;
 
-  
-  
+
+
   @override
   void initState() {
     super.initState();
@@ -280,7 +284,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'data': dataString,
-          'orario_appuntamento' : null,
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'orario_inizio': orarioInizioString,
           'orario_fine': orarioFineString,
           'descrizione': widget.intervento.descrizione,
@@ -590,7 +594,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                         FloatingActionButton(
                           heroTag: "Tag",
                           onPressed: () {
-                            _showUtentiModal(allUtenti);
+                            _showUtentiDialog();
                           },
                           child: Text(
                             '  Assegna  ',
@@ -1034,6 +1038,68 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
+  Future<void> assegna() async {
+    try {
+      final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'id': widget.intervento.id,
+            'data': widget.intervento.data?.toIso8601String(),
+            'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+            'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+            'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+            'descrizione': widget.intervento.descrizione,
+            'importo_intervento': widget.intervento.importo_intervento,
+            'acconto' : widget.intervento.acconto,
+            'assegnato': widget.intervento.assegnato,
+            'conclusione_parziale' : widget.intervento.conclusione_parziale,
+            'concluso': widget.intervento.concluso,
+            'saldato': widget.intervento.saldato,
+            'note': widget.intervento.note,
+            'relazione_tecnico' : widget.intervento.relazione_tecnico,
+            'firma_cliente': widget.intervento.firma_cliente,
+            'utente': _responsabileSelezionato?.toMap(),
+            'cliente': widget.intervento.cliente?.toMap(),
+            'veicolo': widget.intervento.veicolo?.toMap(),
+            'merce' : widget.intervento.merce?.toMap(),
+            'tipologia': widget.intervento.tipologia?.toMap(),
+            'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
+            'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+            'destinazione': widget.intervento.destinazione?.toMap(),
+            'gruppo': widget.intervento.gruppo?.toMap()
+          }));
+      if (response.statusCode == 201) {
+        print('EVVAIIIIIIII');
+        if(_finalSelectedUtenti.isNotEmpty){
+          for(var utente in _finalSelectedUtenti){
+            try{
+              final response = await http.post(
+                Uri.parse('$ipaddress/api/relazioneUtentiInteventi'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({
+                  'utente' : utente?.toMap(),
+                  'intervento' : widget.intervento.toMap(),
+                }),
+              );
+            } catch(e) {
+              print('Errore durante il salvataggio della relazione: $e');
+            }
+          }
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento assegnato!'),
+            duration: Duration(seconds: 3), // Durata dello Snackbar
+          ),
+        );
+      } else {
+
+      }
+    } catch (e) {
+      print('Errore durante il salvataggio del preventivo: $e');
+    }
+  }
+
   Future<void> saldato() async {
     try {
       final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
@@ -1076,8 +1142,108 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         Navigator.pop(context);
       } else {}
     } catch (e) {
-      print('Errore durante il salvataggio del preventivo: $e');
+      print('Errore : $e');
     }
+  }
+
+  void _showUtentiDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Seleziona Utenti', textAlign: TextAlign.center),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          children: allUtenti.map((utente) {
+                            return ListTile(
+                              leading: Checkbox(
+                                value: _finalSelectedUtenti?.contains(utente),
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value!) {
+                                      _selectedUtenti?.add(utente);
+                                      _finalSelectedUtenti?.add(utente);
+                                    } else {
+                                      _finalSelectedUtenti?.remove(utente);
+                                      _selectedUtenti?.remove(utente);
+                                    }
+                                  });
+                                },
+                              ),
+                              title: Text('${utente.nome} ${utente.cognome}'),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        if (_finalSelectedUtenti!.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Scegli un responsabile tra gli utenti selezionati:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 100,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _finalSelectedUtenti?.length,
+                                  itemBuilder: (context, index) {
+                                    final UtenteModel? utente = _finalSelectedUtenti?[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 8.0),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            responsabile = utente;
+                                            _selectedUtenti?.remove(utente);
+                                            _responsabileSelezionato = utente;
+                                            print('Responsabile: ${responsabile?.cognome}');
+                                          });
+                                        },
+                                        child: Chip(
+                                          label: Text('${utente?.nome} ${utente?.cognome}'),
+                                          backgroundColor: _responsabileSelezionato == utente ? Colors.yellow : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+                            ],
+                          ),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              assegna();
+                            },
+                            child: Text(
+                              'ASSEGNA'
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+              ),
+            );
+          },
+        );
+      },
+    )
+        .then((_) {
+      setState(() {}); // Chiamiamo setState() dopo la chiusura del dialogo per forzare il ricaricamento della pagina
+    });
   }
 
   String formatDate(DateTime? date) {
@@ -1094,4 +1260,61 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
   final DateFormat timeFormatter = DateFormat('HH:mm');
+}
+
+class DisplayResponsabileUtentiWidget extends StatefulWidget {
+  final UtenteModel? responsabile;
+  final List<UtenteModel?>? selectedUtenti;
+  final Function(List<UtenteModel?>)? onSelectedUtentiChanged;
+
+  const DisplayResponsabileUtentiWidget({
+    Key? key,
+    required this.responsabile,
+    required this.selectedUtenti,
+    this.onSelectedUtentiChanged,
+  }) : super(key: key);
+
+  @override
+  _DisplayResponsabileUtentiWidgetState createState() =>
+      _DisplayResponsabileUtentiWidgetState();
+}
+
+class _DisplayResponsabileUtentiWidgetState
+    extends State<DisplayResponsabileUtentiWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Responsabile:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          '${widget.responsabile?.nome ?? ''} ${widget.responsabile?.cognome ?? ''}',
+        ),
+        SizedBox(height: 30),
+        Text(
+          'Utenti selezionati:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          height: 80,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.selectedUtenti!.length,
+            itemBuilder: (context, index) {
+              final UtenteModel? utente = widget.selectedUtenti![index];
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: Chip(
+                  label: Text('${utente?.nome ?? ''} ${utente?.cognome ?? ''}'),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }
