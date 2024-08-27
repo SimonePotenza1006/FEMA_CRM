@@ -283,6 +283,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': dataString,
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'orario_inizio': orarioInizioString,
@@ -954,6 +955,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento': orario?.toIso8601String(),
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
@@ -1006,6 +1008,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
+            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : null,
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
@@ -1044,6 +1047,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
+            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
@@ -1051,7 +1055,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': widget.intervento.importo_intervento,
             'acconto' : widget.intervento.acconto,
-            'assegnato': widget.intervento.assegnato,
+            'assegnato': true,
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': widget.intervento.concluso,
             'saldato': widget.intervento.saldato,
@@ -1068,10 +1072,10 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'destinazione': widget.intervento.destinazione?.toMap(),
             'gruppo': widget.intervento.gruppo?.toMap()
           }));
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         print('EVVAIIIIIIII');
-        if(_finalSelectedUtenti.isNotEmpty){
-          for(var utente in _finalSelectedUtenti){
+        if(_selectedUtenti.isNotEmpty){
+          for(var utente in _selectedUtenti){
             try{
               final response = await http.post(
                 Uri.parse('$ipaddress/api/relazioneUtentiInteventi'),
@@ -1106,6 +1110,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
+            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : widget.intervento.orario_appuntamento,
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),

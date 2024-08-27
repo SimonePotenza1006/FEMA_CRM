@@ -33,6 +33,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   List<GruppoInterventiModel> allGruppiConclusi = [];
   late InterventoDataSource _dataSource;
   Map<String, double> _columnWidths = {
+    'intervento' : 10,
     'data_apertura_intervento': 120,
     'data': 120,
     'cliente': 200,
@@ -96,7 +97,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         }
         setState(() {
           _allInterventi = interventi;
-          _filteredInterventi = interventi.where((intervento) => !(intervento.concluso ?? false)).toSet().toList(); // Modify this line
+          _filteredInterventi = interventi.where((intervento) => !(intervento.concluso ?? false)).toList();
           _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap);
           print('Updated _interventoUtentiMap: $interventoUtentiMap');
         });
@@ -376,6 +377,24 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 headerGridLinesVisibility: GridLinesVisibility.both,
                 columns: [
                   GridColumn(
+                      columnName: 'intervento',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'intervento',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      )),
+                  GridColumn(
                     columnName: 'data_apertura_intervento',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -481,23 +500,23 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 200, // Imposta la larghezza minima
                   ),
                   GridColumn(
-                      columnName: 'responsabile',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
+                    columnName: 'responsabile',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
                           ),
                         ),
-                        child: Text(
-                          'Responsabile',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
                       ),
+                      child: Text(
+                        'Responsabile',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
                     width: _columnWidths['responsabile']?? double.nan,
                     minimumWidth: 150,
                   ),
@@ -525,20 +544,20 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                   GridColumn(
                     columnName: 'inserimento_importo',
                     label : Container(
-                      padding: EdgeInsets.all(8),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right : BorderSide(
-                            color: Colors.grey,
-                            width: 1,
-                          )
+                        padding: EdgeInsets.all(8),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                right : BorderSide(
+                                  color: Colors.grey,
+                                  width: 1,
+                                )
+                            )
+                        ),
+                        child: Text(
+                          'Inserimento Importo',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         )
-                      ),
-                      child: Text(
-                        'Inserimento Importo',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      )
                     ),
                     width: _columnWidths['inserimento_importo']?? double.nan,
                     minimumWidth: 80,
@@ -586,23 +605,23 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 150, // Imposta la larghezza minima
                   ),
                   GridColumn(
-                    columnName: 'assegna_gruppo',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          )
-                        )
-                      ),
-                      child: Text(
-                        'Seleziona Gruppo',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    )
+                      columnName: 'assegna_gruppo',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                )
+                            )
+                        ),
+                        child: Text(
+                          'Seleziona Gruppo',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      )
                   )
                 ],
                 onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
@@ -699,6 +718,27 @@ class InterventoDataSource extends DataGridSource {
     List<DataGridRow> rows = [];
     for (int i = 0; i < _interventions.length; i++) {
       InterventoModel intervento = _interventions[i];
+      Color? backgroundColor;
+      switch (intervento.tipologia?.descrizione) {
+        case 'Informatico':
+          backgroundColor = Colors.grey[200]; // grigio chiaro
+          break;
+        case 'Elettrico':
+          backgroundColor = Colors.yellow[200]; // giallo chiaro
+          break;
+        case 'Idrico':
+          backgroundColor = Colors.lightBlue[200]; // azzurro chiaro
+          break;
+        case 'Elettronico':
+          backgroundColor = Colors.pink[50]; // rosa chiarissimo
+          break;
+        case 'Riparazione Merce':
+          backgroundColor = Colors.green[100]; // verde chiarissimo
+          break;
+        default:
+          backgroundColor = Colors.white;
+      }
+
       String utentiNomi = '';
       if (_interventoUtentiMap.containsKey(intervento.id)) {
         List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
@@ -706,10 +746,12 @@ class InterventoDataSource extends DataGridSource {
       } else {
         utentiNomi = 'NESSUNO'; // or any other default value
       }
+
       print('Intervento ${intervento.id} utenti: $utentiNomi'); // Debug statement
 
       rows.add(DataGridRow(
         cells: [
+          DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
           DataGridCell<String>(
             columnName: 'data_apertura_intervento',
             value: intervento.data_apertura_intervento != null
@@ -792,7 +834,7 @@ class InterventoDataSource extends DataGridSource {
             value: utentiNomi,
           ),
           DataGridCell<Widget>(
-            columnName: 'assegna_gruppo',
+              columnName: 'assegna_gruppo',
               value : IconButton(
                 onPressed: (){
                   TextEditingController searchController = TextEditingController();
@@ -898,7 +940,7 @@ class InterventoDataSource extends DataGridSource {
                   );
                 },
                 icon: Icon(Icons.folder, color:Colors.grey),
-            )
+              )
           )
         ],
       ));
@@ -989,16 +1031,12 @@ class InterventoDataSource extends DataGridSource {
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
-    final int rowIndex = row.getCells().first.columnName == 'data_apertura_intervento'
-        ? _interventions.indexWhere((intervento) => intervento.data_apertura_intervento != null
-        ? DateFormat('dd/MM/yyyy').format(intervento.data_apertura_intervento!) == row.getCells().first.value
-        : intervento.data_apertura_intervento == null && row.getCells().first.value == '')
-        : -1;
-    if (rowIndex == -1) {
-      throw Exception('Row not found');
-    }
-    InterventoModel intervento = _interventions[rowIndex];
+    // Recupera l'intervento direttamente dalla cella 'intervento'
+    final InterventoModel intervento = row.getCells().firstWhere(
+          (cell) => cell.columnName == 'intervento',
+    ).value as InterventoModel;
 
+    // Gestione del colore di sfondo in base alla tipologia
     Color? backgroundColor;
     switch (intervento.tipologia?.descrizione) {
       case 'Informatico':
@@ -1025,16 +1063,19 @@ class InterventoDataSource extends DataGridSource {
       List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
       utentiNomi = utenti.map((utente) => utente.nomeCompleto()).join(', ');
     } else {
-      utentiNomi = 'NESSUNO'; // or any other default value
+      utentiNomi = 'NESSUNO';
     }
 
     return DataGridRowAdapter(
       color: backgroundColor,
       cells: row.getCells().map<Widget>((dataGridCell) {
+        if (dataGridCell.columnName == 'intervento') {
+          // Cella invisibile per l'oggetto InterventoModel
+          return SizedBox.shrink(); // La cella sarà invisibile ma presente
+        }
         if (dataGridCell.value is Widget) {
           return Container(
             alignment: Alignment.center,
-            //padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               border: Border(
                 right: BorderSide(
