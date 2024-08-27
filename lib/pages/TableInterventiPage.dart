@@ -699,27 +699,6 @@ class InterventoDataSource extends DataGridSource {
     List<DataGridRow> rows = [];
     for (int i = 0; i < _interventions.length; i++) {
       InterventoModel intervento = _interventions[i];
-      Color? backgroundColor;
-      switch (intervento.tipologia?.descrizione) {
-        case 'Informatico':
-          backgroundColor = Colors.grey[200]; // grigio chiaro
-          break;
-        case 'Elettrico':
-          backgroundColor = Colors.yellow[200]; // giallo chiaro
-          break;
-        case 'Idrico':
-          backgroundColor = Colors.lightBlue[200]; // azzurro chiaro
-          break;
-        case 'Elettronico':
-          backgroundColor = Colors.pink[50]; // rosa chiarissimo
-          break;
-        case 'Riparazione Merce':
-          backgroundColor = Colors.green[100]; // verde chiarissimo
-          break;
-        default:
-          backgroundColor = Colors.white;
-      }
-
       String utentiNomi = '';
       if (_interventoUtentiMap.containsKey(intervento.id)) {
         List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
@@ -727,7 +706,6 @@ class InterventoDataSource extends DataGridSource {
       } else {
         utentiNomi = 'NESSUNO'; // or any other default value
       }
-
       print('Intervento ${intervento.id} utenti: $utentiNomi'); // Debug statement
 
       rows.add(DataGridRow(

@@ -487,6 +487,8 @@ class _CreazioneInterventoByAmministrazionePageState
                             onPressed: () {
                               if(_selectedTipologia?.descrizione == "Riparazione Merce"){
                                 savePics();
+                              } else if(_responsabileSelezionato == null){
+                               _alertDialog();
                               }else{
                                 saveRelations();
                               }
@@ -505,6 +507,30 @@ class _CreazioneInterventoByAmministrazionePageState
         ),
       ),
     );
+  }
+
+  void _alertDialog(){
+    showDialog(
+        context: context,
+        builder: (BuildContext context){
+          return AlertDialog(
+            title: Text('ATTENZIONE'),
+            content: Text('L\'intervento non è stato assegnato ad alcun tecnico, procedere con la creazione?'.toUpperCase()),
+            actions: <Widget>[
+              TextButton(
+                  onPressed: (){
+                    if(_selectedTipologia?.id == 6){
+                      saveInterventoPlusMerce();
+                    } else{
+                      saveIntervento().then((value) => Navigator.pop(context));
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text('Si'),
+              )
+            ],
+          );
+        });
   }
 
   void _showNoClienteDialog() {
@@ -581,6 +607,7 @@ class _CreazioneInterventoByAmministrazionePageState
         throw Exception('Dati dell\'intervento non disponibili.');
       }
       final merce = MerceInRiparazioneModel.fromJson(jsonDecode(data.body));
+      bool assigned = responsabile != null ? true : false;
       try{
         final response = await http.post(
           Uri.parse('$ipaddress/api/intervento'),
@@ -593,7 +620,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
-            'assegnato': true,
+            'assegnato': assigned,
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
@@ -708,11 +735,11 @@ class _CreazioneInterventoByAmministrazionePageState
     return null;
   }
 
-
   Future<http.Response?> saveIntervento() async {
     late http.Response response;
     var orario_appuntamento = _orarioDisponibile ? _selectedTime : null;
     final orario = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, _selectedTime.hour, _selectedTime.minute);
+    bool assigned = responsabile != null ? true : false;
     if(_orarioDisponibile == true){
       try {
         response = await http.post(
@@ -726,7 +753,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
-            'assegnato': true,
+            'assegnato': assigned,
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
