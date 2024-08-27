@@ -36,6 +36,9 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   late List<MarcaTempoModel> timbratureOdierne = [];
   List<MarcaTempoModel> allTimbratureMonth = [];
   List<MarcaTempoModel> allTimbratureDU = [];
+  final _marcatControllers = <TextEditingController>[];
+  final _focusNodes = <FocusNode>[];
+  final _isEdited = <bool>[];
 
   Future<String> getAddressFromCoordinates(
       double latitude, double longitude) async {
@@ -76,6 +79,11 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   @override
   void initState() {
     super.initState();
+    for (int i = 0; i < 10; i++) {
+      _marcatControllers.add(TextEditingController());
+      _focusNodes.add(FocusNode());
+      _isEdited.add(false);
+    }
     _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate);
     _marcatController.text = "";
     getMarcatempoOggi();
@@ -112,6 +120,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   TextEditingController _dateController = TextEditingController();
   TextEditingController _marcatController = TextEditingController();
+  //bool _isEdited = false;
 
   Future<void> _showDatePicker() async {
     final DateTime? picked = await showDatePicker(
@@ -247,16 +256,37 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                       ),
                     ]),
                 SizedBox(height: 10),
-                TextFormField(
-                  maxLines: 3,
-                  controller: _marcatController,
-                  readOnly: true,
-                  showCursor: false,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    // labelText: 'Testo',
-                  ),
-                ),
+                Container(height: 300,width: 200,
+                    child:
+                    ListView.builder(
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        return Row(
+                          children: [
+                            Container(height: 150,width: 100,
+                              child: TextFormField(
+                                maxLines: 1,
+                                controller: _marcatControllers[index],
+                                readOnly: false,
+                                focusNode: _focusNodes[index],
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            /*_focusNodes[index].hasFocus ? // Mostra il bottone SALVA solo se la riga è in editing
+                            ElevatedButton(
+                              onPressed: () {
+                                // Funzione di salvataggio del testo
+                                print('Testo salvato!');
+                                _focusNodes[index].unfocus();
+                              },
+                              child: Text('SALVA'),
+                            ) : Container(),*/ // Non mostra nulla se la riga non è in editing
+                          ],
+                        );
+                      },
+                    )),
               ],
             );
           },
@@ -329,7 +359,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                               },
                               child: Text("Oggi"), //si
                             ),
-                            TextButton(
+                            /*TextButton(
                               onPressed: () {
                                 getAllMarcatempoToday().whenComplete(() {
                                   if (timbratureOdierne.isNotEmpty)
@@ -346,7 +376,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                                 });
                               },
                               child: Text("Modifica"), //si
-                            ),
+                            ),*/
                           ],
                         ),
                       )
