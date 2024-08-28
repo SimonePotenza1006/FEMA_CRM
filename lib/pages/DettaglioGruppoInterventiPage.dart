@@ -135,6 +135,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
+          'data_apertura_intervento': intervento.data_apertura_intervento?.toIso8601String(),
           'data': intervento.data?.toIso8601String(),
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),

@@ -334,6 +334,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'orario_inizio': DateTime.now().toIso8601String(),

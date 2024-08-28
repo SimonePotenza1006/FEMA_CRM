@@ -615,6 +615,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
+          'data_apertura_intervento' : selectedIntervento?.data_apertura_intervento?.toIso8601String(),
           'data': selectedIntervento?.data?.toIso8601String(),
           'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
           'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),
@@ -660,6 +661,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
+          'data_apertura_intervento' : selectedIntervento?.data_apertura_intervento?.toIso8601String(),
           'data': selectedIntervento?.data?.toIso8601String(),
           'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
           'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),

@@ -7,6 +7,7 @@ import 'package:fema_crm/model/RelazioneProdottiInterventoModel.dart';
 import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -41,6 +42,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   UtenteModel? _responsabileSelezionato;
   List<UtenteModel?> _selectedUtenti = [];
   List<UtenteModel?> _finalSelectedUtenti = [];
+  final TextEditingController rapportinoController = TextEditingController();
 
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
@@ -58,6 +60,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     getProdottiDdt();
     _fetchUtenti();
     _futureImages = fetchImages();
+    rapportinoController.text = (widget.intervento.relazione_tecnico != null ? widget.intervento.relazione_tecnico : '//')!;
   }
 
   Future<List<Uint8List>> fetchImages() async {
@@ -322,31 +325,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       print('${utenteSelezionato.nomeCompleto()}');
       print('Errore durante l\'assegnazione dell\'intervento: $e, ');
     }
-  }
-
-  void _showUtentiModal(List<UtenteModel> utenti) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          child: ListView.builder(
-            itemCount: utenti.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(
-                  '${utenti[index].nome ?? 'N/A'} ${utenti[index].cognome ?? 'N/A'}',
-                ),
-                subtitle: Text(utenti[index].ruolo?.descrizione ?? 'N/A'),
-                onTap: () {
-                  _assegnaUtente(utenti[index]);
-                  Navigator.pop(context);
-                },
-              );
-            },
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -624,10 +602,11 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                           ],
                         ),
                       SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Relazione Tecnico',
-                        value: widget.intervento.relazione_tecnico ?? 'N/A',
-                      ),
+                      // buildInfoRow(
+                      //   title: 'Relazione Tecnico',
+                      //   value: widget.intervento.relazione_tecnico ?? 'N/A',
+                      // ),
+                      buildRelazioneForm(title: 'Relazione tecnico'),
                       SizedBox(height: 15),
                       buildInfoRow(
                         title: 'Concluso',
@@ -916,6 +895,48 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     );
   }
 
+  Widget buildRelazioneForm({required String title}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Spacer(),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: rapportinoController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.content_copy),
+                onPressed: () {
+                  if (rapportinoController.text.isNotEmpty) {
+                    Clipboard.setData(ClipboardData(text: rapportinoController.text));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Rapportino copiato!')),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget buildInfoRow({required String title, required String value}) {
     return
       Row(
@@ -1177,15 +1198,15 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                           children: allUtenti.map((utente) {
                             return ListTile(
                               leading: Checkbox(
-                                value: _finalSelectedUtenti?.contains(utente),
+                                value: _finalSelectedUtenti.contains(utente),
                                 onChanged: (value) {
                                   setState(() {
                                     if (value!) {
-                                      _selectedUtenti?.add(utente);
-                                      _finalSelectedUtenti?.add(utente);
+                                      _selectedUtenti.add(utente);
+                                      _finalSelectedUtenti.add(utente);
                                     } else {
-                                      _finalSelectedUtenti?.remove(utente);
-                                      _selectedUtenti?.remove(utente);
+                                      _finalSelectedUtenti.remove(utente);
+                                      _selectedUtenti.remove(utente);
                                     }
                                   });
                                 },
@@ -1253,7 +1274,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       },
     )
         .then((_) {
-      setState(() {}); // Chiamiamo setState() dopo la chiusura del dialogo per forzare il ricaricamento della pagina
+      setState(() {});
     });
   }
 
