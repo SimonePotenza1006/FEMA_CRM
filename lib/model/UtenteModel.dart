@@ -31,7 +31,11 @@ class UtenteModel {
       );
 
   String? nomeCompleto(){
-    return this.nome.toString() + " " + this.cognome.toString();
+    if (nome != null && cognome != null) {
+      return '$nome $cognome';
+    } else {
+      return null; // or some default value, e.g. 'Unknown'
+    }
   }
 
   Map<String, dynamic> toMap() {

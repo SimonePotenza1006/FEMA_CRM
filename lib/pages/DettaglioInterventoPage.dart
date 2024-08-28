@@ -1042,6 +1042,8 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   }
 
   Future<void> assegna() async {
+    print(_selectedUtenti.toString());
+    print(_finalSelectedUtenti.toString());
     try {
       final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
           headers: {'Content-Type': 'application/json'},
@@ -1072,24 +1074,28 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'destinazione': widget.intervento.destinazione?.toMap(),
             'gruppo': widget.intervento.gruppo?.toMap()
           }));
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         print('EVVAIIIIIIII');
         if(_selectedUtenti.isNotEmpty){
           for(var utente in _selectedUtenti){
             try{
+              print('sono qui');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInteventi'),
+                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'utente' : utente?.toMap(),
                   'intervento' : widget.intervento.toMap(),
                 }),
               );
+              print(response.body);
             } catch(e) {
               print('Errore durante il salvataggio della relazione: $e');
             }
           }
         }
+        Navigator.pop(context);
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Intervento assegnato!'),
@@ -1267,59 +1273,3 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   final DateFormat timeFormatter = DateFormat('HH:mm');
 }
 
-class DisplayResponsabileUtentiWidget extends StatefulWidget {
-  final UtenteModel? responsabile;
-  final List<UtenteModel?>? selectedUtenti;
-  final Function(List<UtenteModel?>)? onSelectedUtentiChanged;
-
-  const DisplayResponsabileUtentiWidget({
-    Key? key,
-    required this.responsabile,
-    required this.selectedUtenti,
-    this.onSelectedUtentiChanged,
-  }) : super(key: key);
-
-  @override
-  _DisplayResponsabileUtentiWidgetState createState() =>
-      _DisplayResponsabileUtentiWidgetState();
-}
-
-class _DisplayResponsabileUtentiWidgetState
-    extends State<DisplayResponsabileUtentiWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Responsabile:',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          '${widget.responsabile?.nome ?? ''} ${widget.responsabile?.cognome ?? ''}',
-        ),
-        SizedBox(height: 30),
-        Text(
-          'Utenti selezionati:',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 80,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: widget.selectedUtenti!.length,
-            itemBuilder: (context, index) {
-              final UtenteModel? utente = widget.selectedUtenti![index];
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Chip(
-                  label: Text('${utente?.nome ?? ''} ${utente?.cognome ?? ''}'),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}

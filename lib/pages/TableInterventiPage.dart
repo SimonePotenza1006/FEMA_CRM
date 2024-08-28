@@ -33,7 +33,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   List<GruppoInterventiModel> allGruppiConclusi = [];
   late InterventoDataSource _dataSource;
   Map<String, double> _columnWidths = {
-    'intervento' : 10,
+    'intervento' : 0,
     'data_apertura_intervento': 120,
     'data': 120,
     'cliente': 200,
@@ -42,7 +42,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'responsabile' : 200,
     'importo_intervento': 100,
     'acconto': 100,
-    'utenti' : 200,
     'inserimento_importo' : 100,
     'assegna_gruppo' : 100,
   };
@@ -76,7 +75,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       print('Hai toppato chicco : $e');
     }
   }
-
 
   Future<void> getAllInterventi() async {
     try {
@@ -393,7 +391,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           'intervento',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
-                      )),
+                      ),
+                    width: _columnWidths['intervento']?? double.nan,
+                    minimumWidth: 0,
+                  ),
                   GridColumn(
                     columnName: 'data_apertura_intervento',
                     label: Container(
@@ -584,27 +585,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 80, // Imposta la larghezza minima
                   ),
                   GridColumn(
-                    columnName: 'utenti',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Altri tecnici',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                    width: _columnWidths['utenti'] ?? double.nan,
-                    minimumWidth: 150, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
                       columnName: 'assegna_gruppo',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -700,6 +680,7 @@ class InterventoDataSource extends DataGridSource {
   List<GruppoInterventiModel> allGruppiNonConclusi = [];
   InterventoModel? _selectedIntervento;
 
+
   InterventoDataSource(this.context, List<InterventoModel> interventions, Map<int, List<UtenteModel>> interventoUtentiMap) {
     _interventions = interventions;
     _interventoUtentiMap = interventoUtentiMap;
@@ -738,7 +719,8 @@ class InterventoDataSource extends DataGridSource {
         default:
           backgroundColor = Colors.white;
       }
-
+      List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
+      String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
       String utentiNomi = '';
       if (_interventoUtentiMap.containsKey(intervento.id)) {
         List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
@@ -747,8 +729,14 @@ class InterventoDataSource extends DataGridSource {
         utentiNomi = 'NESSUNO'; // or any other default value
       }
 
-      print('Intervento ${intervento.id} utenti: $utentiNomi'); // Debug statement
-
+      print('Updated _interventoUtentiMap: $_interventoUtentiMap');
+      print('Intervento ${intervento.id} keys: ${_interventoUtentiMap.keys}');
+      try {
+        print('Intervento ${intervento.id} utenti: ${_interventoUtentiMap[int.parse(intervento.id!)]}');
+      } catch (e) {
+        print('Error: $e');
+      }
+      print('Intervento ${intervento.id} type: ${intervento.id.runtimeType}');
       rows.add(DataGridRow(
         cells: [
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
@@ -828,10 +816,6 @@ class InterventoDataSource extends DataGridSource {
             value: intervento.acconto != null
                 ? intervento.acconto!.toStringAsFixed(2) + "€"
                 : '',
-          ),
-          DataGridCell<String>(
-            columnName: 'utenti',
-            value: utentiNomi,
           ),
           DataGridCell<Widget>(
               columnName: 'assegna_gruppo',
@@ -1035,7 +1019,11 @@ class InterventoDataSource extends DataGridSource {
     final InterventoModel intervento = row.getCells().firstWhere(
           (cell) => cell.columnName == 'intervento',
     ).value as InterventoModel;
-
+    final List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
+    print('Utenti for intervention ${intervento.id}: $utenti');
+    utenti.forEach((utente) {
+      print('Utente ${utente.id}: ${utente.nomeCompleto()}');
+    });
     // Gestione del colore di sfondo in base alla tipologia
     Color? backgroundColor;
     switch (intervento.tipologia?.descrizione) {
@@ -1058,13 +1046,7 @@ class InterventoDataSource extends DataGridSource {
         backgroundColor = Colors.white;
     }
 
-    String utentiNomi = '';
-    if (_interventoUtentiMap.containsKey(intervento.id)) {
-      List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
-      utentiNomi = utenti.map((utente) => utente.nomeCompleto()).join(', ');
-    } else {
-      utentiNomi = 'NESSUNO';
-    }
+    // Get the list of users associated with the intervention
 
     return DataGridRowAdapter(
       color: backgroundColor,
@@ -1087,16 +1069,9 @@ class InterventoDataSource extends DataGridSource {
             child: dataGridCell.value,
           );
         } else {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DettaglioInterventoPage(intervento: intervento),
-                ),
-              );
-            },
-            child: Container(
+          if (dataGridCell.columnName == 'utenti') {
+            // Cella per la colonna "Altri tecnici"
+            return Container(
               alignment: Alignment.center,
               padding: EdgeInsets.all(8.0),
               decoration: BoxDecoration(
@@ -1107,9 +1082,39 @@ class InterventoDataSource extends DataGridSource {
                   ),
                 ),
               ),
-              child: Text(dataGridCell.value.toString()),
-            ),
-          );
+              child: Text(
+                utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO',
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          } else {
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DettaglioInterventoPage(intervento: intervento),
+                  ),
+                );
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.grey[600]!,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Text(
+                  dataGridCell.value.toString(),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            );
+          }
         }
       }).toList(),
     );
