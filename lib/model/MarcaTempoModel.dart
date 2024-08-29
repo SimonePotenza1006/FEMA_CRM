@@ -14,9 +14,11 @@ class MarcaTempoModel {
   File? imageData;
   UtenteModel? utente;
   ViaggioModel? viaggio;
+  bool edit = false;
+  bool editu = false;
 
   MarcaTempoModel(this.id, this.name, this.type, this.gps, this.gpsu, this.data,
-      this.datau, this.imageData, this.utente, this.viaggio);
+      this.datau, this.imageData, this.utente, this.viaggio, this.edit, this.editu);
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -29,7 +31,9 @@ class MarcaTempoModel {
       'datau': datau,
       'imageData': imageData,
       'utente': utente,
-      'viaggio': viaggio
+      'viaggio': viaggio,
+      'edit': edit,
+      'editu': editu
     };
     return map;
   }
@@ -45,6 +49,8 @@ class MarcaTempoModel {
     imageData = map['imageData'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
     viaggio = map['viaggio'] != null? ViaggioModel.fromMap(map['viaggio']) : null;
+    edit = map['edit'] ?? false;
+    editu = map['editu'] ?? false;
   }
 
   Map<String, dynamic> toJson() =>
@@ -58,7 +64,9 @@ class MarcaTempoModel {
         'datau': datau,
         'imageData': imageData,
         'utente': utente,
-        'viaggio': viaggio
+        'viaggio': viaggio,
+        'edit': edit,
+        'editu': editu,
       };
 
   factory MarcaTempoModel.fromJson(Map<String, dynamic> json) {
@@ -72,7 +80,9 @@ class MarcaTempoModel {
         json['datau'] != null ? DateTime.parse(json['datau']) : null,
         json['imageData'],
         json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
-        json['viaggio'] != null ? ViaggioModel.fromJson(json['viaggio']) : null
+        json['viaggio'] != null ? ViaggioModel.fromJson(json['viaggio']) : null,
+        json['edit'],
+        json['editu'],
     );
   }
 }
