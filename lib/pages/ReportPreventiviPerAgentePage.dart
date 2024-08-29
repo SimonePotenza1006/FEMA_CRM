@@ -53,10 +53,8 @@ class _ReportPreventiviPerAgentePageState
               });
             },
           ),
-          IconButton(
-            icon: Icon(Icons.info),
-            color: Colors.white,
-            onPressed: () {
+          MouseRegion(
+            onEnter: (event) {
               showModalBottomSheet(
                 context: context,
                 builder: (BuildContext context) {
@@ -68,20 +66,96 @@ class _ReportPreventiviPerAgentePageState
                       children: [
                         Text(
                           'Legenda colori:',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 8),
-                        Text('Giallo: Accettato e in attesa di consegna'),
-                        Text('Rosso: Rifiutato'),
-                        Text('Verde: Consegnato'),
-                        Text('Bianco: Attesa di accettazione'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.yellow,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Accettato e in attesa di consegna'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.red,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Rifiutato'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.green,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Consegnato'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.white70,
+                            ),
+                            SizedBox(width: 3),
+                            Text('Attesa di accettazione'),
+                          ],
+                        ),
                       ],
                     ),
                   );
                 },
               );
             },
+            child: IconButton(
+              icon: Icon(Icons.info),
+              color: Colors.white,
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Legenda colori:',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Text('Giallo: Accettato e in attesa di consegna'),
+                          Text('Rosso: Rifiutato'),
+                          Text('Verde: Consegnato'),
+                          Text('Bianco: Attesa di accettazione'),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
           IconButton(
             icon: Icon(Icons.calendar_today),

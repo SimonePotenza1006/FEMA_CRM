@@ -158,7 +158,7 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
       ),
       body: LayoutBuilder(
         builder: (context, constraints){
-          if(constraints.maxWidth > 800){
+          if(constraints.maxWidth > 1100){
             return Center(
               child: SingleChildScrollView(
                 child: Padding(

@@ -43,6 +43,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'importo_intervento': 100,
     'acconto': 100,
     'inserimento_importo' : 100,
+    'importo_restante' : 100,
     'assegna_gruppo' : 100,
   };
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
@@ -585,6 +586,27 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 80, // Imposta la larghezza minima
                   ),
                   GridColumn(
+                    columnName: 'importo_restante',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Importo restante',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['importo_restante']?? double.nan,
+                    minimumWidth: 100, // Imposta la larghezza minima
+                  ),
+                  GridColumn(
                       columnName: 'assegna_gruppo',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -719,6 +741,11 @@ class InterventoDataSource extends DataGridSource {
         default:
           backgroundColor = Colors.white;
       }
+
+      double? importo = intervento.importo_intervento != null ? intervento.importo_intervento : 0;
+      double? acconto = intervento.acconto != null ? intervento.acconto : 0;
+      double? restante_da_pagare = importo! - acconto!;
+
       List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
       String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
       String utentiNomi = '';
@@ -816,6 +843,10 @@ class InterventoDataSource extends DataGridSource {
             value: intervento.acconto != null
                 ? intervento.acconto!.toStringAsFixed(2) + "€"
                 : '',
+          ),
+          DataGridCell<String>(
+            columnName: 'importo_restante',
+            value: restante_da_pagare.toStringAsFixed(2) + "€"
           ),
           DataGridCell<Widget>(
               columnName: 'assegna_gruppo',
