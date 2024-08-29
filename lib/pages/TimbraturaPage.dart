@@ -12,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'PDFOggiPage.dart';
+import 'TimbratureEdit.dart';
 
 class TimbraturaPage extends StatefulWidget {
   final UtenteModel utente;
@@ -256,37 +257,16 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                       ),
                     ]),
                 SizedBox(height: 10),
-                Container(height: 300,width: 200,
-                    child:
-                    ListView.builder(
-                      itemCount: 10,
-                      itemBuilder: (context, index) {
-                        return Row(
-                          children: [
-                            Container(height: 150,width: 100,
-                              child: TextFormField(
-                                maxLines: 1,
-                                controller: _marcatControllers[index],
-                                readOnly: false,
-                                focusNode: _focusNodes[index],
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                            /*_focusNodes[index].hasFocus ? // Mostra il bottone SALVA solo se la riga è in editing
-                            ElevatedButton(
-                              onPressed: () {
-                                // Funzione di salvataggio del testo
-                                print('Testo salvato!');
-                                _focusNodes[index].unfocus();
-                              },
-                              child: Text('SALVA'),
-                            ) : Container(),*/ // Non mostra nulla se la riga non è in editing
-                          ],
-                        );
-                      },
-                    )),
+                TextFormField(
+                  maxLines: 8,
+                  controller: _marcatController,
+                  readOnly: true,
+                  showCursor: false,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    // labelText: 'Testo',
+                  ),
+                ),
               ],
             );
           },
@@ -307,6 +287,16 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
           centerTitle: true,
           backgroundColor: Colors.red,
           actions:  widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? <Widget>[
+            IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.edit), onPressed: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TimbratureEdit(utente: widget.utente)),
+                  );
+            }),
+            SizedBox(width: 23),
             IconButton(
                 color: Colors.white,
                 icon: Icon(Icons.search), onPressed: () async {
@@ -544,11 +534,12 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             ]);
             // Aggiungi i dati specifici della timbratura alla lista per questa chiave
             groupedRows[key]!.addAll([
-              timbratura!.gps ?? '',
-              DateFormat('HH:mm').format(timbratura.data!),
+              timbratura!.gps == null || timbratura!.gps == '' ? '' : timbratura.edit ? '*'+timbratura!.gps! : timbratura!.gps!,
+              timbratura.edit ? '*'+DateFormat('HH:mm').format(timbratura.data!) : DateFormat('HH:mm').format(timbratura.data!),
               //'${timbratura.data!.hour.toString()}:${timbratura.data!.minute.toString()}',
-              timbratura!.gpsu ?? '',
-              timbratura.datau != null ? DateFormat('HH:mm').format(timbratura.datau!) : '',
+              timbratura!.gpsu == null || timbratura!.gpsu == '' ? '' : timbratura.editu ? '*'+timbratura!.gpsu! : timbratura!.gpsu!,
+              timbratura.datau != null ? timbratura.editu ? '*'+DateFormat('HH:mm').format(timbratura.datau!) : DateFormat('HH:mm').format(timbratura.datau!) : '',
+              //timbratura.editu ? '*'+DateFormat('HH:mm').format(timbratura.datau!) : DateFormat('HH:mm').format(timbratura.datau!),
               //timbratura.datau != null ? '${timbratura.datau!.hour.toString()}:${timbratura.datau!.minute.toString()}' : '',
             ]);
           }
