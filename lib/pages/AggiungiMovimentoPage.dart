@@ -3,6 +3,9 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -13,6 +16,8 @@ import '../model/UtenteModel.dart';
 import 'HomeFormAmministrazione.dart';
 import 'PDFPagamentoAccontoPage.dart';
 import 'PDFPrelievoCassaPage.dart';
+import 'dart:io';
+
 
 class AggiungiMovimentoPage extends StatefulWidget {
   final UtenteModel userData;
@@ -40,6 +45,46 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   List<ClienteModel> filteredClientiList = [];
   List<InterventoModel> interventi = [];
   InterventoModel? selectedIntervento;
+  List<XFile> pickedImages =  [];
+
+  Future<void> takePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        pickedImages.add(pickedFile);
+      });
+    }
+  }
+
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    setState(() {
+                      pickedImages.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -440,20 +485,20 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     ),
                   ),
                 SizedBox(height: 30),
-                /*Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _selectDate(context);
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-                    ),
-                    child: Text(
-                      'Seleziona Data',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
+                  Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: takePicture,
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          onPrimary: Colors.white,
+                        ),
+                        child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                      ),
+                      _buildImagePreview(),
+                    ],
                   ),
-                ),*/
                 SizedBox(height: 10),
                //Center(child:
                   Text(
@@ -481,6 +526,9 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_validateInputs()) {
+                        if(pickedImages.isNotEmpty){
+                          saveMovimentoPlusPics();
+                        }
                         if(_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo){
                           addMovimento();
                           Navigator.pushReplacement(
@@ -615,6 +663,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
+          'data_apertura_intervento' : selectedIntervento?.data_apertura_intervento?.toIso8601String(),
           'data': selectedIntervento?.data?.toIso8601String(),
           'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
           'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),
@@ -660,6 +709,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
+          'data_apertura_intervento' : selectedIntervento?.data_apertura_intervento?.toIso8601String(),
           'data': selectedIntervento?.data?.toIso8601String(),
           'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
           'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),
@@ -699,7 +749,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
     }
   }
 
-  Future<void> addMovimento() async {
+  Future<http.Response?> addMovimento() async {
     String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss").format(selectedDate.toUtc());
     String tipoMovimentazioneString = _selectedTipoMovimentazione.toString().split('.').last; // Otteniamo solo il nome dell'opzione
     Map<String, dynamic> body = {
@@ -728,6 +778,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
             ),
           );
         }
+        return response;
       } else {
         print('Errore durante il salvataggio della movimentazione: ${response.statusCode}');
         if (mounted) {
@@ -747,6 +798,49 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           ),
         );
       }
+    }
+  }
+
+  Future<void> saveMovimentoPlusPics() async{
+    final data = await addMovimento();
+    try{
+      if(data == null){
+        throw Exception('Dati della movimentazione non disponibili.');
+      }
+      final movimento = MovimentiModel.fromJson(jsonDecode(data.body));
+      try{
+        for(var image in pickedImages){
+          if(image.path != null && image.path.isNotEmpty){
+            var request = http.MultipartRequest(
+              'POST',
+              Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+            );
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'movimento',
+                image.path,
+                contentType: MediaType('image', 'jpeg'),
+              )
+            );
+            var response = await request.send();
+            if(response.statusCode == 200){
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Movimentagione registrata con successo!')
+                ),
+              );
+            } else{
+              print('Errore: Il percorso del file non è valido');
+            }
+          }
+          pickedImages.clear();
+          Navigator.pop(context);
+        }
+      } catch(e){
+        print('Errore $e');
+      }
+    } catch(e){
+      print('Errore $e');
     }
   }
 

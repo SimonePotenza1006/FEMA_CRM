@@ -71,7 +71,6 @@ class MovimentiModel {
   }
 
   static TipoMovimentazione _getTipoMovimentazioneFromString(String? tipoMovimentazione) {
-    print(tipoMovimentazione);
     if (tipoMovimentazione == 'Entrata') {
       return TipoMovimentazione.Entrata;
     } else if (tipoMovimentazione == 'Uscita') {

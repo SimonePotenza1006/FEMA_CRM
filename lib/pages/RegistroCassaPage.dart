@@ -234,7 +234,6 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       'Descrizione',
       'Utente',
     ]);
-
     double total = 0;
     for (var spesa in movimentiList2) {
       if (spesa.importo!= null) {
@@ -245,7 +244,6 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         }
       }
     }
-
     for (var spesa in movimentiList2) {
       String importoFormatted;
       if (spesa.importo!= null) {
@@ -259,7 +257,6 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       } else {
         importoFormatted = 'N/A';
       }
-
       sheetObject.appendRow([
         spesa.data!= null? DateFormat('yyyy-MM-dd').format(spesa.data!) : 'N/A',
         spesa.tipo_movimentazione.toString()?? 'N/A',
@@ -268,7 +265,6 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         spesa.utente?.cognome?? 'N/A'
       ]);
     }
-
     sheetObject.appendRow([
       'Totale',
       '',
@@ -276,8 +272,6 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       '',
       ''
     ]);
-
-
     try {
       late String filePath;
       if (Platform.isWindows) {

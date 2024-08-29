@@ -557,7 +557,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         Uri.parse('${ipaddress}/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'data': DateTime.now().toIso8601String(),
+          'data_apertura_intervento' : DateTime.now().toIso8601String(),
+          'data': null,
           'orario_appuntamento' : null,
           'orario_inizio': orarioInizioSalvato?.toIso8601String(),
           'orario_fine': orarioFineSalvato?.toIso8601String(),
@@ -610,6 +611,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
+          'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'data' : _dataOdierna.toIso8601String(),
           'orario_appuntamento' : null,
           'orario_inizio': null,

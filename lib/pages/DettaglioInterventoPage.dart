@@ -7,6 +7,7 @@ import 'package:fema_crm/model/RelazioneProdottiInterventoModel.dart';
 import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_webservice/directions.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -41,6 +42,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   UtenteModel? _responsabileSelezionato;
   List<UtenteModel?> _selectedUtenti = [];
   List<UtenteModel?> _finalSelectedUtenti = [];
+  final TextEditingController rapportinoController = TextEditingController();
 
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
@@ -58,6 +60,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     getProdottiDdt();
     _fetchUtenti();
     _futureImages = fetchImages();
+    rapportinoController.text = (widget.intervento.relazione_tecnico != null ? widget.intervento.relazione_tecnico : '//')!;
   }
 
   Future<List<Uint8List>> fetchImages() async {
@@ -283,6 +286,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': dataString,
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'orario_inizio': orarioInizioString,
@@ -321,31 +325,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       print('${utenteSelezionato.nomeCompleto()}');
       print('Errore durante l\'assegnazione dell\'intervento: $e, ');
     }
-  }
-
-  void _showUtentiModal(List<UtenteModel> utenti) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          child: ListView.builder(
-            itemCount: utenti.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(
-                  '${utenti[index].nome ?? 'N/A'} ${utenti[index].cognome ?? 'N/A'}',
-                ),
-                subtitle: Text(utenti[index].ruolo?.descrizione ?? 'N/A'),
-                onTap: () {
-                  _assegnaUtente(utenti[index]);
-                  Navigator.pop(context);
-                },
-              );
-            },
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -623,10 +602,11 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                           ],
                         ),
                       SizedBox(height: 15),
-                      buildInfoRow(
-                        title: 'Relazione Tecnico',
-                        value: widget.intervento.relazione_tecnico ?? 'N/A',
-                      ),
+                      // buildInfoRow(
+                      //   title: 'Relazione Tecnico',
+                      //   value: widget.intervento.relazione_tecnico ?? 'N/A',
+                      // ),
+                      buildRelazioneForm(title: 'Relazione tecnico'),
                       SizedBox(height: 15),
                       buildInfoRow(
                         title: 'Concluso',
@@ -915,6 +895,48 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     );
   }
 
+  Widget buildRelazioneForm({required String title}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Spacer(),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: rapportinoController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.content_copy),
+                onPressed: () {
+                  if (rapportinoController.text.isNotEmpty) {
+                    Clipboard.setData(ClipboardData(text: rapportinoController.text));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Rapportino copiato!')),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget buildInfoRow({required String title, required String value}) {
     return
       Row(
@@ -954,6 +976,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento': orario?.toIso8601String(),
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
@@ -1006,6 +1029,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
+            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : null,
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
@@ -1039,11 +1063,14 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   }
 
   Future<void> assegna() async {
+    print(_selectedUtenti.toString());
+    print(_finalSelectedUtenti.toString());
     try {
       final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
+            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
@@ -1051,7 +1078,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': widget.intervento.importo_intervento,
             'acconto' : widget.intervento.acconto,
-            'assegnato': widget.intervento.assegnato,
+            'assegnato': true,
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': widget.intervento.concluso,
             'saldato': widget.intervento.saldato,
@@ -1070,22 +1097,26 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           }));
       if (response.statusCode == 201) {
         print('EVVAIIIIIIII');
-        if(_finalSelectedUtenti.isNotEmpty){
-          for(var utente in _finalSelectedUtenti){
+        if(_selectedUtenti.isNotEmpty){
+          for(var utente in _selectedUtenti){
             try{
+              print('sono qui');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInteventi'),
+                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'utente' : utente?.toMap(),
                   'intervento' : widget.intervento.toMap(),
                 }),
               );
+              print(response.body);
             } catch(e) {
               print('Errore durante il salvataggio della relazione: $e');
             }
           }
         }
+        Navigator.pop(context);
+        Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Intervento assegnato!'),
@@ -1106,6 +1137,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
+            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : widget.intervento.orario_appuntamento,
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
@@ -1166,15 +1198,15 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                           children: allUtenti.map((utente) {
                             return ListTile(
                               leading: Checkbox(
-                                value: _finalSelectedUtenti?.contains(utente),
+                                value: _finalSelectedUtenti.contains(utente),
                                 onChanged: (value) {
                                   setState(() {
                                     if (value!) {
-                                      _selectedUtenti?.add(utente);
-                                      _finalSelectedUtenti?.add(utente);
+                                      _selectedUtenti.add(utente);
+                                      _finalSelectedUtenti.add(utente);
                                     } else {
-                                      _finalSelectedUtenti?.remove(utente);
-                                      _selectedUtenti?.remove(utente);
+                                      _finalSelectedUtenti.remove(utente);
+                                      _selectedUtenti.remove(utente);
                                     }
                                   });
                                 },
@@ -1242,7 +1274,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       },
     )
         .then((_) {
-      setState(() {}); // Chiamiamo setState() dopo la chiusura del dialogo per forzare il ricaricamento della pagina
+      setState(() {});
     });
   }
 
@@ -1262,59 +1294,3 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   final DateFormat timeFormatter = DateFormat('HH:mm');
 }
 
-class DisplayResponsabileUtentiWidget extends StatefulWidget {
-  final UtenteModel? responsabile;
-  final List<UtenteModel?>? selectedUtenti;
-  final Function(List<UtenteModel?>)? onSelectedUtentiChanged;
-
-  const DisplayResponsabileUtentiWidget({
-    Key? key,
-    required this.responsabile,
-    required this.selectedUtenti,
-    this.onSelectedUtentiChanged,
-  }) : super(key: key);
-
-  @override
-  _DisplayResponsabileUtentiWidgetState createState() =>
-      _DisplayResponsabileUtentiWidgetState();
-}
-
-class _DisplayResponsabileUtentiWidgetState
-    extends State<DisplayResponsabileUtentiWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Responsabile:',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          '${widget.responsabile?.nome ?? ''} ${widget.responsabile?.cognome ?? ''}',
-        ),
-        SizedBox(height: 30),
-        Text(
-          'Utenti selezionati:',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 80,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: widget.selectedUtenti!.length,
-            itemBuilder: (context, index) {
-              final UtenteModel? utente = widget.selectedUtenti![index];
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Chip(
-                  label: Text('${utente?.nome ?? ''} ${utente?.cognome ?? ''}'),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}

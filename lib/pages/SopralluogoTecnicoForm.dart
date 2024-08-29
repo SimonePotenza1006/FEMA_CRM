@@ -128,90 +128,102 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 16),
-                  DropdownButton<TipologiaInterventoModel>(
-                    value: selectedTipologia,
-                    hint: Text('Seleziona tipologia di intervento'),
-                    isExpanded: true,
-                    onChanged: (TipologiaInterventoModel? newValue) {
-                      setState(() {
-                        selectedTipologia = newValue;
-                      });
-                    },
-                    items: tipologieList
-                        .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                            (TipologiaInterventoModel tipologia) {
-                          return DropdownMenuItem<TipologiaInterventoModel>(
-                            value: tipologia,
-                            child: Text(tipologia.descrizione ?? ''),
-                          );
-                        }).toList(),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 300,
+                    child: DropdownButton<TipologiaInterventoModel>(
+                      value: selectedTipologia,
+                      hint: Text('Seleziona tipologia di intervento'),
+                      isExpanded: true,
+                      onChanged: (TipologiaInterventoModel? newValue) {
+                        setState(() {
+                          selectedTipologia = newValue;
+                        });
+                      },
+                      items: tipologieList
+                          .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                              (TipologiaInterventoModel tipologia) {
+                            return DropdownMenuItem<TipologiaInterventoModel>(
+                              value: tipologia,
+                              child: Text(tipologia.descrizione ?? ''),
+                            );
+                          }).toList(),
+                    ),
                   ),
-                  SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: () {
-                      _showClientiDialog();
-                    },
-                    child: SizedBox(
-                      height: 50,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedCliente?.denominazione ??
-                                'Seleziona Cliente',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Icon(Icons.arrow_drop_down),
-                        ],
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 300,
+                    child: GestureDetector(
+                      onTap: () {
+                        _showClientiDialog();
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              selectedCliente?.denominazione ??
+                                  'Seleziona Cliente',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: indirizzoController, // Utilizza il controller per il campo indirizzo
-                    onChanged: (value) {
-                      // Non è più necessario gestire l'evento onChanged
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Indirizzo',
-                      hintText: 'Indirizzo',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.red),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    controller: descrizioneController,
-                    decoration: InputDecoration(
-                      labelText: 'Descrizione',
-                      hintText: 'Aggiungi una descrizione',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Colors.red),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 400,
+                    child: TextFormField(
+                      controller: indirizzoController, // Utilizza il controller per il campo indirizzo
+                      onChanged: (value) {
+                        // Non è più necessario gestire l'evento onChanged
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Indirizzo',
+                        hintText: 'Indirizzo',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 15,),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 400,
+                    child: TextFormField(
+                      controller: descrizioneController,
+                      decoration: InputDecoration(
+                        labelText: 'Descrizione',
+                        hintText: 'Aggiungi una descrizione',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: takePicture,
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red,
                       onPrimary: Colors.white,
                     ),
-                    child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                    child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)),
                   ),
                   _buildImagePreview(),
                   Container(

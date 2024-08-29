@@ -1500,6 +1500,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
+          'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
