@@ -1,6 +1,12 @@
+import 'dart:io';
+
 class VeicoloModel {
   String? id;
   String? descrizione;
+  String? targa;
+  String? seriale;
+  String? imei;
+  DateTime? scadenza_gps;
   String? proprietario;
   int? chilometraggio_attuale;
   DateTime? data_scadenza_bollo;
@@ -19,6 +25,10 @@ class VeicoloModel {
   VeicoloModel(
       this.id,
       this.descrizione,
+      this.targa,
+      this.seriale,
+      this.imei,
+      this.scadenza_gps,
       this.proprietario,
       this.chilometraggio_attuale,
       this.data_scadenza_bollo,
@@ -39,6 +49,10 @@ class VeicoloModel {
     var map = <String, dynamic>{
       'id': id != null ? id!.toString() : null,
       'descrizione': descrizione?.toString(),
+      'targa' : targa?.toString(),
+      'seriale' : seriale?.toString(),
+      'imei' : imei?.toString(),
+      'scadenza_gps' : scadenza_gps?.toIso8601String(),
       'proprietario' : proprietario?.toString(),
       'chilometraggio_attuale' : chilometraggio_attuale,
       'data_scadenza_bollo': data_scadenza_bollo?.toIso8601String(),
@@ -61,6 +75,10 @@ class VeicoloModel {
   VeicoloModel.fromMap(Map<String, dynamic> map) {
         id = map['id'];
         descrizione = map['descrizione'];
+        targa = map['targa'];
+        seriale = map['seriale'];
+        imei = map['imei'];
+        map['scadenza_gps'] != null ? DateTime.parse(map['scadenza_gps']) : null;
         proprietario = map['proprietario'];
         chilometraggio_attuale = map['chilometraggio_attuale'];
         map['data_scadenza_bollo'] != null ? DateTime.parse(map['data_scadenza_bollo']) : null;
@@ -81,6 +99,10 @@ class VeicoloModel {
     return VeicoloModel(
         json['id']?.toString(),
         json['descrizione']?.toString(),
+        json['targa']?.toString(),
+        json['seriale']?.toString(),
+        json['imei']?.toString(),
+        json['scadenza_gps']!= null ? DateTime.parse(json['scadenza_gps']) : null,
         json['proprietario']?.toString(),
         json['chilometraggio_attuale'],
         json['data_scadenza_bollo']!= null ? DateTime.parse(json['data_scadenza_bollo']) : null,
@@ -101,6 +123,10 @@ class VeicoloModel {
   Map<String, dynamic> toJson() => {
         'id': id,
         'descrizione': descrizione,
+        'targa' : targa,
+        'seriale' : seriale,
+        'imei' : imei,
+        'scadenza_gps' : scadenza_gps?.toIso8601String(),
         'proprietario' : proprietario,
         'chilometraggio_attuale' : chilometraggio_attuale,
         'data_scadenza_bollo': data_scadenza_bollo?.toIso8601String(),

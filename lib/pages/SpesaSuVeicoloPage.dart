@@ -34,6 +34,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   final TextEditingController _kmController = TextEditingController();
   final TextEditingController _dataPolizzaController = TextEditingController();
   final TextEditingController _dataBolloController = TextEditingController();
+  final TextEditingController _noteFornitoreController = TextEditingController();
+  final TextEditingController _noteSpesaController = TextEditingController();
   VeicoloModel? selectedVeicolo;
   TipologiaSpesaVeicoloModel? selectedTipologia;
   String? selectedFornitore;
@@ -41,6 +43,18 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   DateTime data = DateTime.now();
   DateTime? dataScadenzaPolizza;
   DateTime? dataScadenzaBollo;
+  bool isKmValid = true;
+  bool isImportoValid = true;
+  final _formKey = GlobalKey<FormState>();
+
+  void _validateKm() {
+    if (selectedVeicolo != null) {
+      int enteredKm = int.tryParse(_kmController.text) ?? 0;
+      setState(() {
+        isKmValid = enteredKm >= (selectedVeicolo!.chilometraggio_attuale ?? 0);
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -75,46 +89,78 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Form(
+            key: _formKey,
             child: Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: 20),
-                  DropdownButton<VeicoloModel>(
-                    value: selectedVeicolo,
-                    onChanged: (VeicoloModel? newValue) {
-                      setState(() {
-                        selectedVeicolo = newValue;
-                      });
-                    },
-                    items: allVeicoli.map((VeicoloModel veicolo) {
-                      return DropdownMenuItem<VeicoloModel>(
-                        value: veicolo,
-                        child: Text(veicolo.descrizione!),
-                      );
-                    }).toList(),
-                    hint: Text('Veicolo'),
-                  ),
-                  SizedBox(height: 20),
-                  DropdownButton<TipologiaSpesaVeicoloModel>(
-                    value: selectedTipologia,
-                    onChanged: (TipologiaSpesaVeicoloModel? newValue) {
-                      setState(() {
-                        selectedTipologia = newValue;
-                      });
-                    },
-                    items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
-                      return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
-                        value: tipologia,
-                        child: Text(tipologia.descrizione!),
-                      );
-                    }).toList(),
-                    hint: Text('Tipologia di spesa'),
+                  SizedBox(
+                    width: 200,
+                    child: DropdownButtonFormField<VeicoloModel>(
+                      value: selectedVeicolo,
+                      onChanged: (VeicoloModel? newValue) {
+                        setState(() {
+                          selectedVeicolo = newValue;
+                          _validateKm();
+                        });
+                      },
+                      items: allVeicoli.map((VeicoloModel veicolo) {
+                        return DropdownMenuItem<VeicoloModel>(
+                          value: veicolo,
+                          child: Text(veicolo.descrizione!),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Veicolo',
+                      ),
+                      validator: (value) => value == null ? 'Seleziona un veicolo' : null,
+                    ),
                   ),
                   SizedBox(height: 20),
                   SizedBox(
-                    height: 50,
-                    child: DropdownButton<String>(
+                    width: 200,
+                    child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
+                      value: selectedTipologia,
+                      onChanged: (TipologiaSpesaVeicoloModel? newValue) {
+                        setState(() {
+                          selectedTipologia = newValue;
+                        });
+                      },
+                      items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
+                        return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
+                          value: tipologia,
+                          child: Text(tipologia.descrizione!),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Tipologia di spesa',
+                      ),
+                      validator: (value) => value == null ? 'Seleziona una tipologia di spesa' : null,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  if (selectedTipologia?.descrizione == "Altro")
+                    Container(
+                      child: SizedBox(
+                        width: 200,
+                        height: 80,
+                        child: TextFormField(
+                          controller: _noteSpesaController,
+                          decoration: InputDecoration(
+                            labelText: "Tipologia di spesa",
+                            hintText: "Scrivere la tipologia di spesa",
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey, width: 2)),
+                          ),
+                          validator: (value) =>
+                          value == null || value.isEmpty ? 'Inserisci la tipologia di spesa' : null,
+                        ),
+                      ),
+                    ),
+                  SizedBox(
+                    width: 200,
+                    child: DropdownButtonFormField<String>(
                       value: selectedFornitore,
                       onChanged: (newValue) {
                         setState(() {
@@ -130,9 +176,31 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                           child: Text(categoria),
                         );
                       }).toList(),
-                      hint: Text('Fornitore'),
+                      decoration: InputDecoration(
+                        labelText: 'Fornitore',
+                      ),
+                      validator: (value) => value == null ? 'Seleziona un fornitore' : null,
                     ),
                   ),
+                  SizedBox(height: 20),
+                  if (selectedFornitore == "Altro")
+                    Container(
+                      child: SizedBox(
+                        width: 200,
+                        height: 70,
+                        child: TextFormField(
+                          controller: _noteFornitoreController,
+                          decoration: InputDecoration(
+                            labelText: "Fornitore",
+                            hintText: "Scrivere il fornitore",
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey, width: 2)),
+                          ),
+                          validator: (value) =>
+                          value == null || value.isEmpty ? 'Inserisci il fornitore' : null,
+                        ),
+                      ),
+                    ),
                   if (selectedTipologia?.descrizione == "Polizza")
                     Column(
                       children: [
@@ -154,13 +222,15 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                             if (pickedDate != null) {
                               setState(() {
                                 dataScadenzaPolizza = pickedDate;
-                                _dataPolizzaController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                                _dataPolizzaController.text =
+                                    DateFormat('yyyy-MM-dd').format(pickedDate);
                               });
                             }
                           },
+                          validator: (value) =>
+                          value == null || value.isEmpty ? 'Seleziona una data' : null,
                         ),
                         SizedBox(height: 20),
-
                       ],
                     ),
                   if (selectedTipologia?.descrizione == "Bollo")
@@ -184,39 +254,57 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                             if (pickedDate != null) {
                               setState(() {
                                 dataScadenzaBollo = pickedDate;
-                                _dataBolloController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                                _dataBolloController.text =
+                                    DateFormat('yyyy-MM-dd').format(pickedDate);
                               });
                             }
                           },
+                          validator: (value) =>
+                          value == null || value.isEmpty ? 'Seleziona una data' : null,
                         ),
                       ],
                     ),
                   SizedBox(height: 20),
                   SizedBox(
                     width: 200,
-                    child: _buildTextFormField(
-                      _importoController,
-                      "Importo",
-                      "Inserisci l'importo della spesa",
+                    child: TextFormField(
+                      controller: _importoController,
+                      decoration: InputDecoration(
+                        labelText: "Importo",
+                        hintText: "Inserisci l'importo della spesa",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                        ),
+                      ),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      keyboardType: TextInputType.number,
+                      validator: (value) =>
+                      value == null || value.isEmpty ? 'Inserisci un importo valido' : null,
                     ),
                   ),
-
                   SizedBox(height: 20),
-                  if(selectedTipologia?.descrizione == "Polizza")
+                  if (selectedTipologia?.descrizione == "Polizza")
                     Center(
-                      child: Text("Inserire un chilometraggio qualsiasi, il sistema recupererà il precedente record!"),
+                      child: Text(
+                          "Inserire un chilometraggio qualsiasi, il sistema recupererà il precedente record!"),
                     ),
                   SizedBox(
-                    width: 250,
-                    child: _buildTextFormField(
-                      _kmController,
-                      "Chilometri",
-                      "Inserisci il chilometraggio",
+                    width: 200,
+                    child: TextFormField(
+                      controller: _kmController,
+                      decoration: InputDecoration(
+                        labelText: "Chilometri",
+                        hintText: "Inserisci il chilometraggio",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                        ),
+                      ),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      keyboardType: TextInputType.number,
+                      validator: (value) =>
+                      value == null || value.isEmpty ? 'Inserisci un chilometraggio valido' : null,
                     ),
                   ),
-
                   SizedBox(height: 20),
                   Text(
                     'Scatta una foto:',
@@ -259,10 +347,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      //if (pickedImage != null) {
-                      checkScadenze();
-                      saveImmagine();
-                      //}
+                      if (_formKey.currentState!.validate()) {
+                        checkScadenze();
+                        saveImmagine();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red,
@@ -290,6 +378,14 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
       )
           : null,
     );
+  }
+
+
+  void _validateImporto() {
+    double? importo = double.tryParse(_importoController.text);
+    setState(() {
+      isImportoValid = importo != null && importo > 0;
+    });
   }
 
   void _showConfirmationDialog() {
@@ -381,6 +477,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           body: jsonEncode({
             'id': selectedVeicolo?.id,
             'descrizione' : selectedVeicolo?.descrizione,
+            'targa' : selectedVeicolo?.targa,
+            'seriale' : selectedVeicolo?.seriale,
+            'imei' : selectedVeicolo?.imei,
+            'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
             'proprietario' : selectedVeicolo?.proprietario,
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
@@ -416,6 +516,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           body: jsonEncode({
             'id': selectedVeicolo?.id,
             'descrizione' : selectedVeicolo?.descrizione,
+            'targa' : selectedVeicolo?.targa,
+            'seriale' : selectedVeicolo?.seriale,
+            'imei' : selectedVeicolo?.imei,
+            'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
             'proprietario' : selectedVeicolo?.proprietario,
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
@@ -451,6 +555,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           body: jsonEncode({
             'id': selectedVeicolo?.id,
             'descrizione' : selectedVeicolo?.descrizione,
+            'targa' : selectedVeicolo?.targa,
+            'seriale' : selectedVeicolo?.seriale,
+            'imei' : selectedVeicolo?.imei,
+            'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
             'proprietario' : selectedVeicolo?.proprietario,
             'chilometraggio_attuale' : selectedVeicolo?.chilometraggio_attuale,
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
@@ -486,6 +594,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           body: jsonEncode({
             'id': selectedVeicolo?.id,
             'descrizione' : selectedVeicolo?.descrizione,
+            'targa' : selectedVeicolo?.targa,
+            'seriale' : selectedVeicolo?.seriale,
+            'imei' : selectedVeicolo?.imei,
+            'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
             'proprietario' : selectedVeicolo?.proprietario,
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
@@ -521,6 +633,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           body: jsonEncode({
             'id': selectedVeicolo?.id,
             'descrizione' : selectedVeicolo?.descrizione,
+            'targa' : selectedVeicolo?.targa,
+            'seriale' : selectedVeicolo?.seriale,
+            'imei' : selectedVeicolo?.imei,
+            'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
             'proprietario' : selectedVeicolo?.proprietario,
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : dataScadenzaBollo?.toIso8601String(),
@@ -556,6 +672,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           body: jsonEncode({
             'id': selectedVeicolo?.id,
             'descrizione' : selectedVeicolo?.descrizione,
+            'targa' : selectedVeicolo?.targa,
+            'seriale' : selectedVeicolo?.seriale,
+            'imei' : selectedVeicolo?.imei,
+            'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
             'proprietario' : selectedVeicolo?.proprietario,
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
@@ -591,6 +711,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           body: jsonEncode({
             'id': selectedVeicolo?.id,
             'descrizione' : selectedVeicolo?.descrizione,
+            'targa' : selectedVeicolo?.targa,
+            'seriale' : selectedVeicolo?.seriale,
+            'imei' : selectedVeicolo?.imei,
+            'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
             'proprietario' : selectedVeicolo?.proprietario,
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
@@ -692,6 +816,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
 
   Future<http.Response?> saveSpesa() async {
     late http.Response response;
+    var notaF = _noteFornitoreController.text.isEmpty ? _noteFornitoreController.text : null;
+    var notaS = _noteSpesaController.text.isEmpty ? _noteSpesaController.text : null;
     try {
       response = await http.post(
         Uri.parse('$ipaddress/api/spesaVeicolo'),
@@ -704,6 +830,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           'tipologia_spesa': selectedTipologia?.toMap(),
           'veicolo': selectedVeicolo?.toMap(),
           'utente': widget.utente.toMap(),
+          'note_tipologia_spesa' : notaS,
+          'note_fornitore' : notaF,
         }),
       );
       print(response.body.toString());

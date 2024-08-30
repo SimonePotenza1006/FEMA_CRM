@@ -11,6 +11,8 @@ class SpesaVeicoloModel {
   TipologiaSpesaVeicoloModel? tipologia_spesa;
   VeicoloModel? veicolo;
   UtenteModel? utente;
+  String? note_tipologia_spesa;
+  String? note_fornitore;
 
   SpesaVeicoloModel(
       this.idSpesaVeicolo,
@@ -20,7 +22,9 @@ class SpesaVeicoloModel {
       this.fornitore_carburante,
       this.tipologia_spesa,
       this.veicolo,
-      this.utente
+      this.utente,
+      this.note_tipologia_spesa,
+      this.note_fornitore
       );
 
   Map<String, dynamic> toMap(){
@@ -32,7 +36,9 @@ class SpesaVeicoloModel {
       'fornitore_carburante' : fornitore_carburante,
       'tipologia_spesa': tipologia_spesa?.toMap(),
       'veicolo' : veicolo?.toMap(),
-      'utente' : utente?.toMap()
+      'utente' : utente?.toMap(),
+      'note_tipologia_spesa' : note_tipologia_spesa,
+      'note_fornitore' : note_fornitore,
     };
     return map;
   }
@@ -46,6 +52,8 @@ class SpesaVeicoloModel {
     tipologia_spesa = map['tipologia_spesa'] != null ? TipologiaSpesaVeicoloModel.fromMap(map['tipologia_spesa']) : null;
     veicolo = map['veicolo'] != null ? VeicoloModel.fromMap(map['veicolo']) : null;
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
+    note_tipologia_spesa = map['note_tipologia_spesa'];
+    note_fornitore = map['note_fornitore'];
   }
 
   Map<String, dynamic> toJson() => {
@@ -57,6 +65,8 @@ class SpesaVeicoloModel {
     'tipologia_spesa' : tipologia_spesa?.toJson(),
     'veicolo': veicolo?.toJson(),
     'utente': utente?.toJson(),
+    'note_tipologia_spesa' : note_tipologia_spesa,
+    'note_fornitore' : note_fornitore
   };
 
   factory SpesaVeicoloModel.fromJson(Map<String, dynamic> json){
@@ -69,6 +79,8 @@ class SpesaVeicoloModel {
       json['tipologia_spesa'] != null ? TipologiaSpesaVeicoloModel.fromJson(json['tipologia_spesa']) : null,
       json['veicolo'] != null ? VeicoloModel.fromJson(json['veicolo']) : null,
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
+      json['note_tipologia_spesa'].toString(),
+      json['note_fornitore'].toString(),
     );
   }
 }

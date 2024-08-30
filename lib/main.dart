@@ -228,91 +228,106 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white10, Colors.red.shade500],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              // Responsive logo image
-              Image.asset(
-                'assets/images/logo_no_bg.png',
-                width: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
-                //height: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
-                fit: BoxFit.contain,
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+
+              image: DecorationImage(
+
+                  image: ExactAssetImage("assets/images/background.jpg"),
+                  fit: BoxFit.cover,
+                  opacity: 0.8
               ),
-              SizedBox(height: 40),
-              Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: <Widget>[
-                      TextFormField(
-                        controller: _conUserId,
-                        decoration: InputDecoration(
-                          labelText: 'Username',
-                          hintText: 'Inserisci il tuo username',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        autofillHints: [AutofillHints.username],
-                      ),
-                      SizedBox(height: 15),
-                      TextFormField(
-                        controller: _conPassword,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Inserisci la password',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        autofillHints: [AutofillHints.password],
-                      ),
-                      SizedBox(height: 40),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
-                        onPressed: login,
-                        child: Text(
-                          'ACCEDI',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                      ),
-                    ],
+            ),
+          ),
+          Container(
+            // decoration: BoxDecoration(
+            //   gradient: LinearGradient(
+            //     begin: Alignment.topCenter,
+            //     end: Alignment.bottomCenter,
+            //     colors: [Colors.white10, Colors.red.shade500],
+            //   ),
+            // ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  // Responsive logo image
+                  Image.asset(
+                    'assets/images/logo_no_bg.png',
+                    width: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
+                    //height: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
+                    fit: BoxFit.contain,
                   ),
-                ),
+                  SizedBox(height: 40),
+                  Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        children: <Widget>[
+                          TextFormField(
+                            controller: _conUserId,
+                            decoration: InputDecoration(
+                              labelText: 'Username',
+                              hintText: 'Inserisci il tuo username',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            autofillHints: [AutofillHints.username],
+                          ),
+                          SizedBox(height: 15),
+                          TextFormField(
+                            controller: _conPassword,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              hintText: 'Inserisci la password',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            autofillHints: [AutofillHints.password],
+                          ),
+                          SizedBox(height: 40),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            onPressed: login,
+                            child: Text(
+                              'ACCEDI',
+                              style: TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                ],
               ),
-              SizedBox(height: 30),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
