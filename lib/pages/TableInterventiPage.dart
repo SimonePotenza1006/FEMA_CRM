@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:intl/intl.dart';
+import '../model/ClienteModel.dart';
 import '../model/GruppoInterventiModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
@@ -24,6 +25,14 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   List<InterventoModel> _allInterventi = [];
   List<InterventoModel> _filteredInterventi = [];
+  List<ClienteModel> clientiList = [];
+  List<TipologiaInterventoModel> tipologieList = [];
+  List<UtenteModel> utentiList = [];
+  DateTime? _startDate;
+  DateTime? _endDate;
+  UtenteModel? _selectedUtente;
+  ClienteModel? _selecedCliente;
+  TipologiaInterventoModel? _selectedTipologia;
   TextEditingController importoController = TextEditingController();
   bool isSearching = false;
   int _currentSheet = 0;
@@ -43,9 +52,73 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'importo_intervento': 100,
     'acconto': 100,
     'inserimento_importo' : 100,
+    'importo_restante' : 130,
     'assegna_gruppo' : 100,
   };
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
+
+  Future<void> getAllUtenti() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for(var item in jsonData){
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          utentiList = utenti;
+        });
+      } else {
+        throw Exception('Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Qualcosa non va utenti : $e');
+    }
+  }
+
+  Future<void> getAllTipologie() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipologiaInterventoModel> tipologie = [];
+        for(var item in jsonData){
+          tipologie.add(TipologiaInterventoModel.fromJson(item));
+        }
+        setState(() {
+          tipologieList = tipologie;
+        });
+      } else {
+        throw Exception('Failed to load tipologie data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Qualcosa non va tipologie : $e');
+    }
+  }
+
+  Future<void> getAllClienti() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<ClienteModel> clienti = [];
+        for(var item in jsonData){
+          clienti.add(ClienteModel.fromJson(item));
+        }
+        setState(() {
+          clientiList = clienti;
+        });
+      } else {
+        throw Exception('Failed to load clienti data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Qualcosa non va Clienti : $e');
+    }
+  }
 
   Future<void> getAllGruppi() async {
     try {
@@ -91,13 +164,11 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         for (var intervento in interventi) {
           var relazioni = await getRelazioni(int.parse(intervento.id.toString()));
           interventoUtentiMap[int.parse(intervento.id.toString())] = relazioni.map((relazione) => relazione.utente!).toList();
-          print('Intervento ${intervento.id} has ${relazioni.length} utenti: ${relazioni.map((relazione) => relazione.utente!.nomeCompleto()).join(', ')}');
         }
         setState(() {
           _allInterventi = interventi;
-          _filteredInterventi = interventi.where((intervento) => !(intervento.concluso ?? false)).toList();
+          _filteredInterventi = interventi.toList();
           _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap);
-          print('Updated _interventoUtentiMap: $interventoUtentiMap');
         });
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -132,13 +203,19 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       _currentSheet = index;
       switch (index) {
         case 0:
-          _filteredInterventi = _allInterventi.where((intervento) => !(intervento.concluso ?? false)).toList();
+          _filteredInterventi = _allInterventi.toList();
           break;
         case 1:
-          _filteredInterventi = _allInterventi.where((intervento) => (intervento.concluso ?? false) && !(intervento.saldato ?? false)).toList();
+          _filteredInterventi = _allInterventi.where((intervento) => !(intervento.concluso ?? false)).toList();
           break;
         case 2:
+          _filteredInterventi = _allInterventi.where((intervento) => (intervento.concluso ?? false) && !(intervento.saldato ?? false)).toList();
+          break;
+        case 3:
           _filteredInterventi = _allInterventi.where((intervento) => (intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
+          break;
+        case 4:
+          _filteredInterventi = _allInterventi.where((intervento) => !(intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
           break;
       }
       _dataSource.updateData(_filteredInterventi, _interventoUtentiMap);
@@ -146,7 +223,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   }
 
   void filterInterventi(String query) {
-    print('Filtrando per query: $query');
     final lowerCaseQuery = query.toLowerCase();
 
     setState(() {
@@ -183,107 +259,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             tipologia.contains(lowerCaseQuery) ||
             descrizione.contains(lowerCaseQuery);
       }).toList();
-      print('Trovati ${_filteredInterventi.length} interventi corrispondenti alla query');
       _dataSource.updateData(_filteredInterventi, _interventoUtentiMap);
     });
   }
-
-  void startSearch() {
-    setState(() {
-      isSearching = true;
-    });
-  }
-
-  void stopSearch() {
-    setState(() {
-      isSearching = false;
-      searchController.clear();
-      filterInterventi('');
-    });
-  }
-
-  void _showFilterDialog() {
-    String? selectedField;
-    TextEditingController queryController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Filtra interventi'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                value: selectedField,
-                hint: Text('Seleziona campo'),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedField = newValue;
-                  });
-                },
-                items: [
-                  DropdownMenuItem(value: 'cliente', child: Text('Cliente')),
-                  DropdownMenuItem(value: 'descrizione', child: Text('Descrizione')),
-                  DropdownMenuItem(value: 'citta', child: Text('Città')),
-                  DropdownMenuItem(value: 'tipologia', child: Text('Tipologia')),
-                  // Aggiungi altri campi se necessario
-                ],
-              ),
-              TextField(
-                controller: queryController,
-                decoration: InputDecoration(hintText: 'Inserisci la query'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text('Annulla'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Filtra'),
-              onPressed: () {
-                if (selectedField != null && queryController.text.isNotEmpty) {
-                  _applyFilter(selectedField!, queryController.text);
-                  Navigator.of(context).pop();
-                } else {
-                  // Mostra un errore se il campo o la query non sono validi
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Seleziona un campo e inserisci una query valida')),
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _applyFilter(String field, String query) {
-    setState(() {
-      _filteredInterventi = _allInterventi.where((intervento) {
-        switch (field) {
-          case 'cliente':
-            return intervento.cliente?.denominazione?.toLowerCase().contains(query.toLowerCase()) ?? false;
-          case 'descrizione':
-            return intervento.descrizione?.toLowerCase().contains(query.toLowerCase()) ?? false;
-          case 'citta':
-            return (intervento.cliente?.citta?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-                (intervento.destinazione?.citta?.toLowerCase().contains(query.toLowerCase()) ?? false);
-          case 'tipologia':
-            return intervento.tipologia?.descrizione?.toLowerCase().contains(query.toLowerCase()) ?? false;
-          default:
-            return false;
-        }
-      }).toList();
-      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap);
-    });
-  }
-
 
   @override
   void initState() {
@@ -291,42 +269,25 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     _dataSource = InterventoDataSource(context, _filteredInterventi, {});
     getAllInterventi();
     getAllGruppi();
+    getAllClienti().whenComplete(() => print('Clienti ok'));
+    getAllTipologie().whenComplete(() => print('Tipologie ok'));
+    getAllUtenti().whenComplete(() => print('Utenti ok'));
+    _filteredInterventi = _allInterventi.toList();
+
+    _changeSheet(0);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: isSearching
-            ? TextFormField(
-          controller: searchController,
-          onChanged: (value) {
-            startSearch();
-            filterInterventi(value);
-          },
-          decoration: InputDecoration(
-            hintText: 'Cerca...',
-            border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.white),
-          ),
-          style: TextStyle(color: Colors.white),
-        )
-            : Text(
+        title: Text(
           'Lista Interventi',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
-          isSearching
-              ? IconButton(
-            icon: Icon(Icons.cancel, color: Colors.white),
-            onPressed: stopSearch,
-          )
-              : IconButton(
-            icon: Icon(Icons.search, color: Colors.white),
-            onPressed: startSearch,
-          ),
           IconButton(
             icon: Icon(Icons.person_add_alt_1, size: 40, color: Colors.white),
             onPressed: () {
@@ -585,6 +546,27 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 80, // Imposta la larghezza minima
                   ),
                   GridColumn(
+                    columnName: 'importo_restante',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Importo restante',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['importo_restante']?? double.nan,
+                    minimumWidth: 130, // Imposta la larghezza minima
+                  ),
+                  GridColumn(
                       columnName: 'assegna_gruppo',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -626,7 +608,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     elevation: 2.0,
                   ),
-                  child: Text('Non Conclusi', style: TextStyle(color: Colors.white)),
+                  child: Text('Tutti', style: TextStyle(color: Colors.white)),
                 ),
                 SizedBox(width: 5),
                 ElevatedButton(
@@ -639,7 +621,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     elevation: 2.0,
                   ),
-                  child: Text('Conclusi non Saldati', style: TextStyle(color: Colors.white)),
+                  child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
                 ),
                 SizedBox(width: 5),
                 ElevatedButton(
@@ -652,7 +634,33 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     elevation: 2.0,
                   ),
+                  child: Text('Conclusi non saldati', style: TextStyle(color: Colors.white)),
+                ),
+                SizedBox(width: 5),
+                ElevatedButton(
+                  onPressed: () => _changeSheet(3),
+                  style: ElevatedButton.styleFrom(
+                    primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                    onPrimary: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    elevation: 2.0,
+                  ),
                   child: Text('Conclusi e Saldati', style: TextStyle(color: Colors.white)),
+                ),
+                SizedBox(width: 5),
+                ElevatedButton(
+                  onPressed: () => _changeSheet(3),
+                  style: ElevatedButton.styleFrom(
+                    primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                    onPrimary: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    elevation: 2.0,
+                  ),
+                  child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),
@@ -660,7 +668,18 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showFilterDialog,
+        onPressed: () {
+          mostraRicercaInterventiDialog(
+            context: context,
+            utenti: utentiList,
+            clienti: clientiList,
+            tipologie: tipologieList,
+            interventi: _allInterventi,
+            onFiltrati: (interventiFiltrati) {
+              _dataSource.updateData(interventiFiltrati, _interventoUtentiMap);
+            },
+          );
+        },
         child: Icon(Icons.filter_list, color: Colors.white,),
         backgroundColor: Colors.red,
       ),
@@ -690,7 +709,6 @@ class InterventoDataSource extends DataGridSource {
     _interventions.clear();
     _interventions.addAll(newInterventions);
     _interventoUtentiMap = newInterventoUtentiMap;
-    print('New _interventoUtentiMap: $_interventoUtentiMap');
     notifyListeners();
   }
 
@@ -719,6 +737,11 @@ class InterventoDataSource extends DataGridSource {
         default:
           backgroundColor = Colors.white;
       }
+
+      double? importo = intervento.importo_intervento != null ? intervento.importo_intervento : 0;
+      double? acconto = intervento.acconto != null ? intervento.acconto : 0;
+      double? restante_da_pagare = importo! - acconto!;
+
       List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
       String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
       String utentiNomi = '';
@@ -729,14 +752,6 @@ class InterventoDataSource extends DataGridSource {
         utentiNomi = 'NESSUNO'; // or any other default value
       }
 
-      print('Updated _interventoUtentiMap: $_interventoUtentiMap');
-      print('Intervento ${intervento.id} keys: ${_interventoUtentiMap.keys}');
-      try {
-        print('Intervento ${intervento.id} utenti: ${_interventoUtentiMap[int.parse(intervento.id!)]}');
-      } catch (e) {
-        print('Error: $e');
-      }
-      print('Intervento ${intervento.id} type: ${intervento.id.runtimeType}');
       rows.add(DataGridRow(
         cells: [
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
@@ -816,6 +831,10 @@ class InterventoDataSource extends DataGridSource {
             value: intervento.acconto != null
                 ? intervento.acconto!.toStringAsFixed(2) + "€"
                 : '',
+          ),
+          DataGridCell<String>(
+            columnName: 'importo_restante',
+            value: restante_da_pagare.toStringAsFixed(2) + "€"
           ),
           DataGridCell<Widget>(
               columnName: 'assegna_gruppo',
@@ -1022,9 +1041,7 @@ class InterventoDataSource extends DataGridSource {
           (cell) => cell.columnName == 'intervento',
     ).value as InterventoModel;
     final List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
-    print('Utenti for intervention ${intervento.id}: $utenti');
     utenti.forEach((utente) {
-      print('Utente ${utente.id}: ${utente.nomeCompleto()}');
     });
     // Gestione del colore di sfondo in base alla tipologia
     Color? backgroundColor;
@@ -1121,4 +1138,262 @@ class InterventoDataSource extends DataGridSource {
       }).toList(),
     );
   }
+}
+
+void mostraRicercaInterventiDialog({
+  required BuildContext context,
+  required List<UtenteModel> utenti,
+  required List<ClienteModel> clienti,
+  required List<TipologiaInterventoModel> tipologie,
+  required List<InterventoModel> interventi,
+  required Function(List<InterventoModel>) onFiltrati,
+}) {
+  DateTime? startDate;
+  DateTime? endDate;
+  UtenteModel? selectedUtente;
+  ClienteModel? selectedCliente;
+  TipologiaInterventoModel? selectedTipologia;
+  List<ClienteModel> clientiFiltrati = [];
+  TextEditingController _clienteController = TextEditingController();
+
+  List<InterventoModel> filtraPerUtente(List<InterventoModel> interventi, UtenteModel utente) {
+    return interventi.where((intervento) => intervento.utente?.id == utente.id).toList();
+  }
+
+  List<InterventoModel> filtraPerCliente(List<InterventoModel> interventi, ClienteModel cliente) {
+    return interventi.where((intervento) => intervento.cliente?.id == cliente.id).toList();
+  }
+
+  List<InterventoModel> filtraPerTipologia(List<InterventoModel> interventi, TipologiaInterventoModel tipologia) {
+    return interventi.where((intervento) => intervento.tipologia?.id == tipologia.id).toList();
+  }
+
+  List<InterventoModel> filtraPerData(List<InterventoModel> interventi, DateTime data) {
+    return interventi.where((intervento) => intervento.data?.isAtSameMomentAs(data) ?? false).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, DateTime startDate, DateTime endDate) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<InterventoModel> filtraConclusiPerUtenteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, DateTime startDate, DateTime endDate) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.data != null &&
+          intervento.concluso == true &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, ClienteModel cliente, DateTime startDate, DateTime endDate) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteTipologiaEIntervalloDate(
+      List<InterventoModel> interventi,
+      UtenteModel utente,
+      ClienteModel cliente,
+      TipologiaInterventoModel tipologia,
+      DateTime startDate,
+      DateTime endDate
+      ) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          intervento.tipologia?.id == tipologia.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text('Cerca Interventi'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                startDate = pickedDate;
+                              });
+                            }
+                          },
+                          child: InputDecorator(
+                            decoration: InputDecoration(labelText: 'Data Inizio'),
+                            child: Text(startDate == null
+                                ? 'Seleziona'
+                                : DateFormat('dd/MM/yyyy').format(startDate!)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                endDate = pickedDate;
+                              });
+                            }
+                          },
+                          child: InputDecorator(
+                            decoration: InputDecoration(labelText: 'Data Fine'),
+                            child: Text(endDate == null
+                                ? 'Seleziona'
+                                : DateFormat('dd/MM/yyyy').format(endDate!)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  DropdownButtonFormField<UtenteModel>(
+                    decoration: InputDecoration(labelText: 'Seleziona Utente'),
+                    value: selectedUtente,
+                    items: utenti.map((utente) {
+                      return DropdownMenuItem(
+                        value: utente,
+                        child: Text(utente.nomeCompleto()!),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        selectedUtente = val;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: _clienteController,
+                    decoration: InputDecoration(labelText: 'Cerca Cliente per denominazione, indirizzo, numero di telefono, etc.'),
+                    onChanged: (query) {
+                      setState(() {
+                        clientiFiltrati = clienti
+                            .where((cliente) => cliente.denominazione!
+                            .toLowerCase()
+                            .contains(query.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                  ),
+
+                  if (clientiFiltrati.isNotEmpty)
+                    Container(
+                      constraints: BoxConstraints(maxHeight: 200), // Adjust as needed
+                      child: ListView.builder(
+                        itemCount: clientiFiltrati.length > 5 ? 5 : clientiFiltrati.length,
+                        itemBuilder: (context, index) {
+                          ClienteModel cliente = clientiFiltrati[index];
+                          return ListTile(
+                            title: Text(cliente.denominazione!),
+                            onTap: () {
+                              setState(() {
+                                selectedCliente = cliente;
+                                _clienteController.text = cliente.denominazione!; // Update the text of the controller
+                                clientiFiltrati = [];
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  SizedBox(height: 20),
+                  DropdownButtonFormField<TipologiaInterventoModel>(
+                    decoration: InputDecoration(labelText: 'Seleziona Tipologia'),
+                    value: selectedTipologia,
+                    items: tipologie.map((tipologia) {
+                      return DropdownMenuItem(
+                        value: tipologia,
+                        child: Text(tipologia.descrizione!),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        selectedTipologia = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Annulla'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red, // background color
+                  onPrimary: Colors.white, // text color
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // padding
+                ),
+                onPressed: () {
+                  List<InterventoModel> interventiFiltrati = interventi;
+                  if (selectedUtente != null) {
+                    interventiFiltrati = filtraPerUtente(interventiFiltrati, selectedUtente!);
+                  }
+                  if (selectedCliente != null) {
+                    interventiFiltrati = filtraPerCliente(interventiFiltrati, selectedCliente!);
+                  }
+                  if (selectedTipologia != null) {
+                    interventiFiltrati = filtraPerTipologia(interventiFiltrati, selectedTipologia!);
+                  }
+                  if (startDate != null && endDate != null) {
+                    interventiFiltrati = interventiFiltrati.where((intervento) {
+                      return intervento.data != null &&
+                          intervento.data!.isAfter(startDate!) &&
+                          intervento.data!.isBefore(endDate!);
+                    }).toList();
+                  } else if (startDate != null) {
+                    interventiFiltrati = filtraPerData(interventiFiltrati, startDate!);
+                  }
+                  onFiltrati(interventiFiltrati);
+                  Navigator.of(context).pop();
+                },
+                child: Text('Cerca'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
 }

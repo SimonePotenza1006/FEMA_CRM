@@ -8,6 +8,7 @@ import 'dart:io';
 import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
 import 'AggiungiMovimentoPage.dart';
+import 'DettaglioInterventoPage.dart';
 import 'ModificaMovimentazionePage.dart';
 
 class RegistroCassaPage extends StatefulWidget {
@@ -140,6 +141,8 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     DataColumn(label: Text('Descrizione', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Tipo', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Importo', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Cliente', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(label: Text('Intervento', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('Utente', style: TextStyle(fontWeight: FontWeight.bold))),
                     DataColumn(label: Text('')),
                     DataColumn(label: Text('')),
@@ -152,6 +155,45 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                         DataCell(Text(movimento.descrizione ?? '')),
                         DataCell(Text(_getTipoMovimentazioneString(movimento.tipo_movimentazione))),
                         DataCell(Text(movimento.importo != null ? movimento.importo!.toStringAsFixed(2) + '€' : '')),
+                        DataCell(Text(movimento.cliente != null ? movimento.cliente!.denominazione! : '///')),
+                        DataCell(
+                          GestureDetector(
+                            onTap: () {
+                              if (movimento.intervento != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioInterventoPage(intervento: movimento.intervento!),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 1.0), // Aggiunge spazio tra testo e underline
+                                  child: Text(
+                                    movimento.intervento != null ? movimento.intervento!.descrizione! : '///',
+                                    style: TextStyle(
+                                      color: movimento.intervento != null ? Colors.blue : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                if (movimento.intervento != null)
+                                  Positioned(
+                                    bottom: 0, // Posiziona la linea esattamente sotto il testo
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 1, // Altezza della linea di sottolineatura
+                                      color: Colors.blue, // Colore della linea di sottolineatura
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+
                         DataCell(Text(movimento.utente != null ? movimento.utente!.cognome ?? '' : '')),
                         DataCell(
                             Center(
@@ -176,6 +218,9 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                                           title: Text('Eliminare la movimentazione di ${movimento.importo!.toStringAsFixed(2)}€?'),
                                           actions: [
                                             TextButton(onPressed: (){
+                                              if(movimento.tipo_movimentazione == TipoMovimentazione.Acconto || movimento.tipo_movimentazione == TipoMovimentazione.Pagamento){
+                                                deletePics(movimento);
+                                              }
                                               deleteMovimentazione(movimento);
                                             },
                                               child: Text('Si'),
@@ -203,6 +248,23 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         ),
       ),
     );
+  }
+
+  Future<void> deletePics(MovimentiModel movimento) async{
+    try{
+      final response = await http.delete(
+        Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if(response.statusCode == 204){
+        print('Immagini eliminate');
+        await Future.delayed(Duration(seconds: 2));
+        deleteMovimentazione(movimento);
+      }
+    } catch(e){
+      print('Errore durante la richiesta HTTP: $e');
+      deleteMovimentazione(movimento);
+    }
   }
 
   Future<void> deleteMovimentazione(MovimentiModel movimento) async {

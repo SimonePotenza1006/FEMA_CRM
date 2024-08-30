@@ -184,4 +184,67 @@ class InterventoModel {
       json['gruppo'] != null ? GruppoInterventiModel.fromJson(json['gruppo']) : null,
     );
   }
+
+  List<InterventoModel> filtraPerUtente(List<InterventoModel> interventi, UtenteModel utente) {
+    return interventi.where((intervento) => intervento.utente?.id == utente.id).toList();
+  }
+
+  List<InterventoModel> filtraPerCliente(List<InterventoModel> interventi, ClienteModel cliente) {
+    return interventi.where((intervento) => intervento.cliente?.id == cliente.id).toList();
+  }
+
+  List<InterventoModel> filtraPerTipologia(List<InterventoModel> interventi, TipologiaInterventoModel tipologia) {
+    return interventi.where((intervento) => intervento.tipologia?.id == tipologia.id).toList();
+  }
+
+  List<InterventoModel> filtraPerData(List<InterventoModel> interventi, DateTime data) {
+    return interventi.where((intervento) => intervento.data?.isAtSameMomentAs(data) ?? false).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, DateTime startDate, DateTime endDate) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<InterventoModel> filtraConclusiPerUtenteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, DateTime startDate, DateTime endDate) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.data != null &&
+          intervento.concluso == true &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, ClienteModel cliente, DateTime startDate, DateTime endDate) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteTipologiaEIntervalloDate(
+      List<InterventoModel> interventi,
+      UtenteModel utente,
+      ClienteModel cliente,
+      TipologiaInterventoModel tipologia,
+      DateTime startDate,
+      DateTime endDate
+      ) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          intervento.tipologia?.id == tipologia.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate);
+    }).toList();
+  }
 }

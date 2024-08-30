@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:intl/intl.dart';
 
+import 'ClienteModel.dart';
+import 'InterventoModel.dart';
+
 class MovimentiModel {
   String? id;
   DateTime? data;
@@ -11,6 +14,8 @@ class MovimentiModel {
   TipoMovimentazione? tipo_movimentazione;
   double? importo;
   UtenteModel? utente;
+  InterventoModel? intervento;
+  ClienteModel? cliente;
 
   MovimentiModel(
     this.id,
@@ -20,6 +25,8 @@ class MovimentiModel {
     this.tipo_movimentazione,
     this.importo,
     this.utente,
+    this.intervento,
+    this.cliente
   );
 
   MovimentiModel.fromMap(Map<String, dynamic> map) {
@@ -31,6 +38,7 @@ class MovimentiModel {
             (type) => type.toString() == 'tipo_movimentazione.${map['tipo_movimentazione']}');
     importo = map['importo'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
+    cliente = map['cliente'] != null ? ClienteModel.fromMap(map['utente']) : null;
   }
 
   Map<String, dynamic> toMap() {
@@ -42,6 +50,8 @@ class MovimentiModel {
       'tipo_movimentazione': tipo_movimentazione.toString(),
       'importo': importo,
       'utente': utente?.toMap(),
+      'intervento' : intervento?.toMap(),
+      'cliente' : cliente?.toMap()
     };
     return map;
   }
@@ -54,6 +64,8 @@ class MovimentiModel {
       'tipo_movimentazione': tipo_movimentazione.toString().split('.').last, // Convert enum to string
       'importo': importo,
       'utente': utente?.toJson(),
+      'intervento' : intervento?.toJson(),
+      'cliente' : cliente?.toJson()
   };
 
 
@@ -67,6 +79,8 @@ class MovimentiModel {
         _getTipoMovimentazioneFromString(json['tipo_movimentazione']),
       json['importo'] != null ? double.parse(json['importo'].toString()) : null,
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
+      json['intervento'] != null ? InterventoModel.fromJson(json['intervento']) : null,
+      json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
     );
   }
 
