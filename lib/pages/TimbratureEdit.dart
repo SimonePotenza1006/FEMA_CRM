@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import '../model/MarcaTempoModel.dart';
 import '../model/UtenteModel.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:collection';
 
 
 class TimbratureEdit extends StatefulWidget {
@@ -43,6 +44,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
   List<UtenteModel> allUtenti = [];
   final FocusManager _focusManager = FocusManager();
 
+
   @override
   void initState() {
     super.initState();
@@ -53,9 +55,72 @@ class _TimbratureEditState extends State<TimbratureEdit> {
     }
    // _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate);
     //_marcatController.text = "";
-    getAllMarcatempo();
+    getAllMarcatempo().then((value) => groupAndSortTimbrature());
     getAllUtenti();
     //_getCurrentLocation();
+  }
+
+  int getSettimana(DateTime date) {
+    int dayOfYear = getDayOfYear(date);
+    int week = (dayOfYear - date.weekday + 10) ~/ 7;
+    return week;
+  }
+
+  int getDayOfYear(DateTime date) {
+    return date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+  }
+  Map<int, List<_RowData>> groupedRows = {};
+  void groupAndSortTimbrature() {
+    // Raggruppa per utente
+    Map<String, List<MarcaTempoModel>> groupedTimbrature = {};
+    allTimbratureEdit.forEach((timbratura) {
+      if (!groupedTimbrature.containsKey(timbratura.utente!.id!)) {
+        groupedTimbrature[timbratura.utente!.id!] = [];
+      }
+      groupedTimbrature[timbratura.utente!.id!]!.add(timbratura);
+    });
+    //groupedTimbrature = groupBy(allTimbratureEdit, (timbratura) => timbratura.utente);
+    print('vvbcs');
+    // Ordina per data
+    groupedTimbrature.forEach((utente, timbrature) {
+      timbrature.sort((a, b) => b.data!.toIso8601String().compareTo(a.data!.toIso8601String()));
+    });
+    print('azaaza');
+    // Assegna il risultato a allTimbratureEdit
+    allTimbratureEdit.clear();
+    groupedTimbrature.forEach((utente, timbrature) {
+      allTimbratureEdit.addAll(timbrature);
+    });
+    print(allTimbratureEdit.last.id.toString()+' brbas');
+
+
+
+    _rows = allTimbratureEdit.map((marcaTempo) {
+      return _RowData(
+        idmt: marcaTempo.id,
+        utente: marcaTempo.utente!,
+        dataIngresso: DateFormat('dd/MM/yyyy').format(marcaTempo.data!),
+        oraIngresso: DateFormat('HH:mm').format(marcaTempo.data!),//marcaTempo.data!.hour.toString() + ':' + marcaTempo.data!.minute.toString(),
+        indirizzoIngresso: marcaTempo.gps!,
+        dataUscita: marcaTempo.datau != null ? DateFormat('dd/MM/yyyy').format(marcaTempo.datau!) : '',
+        oraUscita: marcaTempo.datau != null ? DateFormat('HH:mm').format(marcaTempo.datau!) : '',
+        indirizzoUscita: marcaTempo.gpsu != null ? marcaTempo.gpsu! : '',
+        utenteEdit: marcaTempo.utenteEdit != null ? marcaTempo.utenteEdit! : null,
+      );
+    }).toList();
+
+
+    for (var row in _rows) {
+      int settimana = getSettimana(DateFormat('dd/MM/yyyy').parse(row.dataIngresso!));
+      if (!groupedRows.containsKey(settimana)) {
+        groupedRows[settimana] = [];
+      }
+      groupedRows[settimana]?.add(row);
+    }
+    _rows.clear();
+    groupedRows.forEach((settimana, rows) {
+      _rows.addAll(rows);
+    });
   }
 
   Future<void> getAllMarcatempo() async {
@@ -86,36 +151,28 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           MarcaTempoModel marcatempo = MarcaTempoModel.fromJson(item);
           // Controlla se la data del marcatempo Ã¨ nel mese corrente
           if (marcatempo.data != null &&
-              (marcatempo.data!.isAfter(threeDaysAgo!) || marcatempo.data == threeDaysAgo) &&
+              (marcatempo.data!.isAfter(firstDayOfMonth!) || marcatempo.data == firstDayOfMonth) &&
               (marcatempo.data!.isBefore(tomorrow!) || marcatempo.data == tomorrow)) {
             allMarcatempos.add(marcatempo);
           }
         }
         setState(() {
           allTimbratureEdit = allMarcatempos;
-          print('timbr '+allMarcatempos.toString());
+          //groupAndSortTimbrature();
+          print('timbr '+allMarcatempos.first.id.toString());
         });
+
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
     }
-    _rows = allTimbratureEdit.map((marcaTempo) {
-      return _RowData(
-        idmt: marcaTempo.id,
-        utente: marcaTempo.utente!,
-        dataIngresso: DateFormat('dd/MM/yyyy').format(marcaTempo.data!),
-        oraIngresso: DateFormat('HH:mm').format(marcaTempo.data!),//marcaTempo.data!.hour.toString() + ':' + marcaTempo.data!.minute.toString(),
-        indirizzoIngresso: marcaTempo.gps!,
-        dataUscita: marcaTempo.datau != null ? DateFormat('dd/MM/yyyy').format(marcaTempo.datau!) : '',
-        oraUscita: marcaTempo.datau != null ? DateFormat('HH:mm').format(marcaTempo.datau!) : '',
-        indirizzoUscita: marcaTempo.gpsu != null ? marcaTempo.gpsu! : '',
-      );
-    }).toList();
+
   }
 
   Future<void> edit(_RowData row) async {
     //if (_isSigned == true) {
       try {
+        print(row.idmt!+' d fdfd');
         if (true){//tipoTimbratura == "INGRESSO") {
           print(DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String()+' '+DateTime.now().toIso8601String());
           final response = await http.post(
@@ -127,7 +184,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               'data': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String(),//DateTime.now().toIso8601String(),
               'gpsu': row.indirizzoUscita,
               'datau': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita}').toIso8601String(),//DateTime.now().toIso8601String(),
-              'utente': row.utente!.toMap(),//widget.utente.toMap(),
+              'utente': row.utente!,//widget.utente.toMap(),
               'viaggio': {
                 'id': 2,
                 'destinazione': 'Calimera',
@@ -136,14 +193,16 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               },
               'edit': row.isEdit,
               'editu': row.isEditu,
+              'utenteEdit': widget.utente!//row.utenteEdit != null ? row.utenteEdit!.toMap() : null,
             }),
           );
           //Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
+
+          /*ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Timbratura registrata con successo!'),
             ),
-          );
+          );*/
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
@@ -201,14 +260,15 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       //return null; // Ritorna null in caso di errore
     }
   }
-
+  List<DataTable> _tables = [];
   void addNewRow() {
     setState(() {
       if (_rows.any((row) => row.isNewRow)) {
         // Annulla la riga precedente se ne esiste una
         _rows.removeWhere((row) => row.isNewRow);
       }
-      _rows.add(_RowData(
+      print('vbbva');
+      /*_rows.insert(0, _RowData(//_rows.add(_RowData(
         idmt: '',
         utente: widget.utente,
         dataIngresso: '',
@@ -218,7 +278,19 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         oraUscita: '',
         indirizzoUscita: '',
         isNewRow: true,
-      ));
+        settimana: null
+      ));*/
+      _RowData newRow = _RowData(
+        idmt: '',
+        utente: widget.utente,
+        dataIngresso: '',
+        oraIngresso: '',
+        indirizzoIngresso: '',
+        dataUscita: '',
+        oraUscita: '',
+        indirizzoUscita: '',
+        isNewRow: true,
+      );
       _editedRowIndex = null;
       for (var otherRow in _rows) {
         //if (otherRow != row) {
@@ -227,6 +299,30 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
         //}
       }
+      DataTable newTable = DataTable(
+        columns: [
+          DataColumn(label: Text('UTENTE')),
+          DataColumn(label: Text('DATA')),
+          DataColumn(label: Text('INGRESSO')),
+          DataColumn(label: Text('INDIRIZZO INGRESSO')),
+          DataColumn(label: Text('USCITA')),
+          DataColumn(label: Text('INDIRIZZO USCITA')),
+          DataColumn(label: Text('MODIFICATA DA')),
+          DataColumn(label: Text('')),
+        ],
+        rows: [DataRow(cells: [
+          DataCell(Text(newRow.utente!.nome! + ' ' + newRow.utente!.cognome!)),
+          DataCell(Text(newRow.dataIngresso!)),
+          DataCell(Text(newRow.oraIngresso!)),
+          DataCell(Text(newRow.indirizzoIngresso!)),
+          DataCell(Text(newRow.dataUscita!)),
+          DataCell(Text(newRow.oraUscita!)),
+          DataCell(Text(newRow.indirizzoUscita!)),
+          DataCell(Text('')),
+        ])],
+      );
+      _tables.insert(0, newTable);
+      print('ew43');
     });
   }
 
@@ -246,10 +342,12 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   @override
   Widget build(BuildContext context) {
+
+    List<Widget> settimane = [];
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Lista Timbrature',
+            'LISTA TIMBRATURE',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -272,7 +370,10 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         ),
         body: Padding(
             padding: EdgeInsets.all(10),
-            child: Column(
+            child: SingleChildScrollView(
+            child:Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                 SizedBox(height: 10),
                 Row(
@@ -280,33 +381,73 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                   children: [
                     ElevatedButton(
                       onPressed: addNewRow,
-                      child: Text('Nuova timbratura'),
+                      child: Text('NUOVA TIMBRATURA'),
                     ),
                 ]),
                   SizedBox(height: 10),
-            Row(
+                  Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-            Expanded(child:
 
-            DataTable(headingRowHeight: 30,
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //_tables,
+                      /*Flexible(child:
+                      Container(
+                      alignment: Alignment.centerLeft,
+                          child:
+                        DataTable(
+                          headingRowHeight: 30,
+                          columnSpacing: 10,
+                          dataRowMinHeight: 30,
+                          dataRowMaxHeight: 38,
+                          border: TableBorder.all(color: Colors.grey),
+                          columns: [
+                            DataColumn(label: Text('UTENTE')),
+                            DataColumn(label: Text('DATA')),
+                            DataColumn(label: Text('INGRESSO')),
+                            DataColumn(label: Text('INDIRIZZO INGRESSO')),
+                            DataColumn(label: Text('USCITA')),
+                            DataColumn(label: Text('INDIRIZZO USCITA')),
+                            DataColumn(label: Text('MODIFICATA DA')),
+                            DataColumn(label: Text('')),
+                          ],
+                          rows: [DataRow(
+                            cells: List<DataCell>.generate(
+                              8,
+                                  (index) => DataCell(Container()),
+                            ),
+                          ),], // Non ci sono righe qui, solo l'header
+                        ))),*/
+                  for (int settimana in groupedRows.keys)
+            Flexible(child:
+            Container(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  children: [
+                DataTable(
+
+              headingRowHeight: 30,
               columnSpacing: 10,
               dataRowMinHeight:  30,
               dataRowMaxHeight: 38,
               border: TableBorder.all(color: Colors.grey),
       columns: [
         DataColumn(label: Text('UTENTE'),),
-        DataColumn(label: Text('DATA')),
+        DataColumn(label: Text(DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(Settimana.getSettimana(settimana, DateTime.now().year)['lunedì']!.toString()),)+' - '+DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(Settimana.getSettimana(settimana, DateTime.now().year)['domenica']!.toString()),))),
         DataColumn(label: Text('INGRESSO')),
         DataColumn(label: Text('INDIRIZZO INGRESSO')),
         //DataColumn(label: Text('Data Uscita')),
         DataColumn(label: Text('USCITA')),
         DataColumn(label: Text('INDIRIZZO USCITA')),
+        DataColumn(label: Text('MODIFICATA DA')),
         DataColumn(label: Text('')),
       ],
-      rows: _rows
-          .map(
-            (row) => DataRow(
+
+      rows: groupedRows[settimana]!.map((row) {
+            return DataRow(
           cells: [
             DataCell(
               Container(width: 200,
@@ -432,7 +573,9 @@ class _TimbratureEditState extends State<TimbratureEdit> {
             )),
             DataCell(
               showEditIcon: row.isModified,
-              TextFormField(
+        Container(width: 300,
+        alignment: Alignment.center,
+        child:TextFormField(
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
                 //focusNode: _focusNodes[_rows.indexOf(row)],
@@ -453,7 +596,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     }
                   });
                 },
-              ),
+              )),
             ),
             /*DataCell(
               TextFormField(
@@ -496,7 +639,9 @@ class _TimbratureEditState extends State<TimbratureEdit> {
             ),
             DataCell(
               showEditIcon: row.isModified,
-              TextFormField(
+        Container(width: 300,
+        alignment: Alignment.center,
+        child:TextFormField(
                 decoration: InputDecoration(border: InputBorder.none),
                 initialValue: row.indirizzoUscita,
                 onChanged: (value) {
@@ -514,6 +659,22 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     }
                   });
                 },
+              )),
+            ),
+            DataCell(
+              showEditIcon: row.isModified,
+              TextFormField(
+                decoration: InputDecoration(border: InputBorder.none),
+                //textAlignVertical: TextAlignVertical.center,
+                textAlign: TextAlign.center, // add this line
+                //style: TextStyle(verticalAlign: TextAlignVertical.center),
+                readOnly: true,
+                initialValue: row.utenteEdit != null ? row.utenteEdit!.nome!+' '+row.utenteEdit!.cognome! : '',//widget.utente.nome!+' '+widget.utente.cognome!//
+                /*onChanged: (value) {
+                  setState(() {
+                    row.oraIngresso = value;
+                  });
+                },*/
               ),
             ),
             DataCell(
@@ -575,10 +736,14 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               selected: _editedRowIndex == _rows.indexOf(row)
                   ? true : false,
 
-        ),
+        );},
       )
           .toList(),
-    ))])])));
+    ),
+                  SizedBox(height: 5,)
+                  ])
+            ))])
+                  ])]))));
   }
 
 }
@@ -586,6 +751,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 class _RowData {
   String? idmt;
   UtenteModel? utente;
+  UtenteModel? utenteEdit;
   String? dataIngresso;
   String? oraIngresso;
   String? indirizzoIngresso;
@@ -599,11 +765,14 @@ class _RowData {
   TextEditingController oraUscitaController = TextEditingController();
   bool isNewRow = false;
   TextEditingController dataIngressoController = TextEditingController();
+  int? settimana;
+
 
 
   _RowData({
     this.idmt,
     this.utente,
+    this.utenteEdit,
     this.dataIngresso,
     this.oraIngresso,
     this.indirizzoIngresso,
@@ -611,6 +780,7 @@ class _RowData {
     this.oraUscita,
     this.indirizzoUscita,
     this.isNewRow = false,
+    this.settimana
   }) {
     oraIngressoController.text = oraIngresso ?? '';
     oraUscitaController.text = oraUscita ?? '';
@@ -618,6 +788,28 @@ class _RowData {
 
 }
 
+class Settimana {
+  static DateTime getLunedi(int numeroSettimana, int anno) {
+  DateTime primoGiornoAnno = DateTime(anno, 1, 1);
+  while (primoGiornoAnno.weekday != 1) {
+  primoGiornoAnno = primoGiornoAnno.add(Duration(days: 1));
+  }
+  return primoGiornoAnno.add(Duration(days: (numeroSettimana - 1) * 7));
+  }
+
+  static DateTime getDomenica(int numeroSettimana, int anno) {
+    return getLunedi(numeroSettimana, anno).add(Duration(days: 6));
+  }
+
+  static Map<String, DateTime> getSettimana(int numeroSettimana, int anno) {
+    DateTime lunedi = getLunedi(numeroSettimana, anno);
+    DateTime domenica = getDomenica(numeroSettimana, anno);
+    return {
+    'lunedì': lunedi,
+    'domenica': domenica,
+    };
+  }
+}
 /*class TimePickerWidget extends StatefulWidget {
   final String initialTime;
   final Function(String) onTimeChanged;
