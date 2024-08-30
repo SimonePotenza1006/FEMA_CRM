@@ -247,75 +247,108 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           padding: EdgeInsets.all(16.0),
           child: Form(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                TextFormField(
-                  controller: _descrizioneController,
-                  decoration: InputDecoration(
-                    labelText: 'DESCRIZIONE',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Inserisci una descrizione';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  controller: _importoController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'IMPORTO',
-                  ),
-                  validator: (value) {
-                    if (value == null || double.tryParse(value) == null) {
-                      return 'Inserisci un importo valido';
-                    }
-                    return null;
-                  },
-                ),
-                DropdownButtonFormField<TipoMovimentazione>(
-                  value: _selectedTipoMovimentazione,
-                  onChanged: (TipoMovimentazione? newValue) {
-                    setState(() {
-                      _selectedTipoMovimentazione = newValue;
-                      if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento || _selectedTipoMovimentazione == TipoMovimentazione.Prelievo) {
-                        _selectUtente();
-                      } else {
-                        selectedUtente = null;
+                SizedBox(
+                  width: 500,
+                  child:TextFormField(
+                    controller: _descrizioneController,
+                    decoration: InputDecoration(
+                      labelText: 'DESCRIZIONE',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Inserisci una descrizione';
                       }
-                    });
-                  },
-                  items: TipoMovimentazione.values.map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
-                    String label;
-                    if (value == TipoMovimentazione.Entrata) {
-                      label = 'ENTRATA';
-                    } else if (value == TipoMovimentazione.Uscita) {
-                      label = 'USCITA';
-                    } else if(value == TipoMovimentazione.Acconto){
-                      label = 'ACCONTO';
-                    } else if (value == TipoMovimentazione.Prelievo){
-                      label = 'PRELIEVO';
-                    } else {
-                      label = 'PAGAMENTO';
-                    }
-                    return DropdownMenuItem<TipoMovimentazione>(
-                      value: value,
-                      child: Text(label),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'TIPO MOVIMENTAZIONE',
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Seleziona il tipo di movimentazione';
-                    }
-                    return null;
-                  },
+                ),
+                SizedBox(
+                  width: 300,
+                  child: TextFormField(
+                    controller: _importoController,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'IMPORTO',
+                    ),
+                    validator: (value) {
+                      if (value == null || double.tryParse(value) == null) {
+                        return 'Inserisci un importo valido';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Data di riferimento:',
+                  style: TextStyle(color: Colors.black),
+                ),
+                //),
+                Center(
+                  child: GestureDetector(
+                      onTap: () {
+                        _selectDate(context);
+                      },
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year.toString().substring(2)} ',
+                              style: TextStyle(color: Colors.black, fontSize: 16),
+                            ),
+                            Icon(Icons.edit, size: 16),
+                          ])
+                  ),
+                ),
+                SizedBox(
+                  width: 400,
+                  child: DropdownButtonFormField<TipoMovimentazione>(
+                    value: _selectedTipoMovimentazione,
+                    onChanged: (TipoMovimentazione? newValue) {
+                      setState(() {
+                        _selectedTipoMovimentazione = newValue;
+                        if (_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento || _selectedTipoMovimentazione == TipoMovimentazione.Prelievo) {
+                          _selectUtente();
+                        } else {
+                          selectedUtente = null;
+                        }
+                      });
+                    },
+                    items: TipoMovimentazione.values.map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
+                      String label;
+                      if (value == TipoMovimentazione.Entrata) {
+                        label = 'ENTRATA';
+                      } else if (value == TipoMovimentazione.Uscita) {
+                        label = 'USCITA';
+                      } else if(value == TipoMovimentazione.Acconto){
+                        label = 'ACCONTO';
+                      } else if (value == TipoMovimentazione.Prelievo){
+                        label = 'PRELIEVO';
+                      } else {
+                        label = 'PAGAMENTO';
+                      }
+                      return DropdownMenuItem<TipoMovimentazione>(
+                        value: value,
+                        child: Text(label),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'TIPO MOVIMENTAZIONE',
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Seleziona il tipo di movimentazione';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
                 if ((_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita || _selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo) && selectedUtente != null)
                   Padding(
@@ -371,7 +404,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       );
                     },
                     child: Container(
-                      width: double.infinity,
+                      width: 500,
                       height: 150,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey),
@@ -433,7 +466,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       );
                     },
                     child: Container(
-                      width: double.infinity,
+                      width: 500,
                       height: 150,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey),
@@ -442,44 +475,52 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                         child: signatureBytesIncaricato != null
                             ? Image.memory(signatureBytesIncaricato!)
                             : Text(
-                          'Firma incaricato a ritiro',
+                          'Firma tecnico',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
                     ),
                   ),
                 if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
-                  Container(
-                    child: GestureDetector(
-                      onTap: () {
-                        _showClientiDialog();
-                      },
-                      child: SizedBox(
-                        height: 50,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
-                            const Icon(Icons.arrow_drop_down),
-                          ],
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 400,
+                    child: Container(
+                      child: GestureDetector(
+                        onTap: () {
+                          _showClientiDialog();
+                        },
+                        child: SizedBox(
+                          height: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                              const Icon(Icons.arrow_drop_down),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto || _selectedTipoMovimentazione == TipoMovimentazione.Pagamento)
-                  Container(
-                    child: GestureDetector(
-                      onTap: () {
-                        _showInterventiDialog();
-                      },
-                      child: SizedBox(
-                        height: 50,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(selectedIntervento?.descrizione ?? 'Seleziona l\'intervento', style: const TextStyle(fontSize: 16)),
-                            const Icon(Icons.arrow_drop_down),
-                          ],
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 400,
+                    child: Container(
+                      child: GestureDetector(
+                        onTap: () {
+                          _showInterventiDialog();
+                        },
+                        child: SizedBox(
+                          height: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(selectedIntervento?.descrizione ?? 'Seleziona l\'intervento', style: const TextStyle(fontSize: 16)),
+                              const Icon(Icons.arrow_drop_down),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -496,38 +537,26 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                         ),
                         child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                       ),
-                      _buildImagePreview(),
+                      if(pickedImages.isNotEmpty)
+                        _buildImagePreview(),
                     ],
                   ),
-                SizedBox(height: 10),
-               //Center(child:
-                  Text(
-                    'Data di riferimento:',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                //),
-                //Center(child:
-                GestureDetector(
-                    onTap: () {
-                      _selectDate(context);
-                      },
-                    child: Row(
-                      children: [
-                        Text(
-                          '${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year.toString().substring(2)} ',
-                          style: TextStyle(color: Colors.black, fontSize: 16),
-                        ),
-                        Icon(Icons.edit, size: 16),
-                      ])
-                ),
-                //),
                 SizedBox(height: 16.0),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
                       if (_validateInputs()) {
                         if(pickedImages.isNotEmpty){
-                          saveMovimentoPlusPics();
+                          if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
+                            saveStatusInterventoPagamento();
+                            saveMovimentoPlusPics();
+                            return;
+                          }
+                          if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto){
+                            saveStatusInterventoAcconto();
+                            saveMovimentoPlusPics();
+                            return;
+                          }
                         }
                         if(_selectedTipoMovimentazione == TipoMovimentazione.Entrata || _selectedTipoMovimentazione == TipoMovimentazione.Uscita ||  _selectedTipoMovimentazione == TipoMovimentazione.Prelievo){
                           addMovimento();
@@ -535,6 +564,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                             context,
                             MaterialPageRoute(builder: (context) => PDFPrelievoCassaPage(utente: widget.userData, data: selectedDate, incaricato:selectedUtente, descrizione : _descrizioneController.text, importo : _importoController.text, firmaCassa : signatureBytes, firmaIncaricato: signatureBytesIncaricato, tipoMovimentazione: _selectedTipoMovimentazione!)),
                           );
+                          return;
                         } else if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
                           saveStatusInterventoPagamento();
                           addMovimento();
@@ -542,6 +572,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                               context,
                               MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
                           );
+                          return;
                         } else {
                           saveStatusInterventoAcconto();
                           saveNotaAcconto();
@@ -550,15 +581,17 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                             context,
                             MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
                           );
+                          return;
                         }
                       }
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(horizontal: 10, vertical: 2))
                     ),
                     child: Text(
                       'Conferma Inserimento',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
                 ),
@@ -750,7 +783,9 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   }
 
   Future<http.Response?> addMovimento() async {
+    ClienteModel? cliente = selectedCliente != null ? selectedCliente : null;
     String formattedDate = DateFormat("yyyy-MM-ddTHH:mm:ss").format(selectedDate.toUtc());
+    Map<String, dynamic>? intervento = selectedIntervento != null ? selectedIntervento!.toMap() : null;
     String tipoMovimentazioneString = _selectedTipoMovimentazione.toString().split('.').last; // Otteniamo solo il nome dell'opzione
     Map<String, dynamic> body = {
       'id': null,
@@ -759,6 +794,8 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       'tipo_movimentazione': tipoMovimentazioneString,
       'importo': double.parse(_importoController.text.toString()),
       'utente': widget.userData.toMap(),
+      'intervento' : intervento,
+      'cliente' : cliente?.toMap()
     };
     try {
       debugPrint("Body della richiesta: ${body.toString()}");
@@ -771,13 +808,6 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       );
       if (response.statusCode == 201) {
         print('Movimentazione salvata con successo');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Movimentazione salvata con successo'),
-            ),
-          );
-        }
         return response;
       } else {
         print('Errore durante il salvataggio della movimentazione: ${response.statusCode}');
@@ -826,7 +856,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
             if(response.statusCode == 200){
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content: Text('Movimentagione registrata con successo!')
+                    content: Text('Movimentazione registrata con successo!')
                 ),
               );
             } else{

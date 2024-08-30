@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/pages/CalendarioPage.dart';
@@ -79,10 +80,12 @@ class _HomeFormAmministrazioneNewPageState
   @override
   void initState() {
     super.initState();
-    _menuItemClickCount.clear();
-    for (int i = 0; i < _menuItems.length; i++) {
-      _menuItemClickCount[i] = 0;
-    };
+    if(Platform.isAndroid){
+      _menuItemClickCount.clear();
+      for (int i = 0; i < _menuItems.length; i++) {
+        _menuItemClickCount[i] = 0;
+      };
+    }
     getAllVeicoli().then((_) {
       checkScadenzeVeicoli().then((_) {
         getNote();
@@ -538,16 +541,21 @@ class _HomeFormAmministrazioneNewPageState
   int _lastClickedIndex = 0;
 
   void _navigateToPage(int index) {
-    if (_lastClickedIndex != index) {
-      _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
-      _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
+    if(Platform.isAndroid){
+      if (_lastClickedIndex != index) {
+        _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
+        _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
+      }
     }
 
-    if (_menuItemClickCount.containsKey(index)) {
-      _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
-    } else {
-      _menuItemClickCount[index] = 1;
+    if(Platform.isAndroid){
+      if (_menuItemClickCount.containsKey(index)) {
+        _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
+      } else {
+        _menuItemClickCount[index] = 1;
+      }
     }
+
 
     //if (_menuItemClickCount[index] % 2 == 0 && _hoveredIndex != -1) {
     if ((_menuItemClickCount[index] ?? 0) % 2 == 0 && _hoveredIndex != -1) {
@@ -793,7 +801,7 @@ class _HomeFormAmministrazioneNewPageState
         padding: EdgeInsets.only(top: 85, left: 25, right: 25, bottom: 40),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 1100) {
+            if (Platform.isAndroid) {
               // Tablet/Mobile layout
               return SingleChildScrollView(
                 child: Column(

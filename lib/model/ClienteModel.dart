@@ -147,4 +147,16 @@ class ClienteModel {
           .toList() ?? [],
     );
   }
+
+  List<ClienteModel> filtraTramiteQuery(List<ClienteModel> clienti, String query){
+    return clienti.where((cliente) {
+      return cliente.denominazione!.toLowerCase().contains(query.toLowerCase()) ||
+          cliente.telefono!.toLowerCase().contains(query.toLowerCase()) ||
+          cliente.citta!.toLowerCase().contains(query.toLowerCase()) ||
+          cliente.indirizzo!.toLowerCase().contains(query.toLowerCase()) ||
+          cliente.email!.toLowerCase().contains(query.toLowerCase()) ||
+          cliente.cellulare!.toLowerCase().contains(query.toLowerCase());
+    }).toList();
+  }
+
 }
