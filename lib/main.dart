@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
+import 'package:fema_crm/pages/HomeFormSegreteriaMobilePage.dart';
 import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -181,27 +184,99 @@ class _LoginFormState extends State<LoginForm> {
     String uid = _conUserId.text.trim();
     String passwd = _conPassword.text;
 
-    await getLoginUser(uid, passwd).then((userData) {
+    try {
+      // Ottieni userData tramite login
+      var userData = await getLoginUser(uid, passwd);
+
       if (userData != null) {
-        setSP(userData).then((_) {
-          // Save the username and password here
-          _saveCredentials(uid, passwd).then((_) {
-            TextInput.finishAutofillContext();
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (_) => userData.ruolo?.descrizione == "Developer" ||
-                    userData.ruolo?.descrizione == "Tecnico"
-                    ? HomeFormTecnicoNewPage(userData: userData)
-                    : HomeFormAmministrazioneNewPage(userData: userData),
-              ),
-                  (Route<dynamic> route) => false,
-            );
-          });
-        });
+        await setSP(userData);
+        await _saveCredentials(uid, passwd);
+
+        TextInput.finishAutofillContext();
+
+        // Debugging: Controlla ruolo, ID e piattaforma
+        print("Ruolo utente: ${userData.ruolo?.descrizione}");
+        print("ID utente: ${userData.id}");
+        print("Platform.isAndroid: ${Platform.isAndroid}");
+
+        // Logica per redirezionare in base al ruolo, id, e piattaforma
+        if (userData.id != null && userData.ruolo != null) {
+          if (isAdministratore(userData)) {
+            // Controllo della larghezza massima dello schermo
+            double screenWidth = MediaQuery.of(context).size.width;
+            print("Larghezza dello schermo: $screenWidth px");
+
+            if (screenWidth < 800) {
+              print("Larghezza dello schermo inferiore a 800px. Reindirizzamento verso HomeFormSegreteriaMobilePage.");
+              navigateToHomeFormSegreteriaMobilePage(userData);
+            } else {
+              // Se la larghezza è maggiore o uguale a 800px, gestisci il reindirizzamento in base alla piattaforma
+              if (Platform.isAndroid) {
+                print("Platform è Android. Reindirizzamento verso HomeFormSegreteriaMobilePage.");
+                navigateToHomeFormSegreteriaMobilePage(userData);
+              } else {
+                print("Platform NON è Android. Reindirizzamento verso HomeFormAmministrazioneNewPage.");
+                navigateToHomeFormAmministrazioneNewPage(userData);
+              }
+            }
+          } else {
+            // Debugging: L'utente non è un amministratore
+            print("L'utente non è un amministratore. Reindirizzamento in base al ruolo.");
+            navigateToHomePageBasedOnRole(userData);
+          }
+        } else {
+          print("Errore: userData.id o userData.ruolo sono null");
+        }
+      } else {
+        print("Errore: userData è null");
       }
-    });
+    } catch (e) {
+      print("Errore durante il login: $e");
+    }
   }
+
+  bool isAdministratore(UtenteModel userData) {
+    bool isAdmin = [10, 12, 4].contains(userData.id) && userData.ruolo?.descrizione == "Amministrazione";
+    print("isAdministratore: $isAdmin per l'utente con ID ${userData.id} e ruolo ${userData.ruolo?.descrizione}");
+    return isAdmin;
+  }
+
+  void navigateToHomeFormSegreteriaMobilePage(UtenteModel userData) {
+    print("Reindirizzamento verso HomeFormSegreteriaMobilePage");
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomeFormSegreteriaMobilePage(userData: userData)),
+    );
+  }
+
+  void navigateToHomeFormAmministrazioneNewPage(UtenteModel userData) {
+    print("Reindirizzamento verso HomeFormAmministrazioneNewPage");
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomeFormAmministrazioneNewPage(userData: userData)),
+    );
+  }
+
+  void navigateToHomePageBasedOnRole(UtenteModel userData) {
+    switch (userData.ruolo?.descrizione) {
+      case "Developer":
+      case "Tecnico":
+        navigateToHomeFormTecnicoNewPage(userData);
+        break;
+      default:
+        navigateToHomeFormAmministrazioneNewPage(userData);
+    }
+  }
+
+  void navigateToHomeFormTecnicoNewPage(UtenteModel userData) {
+    print("Reindirizzamento verso HomeFormTecnicoNewPage");
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: userData)),
+    );
+  }
+
+
 
   Future<void> _saveCredentials(String username, String password) async {
     final SharedPreferences sp = await _pref;
@@ -235,7 +310,7 @@ class _LoginFormState extends State<LoginForm> {
 
               image: DecorationImage(
 
-                  image: ExactAssetImage("assets/images/background.jpg"),
+                  image: ExactAssetImage("assets/images/background_login_1_1.jpg"),
                   fit: BoxFit.cover,
                   opacity: 0.8
               ),
@@ -255,7 +330,7 @@ class _LoginFormState extends State<LoginForm> {
                 children: <Widget>[
                   // Responsive logo image
                   Image.asset(
-                    'assets/images/logo_no_bg.png',
+                    'assets/images/logo fema trasparente bianco.png',
                     width: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
                     //height: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
                     fit: BoxFit.contain,

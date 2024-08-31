@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/TableVeicoliPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/pages/CalendarioPage.dart';
 import 'package:fema_crm/pages/ListaClientiPage.dart';
@@ -77,6 +78,7 @@ class _HomeFormAmministrazioneNewPageState
   List<OrdinePerInterventoModel> allOrdini = [];
   DateTime selectedDate = DateTime.now();
   Map<int, int> _menuItemClickCount = {};
+  bool scadenze = false;
 
   @override
   void initState() {
@@ -90,6 +92,7 @@ class _HomeFormAmministrazioneNewPageState
     getAllVeicoli().then((_) {
       checkScadenzeVeicoli().then((_) {
         getNote();
+        checkVeicoloScadenze(allVeicoli);
       });
     });
     getAllOrdini();
@@ -150,6 +153,75 @@ class _HomeFormAmministrazioneNewPageState
       getAllOrdini();
     });
   }
+
+  bool checkVeicoloScadenze(List<VeicoloModel> allVeicoli) {
+    // Data corrente
+    DateTime now = DateTime.now();
+    // Variabile che indica se ci sono scadenze
+    bool hasScadenze = false;
+
+    // Iteriamo su tutti i veicoli
+    for (var veicolo in allVeicoli) {
+      // Verifica tutte le date e se sono passate o vicine alla scadenza (7 giorni o meno)
+      if (veicolo.scadenza_gps != null && veicolo.scadenza_gps!.isBefore(now.add(Duration(days: 7)))) {
+        hasScadenze = true;
+        break;
+      }
+      if (veicolo.data_scadenza_bollo != null && veicolo.data_scadenza_bollo!.isBefore(now.add(Duration(days: 7)))) {
+        hasScadenze = true;
+        break;
+      }
+      if (veicolo.data_scadenza_polizza != null && veicolo.data_scadenza_polizza!.isBefore(now.add(Duration(days: 7)))) {
+        hasScadenze = true;
+        break;
+      }
+      if (veicolo.data_tagliando != null && veicolo.data_tagliando!.isBefore(now.add(Duration(days: 7)))) {
+        hasScadenze = true;
+        break;
+      }
+      if (veicolo.data_revisione != null && veicolo.data_revisione!.isBefore(now.add(Duration(days: 7)))) {
+        hasScadenze = true;
+        break;
+      }
+      if (veicolo.data_inversione_gomme != null && veicolo.data_inversione_gomme!.isBefore(now.add(Duration(days: 7)))) {
+        hasScadenze = true;
+        break;
+      }
+      if (veicolo.data_sostituzione_gomme != null && veicolo.data_sostituzione_gomme!.isBefore(now.add(Duration(days: 7)))) {
+        hasScadenze = true;
+        break;
+      }
+    }
+    if (hasScadenze) {
+      // Aggiorna lo stato e visualizza l'alert
+      setState(() {
+        scadenze = true;
+      });
+      // Mostra un AlertDialog per segnalare le nuove scadenze
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('ATTENZIONE'),
+            content: Text('Scadenze in corso sui veicoli'.toUpperCase()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Chiude l'alert
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return true;
+    }
+
+    return false;
+  }
+
+
 
   Future<void> getAllVeicoli() async {
     try {
@@ -717,12 +789,20 @@ class _HomeFormAmministrazioneNewPageState
                     },
                   ),
                   ListTile(
-                    title: Text('Management veicoli', style: TextStyle(color: Colors.white),),
+                    title: Text(
+                      'Management veicoli',
+                      style: TextStyle(
+                        color: scadenze ? Colors.red : Colors.white,
+                        fontWeight: scadenze ? FontWeight.bold : FontWeight.normal,
+                        fontSize: scadenze ? 20 : 16, // Cambia la dimensione del testo
+                      ),
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ListaVeicoliPage()),
+                          builder: (context) => TableVeicoliPage(),
+                        ),
                       );
                     },
                   ),
@@ -877,7 +957,7 @@ class _HomeFormAmministrazioneNewPageState
                         ),
                     ),
                     Container(
-                      width: double.infinity,
+                      width: 750,
                       height: 250,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
@@ -952,7 +1032,7 @@ class _HomeFormAmministrazioneNewPageState
                       ),
                     ),
                     Container(
-                      width: double.infinity,
+                      width: 750,
                       height: 250,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
@@ -1349,6 +1429,68 @@ class _HomeFormAmministrazioneNewPageState
                         Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
+                            Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'SCADENZE',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 750,
+                              height: 250,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey.shade700),
+                              ),
+                              child: FutureBuilder<List<NotaTecnicoModel>>(
+                                future: Future.value(allNoteScadenze),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(child: Text('Errore: ${snapshot.error}'));
+                                  } else if (snapshot.hasData) {
+                                    List<NotaTecnicoModel> note = snapshot.data!;
+                                    return SingleChildScrollView(
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: note.length,
+                                        itemBuilder: (context, index) {
+                                          NotaTecnicoModel nota = note[index];
+                                          String formattedDate = intl.DateFormat(
+                                              'dd/MM/yyyy HH:mm')
+                                              .format(
+                                              DateTime.parse(nota.data!.toIso8601String()));
+                                          return ListTile(
+                                            title: Text(
+                                              nota.utente!.nomeCompleto() ?? 'N/A',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            subtitle: Text(
+                                              '$formattedDate - ${nota.nota}',
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  } else {
+                                    return Center(child: Text('Nessuna nota trovata'));
+                                  }
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 24),
                             Center(
                               child: GestureDetector(
                                 onTap: () {

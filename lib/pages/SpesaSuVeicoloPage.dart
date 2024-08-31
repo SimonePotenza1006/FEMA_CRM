@@ -80,7 +80,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Spesa su veicolo', style: TextStyle(color: Colors.white)),
+        title: Text('Spesa su veicolo'.toString().toUpperCase(), style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
         centerTitle: true,
       ),
@@ -96,7 +96,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                 children: [
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 200,
+                    width: 206,
                     child: DropdownButtonFormField<VeicoloModel>(
                       value: selectedVeicolo,
                       onChanged: (VeicoloModel? newValue) {
@@ -112,14 +112,14 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                         );
                       }).toList(),
                       decoration: InputDecoration(
-                        labelText: 'Veicolo',
+                        labelText: 'Veicolo'.toString().toUpperCase(),
                       ),
-                      validator: (value) => value == null ? 'Seleziona un veicolo' : null,
+                      validator: (value) => value == null ? 'Seleziona un veicolo'.toString().toUpperCase() : null,
                     ),
                   ),
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 200,
+                    width: 207,
                     child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
                       value: selectedTipologia,
                       onChanged: (TipologiaSpesaVeicoloModel? newValue) {
@@ -134,32 +134,32 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                         );
                       }).toList(),
                       decoration: InputDecoration(
-                        labelText: 'Tipologia di spesa',
+                        labelText: 'TIPOLOGIA DI SPESA',
                       ),
-                      validator: (value) => value == null ? 'Seleziona una tipologia di spesa' : null,
+                      validator: (value) => value == null ? 'Seleziona una tipologia di spesa'.toString().toUpperCase() : null,
                     ),
                   ),
                   SizedBox(height: 20),
-                  if (selectedTipologia?.descrizione == "Altro")
+                  if (selectedTipologia?.descrizione == "ALTRO")
                     Container(
                       child: SizedBox(
-                        width: 200,
+                        width: 207,
                         height: 80,
                         child: TextFormField(
                           controller: _noteSpesaController,
                           decoration: InputDecoration(
-                            labelText: "Tipologia di spesa",
-                            hintText: "Scrivere la tipologia di spesa",
+                            labelText: "Tipologia di spesa".toString().toUpperCase(),
+                            hintText: "Scrivere la tipologia di spesa".toString().toUpperCase(),
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.grey, width: 2)),
                           ),
                           validator: (value) =>
-                          value == null || value.isEmpty ? 'Inserisci la tipologia di spesa' : null,
+                          value == null || value.isEmpty ? 'Inserisci la tipologia di spesa'.toString().toUpperCase() : null,
                         ),
                       ),
                     ),
                   SizedBox(
-                    width: 200,
+                    width: 207,
                     child: DropdownButtonFormField<String>(
                       value: selectedFornitore,
                       onChanged: (newValue) {
@@ -168,8 +168,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                         });
                       },
                       items: [
-                        'IP Via Europa',
-                        'Altro',
+                        'IP VIA EUROPA',
+                        'ALTRO',
                       ].map((categoria) {
                         return DropdownMenuItem<String>(
                           value: categoria,
@@ -177,13 +177,13 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                         );
                       }).toList(),
                       decoration: InputDecoration(
-                        labelText: 'Fornitore',
+                        labelText: 'Fornitore'.toString().toUpperCase(),
                       ),
-                      validator: (value) => value == null ? 'Seleziona un fornitore' : null,
+                      validator: (value) => value == null ? 'Seleziona un fornitore'.toString().toUpperCase() : null,
                     ),
                   ),
                   SizedBox(height: 20),
-                  if (selectedFornitore == "Altro")
+                  if (selectedFornitore == "ALTRO")
                     Container(
                       child: SizedBox(
                         width: 200,
@@ -191,17 +191,17 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                         child: TextFormField(
                           controller: _noteFornitoreController,
                           decoration: InputDecoration(
-                            labelText: "Fornitore",
-                            hintText: "Scrivere il fornitore",
+                            labelText: "Fornitore".toString().toUpperCase(),
+                            hintText: "Scrivere il fornitore".toString().toUpperCase(),
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.grey, width: 2)),
                           ),
                           validator: (value) =>
-                          value == null || value.isEmpty ? 'Inserisci il fornitore' : null,
+                          value == null || value.isEmpty ? 'Inserisci il fornitore'.toString().toUpperCase() : null,
                         ),
                       ),
                     ),
-                  if (selectedTipologia?.descrizione == "Polizza")
+                  if (selectedTipologia?.descrizione == "POLIZZA")
                     Column(
                       children: [
                         SizedBox(height: 20),
@@ -209,8 +209,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                           controller: _dataPolizzaController,
                           readOnly: true,
                           decoration: InputDecoration(
-                            labelText: "Data nuova scadenza polizza",
-                            hintText: "Seleziona la nuova data di scadenza della polizza",
+                            labelText: "Data nuova scadenza polizza".toString().toUpperCase(),
+                            hintText: "Seleziona la nuova data di scadenza della polizza".toString().toUpperCase(),
                           ),
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
@@ -228,12 +228,12 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                             }
                           },
                           validator: (value) =>
-                          value == null || value.isEmpty ? 'Seleziona una data' : null,
+                          value == null || value.isEmpty ? 'Seleziona una data'.toString().toUpperCase() : null,
                         ),
                         SizedBox(height: 20),
                       ],
                     ),
-                  if (selectedTipologia?.descrizione == "Bollo")
+                  if (selectedTipologia?.descrizione == "BOLLO")
                     Column(
                       children: [
                         SizedBox(height: 20),
@@ -241,8 +241,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                           controller: _dataBolloController,
                           readOnly: true,
                           decoration: InputDecoration(
-                            labelText: "Data nuova scadenza bollo",
-                            hintText: "Seleziona la nuova data di scadenza del bollo",
+                            labelText: "Data nuova scadenza bollo".toString().toUpperCase(),
+                            hintText: "Seleziona la nuova data di scadenza del bollo".toString().toUpperCase(),
                           ),
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
@@ -260,7 +260,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                             }
                           },
                           validator: (value) =>
-                          value == null || value.isEmpty ? 'Seleziona una data' : null,
+                          value == null || value.isEmpty ? 'Seleziona una data'.toString().toUpperCase() : null,
                         ),
                       ],
                     ),
@@ -270,8 +270,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                     child: TextFormField(
                       controller: _importoController,
                       decoration: InputDecoration(
-                        labelText: "Importo",
-                        hintText: "Inserisci l'importo della spesa",
+                        labelText: "Importo".toString().toUpperCase(),
+                        hintText: "Inserisci l'importo della spesa".toString().toUpperCase(),
                         border: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey, width: 2.0),
                         ),
@@ -283,18 +283,18 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  if (selectedTipologia?.descrizione == "Polizza")
+                  if (selectedTipologia?.descrizione == "POLIZZA")
                     Center(
                       child: Text(
-                          "Inserire un chilometraggio qualsiasi, il sistema recupererà il precedente record!"),
+                          "Inserire un chilometraggio qualsiasi, il sistema recupererà il precedente record!".toString().toUpperCase()),
                     ),
                   SizedBox(
                     width: 200,
                     child: TextFormField(
                       controller: _kmController,
                       decoration: InputDecoration(
-                        labelText: "Chilometri",
-                        hintText: "Inserisci il chilometraggio",
+                        labelText: "Chilometri".toString().toUpperCase(),
+                        hintText: "Inserisci il chilometraggio".toString().toUpperCase(),
                         border: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey, width: 2.0),
                         ),
@@ -302,14 +302,14 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       keyboardType: TextInputType.number,
                       validator: (value) =>
-                      value == null || value.isEmpty ? 'Inserisci un chilometraggio valido' : null,
+                      value == null || value.isEmpty ? 'Inserisci un chilometraggio valido'.toString().toUpperCase() : null,
                     ),
                   ),
                   SizedBox(height: 20),
-                  Text(
-                    'Scatta una foto:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  // Text(
+                  //   'Scatta una foto:'.toString().toUpperCase(),
+                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  // ),
                   SizedBox(height: 10),
                   Center(
                     child: Row(
@@ -320,6 +320,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                           onPressed: () {
                             takePicture();
                           },
+                          iconSize: 50,
                         ),
                         if (pickedImage != null)
                           Container(
@@ -345,6 +346,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       ],
                     ),
                   ),
+                  SizedBox(height: 24,),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -357,7 +359,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       onPrimary: Colors.white,
                       textStyle: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    child: Text('Salva spesa'),
+                    child: Text('Salva spesa'.toString().toUpperCase()),
                   ),
                 ],
               ),
@@ -393,14 +395,14 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Scaricare excel report delle spese su veicolo?'),
+          title: Text('Scaricare excel report delle spese su veicolo?'.toString().toUpperCase()),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 _generateExcel();
                 Navigator.of(context).pop();
               },
-              child: Text('Conferma', style: TextStyle(color: Colors.red)),
+              child: Text('Conferma'.toString().toUpperCase(), style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -469,19 +471,19 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
 
   Future<http.Response?> saveNewInfoVeicolo() async{
     print("Step 2 save Info");
-    if(selectedTipologia?.descrizione == "Tagliando"){
+    if(selectedTipologia?.descrizione == "TAGLIANDO"){
       try{
         final response = await http.post(
           Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
-            'descrizione' : selectedVeicolo?.descrizione,
-            'targa' : selectedVeicolo?.targa,
-            'seriale' : selectedVeicolo?.seriale,
-            'imei' : selectedVeicolo?.imei,
+            'descrizione' : selectedVeicolo?.descrizione.toString().toUpperCase(),
+            'targa' : selectedVeicolo?.targa.toString().toUpperCase(),
+            'seriale' : selectedVeicolo?.seriale.toString().toUpperCase(),
+            'imei' : selectedVeicolo?.imei.toString().toUpperCase(),
             'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
-            'proprietario' : selectedVeicolo?.proprietario,
+            'proprietario' : selectedVeicolo?.proprietario.toString().toUpperCase(),
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
             'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
@@ -508,19 +510,19 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         print('Qualcosa non va con il salvataggio dei dati del tagliando: $e');
         return null;
       }
-    } else if(selectedTipologia?.descrizione == "Inversione gomme") {
+    } else if(selectedTipologia?.descrizione == "INVERSIONE GOMME") {
       try{
         final response = await http.post(
           Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
-            'descrizione' : selectedVeicolo?.descrizione,
-            'targa' : selectedVeicolo?.targa,
-            'seriale' : selectedVeicolo?.seriale,
-            'imei' : selectedVeicolo?.imei,
+            'descrizione' : selectedVeicolo?.descrizione.toString().toUpperCase(),
+            'targa' : selectedVeicolo?.targa.toString().toUpperCase(),
+            'seriale' : selectedVeicolo?.seriale.toString().toUpperCase(),
+            'imei' : selectedVeicolo?.imei.toString().toUpperCase(),
             'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
-            'proprietario' : selectedVeicolo?.proprietario,
+            'proprietario' : selectedVeicolo?.proprietario.toString().toUpperCase(),
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
             'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
@@ -547,19 +549,19 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         print('Qualcosa non va con il salvataggio dei dati dell\'inversione: $e');
         return null;
       }
-    } else if(selectedTipologia?.descrizione == "Polizza") {
+    } else if(selectedTipologia?.descrizione == "POLIZZA") {
       try{
         final response = await http.post(
           Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
-            'descrizione' : selectedVeicolo?.descrizione,
-            'targa' : selectedVeicolo?.targa,
-            'seriale' : selectedVeicolo?.seriale,
-            'imei' : selectedVeicolo?.imei,
+            'descrizione' : selectedVeicolo?.descrizione.toString().toUpperCase(),
+            'targa' : selectedVeicolo?.targa.toString().toUpperCase(),
+            'seriale' : selectedVeicolo?.seriale.toString().toUpperCase(),
+            'imei' : selectedVeicolo?.imei.toString().toUpperCase(),
             'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
-            'proprietario' : selectedVeicolo?.proprietario,
+            'proprietario' : selectedVeicolo?.proprietario.toString().toUpperCase(),
             'chilometraggio_attuale' : selectedVeicolo?.chilometraggio_attuale,
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
             'data_scadenza_polizza' : dataScadenzaPolizza?.toIso8601String(),
@@ -586,19 +588,19 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         print('Qualcosa non va con il salvataggio dei dati dell\'inversione: $e');
         return null;
       }
-    } else if(selectedTipologia?.descrizione == "Sostituzione gomme"){
+    } else if(selectedTipologia?.descrizione == "SOSTITUZIONE GOMME"){
       try{
         final response = await http.post(
           Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
-            'descrizione' : selectedVeicolo?.descrizione,
-            'targa' : selectedVeicolo?.targa,
-            'seriale' : selectedVeicolo?.seriale,
-            'imei' : selectedVeicolo?.imei,
+            'descrizione' : selectedVeicolo?.descrizione.toString().toUpperCase(),
+            'targa' : selectedVeicolo?.targa.toString().toUpperCase(),
+            'seriale' : selectedVeicolo?.seriale.toString().toUpperCase(),
+            'imei' : selectedVeicolo?.imei.toString().toUpperCase(),
             'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
-            'proprietario' : selectedVeicolo?.proprietario,
+            'proprietario' : selectedVeicolo?.proprietario.toString().toUpperCase(),
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
             'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
@@ -625,19 +627,19 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         print('Qualcosa non va con il salvataggio dei dati della sostituzione: $e');
         return null;
       }
-    } else if (selectedTipologia?.descrizione == "Bollo"){
+    } else if (selectedTipologia?.descrizione == "BOLLO"){
       try{
         final response = await http.post(
           Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
-            'descrizione' : selectedVeicolo?.descrizione,
-            'targa' : selectedVeicolo?.targa,
-            'seriale' : selectedVeicolo?.seriale,
-            'imei' : selectedVeicolo?.imei,
+            'descrizione' : selectedVeicolo?.descrizione.toString().toUpperCase(),
+            'targa' : selectedVeicolo?.targa.toString().toUpperCase(),
+            'seriale' : selectedVeicolo?.seriale.toString().toUpperCase(),
+            'imei' : selectedVeicolo?.imei.toString().toUpperCase(),
             'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
-            'proprietario' : selectedVeicolo?.proprietario,
+            'proprietario' : selectedVeicolo?.proprietario.toString().toUpperCase(),
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : dataScadenzaBollo?.toIso8601String(),
             'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
@@ -664,19 +666,19 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         print('Qualcosa non va con il salvataggio dei dati della revisione: $e');
         return null;
       }
-    } else if (selectedTipologia?.descrizione == "Revisione"){
+    } else if (selectedTipologia?.descrizione == "REVISIONE"){
       try{
         final response = await http.post(
           Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
-            'descrizione' : selectedVeicolo?.descrizione,
-            'targa' : selectedVeicolo?.targa,
-            'seriale' : selectedVeicolo?.seriale,
-            'imei' : selectedVeicolo?.imei,
+            'descrizione' : selectedVeicolo?.descrizione.toString().toUpperCase(),
+            'targa' : selectedVeicolo?.targa.toString().toUpperCase(),
+            'seriale' : selectedVeicolo?.seriale.toString().toUpperCase(),
+            'imei' : selectedVeicolo?.imei.toString().toUpperCase(),
             'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
-            'proprietario' : selectedVeicolo?.proprietario,
+            'proprietario' : selectedVeicolo?.proprietario.toString().toUpperCase(),
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
             'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
@@ -710,12 +712,12 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
-            'descrizione' : selectedVeicolo?.descrizione,
-            'targa' : selectedVeicolo?.targa,
-            'seriale' : selectedVeicolo?.seriale,
-            'imei' : selectedVeicolo?.imei,
+            'descrizione' : selectedVeicolo?.descrizione.toString().toUpperCase(),
+            'targa' : selectedVeicolo?.targa.toString().toUpperCase(),
+            'seriale' : selectedVeicolo?.seriale.toString().toUpperCase(),
+            'imei' : selectedVeicolo?.imei.toString().toUpperCase(),
             'scadenza_gps' : selectedVeicolo?.scadenza_gps?.toIso8601String(),
-            'proprietario' : selectedVeicolo?.proprietario,
+            'proprietario' : selectedVeicolo?.proprietario.toString().toUpperCase(),
             'chilometraggio_attuale' : int.parse(_kmController.text.toString()),
             'data_scadenza_bollo' : selectedVeicolo?.data_scadenza_bollo?.toIso8601String(),
             'data_scadenza_polizza' : selectedVeicolo?.data_scadenza_polizza?.toIso8601String(),
@@ -766,7 +768,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
                 'data': DateTime.now().toIso8601String(),
-                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima sostituzione gomme!",
+                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima sostituzione gomme!".toString().toUpperCase(),
               }),
             );
             print("Nota sostituzione gomme creata!");
@@ -783,7 +785,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
                 'data': DateTime.now().toIso8601String(),
-                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima inversione gomme!",
+                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima della prossima inversione gomme!".toString().toUpperCase(),
               }),
             );
             print("Nota inversione gomme creata!");
@@ -800,7 +802,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
                 'data': DateTime.now().toIso8601String(),
-                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima del prossimo tagliando!",
+                'nota': "Il veicolo ${veicolo.descrizione} ha quasi raggiunto la soglia dei chilometri prima del prossimo tagliando!".toString().toUpperCase(),
               }),
             );
             print("Nota tagliando creata!");
@@ -830,8 +832,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           'tipologia_spesa': selectedTipologia?.toMap(),
           'veicolo': selectedVeicolo?.toMap(),
           'utente': widget.utente.toMap(),
-          'note_tipologia_spesa' : notaS,
-          'note_fornitore' : notaF,
+          'note_tipologia_spesa' : notaS.toString().toUpperCase(),
+          'note_fornitore' : notaF.toString().toUpperCase(),
         }),
       );
       print(response.body.toString());
