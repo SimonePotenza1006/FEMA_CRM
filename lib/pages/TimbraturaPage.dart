@@ -159,7 +159,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Seleziona data e utente',
+                            'SELEZIONA DATA E UTENTE',
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                           Container(
@@ -200,7 +200,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                           ),
                           SizedBox(width: 50),
                           Text(
-                            'Utente:',
+                            'UTENTE:',
                             style: TextStyle(fontSize: 18),
                           ),
                           SizedBox(width: 10),
@@ -281,7 +281,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
           title: const Text(
-            'Timbratura',
+            'TIMBRATURA',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -310,7 +310,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text("Scarica il resoconto delle presenze"),
+                    title: Text("SCARICA IL RESOCONTO DELLE PRESENZE"),
                     actions: [
                       Center(
                         child:  Column(
@@ -320,7 +320,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                                 getAllMarcatempoMonth(2).whenComplete(() => _generateExcel());
                                 Navigator.of(context).pop();
                               },
-                              child: Text("Mese precedente"), //no
+                              child: Text("MESE PRECEDENTE"), //no
                             ),
                             SizedBox(width: 45,),
                             TextButton(
@@ -328,7 +328,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                                 getAllMarcatempoMonth(1).whenComplete(() =>  _generateExcel());
                                 Navigator.of(context).pop();
                               },
-                              child: Text("Mese corrente"), //si
+                              child: Text("MESE CORRENTE"), //si
                             ),
                             SizedBox(width: 80,),
                             TextButton(
@@ -347,7 +347,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                                   }
                                 });
                               },
-                              child: Text("Oggi"), //si
+                              child: Text("OGGI"), //si
                             ),
                             /*TextButton(
                               onPressed: () {
@@ -617,6 +617,9 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                 'data_arrivo': null,
                 'data_partenza': null,
               },
+              'edit': false,
+              'editu': false,
+              'utenteEdit': null//widget.utente.toMap(),
             }),
           );
           Navigator.pop(context);
@@ -643,6 +646,9 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                 'data_partenza': null,
               },
               'utente': widget.utente.toMap(),
+              'edit': false,
+              'editu': false,
+              'utenteEdit': null
             }),
           );
           Navigator.pop(context);
