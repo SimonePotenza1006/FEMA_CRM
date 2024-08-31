@@ -255,7 +255,7 @@ class _LoginFormState extends State<LoginForm> {
                 children: <Widget>[
                   // Responsive logo image
                   Image.asset(
-                    'assets/images/logo_no_bg.png',
+                    'assets/images/logo fema trasparente bianco.png',
                     width: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
                     //height: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
                     fit: BoxFit.contain,

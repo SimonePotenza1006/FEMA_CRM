@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/TableVeicoliPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/pages/CalendarioPage.dart';
 import 'package:fema_crm/pages/ListaClientiPage.dart';
@@ -722,7 +723,7 @@ class _HomeFormAmministrazioneNewPageState
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ListaVeicoliPage()),
+                            builder: (context) => TableVeicoliPage()),
                       );
                     },
                   ),
