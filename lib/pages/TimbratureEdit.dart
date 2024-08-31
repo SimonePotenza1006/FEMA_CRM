@@ -69,21 +69,32 @@ class _TimbratureEditState extends State<TimbratureEdit> {
   int getDayOfYear(DateTime date) {
     return date.difference(DateTime(date.year, 1, 1)).inDays + 1;
   }
+
   Map<int, List<_RowData>> groupedRows = {};
+
   void groupAndSortTimbrature() {
     // Raggruppa per utente
     Map<String, List<MarcaTempoModel>> groupedTimbrature = {};
+
     allTimbratureEdit.forEach((timbratura) {
+      String key = '${timbratura.utente!.id}-${DateFormat('yyyy-MM-dd').format(timbratura.data!)}';
+      if (!groupedTimbrature.containsKey(key)) {
+        groupedTimbrature[key] = [];
+      }
+      groupedTimbrature[key]!.add(timbratura);
+    });
+
+    /*allTimbratureEdit.forEach((timbratura) {
       if (!groupedTimbrature.containsKey(timbratura.utente!.id!)) {
         groupedTimbrature[timbratura.utente!.id!] = [];
       }
       groupedTimbrature[timbratura.utente!.id!]!.add(timbratura);
-    });
+    });*/
     //groupedTimbrature = groupBy(allTimbratureEdit, (timbratura) => timbratura.utente);
     print('vvbcs');
     // Ordina per data
     groupedTimbrature.forEach((utente, timbrature) {
-      timbrature.sort((a, b) => b.data!.toIso8601String().compareTo(a.data!.toIso8601String()));
+      timbrature.sort((a, b) => a.data!.toIso8601String().compareTo(b.data!.toIso8601String()));
     });
     print('azaaza');
     // Assegna il risultato a allTimbratureEdit
@@ -93,9 +104,70 @@ class _TimbratureEditState extends State<TimbratureEdit> {
     });
     print(allTimbratureEdit.last.id.toString()+' brbas');
 
+    _rows = [];
+    groupedTimbrature.forEach((key, timbrature) {
+      if (timbrature.length > 0) {
+        MarcaTempoModel firstTimbratura = timbrature[0];
+        print('abc '+timbrature[0].id.toString());
+        MarcaTempoModel? secondTimbratura = null;
+        if (timbrature.length > 1) secondTimbratura = timbrature[1];
+
+        _RowData rowData = _RowData(
+          idmt: firstTimbratura.id,
+          idmt2: secondTimbratura != null ? secondTimbratura.id : null,
+          utente: firstTimbratura.utente,
+          dataIngresso: DateFormat('dd/MM/yyyy').format(firstTimbratura.data!),
+          oraIngresso: DateFormat('HH:mm').format(firstTimbratura.data!),
+          indirizzoIngresso: firstTimbratura.gps!,
+          //dataUscita: DateFormat('dd/MM/yyyy').format(secondTimbratura.data!),
+          oraUscita: firstTimbratura.datau != null ? DateFormat('HH:mm').format(firstTimbratura.datau!) : '',
+          indirizzoUscita: firstTimbratura.gpsu != null ? firstTimbratura.gpsu! : '',
+          //dataIngresso2: DateFormat('dd/MM/yyyy').format(secondTimbratura.data!),
+
+          oraIngresso2: secondTimbratura != null ? DateFormat('HH:mm').format(secondTimbratura.data!) : '',
+          indirizzoIngresso2: secondTimbratura != null ? secondTimbratura.gps! : '',
+          oraUscita2: secondTimbratura != null ? secondTimbratura.datau != null ? DateFormat('HH:mm').format(secondTimbratura.datau!) : '' : '',
+          indirizzoUscita2: secondTimbratura != null ? secondTimbratura.gpsu != null ? secondTimbratura.gpsu! : '' : '',
+          utenteEdit: firstTimbratura.utenteEdit
+        );
+        _rows.add(rowData);
+      }
+    });
 
 
-    _rows = allTimbratureEdit.map((marcaTempo) {
+    /*_rows = allTimbratureEdit.map((marcaTempo) {
+      // Trova la riga esistente con lo stesso utente e data
+      _RowData? existingRow;
+      try {
+        existingRow = _rows.firstWhere((row) => row.utente!.id == marcaTempo.utente!.id && row.dataIngresso == DateFormat('dd/MM/yyyy').format(marcaTempo.data!));
+      } catch (e) {
+        // Handle the case when the element is not found
+      }
+
+      if (existingRow != null) {
+        // Aggiungi la timbratura all'elenco esistente
+        existingRow.timbrature.add(marcaTempo);
+      } else {
+        // Crea una nuova riga
+        existingRow = _RowData(
+          idmt: marcaTempo.id,
+          utente: marcaTempo.utente,
+          dataIngresso: DateFormat('dd/MM/yyyy').format(marcaTempo.data!),
+          oraIngresso: DateFormat('HH:mm').format(marcaTempo.data!),
+          indirizzoIngresso: marcaTempo.gps!,
+          dataUscita: marcaTempo.datau != null ? DateFormat('dd/MM/yyyy').format(marcaTempo.datau!) : '',
+          oraUscita: marcaTempo.datau != null ? DateFormat('HH:mm').format(marcaTempo.datau!) : '',
+          indirizzoUscita: marcaTempo.gpsu != null ? marcaTempo.gpsu! : '',
+          timbrature: [marcaTempo],
+        );
+        _rows.add(existingRow);
+      }
+
+      return existingRow;
+    }).toList();*/
+
+    /*_rows = allTimbratureEdit.map((marcaTempo) {
+
       return _RowData(
         idmt: marcaTempo.id,
         utente: marcaTempo.utente!,
@@ -105,9 +177,14 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         dataUscita: marcaTempo.datau != null ? DateFormat('dd/MM/yyyy').format(marcaTempo.datau!) : '',
         oraUscita: marcaTempo.datau != null ? DateFormat('HH:mm').format(marcaTempo.datau!) : '',
         indirizzoUscita: marcaTempo.gpsu != null ? marcaTempo.gpsu! : '',
+        oraIngresso2: ,
+        indirizzoIngresso2: ,
+        oraUscita2: ,
+        indirizzoUscita2: ,
         utenteEdit: marcaTempo.utenteEdit != null ? marcaTempo.utenteEdit! : null,
       );
-    }).toList();
+
+    }).toList();*/
 
 
     for (var row in _rows) {
@@ -117,10 +194,22 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
       groupedRows[settimana]?.add(row);
     }
+    /*_rows.clear();
+    groupedRows.forEach((settimana, rows) {
+      _rows.addAll(rows);
+    });*/
+    groupedRows.forEach((settimana, rows) {
+
+      rows.sort((a, b) {
+        return DateFormat('dd/MM/yyyy').parse(b.dataIngresso!).compareTo(DateFormat('dd/MM/yyyy').parse(a.dataIngresso!));
+      });
+    });
+
     _rows.clear();
     groupedRows.forEach((settimana, rows) {
       _rows.addAll(rows);
     });
+
   }
 
   Future<void> getAllMarcatempo() async {
@@ -195,7 +284,57 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               'editu': row.isEditu,
               'utenteEdit': widget.utente!//row.utenteEdit != null ? row.utenteEdit!.toMap() : null,
             }),
-          );
+          ).then((value) async {
+            if (row.idmt2 != null) { final response = await http.post(
+              Uri.parse('${ipaddress}/marcatempo'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'id' : row.idmt2,
+                'gps': row.indirizzoIngresso2,
+                'data': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso2}').toIso8601String(),//DateTime.now().toIso8601String(),
+                'gpsu': row.indirizzoUscita2,
+                'datau': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita2}').toIso8601String(),//DateTime.now().toIso8601String(),
+                'utente': row.utente!,//widget.utente.toMap(),
+                'viaggio': {
+                  'id': 2,
+                  'destinazione': 'Calimera',
+                  'data_arrivo': null,
+                  'data_partenza': null,
+                },
+                'edit': row.isEdit,
+                'editu': row.isEditu,
+                'utenteEdit': widget.utente!//row.utenteEdit != null ? row.utenteEdit!.toMap() : null,
+              }),
+            );} else if (row.oraIngresso2 != null) {
+              final response = await http.post(
+                Uri.parse('${ipaddress}/marcatempo'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({
+                  'id' : '',
+                  'gps': row.indirizzoIngresso2,
+                  'data': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso2}').toIso8601String(),//DateTime.now().toIso8601String(),
+                  'gpsu': row.indirizzoUscita2,
+                  'datau': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita2}').toIso8601String(),//DateTime.now().toIso8601String(),
+                  'utente': row.utente!,//widget.utente.toMap(),
+                  'viaggio': {
+                    'id': 2,
+                    'destinazione': 'Calimera',
+                    'data_arrivo': null,
+                    'data_partenza': null,
+                  },
+                  'edit': row.isEdit,
+                  'editu': row.isEditu,
+                  'utenteEdit': widget.utente!//row.utenteEdit != null ? row.utenteEdit!.toMap() : null,
+                }),
+              );
+            }
+          });
+          if (response.statusCode == 200) {
+            // Call setState here to update the UI
+            setState(() {});
+            // ...
+          }
+
           //Navigator.pop(context);
 
           /*ScaffoldMessenger.of(context).showSnackBar(
@@ -286,7 +425,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         dataIngresso: '',
         oraIngresso: '',
         indirizzoIngresso: '',
-        dataUscita: '',
+        //dataUscita: '',
         oraUscita: '',
         indirizzoUscita: '',
         isNewRow: true,
@@ -315,7 +454,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           DataCell(Text(newRow.dataIngresso!)),
           DataCell(Text(newRow.oraIngresso!)),
           DataCell(Text(newRow.indirizzoIngresso!)),
-          DataCell(Text(newRow.dataUscita!)),
+          //DataCell(Text(newRow.dataUscita!)),
           DataCell(Text(newRow.oraUscita!)),
           DataCell(Text(newRow.indirizzoUscita!)),
           DataCell(Text('')),
@@ -437,12 +576,17 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       columns: [
         DataColumn(label: Text('UTENTE'),),
         DataColumn(label: Text(DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(Settimana.getSettimana(settimana, DateTime.now().year)['lunedì']!.toString()),)+' - '+DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(Settimana.getSettimana(settimana, DateTime.now().year)['domenica']!.toString()),))),
-        DataColumn(label: Text('INGRESSO')),
+        DataColumn(label: Text('ING')),
         DataColumn(label: Text('INDIRIZZO INGRESSO')),
         //DataColumn(label: Text('Data Uscita')),
-        DataColumn(label: Text('USCITA')),
+        DataColumn(label: Text('USC')),
+        DataColumn(label: Text('INDIRIZZO USCITA')),
+        DataColumn(label: Text('ING')),
+        DataColumn(label: Text('INDIRIZZO INGRESSO')),
+        DataColumn(label: Text('USC')),
         DataColumn(label: Text('INDIRIZZO USCITA')),
         DataColumn(label: Text('MODIFICATA DA')),
+        DataColumn(label: Text('TOT. ORE')),
         DataColumn(label: Text('')),
       ],
 
@@ -450,10 +594,10 @@ class _TimbratureEditState extends State<TimbratureEdit> {
             return DataRow(
           cells: [
             DataCell(
-              Container(width: 200,
+              Container(width: 171,
                   alignment: Alignment.center,
                   child: row.isNewRow ? SizedBox(
-                      width: 178, // Imposta una larghezza massima di 200 pixel
+                      width: 170, // Imposta una larghezza massima di 200 pixel
                       child: DropdownButton(
                     value: row.utente?.nome ?? '',
                     onChanged: (newValue) {
@@ -467,7 +611,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                         value: utente.nome,
                       );
                     }).toList(),
-                  )) : TextFormField(
+                  )) : TextFormField(style: TextStyle(fontSize: 14),
                     decoration: InputDecoration(border: InputBorder.none),
                 //textAlignVertical: TextAlignVertical.center,
                 textAlign: TextAlign.center, // add this line
@@ -481,11 +625,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 },*/
               )),
             ),
-            DataCell(Container(width: 90,
+            DataCell(Container(width: 170,
               alignment: Alignment.center,
               child:
               row.isNewRow
-                  ? TextFormField(
+                  ? TextFormField(style: TextStyle(fontSize: 14),
                 readOnly: true,
                 controller: row.dataIngressoController,
                 decoration: InputDecoration(border: InputBorder.none),
@@ -538,8 +682,8 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               ),*/
             )),
             DataCell(
-              showEditIcon: row.isModified,
-                Container(width: 50,
+              //showEditIcon: row.isModified,
+                Container(width: 47,
                   alignment: Alignment.center,
                   child:TextFormField(
                 decoration: InputDecoration(border: InputBorder.none),
@@ -572,10 +716,10 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               ),
             )),
             DataCell(
-              showEditIcon: row.isModified,
-        Container(width: 300,
+              //showEditIcon: row.isModified,
+        Container(width: 210,
         alignment: Alignment.center,
-        child:TextFormField(
+        child:TextFormField(style: TextStyle(fontSize: 14, color: !row.indirizzoIngresso!.contains('73021')  ? Colors.red : Colors.black),
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
                 //focusNode: _focusNodes[_rows.indexOf(row)],
@@ -606,8 +750,10 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               ),
             ),*/
             DataCell(
-              showEditIcon: row.isModified,
-              TextFormField(
+              //showEditIcon: row.isModified,
+        Container(width: 47,
+        alignment: Alignment.center,
+        child:TextFormField(
                 decoration: InputDecoration(border: InputBorder.none),
                 controller: row.oraUscitaController,
                 onTap: () async {
@@ -636,12 +782,13 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                   }
                 },
               ),
-            ),
+            )),
             DataCell(
-              showEditIcon: row.isModified,
-        Container(width: 300,
+              //showEditIcon: row.isModified,
+        Container(width: 210,
         alignment: Alignment.center,
         child:TextFormField(
+          style: TextStyle(fontSize: 14, color: !row.indirizzoUscita!.contains('73021')  ? Colors.red : Colors.black),
                 decoration: InputDecoration(border: InputBorder.none),
                 initialValue: row.indirizzoUscita,
                 onChanged: (value) {
@@ -662,8 +809,139 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               )),
             ),
             DataCell(
-              showEditIcon: row.isModified,
+                //showEditIcon: row.isModified,
+                Container(width: 47,
+                  alignment: Alignment.center,
+                  child:TextFormField(
+                    decoration: InputDecoration(border: InputBorder.none),
+                    controller: row.oraIngresso2Controller,
+                    onTap: () async {
+                      TimeOfDay? pickedTime = await showTimePicker(
+                        initialEntryMode: TimePickerEntryMode.inputOnly,
+                        context: context,
+                        //initialTime: TimeOfDay.fromDateTime(DateTime.parse('2022-01-01 ${row.oraIngresso}')),
+                        initialTime: row.oraIngresso2 != null && row.oraIngresso2 != '' ? TimeOfDay.fromDateTime(DateTime.parse('2022-01-01 ${row.oraIngresso2}')) :
+                        TimeOfDay.fromDateTime(DateTime.parse('${DateTime.now()}')),
+                      );
+                      if (pickedTime != null) {
+                        setState(() {
+                          row.oraIngresso2 = pickedTime.format(context);
+                          row.oraIngresso2Controller.text = row.oraIngresso2 ?? '';
+                          _editedRowIndex = _rows.indexOf(row);
+                          row.isModified = true;
+                          row.isEdit = true;
+                          idMarcatempo = row.idmt!;
+                          for (var otherRow in _rows) {
+                            if (otherRow != row) {
+                              otherRow.isModified = false; // impostare isModified a false per le altre righe
+                              otherRow.isEdit = false;
+                            }
+                          }
+                        });
+                      }
+                    },
+                  ),
+                )),
+            DataCell(
+              //showEditIcon: row.isModified,
+              Container(width: 210,
+                  alignment: Alignment.center,
+                  child:TextFormField(
+                    style: TextStyle(fontSize: 14, color: !row.indirizzoIngresso2!.contains('73021')  ? Colors.red : Colors.black),
+                    //key: Key(_rows.indexOf(row).toString()),
+                    //autofocus: false,
+                    //focusNode: _focusNodes[_rows.indexOf(row)],
+                    decoration: InputDecoration(border: InputBorder.none),
+                    initialValue: row.indirizzoIngresso2,
+                    onChanged: (value) {
+                      setState(() {
+                        row.indirizzoIngresso2 = value;
+                        _editedRowIndex = _rows.indexOf(row);
+                        row.isModified = true;
+                        row.isEdit = true;
+                        idMarcatempo = row.idmt!;
+                        for (var otherRow in _rows) {
+                          if (otherRow != row) {
+                            otherRow.isModified = false; // impostare isModified a false per le altre righe
+                            otherRow.isEdit = false;
+                          }
+                        }
+                      });
+                    },
+                  )),
+            ),
+            /*DataCell(
               TextFormField(
+                readOnly: true,
+                initialValue: row.dataUscita,
+
+              ),
+            ),*/
+            DataCell(
+              //showEditIcon: row.isModified,
+        Container(width: 47,
+        alignment: Alignment.center,
+        child:TextFormField(
+                decoration: InputDecoration(border: InputBorder.none),
+                controller: row.oraUscita2Controller,
+                onTap: () async {
+                  TimeOfDay? pickedTime = await showTimePicker(
+                    initialEntryMode: TimePickerEntryMode.inputOnly,
+                    context: context,
+                    initialTime: row.oraUscita2 != null && row.oraUscita2 != '' ? TimeOfDay.fromDateTime(DateTime.parse('2022-01-01 ${row.oraUscita2}')) :
+                    //TimeOfDay.fromDateTime(DateTime.parse('2022-01-01 ${row.oraIngresso}')),
+                    TimeOfDay.fromDateTime(DateTime.parse('${DateTime.now()}')),
+                  );
+                  if (pickedTime != null) {
+                    setState(() {
+                      row.oraUscita2 = pickedTime.format(context);
+                      row.oraUscita2Controller.text = row.oraUscita2 ?? '';
+                      _editedRowIndex = _rows.indexOf(row);
+                      row.isModified = true;
+                      row.isEditu = true;
+                      idMarcatempo = row.idmt!;
+                      for (var otherRow in _rows) {
+                        if (otherRow != row) {
+                          otherRow.isModified = false; // impostare isModified a false per le altre righe
+                          otherRow.isEditu = false;
+                        }
+                      }
+                    });
+                  }
+                },
+              ),
+            )),
+            DataCell(
+              //showEditIcon: row.isModified,
+              Container(width: 210,
+                  alignment: Alignment.center,
+                  child:TextFormField(
+                    style: TextStyle(fontSize: 14, color: !row.indirizzoUscita2!.contains('73021')  ? Colors.red : Colors.black),
+                    decoration: InputDecoration(border: InputBorder.none),
+                    initialValue: row.indirizzoUscita2,
+                    onChanged: (value) {
+                      setState(() {
+                        row.indirizzoUscita2 = value;
+                        _editedRowIndex = _rows.indexOf(row);
+                        row.isModified = true;
+                        row.isEditu = true;
+                        idMarcatempo = row.idmt!;
+                        for (var otherRow in _rows) {
+                          if (otherRow != row) {
+                            otherRow.isModified = false; // impostare isModified a false per le altre righe
+                            otherRow.isEditu = false;
+                          }
+                        }
+                      });
+                    },
+                  )),
+            ),
+            DataCell(
+              //showEditIcon: row.isModified,
+        Container(width: 120,
+        alignment: Alignment.center,
+        child:TextFormField(
+                style: TextStyle(fontSize: 14),
                 decoration: InputDecoration(border: InputBorder.none),
                 //textAlignVertical: TextAlignVertical.center,
                 textAlign: TextAlign.center, // add this line
@@ -676,6 +954,30 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                   });
                 },*/
               ),
+            )),
+            DataCell(
+              Container(
+                width: 50,
+                alignment: Alignment.center,
+                child: Text(
+                  '${row.isNewRow ? '' : row._totalHours.inHours}:${row._totalHours.inMinutes.remainder(60).toString().padLeft(2, '0')}',
+                ),
+              ),
+              //showEditIcon: row.isModified,
+              /*TextFormField(
+                style: TextStyle(fontSize: 14),
+                decoration: InputDecoration(border: InputBorder.none),
+                //textAlignVertical: TextAlignVertical.center,
+                textAlign: TextAlign.center, // add this line
+                //style: TextStyle(verticalAlign: TextAlignVertical.center),
+                readOnly: true,
+                initialValue: row.utenteEdit != null ? row.utenteEdit!.nome!+' '+row.utenteEdit!.cognome! : '',//widget.utente.nome!+' '+widget.utente.cognome!//
+                /*onChanged: (value) {
+                  setState(() {
+                    row.oraIngresso = value;
+                  });
+                },*/
+              ),*/
             ),
             DataCell(
               _editedRowIndex == _rows.indexOf(row)
@@ -750,40 +1052,92 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
 class _RowData {
   String? idmt;
+  String? idmt2;
   UtenteModel? utente;
   UtenteModel? utenteEdit;
   String? dataIngresso;
   String? oraIngresso;
   String? indirizzoIngresso;
-  String? dataUscita;
+  //String? dataUscita;
   String? oraUscita;
   String? indirizzoUscita;
+
+
+  String? oraIngresso2;
+  String? indirizzoIngresso2;
+
+  String? oraUscita2;
+  String? indirizzoUscita2;
+
   bool isModified = false;
   bool isEdit = false;
   bool isEditu = false;
   TextEditingController oraIngressoController = TextEditingController();
   TextEditingController oraUscitaController = TextEditingController();
+  TextEditingController oraIngresso2Controller = TextEditingController();
+  TextEditingController oraUscita2Controller = TextEditingController();
   bool isNewRow = false;
   TextEditingController dataIngressoController = TextEditingController();
   int? settimana;
-
-
+  Duration _totalHours = Duration.zero;
+  //List<MarcaTempoModel> timbrature;
 
   _RowData({
     this.idmt,
+    this.idmt2,
     this.utente,
     this.utenteEdit,
     this.dataIngresso,
     this.oraIngresso,
     this.indirizzoIngresso,
-    this.dataUscita,
+    //this.dataUscita,
     this.oraUscita,
     this.indirizzoUscita,
+
+    this.oraIngresso2,
+    this.indirizzoIngresso2,
+
+    this.oraUscita2,
+    this.indirizzoUscita2,
+
     this.isNewRow = false,
-    this.settimana
+    this.settimana,
+    //required this.timbrature
   }) {
     oraIngressoController.text = oraIngresso ?? '';
     oraUscitaController.text = oraUscita ?? '';
+    oraIngresso2Controller.text = oraIngresso2 ?? '';
+    oraUscita2Controller.text = oraUscita2 ?? '';
+    dataIngressoController.text = dataIngresso ?? '';
+    calculateTotalHours();
+  }
+
+  void calculateTotalHours() {
+    if (oraIngressoController.text.isNotEmpty && oraUscitaController.text.isNotEmpty && dataIngressoController.text.isNotEmpty) {
+      DateTime ingresso = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraIngressoController.text}');
+      DateTime uscita = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraUscitaController.text}');
+      _totalHours += uscita.difference(ingresso);
+    }
+    if (oraIngresso2Controller.text.isNotEmpty && oraUscita2Controller.text.isNotEmpty && dataIngressoController.text.isNotEmpty) {
+      DateTime ingresso = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraIngresso2Controller.text}');
+      DateTime uscita = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraUscita2Controller.text}');
+      _totalHours += uscita.difference(ingresso);
+    }
+  }
+
+  void onDataIngressoChanged(String value) {
+    dataIngressoController.text = value;
+    calculateTotalHours();
+  }
+
+  void onOraIngressoChanged(String value) {
+    oraIngressoController.text = value;
+    calculateTotalHours();
+  }
+
+  void onOraUscitaChanged(String value) {
+    oraUscitaController.text = value;
+    calculateTotalHours();
   }
 
 }
