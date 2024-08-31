@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:fema_crm/model/VeicoloModel.dart';
 
 class CreazioneNuovoVeicoloPage extends StatefulWidget {
-  const CreazioneNuovoVeicoloPage({Key? key}) : super(key: key);
+  const  CreazioneNuovoVeicoloPage({Key? key}) : super(key: key);
 
   @override
   _CreazioneNuovoVeicoloPageState createState() => _CreazioneNuovoVeicoloPageState();
@@ -137,7 +137,7 @@ class _CreazioneNuovoVeicoloPageState extends State<CreazioneNuovoVeicoloPage> {
                 ),
                 SizedBox(height: 14),
                 Center(
-                  child: _buildTextFormField(_imeiController, 'Imei'.toUpperCase(), 'Inserisci l\'imei del veicolo'.toUpperCase()),
+                  child: _buildTextFormField(_imeiController, 'Imei gps'.toUpperCase(), 'Inserisci l\'imei del veicolo'.toUpperCase()),
                 ),
                 SizedBox(height: 14),
                 Center(

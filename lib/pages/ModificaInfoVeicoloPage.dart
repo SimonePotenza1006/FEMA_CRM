@@ -69,7 +69,7 @@ class _ModificaInfoVeicoloPageState extends State<ModificaInfoVeicoloPage>{
             children: [
               SizedBox(height: 20),
               SizedBox(
-                width: 300,
+                width: 420,
                 child:TextFormField(
                   controller: _descrizioneController,
                   decoration: InputDecoration(
@@ -80,7 +80,7 @@ class _ModificaInfoVeicoloPageState extends State<ModificaInfoVeicoloPage>{
               ),
               SizedBox(height: 20),
               SizedBox(
-                width: 300,
+                width: 420,
                 child: TextFormField(
                   controller: _proprietarioController,
                   decoration: InputDecoration(
@@ -91,7 +91,7 @@ class _ModificaInfoVeicoloPageState extends State<ModificaInfoVeicoloPage>{
               ),
               SizedBox(height: 20),
               SizedBox(
-                width: 300,
+                width: 420,
                 child: TextFormField(
                   controller: _targaController,
                   decoration: InputDecoration(
@@ -102,254 +102,35 @@ class _ModificaInfoVeicoloPageState extends State<ModificaInfoVeicoloPage>{
               ),
               SizedBox(height: 20),
               SizedBox(
-                width: 300,
+                width: 420,
                 child: TextFormField(
                   controller: _imeiController,
                   decoration: InputDecoration(
-                    labelText: 'IMEI',
+                    labelText: 'IMEI GPS',
                     border: OutlineInputBorder(),
                   ),
                 ),
               ),
               SizedBox(height: 20),
               SizedBox(
-                width: 300,
+                width: 420,
                 child: TextFormField(
                   controller: _serialeController,
                   decoration: InputDecoration(
-                    labelText: 'SERIALE',
+                    labelText: 'SERIALE GPS',
                     border: OutlineInputBorder(),
                   ),
                 ),
               ),
               SizedBox(height: 20),
               SizedBox(
-                width: 300,
-                child: TextFormField(
-                  controller: _chilometraggioController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio attuale'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: TextFormField(
-                  controller: _chilometraggioTagliandoController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio ultimo tagliando'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: TextFormField(
-                  controller: _sogliaTagliandoController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometri da effettuare prima del prossimo tagliando'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child:TextFormField(
-                  controller: _chilometraggioInversioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio ultima inversione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: TextFormField(
-                  controller: _sogliaInversioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometri da effettuare prima della prossima inversione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: TextFormField(
-                  controller: _chilometraggioSostituzioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio ultima sostituzione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: TextFormField(
-                  controller: _sogliaSostituzioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometri da effettuare prima della prossima sostituzione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
+                width: 420,
                 child:GestureDetector(
                   onTap: () {
                     showDatePicker(
                       context: context,
-                      initialDate: _dataScadenzaBollo?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataScadenzaBollo = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data scadenza bollo'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataScadenzaBollo!= null? DateFormat('dd/MM/yyyy').format(_dataScadenzaBollo!) : ''),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataScadenzaPolizza?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataScadenzaPolizza = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data scadenza polizza'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataScadenzaPolizza!= null? DateFormat('dd/MM/yyyy').format(_dataScadenzaPolizza!) : ''),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataTagliando?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataTagliando = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data tagliando'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataTagliando!= null? DateFormat('dd/MM/yyyy').format(_dataTagliando!) : ''),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataRevisione?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataRevisione = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data revisione'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataRevisione!= null? DateFormat('dd/MM/yyyy').format(_dataRevisione!) : ''),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataInversione?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataInversione = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data inversione gomme'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataInversione!= null? DateFormat('dd/MM/yyyy').format(_dataInversione!) : ''),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 300,
-                child:GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _scadenzaGps?? DateTime.now(),
-                      firstDate: DateTime(2000),
+                      initialDate: _scadenzaGps?? DateTime.now().add(Duration(days:1)),
+                      firstDate: DateTime.now().add(Duration(days: 1)),
                       lastDate: DateTime(2100),
                     ).then((date) {
                       setState(() {
@@ -370,12 +151,231 @@ class _ModificaInfoVeicoloPageState extends State<ModificaInfoVeicoloPage>{
               ),
               SizedBox(height: 20),
               SizedBox(
-                width: 300,
+                width: 420,
+                child: TextFormField(
+                  controller: _chilometraggioController,
+                  decoration: InputDecoration(
+                    labelText: 'Chilometraggio attuale'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: TextFormField(
+                  controller: _chilometraggioTagliandoController,
+                  decoration: InputDecoration(
+                    labelText: 'Chilometraggio ultimo tagliando'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width:420,
+                child: TextFormField(
+                  controller: _sogliaTagliandoController,
+                  decoration: InputDecoration(
+                    labelText: 'Chilometri da effettuare prima del prossimo tagliando'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child:TextFormField(
+                  controller: _chilometraggioInversioneController,
+                  decoration: InputDecoration(
+                    labelText: 'Chilometraggio ultima inversione gomme'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: TextFormField(
+                  controller: _sogliaInversioneController,
+                  decoration: InputDecoration(
+                    labelText: 'Chilometri da effettuare prima della prossima inversione gomme'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: TextFormField(
+                  controller: _chilometraggioSostituzioneController,
+                  decoration: InputDecoration(
+                    labelText: 'Chilometraggio ultima sostituzione gomme'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: TextFormField(
+                  controller: _sogliaSostituzioneController,
+                  decoration: InputDecoration(
+                    labelText: 'Chilometri da effettuare prima della prossima sostituzione gomme'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child:GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: _dataScadenzaBollo?? DateTime.now().add(Duration(days:1)),
+                      firstDate: DateTime.now().add(Duration(days: 1)),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      setState(() {
+                        _dataScadenzaBollo = date;
+                      });
+                    });
+                  },
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Data scadenza bollo'.toUpperCase(),
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: TextEditingController(text: _dataScadenzaBollo!= null? DateFormat('dd/MM/yyyy').format(_dataScadenzaBollo!) : ''),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width:420,
                 child: GestureDetector(
                   onTap: () {
                     showDatePicker(
                       context: context,
-                      initialDate: _dataSostituzione?? DateTime.now(),
+                      initialDate: _dataScadenzaPolizza?? DateTime.now().add(Duration(days:1)),
+                      firstDate: DateTime.now().add(Duration(days: 1)),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      setState(() {
+                        _dataScadenzaPolizza = date;
+                      });
+                    });
+                  },
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Data scadenza polizza'.toUpperCase(),
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: TextEditingController(text: _dataScadenzaPolizza!= null? DateFormat('dd/MM/yyyy').format(_dataScadenzaPolizza!) : ''),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: _dataTagliando?? DateTime.now().add(Duration(days:1)),
+                      firstDate: DateTime.now().add(Duration(days: 1)),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      setState(() {
+                        _dataTagliando = date;
+                      });
+                    });
+                  },
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Data tagliando'.toUpperCase(),
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: TextEditingController(text: _dataTagliando!= null? DateFormat('dd/MM/yyyy').format(_dataTagliando!) : ''),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: _dataRevisione?? DateTime.now().add(Duration(days:1)),
+                      firstDate: DateTime.now().add(Duration(days: 1)),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      setState(() {
+                        _dataRevisione = date;
+                      });
+                    });
+                  },
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Data revisione'.toUpperCase(),
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: TextEditingController(text: _dataRevisione!= null? DateFormat('dd/MM/yyyy').format(_dataRevisione!) : ''),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: _dataInversione?? DateTime.now().add(Duration(days:1)),
+                      firstDate: DateTime.now().add(Duration(days: 1)),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      setState(() {
+                        _dataInversione = date;
+                      });
+                    });
+                  },
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Data inversione gomme'.toUpperCase(),
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: TextEditingController(text: _dataInversione!= null? DateFormat('dd/MM/yyyy').format(_dataInversione!) : ''),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: 420,
+                child: GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: _dataSostituzione?? DateTime.now().add(Duration(days:1)),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     ).then((date) {

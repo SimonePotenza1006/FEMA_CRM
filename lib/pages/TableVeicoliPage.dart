@@ -434,63 +434,87 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
   }
 }
 
-class VeicoloDataSource extends DataGridSource{
-  List<VeicoloModel> _vehicles =[];
+class VeicoloDataSource extends DataGridSource {
+  List<VeicoloModel> _vehicles = [];
   BuildContext context;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
 
-  VeicoloDataSource(this.context, List<VeicoloModel> vehicles){
+  VeicoloDataSource(this.context, List<VeicoloModel> vehicles) {
     _vehicles = vehicles;
   }
 
-
   @override
-  List<DataGridRow> get rows{
+  List<DataGridRow> get rows {
     List<DataGridRow> rows = [];
-    for(int i = 0; i < _vehicles.length; i++){
+    for (int i = 0; i < _vehicles.length; i++) {
       VeicoloModel veicolo = _vehicles[i];
-      String? formattedGps = veicolo.scadenza_gps != null ? DateFormat('yyyy/MM/dd').format(veicolo.scadenza_gps!) : "//";
-      String? formattedBollo = veicolo.data_scadenza_bollo != null ? DateFormat('yyyy/MM/dd').format(veicolo.data_scadenza_bollo!) : "//";
-      String? formattedPolizza = veicolo.data_scadenza_polizza != null ? DateFormat('yyyy/MM/dd').format(veicolo.data_scadenza_polizza!) : "//";
-      String? formattedTagliando = veicolo.data_tagliando != null ? DateFormat('yyyy/MM/dd').format(veicolo.data_tagliando!) : "//";
-      String? formattedRevisione = veicolo.data_revisione != null ? DateFormat('yyyy/MM/dd').format(veicolo.data_revisione!) : "//";
-      String? formattedSostituzione = veicolo.data_sostituzione_gomme != null ? DateFormat('yyyy/MM/dd').format(veicolo.data_sostituzione_gomme!) : "//";
-      String? formattedInversione = veicolo.data_inversione_gomme != null ? DateFormat('yyyy/MM/dd').format(veicolo.data_inversione_gomme!) : "//";
-      String? descrizione = veicolo.descrizione != null? veicolo.descrizione! : "//";
+      String? formattedGps = veicolo.scadenza_gps != null ? DateFormat('dd/MM/yyyy').format(veicolo.scadenza_gps!) : "//";
+      String? formattedBollo = veicolo.data_scadenza_bollo != null ? DateFormat('dd/MM/yyyy').format(veicolo.data_scadenza_bollo!) : "//";
+      String? formattedPolizza = veicolo.data_scadenza_polizza != null ? DateFormat('dd/MM/yyyy').format(veicolo.data_scadenza_polizza!) : "//";
+      String? formattedTagliando = veicolo.data_tagliando != null ? DateFormat('dd/MM/yyyy').format(veicolo.data_tagliando!) : "//";
+      String? formattedRevisione = veicolo.data_revisione != null ? DateFormat('dd/MM/yyyy').format(veicolo.data_revisione!) : "//";
+      String? formattedSostituzione = veicolo.data_sostituzione_gomme != null ? DateFormat('dd/MM/yyyy').format(veicolo.data_sostituzione_gomme!) : "//";
+      String? formattedInversione = veicolo.data_inversione_gomme != null ? DateFormat('dd/MM/yyyy').format(veicolo.data_inversione_gomme!) : "//";
+      String? descrizione = veicolo.descrizione != null ? veicolo.descrizione! : "//";
       String? km = veicolo.chilometraggio_attuale != null ? veicolo.chilometraggio_attuale!.toString() : "//";
-      String? targa = veicolo.targa != null ? veicolo.targa! : '//';
+      String? targa = veicolo.targa != null ? veicolo.targa! : "//";
       String? imei = veicolo.imei != null ? veicolo.imei! : "//";
       String? seriale = veicolo.seriale != null ? veicolo.seriale : "//";
       String? proprietario = veicolo.proprietario != null ? veicolo.proprietario : "//";
-      rows.add(DataGridRow(
-        cells: [
-          DataGridCell<VeicoloModel>(columnName: 'veicolo', value: veicolo),
-          DataGridCell<String>(columnName: 'descrizione', value: descrizione),
-          DataGridCell<String>(columnName: 'targa', value: targa),
-          DataGridCell<String>(columnName: 'imei', value: imei),
-          DataGridCell<String>(columnName: 'seriale', value: seriale),
-          DataGridCell<String>(columnName: 'proprietario', value: proprietario),
-          DataGridCell<String>(columnName: 'chilometraggio', value: km),
-          DataGridCell<String>(columnName: 'scadenza_gps', value: formattedGps),
-          DataGridCell<String>(columnName: 'scadenza_bollo', value: formattedBollo),
-          DataGridCell<String>(columnName: 'scadenza_polizza', value: formattedPolizza),
-          DataGridCell<String>(columnName: 'data_tagliando', value: formattedTagliando),
-          DataGridCell<String>(columnName: 'data_revisione', value: formattedRevisione),
-          DataGridCell<String>(columnName: 'data_inversione_gomme', value: formattedInversione),
-          DataGridCell<String>(columnName: 'data_sostituzione_gomme', value: formattedSostituzione),
-        ]
-      ));
+
+      rows.add(DataGridRow(cells: [
+        DataGridCell<VeicoloModel>(columnName: 'veicolo', value: veicolo),
+        DataGridCell<String>(columnName: 'descrizione', value: descrizione),
+        DataGridCell<String>(columnName: 'targa', value: targa),
+        DataGridCell<String>(columnName: 'imei', value: imei),
+        DataGridCell<String>(columnName: 'seriale', value: seriale),
+        DataGridCell<String>(columnName: 'proprietario', value: proprietario),
+        DataGridCell<String>(columnName: 'chilometraggio', value: km),
+        DataGridCell<String>(columnName: 'scadenza_gps', value: formattedGps),
+        DataGridCell<String>(columnName: 'scadenza_bollo', value: formattedBollo),
+        DataGridCell<String>(columnName: 'scadenza_polizza', value: formattedPolizza),
+        DataGridCell<String>(columnName: 'data_tagliando', value: formattedTagliando),
+        DataGridCell<String>(columnName: 'data_revisione', value: formattedRevisione),
+        DataGridCell<String>(columnName: 'data_inversione_gomme', value: formattedInversione),
+        DataGridCell<String>(columnName: 'data_sostituzione_gomme', value: formattedSostituzione),
+      ]));
     }
     return rows;
   }
 
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {
-    // Recupera l'oggetto `VeicoloModel` dalla prima cella (dove è stato memorizzato in precedenza)
     final VeicoloModel veicolo = row.getCells().firstWhere((cell) => cell.columnName == 'veicolo').value;
 
     return DataGridRowAdapter(
       cells: row.getCells().map<Widget>((dataGridCell) {
+        final String columnName = dataGridCell.columnName;
+        final value = dataGridCell.value;
+
+        // Controllo del colore delle celle per le date
+        Color textColor = Colors.black;
+        if (columnName.startsWith('scadenza') || columnName.startsWith('data')) {
+          if (value != "//" && value != null) {
+            DateTime? cellDate;
+            try {
+              cellDate = DateFormat('dd/MM/yyyy').parse(value);
+            } catch (e) {
+              cellDate = null;
+            }
+
+            if (cellDate != null) {
+              final today = DateTime.now();
+              final difference = cellDate.difference(today).inDays;
+
+              if (difference < 0) {
+                textColor = Colors.red; // Data superata
+              } else if (difference <= 7) {
+                textColor = Colors.yellow[700]!; // Data vicina (entro 10 giorni)
+              }
+            }
+          }
+        }
+
         return GestureDetector(
           onTap: () {
             print("Tapped on ${veicolo.targa}");
@@ -505,8 +529,9 @@ class VeicoloDataSource extends DataGridSource{
             alignment: Alignment.center,
             padding: EdgeInsets.all(8.0),
             child: Text(
-              dataGridCell.value.toString(),
+              value.toString(),
               overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: textColor),
             ),
           ),
         );
