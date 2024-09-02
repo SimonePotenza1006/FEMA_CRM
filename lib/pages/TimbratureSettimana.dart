@@ -10,18 +10,16 @@ import '../model/UtenteModel.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:collection';
 
-import 'TimbratureSettimana.dart';
 
-
-class TimbratureEdit extends StatefulWidget {
+class TimbratureSettimana extends StatefulWidget {
   final UtenteModel utente;
-  const TimbratureEdit({Key? key, required this.utente}) : super(key: key);
+  const TimbratureSettimana({Key? key, required this.utente}) : super(key: key);
 
   @override
-  _TimbratureEditState createState() => _TimbratureEditState();
+  _TimbratureSettimanaState createState() => _TimbratureSettimanaState();
 }
 
-class _TimbratureEditState extends State<TimbratureEdit> {
+class _TimbratureSettimanaState extends State<TimbratureSettimana> {
 
   bool _isSigned = false;
   final _formKey = GlobalKey<FormState>();
@@ -544,7 +542,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => TimbratureEdit(utente: widget.utente)),
+                  MaterialPageRoute(builder: (context) => TimbratureSettimana(utente: widget.utente)),
                 );
                 //setState(() {});//getAllMarcatempo();
               },
@@ -1039,7 +1037,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) =>
-                            TimbratureEdit(utente: widget.utente)),
+                            TimbratureSettimana(utente: widget.utente)),
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
