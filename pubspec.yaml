@@ -85,6 +85,7 @@ dependencies:
   #syncfusion_flutter_core: ^26.1.40
   syncfusion_flutter_core: ^21.2.10
   syncfusion_flutter_pdfviewer: ^21.2.10
+  flutter_speed_dial: ^7.0.0
   flutter_localization: ^0.1.10
   syncfusion_localizations: ^21.1.35
   rainbow_color: ^2.0.1

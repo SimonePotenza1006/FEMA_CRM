@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,6 +31,18 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   double? fondoCassaSettimana3;
   final ScrollController _scrollController = ScrollController();
   double fondoCassa = 0.0;
+  bool showSubMenu = false;
+  final _formKeyUscita = GlobalKey<FormState>();
+  final _formKeyPrelievo = GlobalKey<FormState>();
+  final _formKeyVersamento = GlobalKey<FormState>();
+  final TextEditingController _versamentoController = TextEditingController();
+  final TextEditingController _entrataController = TextEditingController();
+  final TextEditingController _uscitaController = TextEditingController();
+  final TextEditingController _accontoController = TextEditingController();
+  final TextEditingController _pagamentoController = TextEditingController();
+  final TextEditingController _prelievoController = TextEditingController();
+  final TextEditingController  _descrizioneUscitaController = TextEditingController();
+
 
 
   @override
@@ -65,40 +79,71 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         ],
       ),
       backgroundColor: Colors.white,
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
+      floatingActionButton: Stack(
         children: [
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AggiungiMovimentoPage(userData: widget.userData)),
-              );
-            },
-            backgroundColor: Colors.red,
-            child: Icon(Icons.add, color: Colors.white),
-            heroTag: "Tag3",
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: SpeedDial(
+              animatedIcon: AnimatedIcons.menu_close,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              children: [
+                SpeedDialChild(
+                  child: Icon(Icons.history, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Rendiconto settimane precedenti',
+                  onTap: () => _showPreviousWeeksDialog(),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.arrow_downward, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Scarica Excel',
+                  onTap: () => _showConfirmationDialog(),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Gestione Patrimoniale',
+                  onTap: () {
+                    setState(() {
+                      showSubMenu = !showSubMenu;
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: () {
-              _showPreviousWeeksDialog();
-            },
-            backgroundColor: Colors.red,
-            child: Icon(Icons.currency_exchange, color: Colors.white),
-            heroTag: "Tag2",
-          ),
-          SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: () {
-              _showConfirmationDialog();
-            },
-            backgroundColor: Colors.red,
-            child: Icon(Icons.arrow_downward, color: Colors.white),
-            heroTag: "Tag1",
-          ),
+          if (showSubMenu) // Condizione per mostrare o nascondere il sub-menu
+            Positioned(
+              bottom: 100,
+              right: 16,
+              child: SpeedDial(
+                animatedIcon: AnimatedIcons.view_list,
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.red,
+                children: [
+                  SpeedDialChild(
+                    child: Icon(Icons.arrow_upward_outlined, color: Colors.white),
+                    backgroundColor: Colors.red,
+                    label: 'Uscita',
+                    onTap: () => _showUscitaDialog(),
+                  ),
+                  SpeedDialChild(
+                    child: Icon(Icons.currency_exchange_outlined, color: Colors.white),
+                    backgroundColor: Colors.red,
+                    label: 'Prelievo',
+                    onTap: () => _showPrelievoDialog(),
+                  ),
+                  SpeedDialChild(
+                    child: Icon(Icons.arrow_downward_outlined, color: Colors.white),
+                    backgroundColor: Colors.red,
+                    label: 'Versamento',
+                    onTap: () => _showVersamentoDialog(),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -301,7 +346,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       if (spesa.importo!= null) {
         if (spesa.tipo_movimentazione == TipoMovimentazione.Uscita || spesa.tipo_movimentazione == TipoMovimentazione.Prelievo) {
           total -= spesa.importo!;
-        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto || spesa.tipo_movimentazione == TipoMovimentazione.Pagamento || spesa.tipo_movimentazione == TipoMovimentazione.Entrata) {
+        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto || spesa.tipo_movimentazione == TipoMovimentazione.Pagamento || spesa.tipo_movimentazione == TipoMovimentazione.Entrata || spesa.tipo_movimentazione == TipoMovimentazione.Versamento) {
           total += spesa.importo!;
         }
       }
@@ -376,6 +421,8 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       return 'Acconto';
     } else if (tipoMovimentazione == TipoMovimentazione.Prelievo){
       return 'Prelievo';
+    } else if (tipoMovimentazione == TipoMovimentazione.Versamento){
+      return 'Versamento';
     } else {
       return 'Informazione non disponibile';
     }
@@ -385,7 +432,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     double fondoCassa = 0;
     for (var movimento in movimenti) {
       if (movimento.importo != null) {
-        if (movimento.tipo_movimentazione == TipoMovimentazione.Entrata || movimento.tipo_movimentazione == TipoMovimentazione.Pagamento || movimento.tipo_movimentazione == TipoMovimentazione.Acconto) {
+        if (movimento.tipo_movimentazione == TipoMovimentazione.Entrata || movimento.tipo_movimentazione == TipoMovimentazione.Pagamento || movimento.tipo_movimentazione == TipoMovimentazione.Acconto || movimento.tipo_movimentazione == TipoMovimentazione.Versamento) {
           fondoCassa += movimento.importo!;
         } else if (movimento.tipo_movimentazione == TipoMovimentazione.Uscita || movimento.tipo_movimentazione == TipoMovimentazione.Prelievo) {
           fondoCassa -= movimento.importo!;
@@ -497,6 +544,289 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         );
       },
     );
+  }
+
+  void _showUscitaDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('COMPILA LE INFORMAZIONI DELL\'USCITA'),
+          content: Form( // Avvolgi tutto dentro un Form
+            key: _formKeyUscita,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _descrizioneUscitaController,
+                  decoration: InputDecoration(
+                    labelText: 'Descrizione'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) { // Aggiungi validatore
+                    if (value == null || value.isEmpty) {
+                      return 'Inserisci una descrizione valida';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 12),
+                TextFormField(
+                  controller: _uscitaController,
+                  decoration: InputDecoration(
+                    labelText: 'Importo uscita'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                  ],
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) { // Aggiungi validatore
+                    if (value == null || value.isEmpty) {
+                      return 'Inserisci un importo valido';
+                    }
+                    try {
+                      double.parse(value);
+                    } catch (e) {
+                      return 'Inserisci un importo numerico valido';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                if (_formKeyUscita.currentState!.validate()) { // Convalida il form
+                  addUscita();
+                }
+              },
+              child: Text('Conferma uscita'.toUpperCase()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPrelievoDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('INSERISCI L\'IMPORTO DEL PRELIEVO'),
+          content: Form( // Avvolgi tutto dentro un Form
+            key: _formKeyPrelievo,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _prelievoController,
+                  decoration: InputDecoration(
+                    labelText: 'Importo prelievo'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // Consenti solo numeri e fino a 2 decimali
+                  ],
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) { // Aggiungi validatore
+                    if (value == null || value.isEmpty) {
+                      return 'Inserisci un importo valido';
+                    }
+                    // Rimuovi spazi vuoti o caratteri indesiderati
+                    String cleanedValue = value.trim();
+                    try {
+                      double.parse(cleanedValue);  // Convalida se può essere convertito in double
+                    } catch (e) {
+                      return 'Inserisci un importo numerico valido';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                if (_formKeyPrelievo.currentState!.validate()) { // Convalida il form
+                  // Puliamo l'input prima di inviarlo alla funzione
+                  String cleanedInput = _prelievoController.text.trim();
+                  addPrelievo(cleanedInput); // Aggiunge il prelievo con l'importo pulito
+                }
+              },
+              child: Text('Conferma prelievo'.toUpperCase()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showVersamentoDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('INSERISCI L\'IMPORTO DEL VERSAMENTO'),
+          content: Form( // Avvolgi tutto dentro un Form
+            key: _formKeyVersamento,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _versamentoController,
+                  decoration: InputDecoration(
+                    labelText: 'Importo versamento'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // Consenti solo numeri e fino a 2 decimali
+                  ],
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) { // Aggiungi validatore
+                    if (value == null || value.isEmpty) {
+                      return 'Inserisci un importo valido';
+                    }
+                    try {
+                      double.parse(value);
+                    } catch (e) {
+                      return 'Inserisci un importo numerico valido';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                if (_formKeyVersamento.currentState!.validate()) { // Convalida il form
+                  addVersamento(_versamentoController.text);
+                }
+              },
+              child: Text('Conferma versamento'.toUpperCase()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> addUscita() async{
+    try{
+       final response = await http.post(
+         Uri.parse('$ipaddress/api/movimenti'),
+         headers: {'Content-Type': 'application/json'},
+         body: jsonEncode({
+           'data': DateTime.now().toIso8601String(),
+           'descrizione' : _descrizioneUscitaController.text.toString().toUpperCase(),
+           'tipo_movimentazione' : "Uscita",
+           'importo' : double.parse(_uscitaController.text.toString()),
+           'utente' : widget.userData.toMap()
+         }),
+       );
+       if (response.statusCode == 201) {
+         Navigator.pop(context);
+         _uscitaController.clear();
+         _descrizioneUscitaController.clear();
+         setState(() {
+           showSubMenu = false;
+         });
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+             content: Text('Movimentazione salvata con successo'),
+           ),
+         );
+         getAllMovimentazioni();
+       } else {
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+             content: Text('Errore durante il salvataggio della movimentazione'),
+           ),
+         );
+       }
+    } catch (e) {
+      print('Ops: $e');
+    }
+  }
+
+  Future<void> addPrelievo(String importo) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/movimenti'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({  // serializza il corpo della richiesta come JSON
+          'data': DateTime.now().toIso8601String(),
+          'descrizione': "Prelievo del ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}".toUpperCase(),
+          'tipo_movimentazione': "Prelievo",
+          'importo': importo,
+          'utente': widget.userData.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        Navigator.pop(context);
+        _prelievoController.clear();
+        setState(() {
+          showSubMenu = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Movimentazione salvata con successo'.toUpperCase()),
+          ),
+        );
+        getAllMovimentazioni();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Errore durante il salvataggio della movimentazione'),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Ops: $e');
+    }
+  }
+
+  Future<void> addVersamento(String importo) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/movimenti'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({  // serializza il corpo della richiesta come JSON
+          'data': DateTime.now().toIso8601String(),
+          'descrizione': "Versamento del ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}".toUpperCase(),
+          'tipo_movimentazione': "Versamento",
+          'importo': double.parse(_versamentoController.text.toString()),
+          'utente': widget.userData.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        Navigator.pop(context);
+        _versamentoController.clear();
+        setState(() {
+          showSubMenu = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Movimentazione salvata con successo'.toUpperCase()),
+          ),
+        );
+        getAllMovimentazioni();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Errore durante il salvataggio della movimentazione'),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Ops: $e');
+    }
   }
 
   void _showPreviousWeeksDialog() {
