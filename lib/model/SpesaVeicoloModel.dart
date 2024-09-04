@@ -75,12 +75,12 @@ class SpesaVeicoloModel {
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['km'].toString(),
       json['importo'].toString(),
-      json['fornitore_carburante'].toString(),
+      json['fornitore_carburante'],
       json['tipologia_spesa'] != null ? TipologiaSpesaVeicoloModel.fromJson(json['tipologia_spesa']) : null,
       json['veicolo'] != null ? VeicoloModel.fromJson(json['veicolo']) : null,
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
-      json['note_tipologia_spesa'].toString(),
-      json['note_fornitore'].toString(),
+      json['note_tipologia_spesa'],
+      json['note_fornitore'],
     );
   }
 }

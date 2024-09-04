@@ -32,9 +32,12 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
     'scadenza_bollo' :  200,
     'scadenza_polizza':  200,
     'data_tagliando':  200,
+    'chilometraggio_tagliando' : 200,
     'data_revisione' :  200,
     'data_inversione_gomme' :  200,
+    'km_inversione' : 200,
     'data_sostituzione_gomme' :  200,
+    'km_sostituzione' : 200
   };
 
   @override
@@ -348,11 +351,32 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
                         ),
                       ),
                       child: Text(
-                        'DATA TAGLIANDO',
+                        'DATA ULTIMO TAGLIANDO',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                     ),
                     width: _columnWidths['data_tagliando']?? double.nan,
+                    minimumWidth: 200,
+                  ),
+                  GridColumn(
+                    columnName: 'chilometraggio_tagliando',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'CHILOMETRAGGIO ULTIMO TAGLIANDO',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['chilometraggio_tagliando']?? double.nan,
                     minimumWidth: 200,
                   ),
                   GridColumn(
@@ -398,6 +422,27 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
                     minimumWidth: 200,
                   ),
                   GridColumn(
+                    columnName: 'km_inversione',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'CHILOMETRAGGIO ULTIMA INVERSIONE GOMME',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['km_inversione']?? double.nan,
+                    minimumWidth: 200,
+                  ),
+                  GridColumn(
                     columnName: 'data_sostituzione_gomme',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -416,6 +461,27 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
                       ),
                     ),
                     width: _columnWidths['data_sostituzione_gomme']?? double.nan,
+                    minimumWidth: 200,
+                  ),
+                  GridColumn(
+                    columnName: 'km_sostituzione',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'CHILOMETRAGGIO ULTIMA SOSTITUZIONE GOMME',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['km_sostituzione']?? double.nan,
                     minimumWidth: 200,
                   ),
                 ],
@@ -457,6 +523,9 @@ class VeicoloDataSource extends DataGridSource {
       String? formattedInversione = veicolo.data_inversione_gomme != null ? DateFormat('dd/MM/yyyy').format(veicolo.data_inversione_gomme!) : "//";
       String? descrizione = veicolo.descrizione != null ? veicolo.descrizione! : "//";
       String? km = veicolo.chilometraggio_attuale != null ? veicolo.chilometraggio_attuale!.toString() : "//";
+      String? km_tagliando = veicolo.chilometraggio_ultimo_tagliando != null ? veicolo.chilometraggio_ultimo_tagliando!.toString() : "//";
+      String? km_inversione = veicolo.chilometraggio_ultima_inversione != null ? veicolo.chilometraggio_ultima_inversione!.toString() : "//";
+      String? km_sostituzione = veicolo.chilometraggio_ultima_sostituzione != null ? veicolo.chilometraggio_ultima_sostituzione!.toString() : "//";
       String? targa = veicolo.targa != null ? veicolo.targa! : "//";
       String? imei = veicolo.imei != null ? veicolo.imei! : "//";
       String? seriale = veicolo.seriale != null ? veicolo.seriale : "//";
@@ -474,9 +543,12 @@ class VeicoloDataSource extends DataGridSource {
         DataGridCell<String>(columnName: 'scadenza_bollo', value: formattedBollo),
         DataGridCell<String>(columnName: 'scadenza_polizza', value: formattedPolizza),
         DataGridCell<String>(columnName: 'data_tagliando', value: formattedTagliando),
+        DataGridCell<String>(columnName: 'chilometraggio_tagliando', value : km_tagliando),
         DataGridCell<String>(columnName: 'data_revisione', value: formattedRevisione),
         DataGridCell<String>(columnName: 'data_inversione_gomme', value: formattedInversione),
+        DataGridCell<String>(columnName: 'km_inversione', value: km_inversione),
         DataGridCell<String>(columnName: 'data_sostituzione_gomme', value: formattedSostituzione),
+        DataGridCell<String>(columnName: 'km_sostituzione', value: km_sostituzione)
       ]));
     }
     return rows;
@@ -491,27 +563,92 @@ class VeicoloDataSource extends DataGridSource {
         final String columnName = dataGridCell.columnName;
         final value = dataGridCell.value;
 
-        // Controllo del colore delle celle per le date
+        // Default text color
         Color textColor = Colors.black;
-        if (columnName.startsWith('scadenza') || columnName.startsWith('data')) {
-          if (value != "//" && value != null) {
-            DateTime? cellDate;
-            try {
-              cellDate = DateFormat('dd/MM/yyyy').parse(value);
-            } catch (e) {
-              cellDate = null;
-            }
 
-            if (cellDate != null) {
-              final today = DateTime.now();
-              final difference = cellDate.difference(today).inDays;
+        if(columnName == 'scadenza_gps' && veicolo.scadenza_gps != null){
+          DateTime dataScadenza = veicolo.scadenza_gps!;
+          Duration differenza = dataScadenza.difference(DateTime.now());
 
-              if (difference < 0) {
-                textColor = Colors.red; // Data superata
-              } else if (difference <= 7) {
-                textColor = Colors.yellow[700]!; // Data vicina (entro 10 giorni)
-              }
-            }
+          if(differenza.inDays <= 10){
+            textColor = Colors.red;
+          }
+        }
+        // Colorazione per la data_tagliando con controllo dei 2 anni
+        if (columnName == 'data_tagliando' && veicolo.data_tagliando != null) {
+          DateTime dataTagliando = veicolo.data_tagliando!;
+          DateTime dueAnniDopo = dataTagliando.add(Duration(days: 365 * 2));
+          Duration differenza = dueAnniDopo.difference(DateTime.now());
+
+          if (differenza.inDays <= 10) {
+            textColor = Colors.red; // Meno di 10 giorni per i due anni.
+          }
+        }
+
+        if(columnName == 'scadenza_bollo' && veicolo.data_scadenza_bollo != null){
+          DateTime dataScadenzaBollo = veicolo.data_scadenza_bollo!;
+          Duration differenza = dataScadenzaBollo.difference(DateTime.now());
+
+          if(differenza.inDays <= 10){
+            textColor = Colors.red;
+          }
+        }
+
+        if(columnName == 'scadenza_polizza' && veicolo.data_scadenza_polizza != null){
+          DateTime dataScadenzaPolizza = veicolo.data_scadenza_polizza!;
+          Duration differenza = dataScadenzaPolizza.difference(DateTime.now());
+
+          if(differenza.inDays <= 10){
+            textColor = Colors.red;
+          }
+        }
+
+        if(columnName == 'km_inversione' &&
+            veicolo.chilometraggio_attuale != null &&
+            veicolo.chilometraggio_ultima_inversione != null &&
+            veicolo.soglia_inversione != null) {
+
+          int chilometraggioAttuale = veicolo.chilometraggio_attuale!;
+          int chilometraggioUltimaInversione = veicolo.chilometraggio_ultima_inversione!;
+          int sogliaInversione = veicolo.soglia_inversione!;
+          int chilometraggioLimite = chilometraggioUltimaInversione + sogliaInversione;
+          int chilometriRimanenti = chilometraggioLimite - chilometraggioAttuale;
+
+          if(chilometriRimanenti <= 100){
+            textColor = Colors.red;
+          }
+        }
+
+        if(columnName == 'km_sostituzione' &&
+            veicolo.chilometraggio_attuale != null &&
+            veicolo.chilometraggio_ultima_sostituzione != null &&
+            veicolo.soglia_sostituzione != null) {
+
+          int chilometraggioAttuale = veicolo.chilometraggio_attuale!;
+          int chilometraggioUltimaSostituzione = veicolo.chilometraggio_ultima_sostituzione!;
+          int sogliaSostituzione = veicolo.soglia_sostituzione!;
+          int chilometraggioLimite = chilometraggioUltimaSostituzione + sogliaSostituzione;
+          int chilometriRimanenti = chilometraggioLimite - chilometraggioAttuale;
+
+          if(chilometriRimanenti <= 100){
+            textColor = Colors.red;
+          }
+        }
+
+        // Colorazione per chilometraggio_tagliando
+        if (columnName == 'chilometraggio_tagliando' &&
+            veicolo.chilometraggio_attuale != null &&
+            veicolo.chilometraggio_ultimo_tagliando != null &&
+            veicolo.soglia_tagliando != null) {
+
+          int chilometraggioAttuale = veicolo.chilometraggio_attuale!;
+          int chilometraggioUltimoTagliando = veicolo.chilometraggio_ultimo_tagliando!;
+          int sogliaTagliando = veicolo.soglia_tagliando!;
+          int chilometraggioLimite = chilometraggioUltimoTagliando + sogliaTagliando;
+          int chilometriRimanenti = chilometraggioLimite - chilometraggioAttuale;
+
+          if (chilometriRimanenti <= 100) {
+            textColor = Colors.red; // Meno di 100 chilometri alla soglia del prossimo tagliando.
           }
         }
 
