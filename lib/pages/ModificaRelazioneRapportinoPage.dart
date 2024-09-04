@@ -96,6 +96,7 @@ class _ModificaRelazioneRapportinoPageState extends State<ModificaRelazioneRappo
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': widget.intervento.importo_intervento,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
           'assegnato': widget.intervento.assegnato,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,

@@ -43,6 +43,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   late InterventoDataSource _dataSource;
   Map<String, double> _columnWidths = {
     'intervento' : 0,
+    'id_intervento' : 120,
     'data_apertura_intervento': 120,
     'data': 120,
     'cliente': 200,
@@ -50,6 +51,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'descrizione': 300,
     'responsabile' : 200,
     'importo_intervento': 100,
+    'prezzo_ivato' : 100,
     'acconto': 100,
     'inserimento_importo' : 100,
     'importo_restante' : 130,
@@ -357,6 +359,27 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 0,
                   ),
                   GridColumn(
+                    columnName: 'id_intervento',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'ID',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['id_intervento']?? double.nan,
+                    minimumWidth: 0,
+                  ),
+                  GridColumn(
                     columnName: 'data_apertura_intervento',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -523,6 +546,27 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     width: _columnWidths['inserimento_importo']?? double.nan,
                     minimumWidth: 80,
+                  ),
+                  GridColumn(
+                    columnName: 'prezzo_ivato',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Prezzo Ivato',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['prezzo_ivato']?? double.nan,
+                    minimumWidth: 100, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'acconto',
@@ -698,6 +742,7 @@ class InterventoDataSource extends DataGridSource {
   List<GruppoInterventiModel> allGruppiConclusi = [];
   List<GruppoInterventiModel> allGruppiNonConclusi = [];
   InterventoModel? _selectedIntervento;
+  bool prezzoIvato = false;
 
 
   InterventoDataSource(this.context, List<InterventoModel> interventions, Map<int, List<UtenteModel>> interventoUtentiMap) {
@@ -756,6 +801,10 @@ class InterventoDataSource extends DataGridSource {
         cells: [
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
           DataGridCell<String>(
+            columnName: 'id_intervento',
+            value: "${intervento.id}/${DateTime.now().year}",
+          ),
+          DataGridCell<String>(
             columnName: 'data_apertura_intervento',
             value: intervento.data_apertura_intervento != null
                 ? DateFormat('dd/MM/yyyy').format(intervento.data_apertura_intervento!)
@@ -798,33 +847,63 @@ class InterventoDataSource extends DataGridSource {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Inserisci un importo'),
-                      actions: <Widget>[
-                        TextFormField(
-                          controller: importoController,
-                          decoration: InputDecoration(
-                            labelText: 'Importo',
-                            border: OutlineInputBorder(),
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
-                          ],
-                          keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            saveImporto(intervento); // <--- Pass the intervento object here
-                          },
-                          child: Text('Salva importo'),
-                        ),
-                      ],
-                    );
+                    return
+                      StatefulBuilder(
+                          builder: (context, setState){
+                            return AlertDialog(
+                              title: Text('Inserisci un importo'),
+                              actions: <Widget>[
+                                TextFormField(
+                                  controller: importoController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Importo',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                                  ],
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: intervento.prezzo_ivato,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          intervento.prezzo_ivato = value;
+                                          prezzoIvato = value!;
+                                        });
+                                      },
+                                    ),
+                                    Text('IVA INCLUSA'),
+                                  ],
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    saveImporto(intervento, prezzoIvato).then((_) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                                      );
+                                    });
+                                  },
+                                  child: Text('Salva importo'),
+                                ),
+                              ],
+                            );
+                          }
+                      );
                   },
                 );
               },
               icon: Icon(Icons.create, color: Colors.grey),
             ),
+          ),
+          DataGridCell<String>(
+            columnName: 'prezzo_ivato',
+            value: intervento.prezzo_ivato != null
+                ? (intervento.prezzo_ivato! ? 'SI' : 'NO')
+                : 'NON INSERITO',
           ),
           DataGridCell<String>(
             columnName: 'acconto',
@@ -965,6 +1044,7 @@ class InterventoDataSource extends DataGridSource {
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
           'importo_intervento': intervento.importo_intervento,
+          'prezzo_ivato' : intervento.prezzo_ivato,
           'assegnato': intervento.assegnato,
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
@@ -993,7 +1073,7 @@ class InterventoDataSource extends DataGridSource {
     }
   }
 
-  Future<void> saveImporto(InterventoModel intervento) async {
+  Future<void> saveImporto(InterventoModel intervento, bool prezzoIvato) async {
     try {
       final response = await http.post(
         Uri.parse('${ipaddress}/api/intervento'),
@@ -1007,6 +1087,7 @@ class InterventoDataSource extends DataGridSource {
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
           'importo_intervento': double.parse(importoController.text),
+          'prezzo_ivato' : prezzoIvato,
           'assegnato': intervento.assegnato,
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
@@ -1027,7 +1108,9 @@ class InterventoDataSource extends DataGridSource {
       );
       if (response.statusCode == 201) {
         print('EVVAIIIIIIII');
-        Navigator.pop(context);
+        Navigator.of(context).pop();
+        prezzoIvato = false;
+
       }
     } catch (e) {
       print('Errore durante il salvataggio del intervento: $e');
@@ -1036,14 +1119,12 @@ class InterventoDataSource extends DataGridSource {
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
-    // Recupera l'intervento direttamente dalla cella 'intervento'
     final InterventoModel intervento = row.getCells().firstWhere(
           (cell) => cell.columnName == 'intervento',
     ).value as InterventoModel;
     final List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
     utenti.forEach((utente) {
     });
-    // Gestione del colore di sfondo in base alla tipologia
     Color? backgroundColor;
     switch (intervento.tipologia?.descrizione) {
       case 'Informatico':
@@ -1064,9 +1145,6 @@ class InterventoDataSource extends DataGridSource {
       default:
         backgroundColor = Colors.white;
     }
-
-    // Get the list of users associated with the intervention
-
     return DataGridRowAdapter(
       color: backgroundColor,
       cells: row.getCells().map<Widget>((dataGridCell) {
@@ -1180,7 +1258,6 @@ void mostraRicercaInterventiDialog({
           intervento.data!.isBefore(endDate);
     }).toList();
   }
-
   List<InterventoModel> filtraConclusiPerUtenteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, DateTime startDate, DateTime endDate) {
     return interventi.where((intervento) {
       return intervento.utente?.id == utente.id &&
@@ -1190,7 +1267,6 @@ void mostraRicercaInterventiDialog({
           intervento.data!.isBefore(endDate);
     }).toList();
   }
-
   List<InterventoModel> filtraPerUtenteClienteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, ClienteModel cliente, DateTime startDate, DateTime endDate) {
     return interventi.where((intervento) {
       return intervento.utente?.id == utente.id &&
@@ -1312,7 +1388,6 @@ void mostraRicercaInterventiDialog({
                       });
                     },
                   ),
-
                   if (clientiFiltrati.isNotEmpty)
                     Container(
                       constraints: BoxConstraints(maxHeight: 200), // Adjust as needed
@@ -1360,36 +1435,63 @@ void mostraRicercaInterventiDialog({
                 child: Text('Annulla'),
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red, // background color
-                  onPrimary: Colors.white, // text color
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // padding
-                ),
                 onPressed: () {
                   List<InterventoModel> interventiFiltrati = interventi;
                   if (selectedUtente != null) {
                     interventiFiltrati = filtraPerUtente(interventiFiltrati, selectedUtente!);
                   }
+
                   if (selectedCliente != null) {
                     interventiFiltrati = filtraPerCliente(interventiFiltrati, selectedCliente!);
                   }
+
                   if (selectedTipologia != null) {
                     interventiFiltrati = filtraPerTipologia(interventiFiltrati, selectedTipologia!);
                   }
+
                   if (startDate != null && endDate != null) {
-                    interventiFiltrati = interventiFiltrati.where((intervento) {
-                      return intervento.data != null &&
-                          intervento.data!.isAfter(startDate!) &&
-                          intervento.data!.isBefore(endDate!);
-                    }).toList();
+                    if (selectedUtente != null && selectedCliente != null && selectedTipologia != null) {
+                      interventiFiltrati = filtraPerUtenteClienteTipologiaEIntervalloDate(
+                          interventiFiltrati,
+                          selectedUtente!,
+                          selectedCliente!,
+                          selectedTipologia!,
+                          startDate!,
+                          endDate!
+                      );
+                    } else if (selectedUtente != null && selectedCliente != null) {
+                      interventiFiltrati = filtraPerUtenteClienteEIntervalloDate(
+                          interventiFiltrati,
+                          selectedUtente!,
+                          selectedCliente!,
+                          startDate!,
+                          endDate!
+                      );
+                    } else if (selectedUtente != null) {
+                      interventiFiltrati = filtraPerUtenteEIntervalloDate(
+                          interventiFiltrati,
+                          selectedUtente!,
+                          startDate!,
+                          endDate!
+                      );
+                    } else {
+                      interventiFiltrati = interventiFiltrati.where((intervento) {
+                        return intervento.data != null &&
+                            intervento.data!.isAfter(startDate!) &&
+                            intervento.data!.isBefore(endDate!);
+                      }).toList();
+                    }
                   } else if (startDate != null) {
                     interventiFiltrati = filtraPerData(interventiFiltrati, startDate!);
+                  } else if (endDate != null) {
+                    interventiFiltrati = filtraPerData(interventiFiltrati, endDate!);
                   }
+
                   onFiltrati(interventiFiltrati);
                   Navigator.of(context).pop();
                 },
                 child: Text('Cerca'),
-              ),
+              )
             ],
           );
         },

@@ -11,6 +11,7 @@ import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
 import 'AggiungiMovimentoPage.dart';
 import 'DettaglioInterventoPage.dart';
+import 'FemaShopPage.dart';
 import 'ModificaMovimentazionePage.dart';
 
 class RegistroCassaPage extends StatefulWidget {
@@ -90,21 +91,43 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
               foregroundColor: Colors.white,
               children: [
                 SpeedDialChild(
+                  child: Icon(Icons.shopping_bag_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'FEMASHOP'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FemaShopPage(utente : widget.userData),
+                    ),
+                  ),
+                ),
+                SpeedDialChild(
                   child: Icon(Icons.history, color: Colors.white),
                   backgroundColor: Colors.red,
-                  label: 'Rendiconto settimane precedenti',
+                  label: 'Rendiconto settimane precedenti'.toUpperCase(),
                   onTap: () => _showPreviousWeeksDialog(),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.build, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Pagamento/Acconto intervento'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AggiungiMovimentoPage(userData: widget.userData),
+                    ),
+                  ),
                 ),
                 SpeedDialChild(
                   child: Icon(Icons.arrow_downward, color: Colors.white),
                   backgroundColor: Colors.red,
-                  label: 'Scarica Excel',
+                  label: 'Scarica Excel'.toUpperCase(),
                   onTap: () => _showConfirmationDialog(),
                 ),
                 SpeedDialChild(
                   child: Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
                   backgroundColor: Colors.red,
-                  label: 'Gestione Patrimoniale',
+                  label: 'Gestione Patrimoniale'.toUpperCase(),
                   onTap: () {
                     setState(() {
                       showSubMenu = !showSubMenu;
@@ -116,7 +139,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
           ),
           if (showSubMenu) // Condizione per mostrare o nascondere il sub-menu
             Positioned(
-              bottom: 100,
+              bottom: 80,
               right: 16,
               child: SpeedDial(
                 animatedIcon: AnimatedIcons.view_list,
@@ -126,19 +149,19 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                   SpeedDialChild(
                     child: Icon(Icons.arrow_upward_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
-                    label: 'Uscita',
+                    label: 'Uscita'.toUpperCase(),
                     onTap: () => _showUscitaDialog(),
                   ),
                   SpeedDialChild(
                     child: Icon(Icons.currency_exchange_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
-                    label: 'Prelievo',
+                    label: 'Prelievo'.toUpperCase(),
                     onTap: () => _showPrelievoDialog(),
                   ),
                   SpeedDialChild(
                     child: Icon(Icons.arrow_downward_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
-                    label: 'Versamento',
+                    label: 'Versamento'.toUpperCase(),
                     onTap: () => _showVersamentoDialog(),
                   ),
                 ],

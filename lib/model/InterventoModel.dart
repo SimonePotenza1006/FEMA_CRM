@@ -18,6 +18,7 @@ class InterventoModel {
   DateTime? orario_fine;
   String? descrizione;
   double? importo_intervento;
+  bool? prezzo_ivato;
   double? acconto;
   bool? assegnato;
   bool? conclusione_parziale;
@@ -45,6 +46,7 @@ class InterventoModel {
       this.orario_fine,
       this.descrizione,
       this.importo_intervento,
+      this.prezzo_ivato,
       this.acconto,
       this.assegnato,
       this.conclusione_parziale,
@@ -74,6 +76,7 @@ class InterventoModel {
       'orario_fine': orario_fine?.toIso8601String(),
       'descrizione': descrizione,
       'importo_intervento': importo_intervento,
+      'prezzo_ivato' : prezzo_ivato,
       'acconto' : acconto,
       'assegnato': assegnato,
       'conclusione_parziale' : conclusione_parziale,
@@ -106,6 +109,7 @@ class InterventoModel {
     map['orario_fine'] != null ? DateTime.parse(map['orario_fine']) : null;
     descrizione = map['descrizione'];
     importo_intervento = map['importo_intervento'];
+    prezzo_ivato = map['prezzo_ivato'];
     acconto = map['acconto'];
     assegnato = map['assegnato'];
     conclusione_parziale = map['conclusione_parziale'];
@@ -135,6 +139,7 @@ class InterventoModel {
     'orario_fine': orario_fine?.toIso8601String(),
     'descrizione': descrizione,
     'importo_intervento': importo_intervento,
+    'prezzo_ivato' : prezzo_ivato,
     'acconto' : acconto,
     'assegnato': assegnato,
     'conclusione_parziale' : conclusione_parziale,
@@ -165,6 +170,7 @@ class InterventoModel {
       json['orario_fine'] != null ? DateTime.parse(json['orario_fine']) : null,
       json['descrizione']?.toString(),
       json['importo_intervento'] != null ? double.parse(json['importo_intervento'].toString()) : null,
+      json['prezzo_ivato'],
       json['acconto'] != null ? double.parse(json['acconto'].toString()) : null,
       json['assegnato'],
       json['conclusione_parziale'],

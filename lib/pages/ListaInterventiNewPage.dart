@@ -891,6 +891,7 @@ class _ListaInterventiNewPageState extends State<ListaInterventiNewPage>{
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
           'importo_intervento': double.parse(importoController.text),
+          'prezzo_ivato': intervento.prezzo_ivato,
           'assegnato': intervento.assegnato,
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
