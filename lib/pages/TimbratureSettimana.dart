@@ -55,9 +55,417 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
     }
    // _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate);
     //_marcatController.text = "";
-    getAllMarcatempo().then((value) => groupAndSortTimbrature());
+    getAllMarcatempo().then((value) {
+      calcolaOreLavoro(allTimbratureEdit);
+      calcolaOreLavoroMese(allTimbratureEdit);
+      groupAndSortTimbrature();
+    } );
     getAllUtenti();
     //_getCurrentLocation();
+  }
+
+  List<Widget> tabelleM = [];
+
+  void calcolaOreLavoroMese(List<MarcaTempoModel> listaMarcaTempo) {
+    List<String> nomiMesi = [
+      'GENNAIO',
+      'FEBBRAIO',
+      'MARZO',
+      'APRILE',
+      'MAGGIO',
+      'GIUGNO',
+      'LUGLIO',
+      'AGOSTO',
+      'SETTEMBRE',
+      'OTTOBRE',
+      'NOVEMBRE',
+      'DICEMBRE'
+    ];
+    // Creo una mappa per memorizzare le ore di lavoro per utente e mese
+    Map<String, Map<String, double>> oreLavoroMese = {};
+
+    // Itero sulla lista di marca tempo
+    listaMarcaTempo.forEach((marcaTempo) {
+      // Controllo se l'utente è presente nella mappa
+      if (!oreLavoroMese.containsKey(marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!)) {
+        oreLavoroMese[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!] = {};
+      }
+
+      // Calcolo il mese dell'anno
+      int mese = marcaTempo.data!.month;
+      String nomeMese = nomiMesi[marcaTempo.data!.month - 1];
+
+      // Controllo se il mese è presente nella mappa dell'utente
+      if (!oreLavoroMese[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]!.containsKey(nomeMese)) {
+        oreLavoroMese[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]![nomeMese] = 0;
+      }
+
+      // Calcolo le ore e minuti di lavoro
+      int minuti = marcaTempo.datau != null
+          ? marcaTempo.datau!.difference(marcaTempo.data!).inMinutes
+          : 0;
+
+      double ore = minuti / 60.0;
+
+      // Aggiungo le ore di lavoro alla mappa
+      oreLavoroMese[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]![nomeMese] = oreLavoroMese[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]![nomeMese]! + ore;
+    });
+
+    // Creo una mappa per memorizzare le tabelle per ogni mese
+    Map<String, List<DataRow>> tabelleMese = {};
+
+    // Itero sulla mappa di ore di lavoro
+    oreLavoroMese.forEach((utente, mesi) {
+      mesi.forEach((mese, ore) {
+        int oreInt = ore.toInt();
+        int minuti = ((ore - oreInt) * 60).toInt();
+
+        // Controllo se il mese è presente nella mappa delle tabelle
+        if (!tabelleMese.containsKey(mese)) {
+          tabelleMese[mese] = [];
+        }
+
+        // Aggiungo la riga alla tabella del mese corrente
+        tabelleMese[mese]!.add(
+          DataRow(
+            cells: [
+              DataCell(
+                  Container(width: 140,
+            alignment: Alignment.center,
+            child:
+                Text(utente),)
+              ),
+              DataCell(
+              Container(width: 120,
+              alignment: Alignment.center,
+        child:
+                  Text('$oreInt ore $minuti minuti'))
+              ),
+            ],
+          ),
+        );
+      });
+    });
+
+
+    // Itero sulla mappa delle tabelle
+    tabelleMese.forEach((mese, righe) {
+      // Creo la tabella del mese corrente
+      DataTable tabellaMese = DataTable(
+        border: TableBorder.all(color: Colors.grey),
+        columns: [
+          DataColumn(label: Text('UTENTE'), ),
+          DataColumn(label: Text('ORE')),
+        ],
+        rows: righe,
+      );
+
+      // Aggiungo la tabella alla lista di tabelle
+      tabelleM.add(
+        Column(
+          children: [
+            //SizedBox(height: 15,),
+            Text('\n$mese'),
+            tabellaMese,
+          ],
+        ),
+      );
+    });
+
+    // Ordino la lista di tabelle in ordine decrescente di mese
+    tabelleM.sort((a, b) {
+      Column columnA = a as Column;
+      Column columnB = b as Column;
+
+      //int meseA = int.parse((columnA.children.first as Text).data!.split(' ')[1]);
+      Text textWidget = columnA.children.first as Text;
+      List<String> parts = textWidget.data!.split(' ');
+      int meseA;
+      if (parts.length > 1) {
+        meseA = int.parse(parts[1]);
+      } else {
+        // Handle the case where there's no space in the text
+        meseA = 0; // or some other default value
+      }
+
+      Text textWidget2 = columnB.children.first as Text;
+      List<String> parts2 = textWidget2.data!.split(' ');
+      int meseB;
+      if (parts2.length > 1) {
+        meseB = int.parse(parts2[1]);
+      } else {
+        // Handle the case where there's no space in the text
+        meseB = 0; // or some other default value
+      }
+
+      //int meseB = int.parse((columnB.children.first as Text).data!.split(' ')[1]);
+      return meseB.compareTo(meseA);
+    });
+
+    // Mostra le tabelle
+    // ...
+  }
+
+  static List<DataColumn> _columns = [
+    DataColumn(label: Text('UTENTE')),
+    DataColumn(label: Text('SETTIMANA')),
+    DataColumn(label: Text('ORE')),
+  ];
+  DataTable tabella = DataTable(
+    columns: _columns,
+    rows: [], // You can leave the rows empty for now
+  );
+
+  List<Widget> tabelle = [];
+
+  void calcolaOreLavoro(List<MarcaTempoModel> listaMarcaTempo) {
+    // Creo una mappa per memorizzare le ore di lavoro per utente e settimana
+    Map<String, Map<int, double>> oreLavoro = {};
+
+    // Itero sulla lista di marca tempo
+    listaMarcaTempo.forEach((marcaTempo) {
+      // Controllo se l'utente è presente nella mappa
+      if (!oreLavoro.containsKey(marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!)) {
+        oreLavoro[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!] = {};
+      }
+
+      // Calcolo la settimana dell'anno
+      int settimana = getSettimana(marcaTempo.data!);
+
+      // Controllo se la settimana è presente nella mappa dell'utente
+      if (!oreLavoro[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]!.containsKey(settimana)) {
+        oreLavoro[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]![settimana] = 0;
+      }
+
+      // Calcolo le ore e minuti di lavoro
+      int minuti = marcaTempo.datau != null
+          ? marcaTempo.datau!.difference(marcaTempo.data!).inMinutes
+          : 0;
+
+      double ore = minuti / 60.0;
+
+      // Aggiungo le ore di lavoro alla mappa
+      oreLavoro[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]![settimana] = oreLavoro[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]![settimana]! + ore;
+    });
+
+    // Creo una mappa per memorizzare le tabelle per ogni settimana
+    Map<int, List<DataRow>> tabelleSettimana = {};
+
+    // Itero sulla mappa di ore di lavoro
+    oreLavoro.forEach((utente, settimane) {
+      settimane.forEach((settimana, ore) {
+        int oreInt = ore.toInt();
+        int minuti = ((ore - oreInt) * 60).toInt();
+
+        // Controllo se la settimana è presente nella mappa delle tabelle
+        if (!tabelleSettimana.containsKey(settimana)) {
+          tabelleSettimana[settimana] = [];
+        }
+
+        // Aggiungo la riga alla tabella della settimana corrente
+        tabelleSettimana[settimana]!.add(
+          DataRow(
+            cells: [
+              DataCell(
+                  Container(width: 140,
+                    alignment: Alignment.center,
+                    child:
+                    Text(utente),)
+              ),
+              DataCell(
+              Container(width: 120,
+              alignment: Alignment.center,
+        child:
+                  Text('$oreInt ore $minuti minuti'))
+              ),
+            ],
+          ),
+        );
+      });
+    });
+
+    // Creo la lista di tabelle
+    //List<DataTable> tabelle = [];
+
+    // Itero sulla mappa delle tabelle
+    tabelleSettimana.forEach((settimana, righe) {
+      // Creo la tabella della settimana corrente
+      DataTable tabellaSettimana = DataTable(
+        border: TableBorder.all(color: Colors.grey),
+        columns: [
+          DataColumn(label: Text('UTENTE')),
+          DataColumn(label: Text('ORE')),
+        ],
+        rows: righe,
+      );
+
+      // Aggiungo la tabella alla lista di tabelle
+      tabelle.add(
+        Column(
+          children: [
+            Text('\n'+DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(Settimana.getSettimana(settimana, DateTime.now().year)['lunedì']!.toString()),)+' - '+DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parse(Settimana.getSettimana(settimana, DateTime.now().year)['domenica']!.toString()),)),
+            //Text('\nSettimana $settimana'),
+            tabellaSettimana,
+          ],
+        ),
+      );
+    });
+
+    // Ordino la lista di tabelle in ordine decrescente di settimana
+    tabelle.sort((a, b) {
+      Column columnA = a as Column;
+      Column columnB = b as Column;
+
+      //int meseA = int.parse((columnA.children.first as Text).data!.split(' ')[1]);
+      Text textWidget = columnA.children.first as Text;
+      List<String> parts = textWidget.data!.split(' ');
+      int settimanaA;
+      if (parts.length > 1) {
+        String valore = parts[1].trim(); // Rimuove gli spazi bianchi
+        if (valore.isNotEmpty && RegExp(r'^\d+$').hasMatch(valore)) { // Controlla se il valore è un numero
+          settimanaA = int.parse(valore);
+        } else {
+          // Handle the case where the value is not a number
+          settimanaA = 0; // or some other default value
+        }
+      } else {
+        // Handle the case where there's no space in the text
+        settimanaA = 0; // or some other default value
+      }
+
+      Text textWidget2 = columnB.children.first as Text;
+      List<String> parts2 = textWidget2.data!.split(' ');
+      int settimanaB;
+      if (parts2.length > 1) {
+        String valore = parts2[1].trim(); // Rimuove gli spazi bianchi
+        if (valore.isNotEmpty && RegExp(r'^\d+$').hasMatch(valore)) { // Controlla se il valore è un numero
+          settimanaB = int.parse(valore);
+        } else {
+          // Handle the case where the value is not a number
+          settimanaB = 0; // or some other default value
+        }
+      } else {
+        // Handle the case where there's no space in the text
+        settimanaB = 0; // or some other default value
+      }
+
+      return settimanaB.compareTo(settimanaA);
+    });
+
+    // Mostra le tabelle
+    // ...
+  }
+
+  void calcolaOreLavoroOld(List<MarcaTempoModel> listaMarcaTempo) {
+    // Creo una mappa per memorizzare le ore di lavoro per utente e settimana
+    Map<String, Map<int, double>> oreLavoro = {};
+
+    // Itero sulla lista di marca tempo
+    listaMarcaTempo.forEach((marcaTempo) {
+      // Controllo se l'utente è presente nella mappa
+      if (!oreLavoro.containsKey(marcaTempo.utente?.id)) {
+        oreLavoro[marcaTempo.utente!.id!] = {};
+      }
+
+      // Calcolo la settimana dell'anno
+      int settimana = getSettimana(marcaTempo.data!);
+
+      // Controllo se la settimana è presente nella mappa dell'utente
+      if (!oreLavoro[marcaTempo.utente?.id]!.containsKey(settimana)) {
+        oreLavoro[marcaTempo.utente?.id]![settimana] = 0;
+      }
+
+      // Calcolo le ore e minuti di lavoro
+      int minuti = marcaTempo.datau != null
+          ? marcaTempo.datau!.difference(marcaTempo.data!).inMinutes
+          : 0;
+
+      double ore = minuti / 60.0;
+
+      // Aggiungo le ore di lavoro alla mappa
+      oreLavoro[marcaTempo.utente?.id]![settimana] = oreLavoro[marcaTempo.utente?.id]![settimana]! + ore;
+    });
+
+    // Creo una lista di dati per la tabella
+    List<DataRow> dati = [];
+
+    // Itero sulla mappa di ore di lavoro
+    oreLavoro.forEach((utente, settimane) {
+      settimane.forEach((settimana, ore) {
+        int oreInt = ore.toInt();
+        int minuti = ((ore - oreInt) * 60).toInt();
+        dati.add(DataRow(
+
+         cells: [
+          DataCell(Text(utente)),
+          DataCell(Text(settimana.toString())),
+          DataCell(Text('$oreInt ore $minuti minuti')),
+        ]));
+      });
+    });
+
+    // Ordino la lista di dati in ordine decrescente di settimana
+    dati.sort((a, b) {
+      int settimanaA = int.parse((a.cells[1].child as Text).data!);
+      int settimanaB = int.parse((b.cells[1].child as Text).data!);
+      return settimanaB.compareTo(settimanaA);
+    });
+
+
+    // Creo la tabella
+    tabella = DataTable(
+      columns: [
+        DataColumn(label: Text('Utente')),
+        DataColumn(label: Text('Settimana')),
+        DataColumn(label: Text('Ore')),
+      ],
+      rows: dati,
+    );
+
+    // Mostra la tabella
+    // ...
+  }
+
+  void calcolaOreLavoro2(List<MarcaTempoModel> listaMarcaTempo) {
+    // Creo una mappa per memorizzare le ore di lavoro per utente e settimana
+    Map<String, Map<int, double>> oreLavoro = {};
+
+    // Itero sulla lista di marca tempo
+    listaMarcaTempo.forEach((marcaTempo) {
+      // Controllo se l'utente è presente nella mappa
+      if (!oreLavoro.containsKey(marcaTempo.utente?.id)) {
+        oreLavoro[marcaTempo.utente!.id!] = {};
+      }
+
+      // Calcolo la settimana dell'anno
+      int settimana = getSettimana(marcaTempo.data!);
+
+      // Controllo se la settimana è presente nella mappa dell'utente
+      if (!oreLavoro[marcaTempo.utente?.id]!.containsKey(settimana)) {
+        oreLavoro[marcaTempo.utente?.id]![settimana] = 0;
+      }
+
+      int minuti = marcaTempo.datau != null
+          ? marcaTempo.datau!.difference(marcaTempo.data!).inMinutes
+          : 0;
+
+      double ore = minuti / 60.0;
+
+      // Aggiungo le ore di lavoro alla mappa
+      oreLavoro[marcaTempo.utente?.id]![settimana] = oreLavoro[marcaTempo.utente?.id]![settimana]! + ore;
+
+    });
+
+    // Stampo le ore di lavoro per utente e settimana
+    oreLavoro.forEach((utente, settimane) {
+      print('Utente: $utente');
+      settimane.forEach((settimana, ore) {
+        int oreInt = ore.toInt();
+        int minuti = ((ore - oreInt) * 60).toInt();
+        print('Settimana: $settimana, Ore: $oreInt, Minuti: $minuti');
+
+      });
+    });
   }
 
   int getSettimana(DateTime date) {
@@ -71,8 +479,15 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
   }
 
   Map<int, List<_RowData>> groupedRows = {};
+  Map<String, Duration> _totalHoursPerUser = {};
 
   void groupAndSortTimbrature() {
+
+    _rows.forEach((row) {
+      if (!_totalHoursPerUser.containsKey(row.utente!.id!)) {
+        _totalHoursPerUser[row.utente!.id!] = Duration.zero;
+      }
+    });
 
     // Raggruppa per utente
     Map<String, List<MarcaTempoModel>> groupedTimbrature = {};
@@ -507,14 +922,33 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
     });
   }
 
+
+  Duration getTotalHours(String userId) {
+    _RowData? row;
+    try {
+      row = _rows.firstWhere((r) => r.utente!.id == userId);
+    } on StateError {
+      row = null;
+    }
+    return row != null ? row.getTotalHoursForUser() : Duration.zero;
+  }
+
   @override
   Widget build(BuildContext context) {
-
+    /*Duration getTotalHours(String userId) {
+      _RowData? row;
+      try {
+        row = _rows.firstWhere((r) => r.utente!.id == userId);
+      } on StateError {
+        row = null;
+      }
+      return row != null ? row.getTotalHoursForUser() : Duration.zero;
+    }*/
     List<Widget> settimane = [];
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'LISTA TIMBRATURE',
+            'REPORT TIMBRATURE',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -557,23 +991,46 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                 SizedBox(height: 10),
-                Row(
+                /*Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ElevatedButton(
                       onPressed: addNewRow,
                       child: Text('NUOVA TIMBRATURA'),
                     ),
-                ]),
+                ]),*/
                   SizedBox(height: 10),
                   Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.values[0],
+                    mainAxisSize: MainAxisSize.min,
                 children: [
-
+Row(mainAxisAlignment: MainAxisAlignment.start,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    //children: [Stack(
+    //alignment: AlignmentDirectional.topStart,
+    children: [Column(
+        mainAxisAlignment: MainAxisAlignment.values[0],
+        mainAxisSize: MainAxisSize.min,
+        children:[ Text('SETTIMANALE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                       Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.values[0],
                       mainAxisSize: MainAxisSize.min,
-                      children: [
+                      children:
+                      tabelle.reversed.toList()//.map((table) => table).toList(),
+                      )]),
+SizedBox(width: 100),
+      Column(
+          mainAxisAlignment: MainAxisAlignment.values[0],
+          mainAxisSize: MainAxisSize.min,
+          children:[
+            Text('MENSILE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+            Column(
+    mainAxisAlignment: MainAxisAlignment.values[0],
+    mainAxisSize: MainAxisSize.min,
+    children:
+    tabelleM.reversed.toList()//.map((table) => table).toList(),
+  )])
+    ])
                         //_tables,
                       /*Flexible(child:
                       Container(
@@ -602,7 +1059,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
                             ),
                           ),], // Non ci sono righe qui, solo l'header
                         ))),*/
-                  for (int settimana in groupedRows.keys.toList().reversed)
+                  /*for (int settimana in groupedRows.keys.toList().reversed)
             Flexible(child:
             Container(
                 alignment: Alignment.centerLeft,
@@ -1002,9 +1459,12 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
                 width: 50,
                 alignment: Alignment.center,
                 child: Text(
-                  '${row.isNewRow ? '' : row._totalHours.inHours}:${row._totalHours.inMinutes.remainder(60).toString().padLeft(2, '0')}',
+                  '${getTotalHours(row.utente!.id!).inHours}:${getTotalHours(row.utente!.id!).inMinutes.remainder(60).toString().padLeft(2, '0')}',
+
+                  //'${row.isNewRow ? '' : row._totalHours.inHours}:${row._totalHours.inMinutes.remainder(60).toString().padLeft(2, '0')}',
                 ),
               ),
+            ),
               //showEditIcon: row.isModified,
               /*TextFormField(
                 style: TextStyle(fontSize: 14),
@@ -1020,7 +1480,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
                   });
                 },*/
               ),*/
-            ),
+
             DataCell(
               _editedRowIndex == _rows.indexOf(row)
                   ? Row(children: [
@@ -1086,8 +1546,12 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
     ),
                   SizedBox(height: 5,)
                   ])
-            ))])
-                  ])]))));
+            )
+    )*/
+    //]
+    //)
+],)
+                  ]))));
   }
 
 }
@@ -1182,6 +1646,25 @@ class _RowData {
     calculateTotalHours();
   }
 
+}
+
+extension RowDataExtension on _RowData {
+  Duration getTotalHoursForUser() {
+    Duration totalHours = Duration.zero;
+
+    if (oraIngressoController.text.isNotEmpty && oraUscitaController.text.isNotEmpty && dataIngressoController.text.isNotEmpty) {
+      DateTime ingresso = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraIngressoController.text}');
+      DateTime uscita = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraUscitaController.text}');
+      totalHours += uscita.difference(ingresso);
+    }
+    if (oraIngresso2Controller.text.isNotEmpty && oraUscita2Controller.text.isNotEmpty && dataIngressoController.text.isNotEmpty) {
+      DateTime ingresso = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraIngresso2Controller.text}');
+      DateTime uscita = DateFormat('dd/MM/yyyy HH:mm').parse('${dataIngressoController.text} ${oraUscita2Controller.text}');
+      totalHours += uscita.difference(ingresso);
+    }
+
+    return totalHours;
+  }
 }
 
 class Settimana {
