@@ -409,7 +409,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                   style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: 50),
-                SizedBox(
+                tipoTimbratura != 'TIMBRATURE ODIERNE TERMINATE' ? SizedBox(
                   width: 650,
                   child: Container(
                     decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
@@ -423,9 +423,9 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                         minimumStrokeWidth: 1.0,
                         maximumStrokeWidth: 4.0),
                   ),
-                ),
+                ) : Container(),
                 SizedBox(height: 30),
-                Container(
+                tipoTimbratura != 'TIMBRATURE ODIERNE TERMINATE' ? Container(
                   alignment: Alignment.bottomCenter,
                   padding: const EdgeInsets.only(bottom: 20.0),
                   child: Row(
@@ -459,7 +459,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                       ),
                     ],
                   ),
-                ),
+                ) : Container(),
               ],
             ),
           ),
@@ -806,19 +806,24 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
           });
         }
         if (timbrature.isNotEmpty) {
-          if (timbrature.last.datau == null) {
-            print("Uscita");
-            setState(() {
-              idMarcatempo = int.parse(timbrature.last.id!);
-              tipoTimbratura = "USCITA";
-            });
+          print('lllle '+timbrature.toString());
+            if (timbrature.length == 2 && timbrature.last.datau != null) {
+              tipoTimbratura = "TIMBRATURE ODIERNE TERMINATE";
           } else {
-            print('Entrata');
-            setState(() {
-              idMarcatempo = int.parse(timbrature.last.id!);
-              tipoTimbratura = "INGRESSO";
-            });
-          }
+              if (timbrature.last.datau == null) {
+                print("Uscita");
+                setState(() {
+                  idMarcatempo = int.parse(timbrature.last.id!);
+                  tipoTimbratura = "USCITA";
+                });
+              } else {
+                print('Entrata');
+                setState(() {
+                  idMarcatempo = int.parse(timbrature.last.id!);
+                  tipoTimbratura = "INGRESSO";
+                });
+              }
+            }
         } else {
           print("Entrata");
           setState(() {
