@@ -46,33 +46,6 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
     });
   }
 
-  void _showAssignTechnicianDialog(BuildContext context) async {
-    await getAllUtenti();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Seleziona un tecnico'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: allUtenti.map((utente) {
-                return ListTile(
-                  title: Text(utente.nome ?? ''),
-                  onTap: () {
-                    selectUtente(utente); // Chiamata alla funzione per memorizzare l'utente selezionato
-                    Navigator.of(context).pop();
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-
-
   Widget _buildImagePreview() {
     return SizedBox(
       height: 200,
@@ -108,14 +81,61 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
     importoPreventivatoController = TextEditingController(text: widget.merce.importo_preventivato.toString());
   }
 
-
+  Widget buildInfoRow({required String title, required String value}) {
+    return SizedBox(
+      width: 500,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  value.toUpperCase(),
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold// Un colore secondario per differenziare il valore
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Dettaglio Merce in Riparazione',
+          'Dettaglio Merce in Riparazione'.toUpperCase(),
           style: TextStyle(color: Colors.white, fontSize: 22.0), // Aumenta la dimensione del testo dell'intestazione
         ),
         centerTitle: true,
@@ -123,170 +143,143 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Wrap(
           children: [
-            SizedBox(height: 15,),
-            ElevatedButton(
-              onPressed: takePicture,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red,
-                onPrimary: Colors.white,
-              ),
-              child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-            ),
-            SizedBox(height: 15,),
-            _buildImagePreview(),
-            if(pickedImages.length > 0)
-              ElevatedButton(
-                onPressed: () async {
-                  if (pickedImages.isNotEmpty) {
-                    await saveImagesMerce();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Devi scattare almeno una foto!'),
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
-                  }
-                },
-                child: Text('Salva e Invia Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
-                  onPrimary: Colors.white,
-                ),
-              ),
-            SizedBox(height: 10.0),
-            Text('ID:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.id ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildDarkDivider(),
-            Text('Data arrivo merce:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.data != null ? DateFormat('dd-MM-yyyy').format(widget.merce.data!) : '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            Text('Articolo:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.articolo ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            Text('Accessori:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.accessori ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildDarkDivider(),
-            Text('Difetto Riscontrato:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.difetto_riscontrato ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            Text('Data Presa in Carico:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.data_presa_in_carico != null ? DateFormat('dd-MM-yyyy').format(widget.merce.data_presa_in_carico!) : '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildDarkDivider(),
-            Text('Password:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.password ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            Text('Dati:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.dati ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildDarkDivider(),
-            if (selectedUtente != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Tecnico Selezionato:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
-                  Text(selectedUtente?.nome ?? '', style: TextStyle(fontSize: 18.0)),
-                ],
-              ),
-            SizedBox(height: 20,),
-            Text('Preventivo:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.preventivo == true ? 'SI' : 'NO', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            Text('Importo Preventivato:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
-            if (widget.merce.preventivo == true && widget.merce.importo_preventivato == 0.0)
-              TextFormField(
-                controller: importoPreventivatoController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
-                  labelText: 'Importo Preventivato',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  // Non è più necessario aggiornare widget.merce.importo_preventivato qui
-                },
-              ),
-            if (!(widget.merce.preventivo == true && widget.merce.importo_preventivato == 0.0))
-              Text(widget.merce.importo_preventivato?.toString() ?? '', style: TextStyle(fontSize: 18.0)),
-            if (widget.merce.preventivo == true && widget.merce.importo_preventivato == 0.0)
-              SizedBox(height: 10),
-            if (widget.merce.preventivo == true && widget.merce.importo_preventivato == 0.0)
-              ElevatedButton(
-                onPressed: () {
-                  saveImportoPreventivo();
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
-                  onPrimary: Colors.white,
-                ),
-                child: Text('Salva importo Preventivo'),
-              ),
-            SizedBox(height: 10),
-            buildDarkDivider(),
-            Text('Diagnosi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.diagnosi ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            Text('Risoluzione:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.risoluzione ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildDarkDivider(),
-            Text('Data Conclusione:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.data_conclusione != null ? DateFormat('dd-MM-yyyy').format(widget.merce.data_conclusione!) : '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            Text('Prodotti Installati:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.prodotti_installati ?? '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildDarkDivider(),
-            Text('Data Consegna:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
-            Text(widget.merce.data_consegna != null ? DateFormat('dd-MM-yyyy').format(widget.merce.data_consegna!) : '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
-            buildLightDivider(),
-            SizedBox(height: 60.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (selectedUtente != null) // Mostra il pulsante solo se selectedUtente è valorizzato
-                  ElevatedButton(
-                    onPressed: () {
-                      assegna();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        padding: EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Info merce in riparazione'.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+                            SizedBox(height: 10.0),
+                            buildInfoRow(title: 'ID MERCE', value: widget.merce.id!),
+                            SizedBox(height: 10.0),
+                            buildInfoRow(title: "articolo", value: widget.merce.articolo!),
+                            SizedBox(height: 10.0),
+                            buildInfoRow(title: "accessori", value: widget.merce.accessori ?? "N/A"),
+                            SizedBox(height: 10.0),
+                            buildInfoRow(title: "difetto", value: widget.merce.difetto_riscontrato ?? "N/A"),
+                            SizedBox(height: 10.0),
+                            buildInfoRow(title: 'Password', value: widget.merce.password ?? "N/A"),
+                            SizedBox(height: 10.0),
+                            buildInfoRow(title: "dati", value: widget.merce.dati ?? "N/A"),
+                            SizedBox(height: 10.0),
+                            buildInfoRow(title: "Richiesta preventivo", value: widget.merce.preventivo != null ? (widget.merce.preventivo != true ? "NO" : "SI"): "N/A"),
+                            if (widget.merce.preventivo != null && widget.merce.preventivo == true)
+                              buildInfoRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito"),
+                            SizedBox(
+                                width: 500,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: 150,
+                                      child: TextFormField(
+                                        controller: importoPreventivatoController,
+                                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                        decoration: InputDecoration(
+                                          labelText: 'Importo Preventivato'.toUpperCase(),
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        saveImportoPreventivo();
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red,
+                                        onPrimary: Colors.white,
+                                      ),
+                                      child: Text('Salva importo Preventivo'.toUpperCase()),
+                                    ),
+                                  ],
+                                )
+                            ),
+
+                          ],
+                        )
+                    ),
+                    SizedBox(width: 20),
+                    Container(
+                      padding: EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ),
-                    child: Text('Assegna ad utente'),
-                  ),
-                ElevatedButton(
-                  onPressed: () {
-                    merceConsegnata();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    onPrimary: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                  ),
-                  child: Text('Merce consegnata'),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          buildInfoRow(title: "data arrivo", value: widget.merce.data != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data!) : "N/A"),
+                          SizedBox(height: 10.0),
+                          buildInfoRow(title: "data presa in carico", value:(widget.merce.data_presa_in_carico != null ? DateFormat('dd-MM-yyyy').format(widget.merce.data_presa_in_carico!) : 'N/A' )),
+                          SizedBox(height: 10.0),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    merceSaldata();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    onPrimary: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    if (selectedUtente != null) // Mostra il pulsante solo se selectedUtente è valorizzato
+                      ElevatedButton(
+                        onPressed: () {
+                          assegna();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          onPrimary: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                        ),
+                        child: Text('Assegna ad utente'),
+                      ),
+                    ElevatedButton(
+                      onPressed: () {
+                        merceConsegnata();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        onPrimary: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: Text('Merce consegnata'),
                     ),
-                  ),
-                  child: Text('Merce saldata'),
+                    ElevatedButton(
+                      onPressed: () {
+                        merceSaldata();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        onPrimary: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ),
+                      child: Text('Merce saldata'),
+                    ),
+                  ],
                 ),
               ],
             ),
           ],
-        ),
+        )
       ),
     );
   }
