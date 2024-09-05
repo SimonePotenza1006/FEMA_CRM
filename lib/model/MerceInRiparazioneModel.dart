@@ -121,7 +121,7 @@ class MerceInRiparazioneModel{
       json['preventivo'],
       json['importo_preventivato']!= null ? double.parse(json['importo_preventivato'].toString()) : null,
       json['data_comunica_preventivo'] != null ? DateTime.parse(json['data_comunica_preventivo']) : null,
-      json['preventivo_accettato'],
+      json['preventivo_accettato'] != null ? json['preventivo_accettato'] : null,
       json['data_accettazione_preventivo'] != null ? DateTime.parse(json['data_accettazione_preventivo']) : null,
       json['diagnosi']?.toString(),
       json['risoluzione']?.toString(),

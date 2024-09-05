@@ -284,7 +284,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Lista Interventi',
+          'Lista Interventi'.toUpperCase(),
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,

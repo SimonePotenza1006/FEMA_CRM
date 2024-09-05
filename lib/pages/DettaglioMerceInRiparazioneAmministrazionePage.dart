@@ -239,7 +239,6 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
             Text('Data Consegna:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)), // Aumenta la dimensione del testo
             Text(widget.merce.data_consegna != null ? DateFormat('dd-MM-yyyy').format(widget.merce.data_consegna!) : '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
             buildLightDivider(),
-
             SizedBox(height: 60.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
