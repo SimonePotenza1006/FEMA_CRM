@@ -1,9 +1,9 @@
 import 'dart:convert';
+import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fema_crm/model/CommissioneModel.dart';
-import 'HomeFormAmministrazione.dart';
 import 'HomeFormTecnico.dart';
 
 class DettaglioCommissioneAmministrazionePage extends StatefulWidget {
@@ -138,7 +138,7 @@ class _DettaglioCommissioneAmministrazionePageState
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeFormAmministrazione(
+            builder: (context) => HomeFormAmministrazioneNewPage(
               userData: widget.commissione.utente!,
             ),
           ),
