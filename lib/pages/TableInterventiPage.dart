@@ -763,24 +763,27 @@ class InterventoDataSource extends DataGridSource {
     for (int i = 0; i < _interventions.length; i++) {
       InterventoModel intervento = _interventions[i];
       Color? backgroundColor;
-      switch (intervento.tipologia?.descrizione) {
-        case 'Informatico':
+      switch (intervento.tipologia?.id) {
+        case '7' :
+          backgroundColor = Colors.blueGrey[200];
+          break;
+        case '1':
           backgroundColor = Colors.grey[200]; // grigio chiaro
           break;
-        case 'Elettrico':
+        case '2':
           backgroundColor = Colors.yellow[200]; // giallo chiaro
           break;
-        case 'Idrico':
+        case '3':
           backgroundColor = Colors.lightBlue[200]; // azzurro chiaro
           break;
-        case 'Elettronico':
+        case '4':
           backgroundColor = Colors.pink[50]; // rosa chiarissimo
           break;
-        case 'Riparazione Merce':
+        case '6':
           backgroundColor = Colors.green[100]; // verde chiarissimo
           break;
         default:
-          backgroundColor = Colors.white;
+          backgroundColor = Colors.blueGrey[200];
       }
 
       double? importo = intervento.importo_intervento != null ? intervento.importo_intervento : 0;
@@ -1440,15 +1443,12 @@ void mostraRicercaInterventiDialog({
                   if (selectedUtente != null) {
                     interventiFiltrati = filtraPerUtente(interventiFiltrati, selectedUtente!);
                   }
-
                   if (selectedCliente != null) {
                     interventiFiltrati = filtraPerCliente(interventiFiltrati, selectedCliente!);
                   }
-
                   if (selectedTipologia != null) {
                     interventiFiltrati = filtraPerTipologia(interventiFiltrati, selectedTipologia!);
                   }
-
                   if (startDate != null && endDate != null) {
                     if (selectedUtente != null && selectedCliente != null && selectedTipologia != null) {
                       interventiFiltrati = filtraPerUtenteClienteTipologiaEIntervalloDate(
@@ -1486,7 +1486,6 @@ void mostraRicercaInterventiDialog({
                   } else if (endDate != null) {
                     interventiFiltrati = filtraPerData(interventiFiltrati, endDate!);
                   }
-
                   onFiltrati(interventiFiltrati);
                   Navigator.of(context).pop();
                 },

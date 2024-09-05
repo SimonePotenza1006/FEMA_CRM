@@ -240,18 +240,6 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
             Text(widget.merce.data_consegna != null ? DateFormat('dd-MM-yyyy').format(widget.merce.data_consegna!) : '', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo
             buildLightDivider(),
 
-
-
-            // ElevatedButton(
-            //   onPressed: () {
-            //     saveImportoFinale(); // Funzione da implementare per salvare l'importo finale
-            //   },
-            //   style: ElevatedButton.styleFrom(
-            //     primary: Colors.red,
-            //     onPrimary: Colors.white,
-            //   ),
-            //   child: Text('Salva importo finale'),
-            // ),
             SizedBox(height: 60.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
