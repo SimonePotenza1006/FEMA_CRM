@@ -37,7 +37,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
 
   Future<void> getAllMerce() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/merceInRiparazione');
+      var apiUrl = Uri.parse('$ipaddress/api/merceInRiparazione/ordered');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -74,6 +74,17 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              getAllMerce();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(10),

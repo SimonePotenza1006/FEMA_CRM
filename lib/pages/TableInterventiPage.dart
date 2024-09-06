@@ -290,6 +290,109 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
+          MouseRegion(
+            onEnter: (event) {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Legenda colori:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.grey[200],
+                            ),
+                            SizedBox(width: 3),
+                            Text('INFORMATICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.yellow[200],
+                            ),
+                            SizedBox(width: 3),
+                            Text('ELETTRICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.lightBlue[200],
+                            ),
+                            SizedBox(width: 3),
+                            Text('IDRICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.pink[50],
+                            ),
+                            SizedBox(width: 3),
+                            Text('ELETTRONICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.green[100],
+                            ),
+                            SizedBox(width: 3),
+                            Text('RIPARAZIONE MERCE'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 3),
+                            Text('VENDITA FRONT OFFICE'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: IconButton(
+              icon: Icon(Icons.info),
+              color: Colors.white, onPressed: () {  },
+            ),
+          ),
           IconButton(
             icon: Icon(Icons.person_add_alt_1, size: 40, color: Colors.white),
             onPressed: () {
@@ -695,7 +798,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 ),
                 SizedBox(width: 5),
                 ElevatedButton(
-                  onPressed: () => _changeSheet(3),
+                  onPressed: () => _changeSheet(4),
                   style: ElevatedButton.styleFrom(
                     primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
                     onPrimary: Colors.black,
@@ -1384,10 +1487,16 @@ void mostraRicercaInterventiDialog({
                     onChanged: (query) {
                       setState(() {
                         clientiFiltrati = clienti
-                            .where((cliente) => cliente.denominazione!
-                            .toLowerCase()
-                            .contains(query.toLowerCase()))
-                            .toList();
+                            .where((cliente) {
+                          return (cliente.denominazione != null && cliente.denominazione!.toLowerCase().contains(query.toLowerCase())) ||
+                              (cliente.cellulare != null && cliente.cellulare!.toLowerCase().contains(query.toLowerCase())) ||
+                              (cliente.telefono != null && cliente.telefono!.toLowerCase().contains(query.toLowerCase())) ||
+                              (cliente.citta != null && cliente.citta!.toLowerCase().contains(query.toLowerCase())) ||
+                              (cliente.codice_fiscale != null && cliente.codice_fiscale!.toLowerCase().contains(query.toLowerCase())) ||
+                              (cliente.partita_iva != null && cliente.partita_iva!.toLowerCase().contains(query.toLowerCase())) ||
+                              (cliente.fax != null && cliente.fax!.toLowerCase().contains(query.toLowerCase())) ||
+                              (cliente.email != null && cliente.email!.toLowerCase().contains(query.toLowerCase()));
+                        }).toList();
                       });
                     },
                   ),

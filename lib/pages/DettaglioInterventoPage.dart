@@ -373,6 +373,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 child: buildInfoRow(
                                   title: 'Descrizione',
                                   value: descrizioneInterventoSub,
+                                  context: context
                                 ),
                               ),
                               SizedBox(
@@ -413,11 +414,13 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               buildInfoRow(
                                 title: 'ID intervento',
                                 value: widget.intervento.id!,
+                                  context: context
                               ),
                               SizedBox(width: 20),
                               buildInfoRow(
                                 title: 'Data creazione',
                                 value: formatDate(widget.intervento.data_apertura_intervento),
+                                  context: context
                               ),
                             ],
                           ),
@@ -427,11 +430,13 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               buildInfoRow(
                                 title: 'Data accordata',
                                 value: formatDate(widget.intervento.data),
+                                  context: context
                               ),
                               SizedBox(width: 20),
                               buildInfoRow(
                                 title: 'Orario appuntamento',
                                 value: formatTime(widget.intervento.orario_appuntamento),
+                                  context: context
                               ),
                             ],
                           ),
@@ -508,6 +513,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     buildInfoRow(
                                       title: 'Orario Inizio',
                                       value: formatTime(widget.intervento.orario_inizio),
+                                        context: context
                                     ),
                                     if (widget.intervento.orario_inizio == null)
                                       Align(
@@ -539,6 +545,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     buildInfoRow(
                                       title: 'Orario Fine',
                                       value: formatTime(widget.intervento.orario_fine),
+                                        context: context
                                     ),
                                     if (widget.intervento.orario_fine == null)
                                       Align(
@@ -567,7 +574,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             width: 500,
                             child: buildInfoRow(
                                 title: 'Cliente',
-                                value: widget.intervento.cliente?.denominazione ?? 'N/A'),
+                                value: widget.intervento.cliente?.denominazione ?? 'N/A', context: context),
                           ),
                           SizedBox(height: 10),
                           SizedBox(
@@ -575,6 +582,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Indirizzo destinazione',
                               value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
+                                context: context
                             ),
                           ),
                           SizedBox(height : 15),
@@ -583,6 +591,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Cellulare destinazione',
                               value: widget.intervento.destinazione?.cellulare ?? 'N/A',
+                                context: context
                             ),
                           ),
                           SizedBox(height : 15),
@@ -591,6 +600,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Telefono destinazione',
                               value: widget.intervento.destinazione?.telefono ?? 'N/A',
+                                context: context
                             ),
                           ),
                           SizedBox(height : 15),
@@ -599,6 +609,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Indirizzo cliente',
                               value: widget.intervento.cliente?.indirizzo ?? 'N/A',
+                                context: context
                             ),
                           ),
                           SizedBox(height : 15),
@@ -607,6 +618,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Telefono cliente',
                               value: widget.intervento.cliente?.telefono ?? 'N/A',
+                                context: context
                             ),
                           ),
                           SizedBox(height : 15),
@@ -615,6 +627,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Cellulare cliente',
                               value: widget.intervento.cliente?.cellulare ?? 'N/A',
+                                context: context
                             ),
                           ),
                         ],
@@ -645,7 +658,8 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 width: 500,
                                 child: buildInfoRow(
                                   title: 'Importo Intervento',
-                                  value: widget.intervento.importo_intervento?.toString() ?? 'N/A',
+                                  value: widget.intervento.importo_intervento?.toStringAsFixed(2) ?? 'N/A',
+                                    context: context
                                 ),
                               ),
                               SizedBox(
@@ -685,6 +699,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Assegnato',
                               value: booleanToString(widget.intervento.assegnato ?? false),
+                                context: context
                             ),
                           ),
                           SizedBox(height: 15),
@@ -706,6 +721,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Utente incaricato',
                               value: '${widget.intervento.utente?.nomeCompleto() ?? 'Non assegnato'}',
+                                context: context
                             ),
                           ),
                           if (otherUtenti.isNotEmpty)
@@ -721,6 +737,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   ...otherUtenti.map((relazione) => buildInfoRow(
                                     title: 'Utente',
                                     value: '${relazione.utente?.nomeCompleto() ?? 'N/A'}',
+                                      context: context
                                   )),
                                 ],
                               ),
@@ -733,6 +750,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Concluso',
                               value: booleanToString(widget.intervento.concluso ?? false),
+                                context: context
                             ),
                           ),
                           SizedBox(height: 15),
@@ -749,6 +767,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             child: buildInfoRow(
                               title: 'Note',
                               value: widget.intervento.note ?? 'N/A',
+                                context: context
                             ),
                           ),
                           SizedBox(height: 15),
@@ -759,6 +778,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               value: widget.intervento.tipologia_pagamento != null
                                   ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
                                   : 'N/A',
+                                context: context
                             ),
                           ),
                         ],
@@ -789,6 +809,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child : buildInfoRow(
                                     title: 'Articolo',
                                     value: widget.intervento.merce?.articolo ?? 'N/A',
+                                      context: context
                                   ),
                                 ),
                                 SizedBox(height: 15),
@@ -797,6 +818,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child: buildInfoRow(
                                     title: 'Accessori',
                                     value: widget.intervento.merce?.accessori ?? 'N/A',
+                                      context: context
                                   ),
                                 ),
                                 SizedBox(height: 15),
@@ -805,6 +827,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child: buildInfoRow(
                                     title: 'Difetto riscontrato',
                                     value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
+                                      context: context
                                   ),
                                 ),
                                 SizedBox(height: 15),
@@ -813,6 +836,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child: buildInfoRow(
                                     title: 'Diagnosi',
                                     value: widget.intervento.merce?.diagnosi ?? 'N/A',
+                                      context: context
                                   ),
                                 ),
                                 SizedBox(height: 15),
@@ -821,6 +845,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child: buildInfoRow(
                                     title: 'Richiesta di preventivo',
                                     value: booleanToString(widget.intervento.merce?.preventivo ?? false),
+                                      context: context
                                   ),
                                 ),
                                 SizedBox(height: 15),
@@ -829,6 +854,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child: buildInfoRow(
                                     title: 'Importo preventivato',
                                     value: widget.intervento.merce?.importo_preventivato.toString() ?? 'N/A',
+                                      context: context
                                   ),
                                 ),
                                 SizedBox(height: 15),
@@ -837,6 +863,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child: buildInfoRow(
                                     title: 'Password',
                                     value: widget.intervento.merce?.password ?? 'N/A',
+                                      context: context
                                   ),
                                 ),
                                 SizedBox(height: 15),
@@ -845,11 +872,13 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   child: buildInfoRow(
                                     title: 'Dati',
                                     value: widget.intervento.merce?.dati ?? 'N/A',
+                                      context: context
                                   ),
                                 )
                               ],
                             ),
                           ),
+                        SizedBox(height: 20,),
                         Container(
                           width: 600,
                           child: FutureBuilder<List<Uint8List>>(
@@ -1127,48 +1156,85 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     );
   }
 
-  Widget buildInfoRow({required String title, required String value}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 4, // Linea di accento colorata
-                    height: 24,
-                    color: Colors.redAccent, // Colore di accento per un tocco di vivacità
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    title + ": ",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87, // Colore contrastante per il testo
+  Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
+    // Verifica se il valore supera i 25 caratteri
+    bool isValueTooLong = value.length > 25;
+    String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+    return SizedBox(
+      width:280,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
                     ),
-                  ),
-                ],
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold// Un colore secondario per differenziare il valore
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Divider( // Linea di separazione tra i widget
-            color: Colors.grey[400],
-            thickness: 1,
-          ),
-        ],
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        displayedValue.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (isValueTooLong && context != null)
+                        IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("${title.toUpperCase()}"),
+                                  content: Text(value),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
       ),
     );
   }
