@@ -193,7 +193,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Ordine al fornitore',
+          'ORDINE AL FORNITORE',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red,

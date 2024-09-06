@@ -236,7 +236,8 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   bool isAdministratore(UtenteModel userData) {
-    bool isAdmin = [10, 12, 4].contains(userData.id) && userData.ruolo?.descrizione == "Amministrazione";
+    print('ruolo '+userData.ruolo!.descrizione!);
+    bool isAdmin = ['10', '12', '4'].contains(userData.id) && userData.ruolo!.descrizione! == "Amministrazione";
     print("isAdministratore: $isAdmin per l'utente con ID ${userData.id} e ruolo ${userData.ruolo?.descrizione}");
     return isAdmin;
   }

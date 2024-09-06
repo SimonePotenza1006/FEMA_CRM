@@ -1,10 +1,11 @@
+import 'dart:io';
 import 'package:fema_crm/model/MerceInRiparazioneModel.dart';
 import 'package:fema_crm/pages/MenuSopralluoghiTecnicoPage.dart';
 import 'package:fema_crm/pages/SpesaSuVeicoloPage.dart';
 import 'package:fema_crm/pages/TimbraturaPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
 import 'dart:convert';
 import '../main.dart';
 import '../model/CommissioneModel.dart';
@@ -21,6 +22,7 @@ import 'InizializzazionePreventivoByTecnicoPage.dart';
 import 'ListaPreventiviTecnicoPage.dart';
 import 'SopralluogoTecnicoForm.dart';
 import '../databaseHandler/DbHelper.dart';
+import 'dart:math' as math;
 
 class HomeFormSegreteriaMobilePage extends StatefulWidget{
   final UtenteModel? userData;
@@ -34,17 +36,31 @@ class HomeFormSegreteriaMobilePage extends StatefulWidget{
 class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobilePage>{
   DateTime selectedDate = DateTime.now();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-  String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
-
-
-
+  String formattedDate = intl.DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
+  int _hoveredIndex = -1;
+  int _lastClickedIndex = 0;
+  Map<int, int> _menuItemClickCount = {};
 
 
   @override
   void initState() {
     super.initState();
+    if(Platform.isAndroid){
+      _menuItemClickCount.clear();
+      for (int i = 0; i < _menuItems.length; i++) {
+        _menuItemClickCount[i] = 0;
+      };
+    }
     saveIngresso();
   }
+
+  final List<MenuItem> _menuItems = [
+    MenuItem(icon: Icons.more_time, label: 'TIMBRATURA'),
+    MenuItem(icon: Icons.calendar_month_outlined, label: 'CALENDARIO'),
+    MenuItem(icon: Icons.business_center, label: 'RICHIESTA D\'ORDINE'),
+    MenuItem(icon: Icons.remove_red_eye_outlined, label: 'SOPRALLUOGO'),
+    MenuItem(icon: Icons.emoji_transportation_sharp, label: 'SPESA SU\nVEICOLO'),
+  ];
 
   Future<void> saveIngresso() async{
     try{
@@ -161,6 +177,73 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     }
   }
 
+  void _navigateToPage(int index) {
+    if(Platform.isAndroid){
+      if (_lastClickedIndex != index) {
+        _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
+        _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
+      }
+    }
+
+    if(Platform.isAndroid){
+      if (_menuItemClickCount.containsKey(index)) {
+        _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
+      } else {
+        _menuItemClickCount[index] = 1;
+      }
+    }
+
+
+    //if (_menuItemClickCount[index] % 2 == 0 && _hoveredIndex != -1) {
+    if ((_menuItemClickCount[index] ?? 0) % 2 == 0 && _hoveredIndex != -1) {
+      switch (index) {
+        case 0:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TimbraturaPage(
+                utente: widget.userData!)),
+          );
+          break;
+        case 1:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                CalendarioUtentePage(utente : widget.userData)),
+          );
+          break;
+        case 2:
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => FormOrdineFornitorePage(utente: widget.userData!)),
+          );
+          break;
+        case 3:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                MenuSopralluoghiTecnicoPage(utente: widget.userData!)), //ListaInterventiFinalPage()),
+          );
+          break;
+        case 4:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>
+                SpesaSuVeicoloPage(utente: widget.userData!)),
+          );
+          break;
+      }
+    }
+  }
+
+  int _calculateHoveredIndex(Offset position) {
+    final center = Offset(500 / 2, 500 / 2); // Use the same size as in CustomPaint
+    final angle = (math.atan2(position.dy - center.dy, position.dx - center.dx) + math.pi * 2) % (math.pi * 2);
+    final sectorAngle = (2 * math.pi) / 14; // 14 menu items
+    final hoveredIndex = (angle ~/ sectorAngle) % 14;
+    return hoveredIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -202,14 +285,14 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
           MainAxisSize.min, // Imposta grandezza minima per la colonna
           children: [
             Padding(
-              padding: const EdgeInsets.all(60.0),
+              padding: const EdgeInsets.all(35.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Center(
                     child: Text(
-                      "Bentornato ${widget.userData!.nome.toString()}!",
+                      "CIAO ${widget.userData!.nome!.toUpperCase().toString()}!",
                       textAlign: TextAlign.center, // Centra il testo
                       style: TextStyle(
                         fontSize: 24, // Imposta la dimensione del testo
@@ -217,10 +300,44 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 40,
+                  /*SizedBox(
+                    height: 7,
+                  ),*/
+                  GestureDetector(
+                    onTapUp: (details) {
+                      if (_hoveredIndex != -1) {
+                        _navigateToPage(_hoveredIndex);
+                      }
+                    },
+                    onPanUpdate: (details) {
+                      RenderBox box = context.findRenderObject() as RenderBox;
+                      Offset localOffset = box.globalToLocal(details.globalPosition);
+                      setState(() {
+                        _hoveredIndex = _calculateHoveredIndex(localOffset);
+                      });
+                    },
+                    child: CustomPaint(
+                      size: Size(400, 400),
+                      painter: MenuPainter(
+                            (index) {
+                          setState(() {
+                            _hoveredIndex = index;
+                          });
+                        },
+                            () {
+                          setState(() {
+                            _hoveredIndex = -1;
+                          });
+                        },
+                        context,
+                        size: Size(400, 400),
+                        hoveredIndex: _hoveredIndex,
+                      ),
+                    ),
                   ),
-                  SizedBox(
+
+
+                  /*SizedBox(
                     width: double.infinity,
                     height: 60,
                     child: ElevatedButton.icon(
@@ -384,10 +501,8 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         )
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  ),*/
+
                   // SizedBox(
                   //   width: double.infinity,
                   //   height: 60,
@@ -447,12 +562,15 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                 ],
               ),
             ),
+            /*SizedBox(
+              height: 180,
+            ),*/
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Interventi',
+                    'INTERVENTI',
                     style: TextStyle(
                         fontSize: 30.0, fontWeight: FontWeight.bold),
                   ),
@@ -635,7 +753,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
 
             const SizedBox(height: 50.0),
             const Text(
-              'Agenda Commissioni',
+              'AGENDA COMMISSIONI',
               style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20.0),
@@ -688,4 +806,152 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
       ),
     );
   }
+}
+
+class MenuPainter extends CustomPainter {
+  final Function(int) onHover;
+  final Function() onHoverExit;
+  final Size size;
+  final int hoveredIndex;
+  final BuildContext context; // Add BuildContext
+
+  MenuPainter(this.onHover, this.onHoverExit, this.context, {required this.size, required this.hoveredIndex});
+
+  // List of menu items
+  final List<MenuItem> _menuItems = [
+    MenuItem(icon: Icons.more_time, label: 'TIMBRATURA'),
+    MenuItem(icon: Icons.calendar_month_outlined, label: 'CALENDARIO'),
+    MenuItem(icon: Icons.business_center, label: 'RICHIESTA\nD\'ORDINE'),
+    MenuItem(icon: Icons.remove_red_eye_outlined, label: 'SOPRALLUOGO'),
+    MenuItem(icon: Icons.emoji_transportation_sharp, label: 'SPESA SU\nVEICOLO'),
+  ];
+
+  TextPainter labelPainter = TextPainter(
+    text: TextSpan(
+      text: '',
+      style: TextStyle(
+        fontSize: 18,
+        color: Colors.black,
+      ),
+    ),
+    textAlign: TextAlign.center,
+    textDirection: TextDirection.ltr,
+  );
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    // Radius
+    final outerRadius = size.width / 2;
+    final innerRadius = size.width / 4.5;
+    final center = Offset(size.width / 2, size.height / 2);
+
+    // Draw the menu items
+    final angle = 2 * math.pi / _menuItems.length;
+    for (int i = 0; i < _menuItems.length; i++) {
+      final menuItem = _menuItems[i];
+      final startAngle = i * angle;
+      final sweepAngle = angle - 0.02; // Add a small gap between each arc
+
+      // Determine if this menu item is hovered
+      bool isHovered = hoveredIndex == i;
+
+      // Calculate the scale factor for the hovered section
+      double scaleFactor = isHovered ? 1.2 : 1.0;
+
+      // Draw the sections
+      paint.color = isHovered ? Colors.red[900]!.withOpacity(0.6 ) : Colors.red;
+      Path path = Path();
+      path.arcTo(
+        Rect.fromCircle(center: center, radius: outerRadius * scaleFactor),
+        startAngle,
+        sweepAngle,
+        false,
+      );
+      path.arcTo(
+        Rect.fromCircle(center: center, radius: innerRadius * scaleFactor),
+        startAngle + sweepAngle,
+        -sweepAngle,
+        false,
+      );
+      path.close();
+      canvas.drawPath(path, paint);
+
+      //Draw the icon in white
+      final iconX = center.dx +
+          (outerRadius * scaleFactor + (isHovered ? innerRadius * scaleFactor * 1.2 : innerRadius * scaleFactor)) /
+              2 *
+              math.cos(startAngle + sweepAngle / 2);
+      final iconY = center.dy +
+          (outerRadius * scaleFactor + (isHovered ? innerRadius * scaleFactor * 1.2 : innerRadius * scaleFactor)) /
+              2 *
+              math.sin(startAngle + sweepAngle / 2);
+      TextPainter textPainter = TextPainter(
+        text: TextSpan(
+          text: String.fromCharCode(menuItem.icon.codePoint),
+          style: TextStyle(
+            fontSize: isHovered ? 28 : 24,
+            fontFamily: menuItem.icon.fontFamily,
+            color: Colors.white,
+          ),
+        ),
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      textPainter.paint(
+          canvas,
+          Offset(iconX - textPainter.width / 2,
+              iconY - textPainter.height / 2));
+
+      // Draw the label if hovered
+      if (isHovered) {
+        final labelX = center.dx;
+        labelPainter.text = TextSpan(
+          text: menuItem.label,
+          style: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.bold
+          ),
+        );
+        labelPainter.layout();
+        final labelHeight = labelPainter.height;
+        final labelY = center.dy - innerRadius * scaleFactor * 0.1 + labelHeight / 2;
+        labelPainter.paint(
+            canvas,
+            Offset(labelX - labelPainter.width / 2,
+                labelY - labelHeight / 2));
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(MenuPainter oldDelegate) => oldDelegate.hoveredIndex != hoveredIndex;
+
+  @override
+  bool hitTest(Offset position) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final distance = math.sqrt(math.pow(position.dx - center.dx, 2) + math.pow(position.dy - center.dy, 2));
+    final radius = size.width / 2;
+
+    if (distance <= radius) {
+      final angle = (math.atan2(position.dy - center.dy, position.dx - center.dx) + math.pi * 2) % (math.pi * 2);
+      final section = (angle / (2 * math.pi / _menuItems.length)).floor();
+
+      final newIndex = section % _menuItems.length;
+      onHover(newIndex); // Call the onHover callback
+      return true;
+    }
+    onHoverExit(); // Call the onHoverExit callback
+    return false;
+  }
+}
+
+class MenuItem {
+  final IconData icon;
+  final String label;
+
+  MenuItem({required this.icon, required this.label});
 }

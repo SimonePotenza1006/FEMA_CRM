@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:excel/excel.dart' as ex;
 import 'package:fema_crm/model/MarcaTempoModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
+import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
+import 'package:fema_crm/pages/TimbratureSettimana.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +15,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'PDFOggiPage.dart';
 import 'TimbratureEdit.dart';
+import 'package:open_filex/open_filex.dart';
 
 class TimbraturaPage extends StatefulWidget {
   final UtenteModel utente;
@@ -47,7 +50,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       List<Placemark> placemarks =
       await placemarkFromCoordinates(latitude, longitude);
       Placemark place = placemarks[0];
-      return '${place.street},${place.subThoroughfare} ${place.locality} ${place.postalCode}';//, ${place.country}';
+      return '${place.street},${place.subThoroughfare} ${place.locality}, ${place.administrativeArea} ${place.postalCode}';//, ${place.country}';
     } catch (e) {
       print("Errore durante la conversione delle coordinate in indirizzo: $e");
       return "Indirizzo non disponibile";
@@ -280,6 +283,15 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+          leading: BackButton(
+            onPressed: (){Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeFormAmministrazioneNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
+              ),
+            );},
+            color: Colors.black, // <-- SEE HERE
+          ),
           title: const Text(
             'TIMBRATURA',
             style: TextStyle(color: Colors.white),
@@ -290,10 +302,20 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             IconButton(
                 color: Colors.white,
                 icon: Icon(Icons.edit), onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => TimbratureEdit(utente: widget.utente)),
+              );
+            }),
+            SizedBox(width: 23),
+            IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.assignment_outlined), onPressed: () async {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TimbratureEdit(utente: widget.utente)),
+                        builder: (context) => TimbratureSettimana(utente: widget.utente)),
                   );
             }),
             SizedBox(width: 23),
@@ -305,7 +327,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             SizedBox(width: 23),
             IconButton(
                 color: Colors.white,
-                icon: Icon(Icons.assignment_outlined), onPressed: () async {
+                icon: Icon(Icons.download), onPressed: () async {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -395,15 +417,15 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                 ),
                 const SizedBox(height: 10.0),
                 Text(
-                  '${nomeUtente}',
+                  '${nomeUtente}'.toUpperCase(),
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 15),
+                SizedBox(height: 25),
                 Text(
                   '${tipoTimbratura}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 15),
+                SizedBox(height: 10),
                 Text(
                   '${dataOdierna}',
                   style: TextStyle(fontSize: 20),
@@ -554,7 +576,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             for (var column in ['D', 'F', 'H', 'J', 'L', 'N']) {
               var cellValue = sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).value;
               print('value '+cellValue.toString());
-              if (cellValue.toString() != 'null' && cellValue.toString() != '' && (!cellValue.toString().contains('Via Europa') || !cellValue.toString().contains('73021'))) {
+              if (cellValue.toString() != 'null' && cellValue.toString() != '' && (!cellValue.toString().contains('Puglia') || !cellValue.toString().contains('Puglia'))) {
                 print('rig $rowIndex, colonn $column $cellValue');
                 sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleRed;
                 sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).cellStyle = cellStyleRed;
@@ -587,7 +609,9 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       if (excelBytes != null) {
         await File(filePath).create(recursive: true).then((file) {
           file.writeAsBytesSync(excelBytes);
+          OpenFilex.open(file?.path);
         });
+
         // Notifica all'utente che il file Ã¨ stato salvato con successo
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Excel salvato in $filePath')));

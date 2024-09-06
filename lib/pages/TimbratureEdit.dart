@@ -565,6 +565,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
   List<DataTable> _tables = [];
   _RowData newRow = _RowData();
   final _indirizzoIngressoController = TextEditingController();
+  final _indirizzoUscitaController = TextEditingController();
 
   void addNewRow() {
     setState(() {
@@ -609,7 +610,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         headingRowHeight: 30,
         columnSpacing: 10,
         dataRowMinHeight:  30,
-        dataRowMaxHeight: 38,
+        //dataRowMaxHeight: 38,
         border: TableBorder.all(color: Colors.grey),
         columns: [
           DataColumn(label: Text('UTENTE')),
@@ -751,12 +752,16 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           )),//Text(newRow.oraIngresso!)),
           DataCell(Container(width: 210,
               alignment: Alignment.center,
-              child:TextFormField(style: TextStyle(fontSize: 14, color: !newRow.indirizzoIngresso!.contains('73021')  ? Colors.red : Colors.black),
+              child:TextFormField(
+                minLines: 2,
+                maxLines: null,
+                style: TextStyle(
+                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !newRow.indirizzoIngresso!.contains('Puglia')  ? Colors.red : Colors.black),
                 controller: _indirizzoIngressoController,//TextEditingController(text: newRow.indirizzoIngresso),
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
                 //focusNode: _focusNodes[_rows.indexOf(row)],
-                decoration: InputDecoration(border: InputBorder.none),
+                decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                 //initialValue: newRow.indirizzoIngresso,
                 onChanged: (value) {
                   setState(() {
@@ -809,12 +814,17 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           )),//Text(newRow.oraUscita!)),
           DataCell(Container(width: 210,
               alignment: Alignment.center,
-              child:TextFormField(style: TextStyle(fontSize: 14, color: !newRow.indirizzoUscita!.contains('73021')  ? Colors.red : Colors.black),
+              child:TextFormField(
+                minLines: 2,
+                maxLines: null,
+                style: TextStyle(
+                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !newRow.indirizzoIngresso!.contains('Puglia')  ? Colors.red : Colors.black),
+                controller: _indirizzoUscitaController,
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
                 //focusNode: _focusNodes[_rows.indexOf(row)],
-                decoration: InputDecoration(border: InputBorder.none),
-                initialValue: newRow.indirizzoUscita,
+                decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
+                //initialValue: newRow.indirizzoUscita,
                 onChanged: (value) {
                   setState(() {
                     newRow.indirizzoUscita = value;
@@ -833,9 +843,10 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               ))),//DataCell(Text(newRow.indirizzoUscita!)),
           DataCell(
               _editedRowIndex == _rowsNew.indexOf(newRow)
-              ? Container(width: 250,
-              alignment: Alignment.center,
+              ? Container(//width: 320,
+              //alignment: Alignment.center,
               child:Row(children: [
+                SizedBox(width: 5),
             ElevatedButton(
               onPressed: () {
                 if (newRow.dataIngresso != null && newRow.dataIngresso!.isNotEmpty && newRow.dataIngresso != '') {
@@ -869,9 +880,9 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                   );
                 }
               },
-              child: Text('NUOVA RIGA'),
+              child: Text('SALVA'),
             ),
-            SizedBox(width: 3),
+            SizedBox(width: 5),
             newRow.isNewRow
                 ? ElevatedButton(
               onPressed: ()  {
@@ -895,7 +906,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     );*/
               },
               child: Text('ANNULLA'),
-            ) : Container(width: 170)
+            ) : Container()
           ],))
               : Container(width: 170,child: Text(''),)),//Text('')),
         ])],
@@ -907,16 +918,17 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> reset(int index) async {
     setState(() {
-
+      newRow.utente = null;
       newRow.dataIngresso = null;
       newRow.dataIngressoController.text = '';
       newRow.oraIngresso = null;
       newRow.oraIngressoController.text = '';
       newRow.oraUscita = null;
+      newRow.oraUscitaController.text = '';
       newRow.indirizzoIngresso = '';
       newRow.indirizzoUscita = '';
       _indirizzoIngressoController.text = '';
-
+      _indirizzoUscitaController.text = '';
     });
      print('ppp '+newRow.indirizzoIngresso.toString());
   }
@@ -957,7 +969,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           centerTitle: true,
           backgroundColor: Colors.red,
           actions: [
-            IconButton(
+            /*IconButton(
               icon: Icon(
                 Icons.assignment_outlined, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
                 color: Colors.white,
@@ -969,7 +981,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 );
                 //setState(() {});//getAllMarcatempo();
               },
-            ),
+            ),*/
             SizedBox(width: 23),
             IconButton(
               icon: Icon(
@@ -986,33 +998,57 @@ class _TimbratureEditState extends State<TimbratureEdit> {
             ),
           ],
         ),
-        body: Padding(
+        body: Scrollbar(
+            thumbVisibility: true,
+            trackVisibility: true,
+    child: Padding(
             padding: EdgeInsets.all(10),
             child: SingleChildScrollView(
-            child:Column(
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [/*Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                SizedBox(height: 10),
-                Row(
+                children: [*/
+                //SizedBox(height: 10),
+                /*Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ElevatedButton(
                       onPressed: addNewRow,
                       child: Text('NUOVA TIMBRATURA'),
                     ),
-                ]),
-                  SizedBox(height: 10),
+                ]),*/
+
+
                   Column(
                 mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                 children: [
+                  Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          alignment: Alignment.topLeft, // allinea a sinistra
+                          child:newTable),
+                        SizedBox(width: 540,)
+                  ]),
 
-                      Column(
+                      /*Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [Container(
-                      alignment: Alignment.centerLeft,
-                      child:newTable),
+
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                          children: [newTable])),*/
                         //_tables,
                       /*Flexible(child:
                       Container(
@@ -1041,7 +1077,12 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                             ),
                           ),], // Non ci sono righe qui, solo l'header
                         ))),*/
-                  SizedBox(height: 12),
+                  Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [Divider(thickness: 20),]),
+                        //SizedBox(height: 12),
                         for (int settimana in groupedRows.keys.toList().reversed)
             Flexible(child:
             Container(
@@ -1053,7 +1094,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               headingRowHeight: 30,
               columnSpacing: 10,
               dataRowMinHeight:  30,
-              dataRowMaxHeight: 38,
+              //dataRowMaxHeight: 38,
               border: TableBorder.all(color: Colors.grey),
       columns: [
         DataColumn(label: Text('UTENTE'),),
@@ -1107,7 +1148,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 },*/
               )),
             ),
-            DataCell(Container(width: 170,
+            DataCell(Container(width: 190,
               alignment: Alignment.center,
               child:
               row.isNewRow
@@ -1202,11 +1243,15 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               //showEditIcon: row.isModified,
         Container(width: 210,
         alignment: Alignment.center,
-        child:TextFormField(style: TextStyle(fontSize: 14, color: !row.indirizzoIngresso!.contains('73021')  ? Colors.red : Colors.black),
+        child:TextFormField(
+          minLines: 2,
+          maxLines: null,
+          style: TextStyle(
+              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoIngresso!.contains('Puglia')  ? Colors.red : Colors.black),
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
                 //focusNode: _focusNodes[_rows.indexOf(row)],
-                decoration: InputDecoration(border: InputBorder.none),
+                decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                 initialValue: row.indirizzoIngresso,
                 onChanged: (value) {
                   setState(() {
@@ -1271,8 +1316,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         Container(width: 210,
         alignment: Alignment.center,
         child:TextFormField(
-          style: TextStyle(fontSize: 14, color: !row.indirizzoUscita!.contains('73021')  ? Colors.red : Colors.black),
-                decoration: InputDecoration(border: InputBorder.none),
+          minLines: 2,
+          maxLines: null,
+          style: TextStyle(
+              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoUscita!.contains('Puglia')  ? Colors.red : Colors.black),
+                decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                 initialValue: row.indirizzoUscita,
                 onChanged: (value) {
                   setState(() {
@@ -1330,11 +1378,14 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               Container(width: 210,
                   alignment: Alignment.center,
                   child:TextFormField(
-                    style: TextStyle(fontSize: 14, color: !row.indirizzoIngresso2!.contains('73021')  ? Colors.red : Colors.black),
+                    minLines: 2,
+                    maxLines: null,
+                    style: TextStyle(
+                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoIngresso2!.contains('Puglia')  ? Colors.red : Colors.black),
                     //key: Key(_rows.indexOf(row).toString()),
                     //autofocus: false,
                     //focusNode: _focusNodes[_rows.indexOf(row)],
-                    decoration: InputDecoration(border: InputBorder.none),
+                    decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                     initialValue: row.indirizzoIngresso2,
                     onChanged: (value) {
                       setState(() {
@@ -1399,8 +1450,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               Container(width: 210,
                   alignment: Alignment.center,
                   child:TextFormField(
-                    style: TextStyle(fontSize: 14, color: !row.indirizzoUscita2!.contains('73021')  ? Colors.red : Colors.black),
-                    decoration: InputDecoration(border: InputBorder.none),
+                    minLines: 2,
+                    maxLines: null,
+                    style: TextStyle(
+                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoUscita2!.contains('Puglia')  ? Colors.red : Colors.black),
+                    decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                     initialValue: row.indirizzoUscita2,
                     onChanged: (value) {
                       setState(() {
@@ -1444,7 +1498,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 alignment: Alignment.center,
                 child: Text(
                   '${row.isNewRow ? '' : row._totalHours.inHours}:${row._totalHours.inMinutes.remainder(60).toString().padLeft(2, '0')}',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
               ),
               //showEditIcon: row.isModified,
               /*TextFormField(
@@ -1465,6 +1519,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
             DataCell(
               _editedRowIndex == _rowsNew.indexOf(row)
                   ? Row(children: [
+                    //SizedBox(width: 3),
               ElevatedButton(
                 onPressed: () {
                   if (row.dataIngresso != null && row.dataIngresso!.isNotEmpty && row.dataIngresso != '') {
@@ -1497,7 +1552,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     );
                   }
                 },
-                child: Text('SALVA RIGA'),
+                child: Text('SALVA'),
               ),
                 SizedBox(width: 3),
                 row.isNewRow
@@ -1517,7 +1572,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                   child: Text('ANNULLA'),
                 ) : Container()
               ],)
-                  : Container(width: 130),
+                  : Container(width: 95),
             ),
           ],
               selected: _editedRowIndex == _rowsNew.indexOf(row)
@@ -1530,7 +1585,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                   SizedBox(height: 5,)
                   ])
             ))])
-                  ])]))));
+                  ]))))));
   }
 
 }

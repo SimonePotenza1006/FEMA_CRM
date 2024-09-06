@@ -126,7 +126,7 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
                       print('Vista cambiata a Mensile');
                     });
                   },
-                  child: Text('Mensile'),
+                  child: Text('MESE'),
                 ),
                 SizedBox(width: 10),
                 ElevatedButton(
@@ -143,7 +143,7 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
                       print('Vista cambiata a Settimanale');
                     });
                   },
-                  child: Text('Settimanale'),
+                  child: Text('SETTIMANA'),
                 ),
                 SizedBox(width: 10),
                 ElevatedButton(
@@ -160,7 +160,7 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
                       print('Vista cambiata a Giornaliera');
                     });
                   },
-                  child: Text('Giornaliera'),
+                  child: Text('GIORNO'),
                 ),
                 SizedBox(width: 15),
               ],

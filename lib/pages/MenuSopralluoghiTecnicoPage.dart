@@ -21,7 +21,7 @@ class _MenuSopralluoghiTecnicoPageState extends State<MenuSopralluoghiTecnicoPag
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sopralluoghi', style: TextStyle(color: Colors.white)),
+        title: const Text('SOPRALLUOGHI', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [

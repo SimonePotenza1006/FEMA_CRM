@@ -10,6 +10,9 @@ import '../model/UtenteModel.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:collection';
 
+import 'PDFSettPage.dart';
+import 'TimbraturaPage.dart';
+
 
 class TimbratureSettimana extends StatefulWidget {
   final UtenteModel utente;
@@ -947,6 +950,15 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
     List<Widget> settimane = [];
     return Scaffold(
         appBar: AppBar(
+          leading: BackButton(
+            onPressed: (){Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TimbraturaPage(utente: widget.utente),
+              ),
+            );},
+            color: Colors.black, // <-- SEE HERE
+          ),
           title: Text(
             'REPORT TIMBRATURE',
             style: TextStyle(color: Colors.white),
@@ -954,7 +966,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
           centerTitle: true,
           backgroundColor: Colors.red,
           actions: [
-            IconButton(
+            /*IconButton(
               icon: Icon(
                 Icons.assignment_outlined, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
                 color: Colors.white,
@@ -966,7 +978,18 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
                 );
                 //setState(() {});//getAllMarcatempo();
               },
-            ),
+            ),*/
+            IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.print), onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PDFSettPage(timbrature: allTimbratureEdit),
+                ),
+              );
+            }),
             SizedBox(width: 23),
             IconButton(
               icon: Icon(
@@ -986,6 +1009,10 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
         body: Padding(
             padding: EdgeInsets.all(10),
             child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+
             child:Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -1551,7 +1578,7 @@ SizedBox(width: 100),
     //]
     //)
 ],)
-                  ]))));
+                  ])))));
   }
 
 }
