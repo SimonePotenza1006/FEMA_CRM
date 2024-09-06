@@ -158,6 +158,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': null,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
           'assegnato': true,
           'conclusione_parziale' : widget.intervento.conclusione_parziale,
           'concluso': true,

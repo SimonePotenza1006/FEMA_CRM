@@ -11,6 +11,9 @@ class MerceInRiparazioneModel{
   String? dati;
   bool? preventivo;
   double? importo_preventivato;
+  DateTime? data_comunica_preventivo;
+  bool? preventivo_accettato;
+  DateTime? data_accettazione_preventivo;
   String? diagnosi;
   String? risoluzione;
   DateTime? data_conclusione;
@@ -28,6 +31,9 @@ class MerceInRiparazioneModel{
       this.dati,
       this.preventivo,
       this.importo_preventivato,
+      this.data_comunica_preventivo,
+      this.preventivo_accettato,
+      this.data_accettazione_preventivo,
       this.diagnosi,
       this.risoluzione,
       this.data_conclusione,
@@ -47,6 +53,9 @@ class MerceInRiparazioneModel{
       'dati': dati,
       'preventivo': preventivo,
       'importo_preventivato' : importo_preventivato,
+      'data_comunica_preventivo' : data_comunica_preventivo?.toIso8601String(),
+      'preventivo_accettato' : preventivo_accettato,
+      'data_accettazione_preventivo' : data_accettazione_preventivo?.toIso8601String(),
       'diagnosi' : diagnosi,
       'risoluzione' : risoluzione,
       'data_conclusione': data_conclusione?.toIso8601String(),
@@ -67,6 +76,9 @@ class MerceInRiparazioneModel{
     dati = map['dati'];
     preventivo = map['preventivo'];
     importo_preventivato = map['importo_preventivato'];
+    data_comunica_preventivo = map['data_comunica_preventivo'] != null ? DateTime.parse(map['data_comunica_preventvo']) : null;
+    preventivo_accettato = map['preventivo_accettato'];
+    data_accettazione_preventivo = map['data_accettazione_preventivo'] != null ? DateTime.parse(map['data_accettazione_preventivo']) : null;
     diagnosi = map['diagnosi'];
     risoluzione = map['risoluzione'];
     data_conclusione = map['data_conclusione'] != null ? DateTime.parse(map['data_conclusione']) : null;
@@ -86,6 +98,9 @@ class MerceInRiparazioneModel{
     'dati' : dati,
     'preventivo' : preventivo,
     'importo_preventivato' : importo_preventivato,
+    'data_comunica_preventivo' : data_comunica_preventivo?.toIso8601String(),
+    'preventivo_accettato' : preventivo_accettato,
+    'data_accettazione_preventivo' : data_accettazione_preventivo?.toIso8601String(),
     'diagnosi' : diagnosi,
     'risoluzione' : risoluzione,
     'data_conclusione' : data_conclusione?.toIso8601String(),
@@ -105,6 +120,9 @@ class MerceInRiparazioneModel{
       json['dati']?.toString(),
       json['preventivo'],
       json['importo_preventivato']!= null ? double.parse(json['importo_preventivato'].toString()) : null,
+      json['data_comunica_preventivo'] != null ? DateTime.parse(json['data_comunica_preventivo']) : null,
+      json['preventivo_accettato'] != null ? json['preventivo_accettato'] : null,
+      json['data_accettazione_preventivo'] != null ? DateTime.parse(json['data_accettazione_preventivo']) : null,
       json['diagnosi']?.toString(),
       json['risoluzione']?.toString(),
       json['data_conclusione'] != null ? DateTime.parse(json['data_conclusione']) : null,

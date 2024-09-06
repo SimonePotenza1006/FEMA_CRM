@@ -164,6 +164,7 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
                               MaterialPageRoute(
                                 builder: (context) => PhotoViewPage(
                                   images: snapshot.data!,
+                                  initialIndex: snapshot.data!.indexOf(imageData),
                                 ),
                               ),
                             );

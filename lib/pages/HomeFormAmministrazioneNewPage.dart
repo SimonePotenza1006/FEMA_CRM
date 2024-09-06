@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/TableMerceInRiparazionePage.dart';
 import 'package:fema_crm/pages/TableSpeseVeicoliPage.dart';
 import 'package:fema_crm/pages/TableVeicoliPage.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,6 @@ import 'package:fema_crm/pages/ListaCredenzialiPage.dart';
 import 'package:fema_crm/pages/ListaInterventiFinalPage.dart';
 import 'package:fema_crm/pages/LogisticaPreventiviHomepage.dart';
 import 'package:fema_crm/pages/MenuCommissioniPage.dart';
-import 'package:fema_crm/pages/MenuMerceInRiparazionePage.dart';
 import 'package:fema_crm/pages/MenuOrdiniFornitorePage.dart';
 import 'package:fema_crm/pages/MenuSopralluoghiPage.dart';
 import 'package:fema_crm/pages/ScannerQrCodeAmministrazionePage.dart';
@@ -679,7 +679,7 @@ class _HomeFormAmministrazioneNewPageState
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) =>
-                MenuMerceInRiparazionePage(utente: widget.userData)),
+                TableMerceInRiparazionePage()),
           );
           break;
         case 5:

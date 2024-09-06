@@ -78,6 +78,7 @@ class _GalleriaFotoInterventoPageState extends State<GalleriaFotoInterventoPage>
                           MaterialPageRoute(
                             builder: (context) => PhotoViewPage(
                               images: snapshot.data!,
+                              initialIndex: snapshot.data!.indexOf(imageData), // Passa l'indice corretto dell'immagine
                             ),
                           ),
                         );
@@ -111,15 +112,24 @@ class _GalleriaFotoInterventoPageState extends State<GalleriaFotoInterventoPage>
 
 class PhotoViewPage extends StatefulWidget {
   final List<Uint8List> images;
+  final int initialIndex;
 
-  PhotoViewPage({required this.images});
+
+  PhotoViewPage({required this.images, required this.initialIndex});
 
   @override
   _PhotoViewPageState createState() => _PhotoViewPageState();
 }
 
 class _PhotoViewPageState extends State<PhotoViewPage> {
+  late PageController _pageController;
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.initialIndex); // Imposta la pagina iniziale
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,6 +140,7 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
       body: Stack(
         children: [
           PageView(
+            controller: _pageController, // Associa il PageController
             onPageChanged: (index) {
               setState(() {
                 _currentIndex = index;

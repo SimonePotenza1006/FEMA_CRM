@@ -403,6 +403,7 @@ class _CompilazioneRapportinoPageState
             'orario_fine': DateTime.now().toIso8601String(),
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': null,
+            'prezzo_ivato' : widget.intervento.prezzo_ivato,
             'assegnato': true,
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': true,

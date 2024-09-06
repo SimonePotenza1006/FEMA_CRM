@@ -270,93 +270,104 @@ class _CreazioneInterventoByAmministrazionePageState
                           ),
                         ),
                         const SizedBox(height: 20),
-                        SizedBox(
-                          width: 200,
-                          child: GestureDetector(
-                            onTap: () {
-                              _showClientiDialog();
-                            },
-                            child: SizedBox(
-                              height: 50,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
-                                  const Icon(Icons.arrow_drop_down),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: 200,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      CreazioneClientePage(),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
-                              onPrimary: Colors.white,
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                            ),
-                            child: Text('Crea nuovo cliente'),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        SizedBox(
-                          width: 200,
-                          child: GestureDetector(
-                            onTap: () {
-                              _showDestinazioniDialog();
-                            },
-                            child: SizedBox(
-                              height: 50,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
-                                  const Icon(Icons.arrow_drop_down),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        SizedBox(
-                          width: 210,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if(selectedCliente != null){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        NuovaDestinazionePage(cliente: selectedCliente!),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 200,
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showClientiDialog();
+                                },
+                                child: SizedBox(
+                                  height: 50,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                                      const Icon(Icons.arrow_drop_down),
+                                    ],
                                   ),
-                                );
-                              } else {
-                                return _showNoClienteDialog();
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
-                              onPrimary: Colors.white,
-                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                ),
+                              ),
                             ),
-                            child: Text('Crea nuova destinazione'),
-                          ),
+                            const SizedBox(width: 20),
+                            SizedBox(
+                              width: 200,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          CreazioneClientePage(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                  onPrimary: Colors.white,
+                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                ),
+                                child: Text('Crea nuovo cliente'),
+                              ),
+                            ),
+                          ],
                         ),
+
+
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 200,
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showDestinazioniDialog();
+                                },
+                                child: SizedBox(
+                                  height: 50,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
+                                      const Icon(Icons.arrow_drop_down),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 20),
+
+                            SizedBox(
+                              width: 210,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if(selectedCliente != null){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NuovaDestinazionePage(cliente: selectedCliente!),
+                                      ),
+                                    );
+                                  } else {
+                                    return _showNoClienteDialog();
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                  onPrimary: Colors.white,
+                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                ),
+                                child: Text('Crea nuova destinazione'),
+                              ),
+                            ),
+                          ],
+                        ),
+
 
                         const SizedBox(height: 20),
 
@@ -484,19 +495,22 @@ class _CreazioneInterventoByAmministrazionePageState
                         Padding(
                           padding: const EdgeInsets.only(bottom: 20.0),
                           child: ElevatedButton(
-                            onPressed: () {
-                              if(_selectedTipologia?.descrizione == "Riparazione Merce"){
+                            onPressed: (selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty && _selectedTipologia != null)
+                                ? () {
+                              if (_selectedTipologia?.descrizione == "Riparazione Merce") {
                                 savePics();
-                              } else if(_responsabileSelezionato == null){
-                               _alertDialog();
-                              }else{
+                              } else if (_responsabileSelezionato == null) {
+                                _alertDialog();
+                              } else {
                                 saveRelations();
                               }
-                            },
+                            }
+                                : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
                             style: ElevatedButton.styleFrom(primary: Colors.red),
                             child: const Text('Salva Intervento', style: TextStyle(color: Colors.white)),
                           ),
                         ),
+
                       ],
                     ),
                   ),
@@ -620,6 +634,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
+            'prezzo_ivato' : null,
             'assegnato': assigned,
             'conclusione_parziale' : false,
             'concluso': false,
@@ -753,6 +768,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
+            'prezzo_ivato' : null,
             'assegnato': assigned,
             'conclusione_parziale' : false,
             'concluso': false,
@@ -790,6 +806,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
+            'prezzo_ivato': null,
             'assegnato': true,
             'conclusione_parziale' : false,
             'concluso': false,

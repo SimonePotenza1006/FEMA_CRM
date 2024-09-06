@@ -110,9 +110,13 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 15,),
-                  _buildTextFormField(
-                      _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
+                  SizedBox(
+                    width: 400,
+                    child: _buildTextFormField(
+                        _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
+                  ),
                   SizedBox(height: 15,),
+
                   _buildTextFormField(
                       _accessoriController, "Accessori", "Inserisci gli accessori se presenti"),
                   SizedBox(height: 15,),
