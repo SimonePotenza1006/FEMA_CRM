@@ -150,7 +150,7 @@ class _ReportOrdiniPerUtentePageState extends State<ReportOrdiniPerUtentePage>{
 
     for(var utente in utentiList){
       final ordini = ordiniPerUtenteMap[utente.id!] ?? [];
-
+      if (ordini.length > 0)
       tables.add(
         Padding(
           padding: const EdgeInsets.all(8),

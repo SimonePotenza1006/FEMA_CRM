@@ -55,7 +55,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     getRelazioni();
     getNoteByIntervento();
     getProdottiDdt();
-    _fetchUtenti();
+    _fetchUtentiAttivi();
     _futureImages = fetchImages();
     rapportinoController.text = (widget.intervento.relazione_tecnico != null ? widget.intervento.relazione_tecnico : '//')!;
   }
@@ -247,9 +247,9 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
-  Future<void> _fetchUtenti() async {
+  Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('${ipaddress}/api/utente'));
+      final response = await http.get(Uri.parse('${ipaddress}/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
