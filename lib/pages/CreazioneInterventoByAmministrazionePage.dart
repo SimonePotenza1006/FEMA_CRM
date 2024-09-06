@@ -65,7 +65,7 @@ class _CreazioneInterventoByAmministrazionePageState
   @override
   void initState() {
     super.initState();
-    getAllUtenti();
+    getAllUtentiAttivi();
     getAllClienti();
     getAllTipologie();
   }
@@ -321,7 +321,7 @@ class _CreazioneInterventoByAmministrazionePageState
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 200,
+                              width: 220,
                               child: GestureDetector(
                                 onTap: () {
                                   _showDestinazioniDialog();
@@ -342,7 +342,7 @@ class _CreazioneInterventoByAmministrazionePageState
                             const SizedBox(width: 20),
 
                             SizedBox(
-                              width: 210,
+                              //width: 210,
                               child: ElevatedButton(
                                 onPressed: () {
                                   if(selectedCliente != null){
@@ -1064,9 +1064,9 @@ class _CreazioneInterventoByAmministrazionePageState
     );
   }
 
-  Future<void> getAllUtenti() async {
+  Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);

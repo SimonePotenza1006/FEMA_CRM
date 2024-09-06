@@ -90,7 +90,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   @override
   void initState() {
     super.initState();
-    getAllUtenti();
+    getAllUtentiAttivi();
     getAllClienti();
     _signaturePadKey = GlobalKey<SfSignaturePadState>();
     selectedDate = DateTime.now(); // Inizializza la data selezionata con la data corrente
@@ -648,6 +648,28 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   Future<void> getAllUtenti() async {
     try {
       var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for(var item in jsonData){
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        throw Exception(
+            'Failed to load agenti data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching agenti data from API: $e');
+    }
+  }
+
+  Future<void> getAllUtentiAttivi() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
