@@ -53,7 +53,7 @@ class _PDFOggiPageState extends State<PDFOggiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Generazione PDF timbrature'),
+        title: Text('Generazione PDF timbrature odierne'),
       ),
       body: FutureBuilder<Uint8List>(
         future: _pdfFuture,

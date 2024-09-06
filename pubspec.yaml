@@ -47,7 +47,7 @@ dependencies:
   email_validator: ^2.0.1
   http:
   image_picker: ^0.8.4+3
-  connectivity_plus: ^5.0.2
+  #connectivity_plus: ^5.0.2
   plugin_platform_interface: ^2.1.4
   io: #^1.0.4
   file_picker: ^5.2.5

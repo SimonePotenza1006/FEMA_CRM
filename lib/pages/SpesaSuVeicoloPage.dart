@@ -96,7 +96,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                 children: [
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 206,
+                    width: 220,
                     child: DropdownButtonFormField<VeicoloModel>(
                       value: selectedVeicolo,
                       onChanged: (VeicoloModel? newValue) {
@@ -119,7 +119,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   ),
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 207,
+                    width: 220,
                     child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
                       value: selectedTipologia,
                       onChanged: (TipologiaSpesaVeicoloModel? newValue) {
@@ -143,13 +143,13 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   if (selectedTipologia?.descrizione == "ALTRO")
                     Container(
                       child: SizedBox(
-                        width: 207,
+                        width: 220,
                         height: 80,
                         child: TextFormField(
                           controller: _noteSpesaController,
                           decoration: InputDecoration(
                             labelText: "Tipologia di spesa".toString().toUpperCase(),
-                            hintText: "Scrivere la tipologia di spesa".toString().toUpperCase(),
+                            hintText: "Scrivi la tipologia di spesa".toString().toUpperCase(),
                             border: OutlineInputBorder(
                                 borderSide: BorderSide(color: Colors.grey, width: 2)),
                           ),
@@ -159,7 +159,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       ),
                     ),
                   SizedBox(
-                    width: 207,
+                    width: 220,
                     child: DropdownButtonFormField<String>(
                       value: selectedFornitore,
                       onChanged: (newValue) {

@@ -156,7 +156,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inserimento Intervento Tecnico', style: TextStyle(color: Colors.white)),
+        title: const Text('NUOVO INTERVENTO TECNICO', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
@@ -166,15 +166,15 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Data: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
+              Text('DATA: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
               ElevatedButton(
                 onPressed: _selezionaData,
                 style: ElevatedButton.styleFrom(primary: Colors.red),
-                child: const Text('Seleziona Data', style: TextStyle(color: Colors.white)),
+                child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
               ),
               TextFormField(
                 controller: _descrizioneController,
-                decoration: const InputDecoration(labelText: 'Descrizione'),
+                decoration: const InputDecoration(labelText: 'DESCRIZIONE'),
                 onChanged: (value) {
                   setState(() {
                     _descrizione = value;
@@ -185,7 +185,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
               const SizedBox(height: 20.0),
               Row(
                 children: [
-                  const Text('Intervento Concluso:', style: TextStyle(color: Colors.black)),
+                  const Text('INTERVENTO CONCLUSO:', style: TextStyle(color: Colors.black)),
                   Checkbox(
                     value: _interventoConcluso,
                     onChanged: (bool? value) {
@@ -199,7 +199,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
               SizedBox(height: 20),
               DropdownButton<TipologiaInterventoModel>(
                 value: _selectedTipologia,
-                hint: Text('Seleziona tipologia di intervento'),
+                hint: Text('TIPOLOGIA DI INTERVENTO'),
                 onChanged: (TipologiaInterventoModel? newValue) {
                   setState(() {
                     _selectedTipologia = newValue;
@@ -220,7 +220,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                   children: [
                     DropdownButton<VeicoloModel>(
                       value: _selectedVeicolo,
-                      hint: Text('Seleziona veicolo'),
+                      hint: Text('SELEZIONA VEICOLO'),
                       onChanged: (VeicoloModel? newValue) {
                         setState(() {
                           _selectedVeicolo = newValue;
@@ -237,19 +237,19 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     ElevatedButton(
                       onPressed: _selezionaOrarioInizio,
                       style: ElevatedButton.styleFrom(primary: Colors.red),
-                      child: Text('Orario Inizio: ${_orarioInizio.format(context)}', style: TextStyle(color: Colors.white)),
+                      child: Text('ORARIO INIZIO: ${_orarioInizio.format(context)}', style: TextStyle(color: Colors.white)),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _selezionaOrarioFine,
                       style: ElevatedButton.styleFrom(primary: Colors.red),
-                      child: Text('Orario Fine: ${_orarioFine.format(context)}', style: TextStyle(color: Colors.white)),
+                      child: Text('ORARIO FINE: ${_orarioFine.format(context)}', style: TextStyle(color: Colors.white)),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _relazioneController,
                       maxLines: null, // aggiungi questo parametro
-                      decoration: const InputDecoration(labelText: 'Rapportino'),
+                      decoration: const InputDecoration(labelText: 'RAPPORTINO'),
                       onChanged: (value) {
                         setState(() {
                           _relazione = value;
@@ -258,7 +258,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     ),
                     SizedBox(height: 30),
                     Text(
-                      'Inserisci la firma del cliente:',
+                      'INSERISCI FIRMA CLIENTE:',
                       style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(height: 10),
@@ -284,7 +284,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('Chiudi'),
+                                  child: Text('CHIUDI'),
                                 ),
                                 ElevatedButton(
                                   onPressed: () async {
@@ -295,7 +295,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                                     });
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('Salva'),
+                                  child: Text('SALVA'),
                                 ),
                               ],
                             );
@@ -312,7 +312,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                           child: signatureBytes != null
                               ? Image.memory(signatureBytes!)
                               : Text(
-                            'Tocca per aggiungere la firma',
+                            'TOCCA PER AGGIUNGERE LA FIRMA',
                             style: TextStyle(color: Colors.grey),
                           ),
                         ),
@@ -323,7 +323,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
               const SizedBox(height: 20.0),
               TextFormField(
                 controller: _notaController,
-                decoration: const InputDecoration(labelText: 'Nota'),
+                decoration: const InputDecoration(labelText: 'NOTA'),
                 onChanged: (value) {
                   setState(() {
                     _nota = value;
@@ -341,7 +341,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                        selectedCliente?.denominazione ?? 'SELEZIONA CLIENTE',
                         style: TextStyle(fontSize: 16),
                       ),
                       Icon(Icons.arrow_drop_down),
@@ -360,7 +360,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        selectedDestinazione?.denominazione ?? 'Seleziona Destinazione',
+                        selectedDestinazione?.denominazione ?? 'SELEZIONA DESTINAZIONE',
                         style: TextStyle(fontSize: 16),
                       ),
                       Icon(Icons.arrow_drop_down),
@@ -381,7 +381,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     }
                   },
                   style: ElevatedButton.styleFrom(primary: Colors.red),
-                  child: const Text('Salva Intervento', style: TextStyle(color: Colors.white)),
+                  child: const Text('SALVA INTERVENTO', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],
@@ -417,7 +417,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Seleziona Cliente',
+            'SELEZIONA CLIENTE',
             textAlign: TextAlign.center,
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -437,7 +437,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     });
                   },
                   decoration: InputDecoration(
-                    labelText: 'Cerca Cliente',
+                    labelText: 'CERCA CLIENTE',
                     prefixIcon: Icon(Icons.search),
                   ),
                 ),
@@ -475,7 +475,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Seleziona Destinazione',
+            'SELEZIONA DESTINAZIONE',
             textAlign: TextAlign.center,
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),

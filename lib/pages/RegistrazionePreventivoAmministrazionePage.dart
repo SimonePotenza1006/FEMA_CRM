@@ -65,7 +65,7 @@ class _RegistrazionePreventivoAmministrazionePageState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrazione preventivo',
+        title: const Text('REGISTRAZIONE PREVENTIVO',
             style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
@@ -113,7 +113,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                     ),
                     SizedBox(height: 20),
                     SizedBox(
-                      width: 160,
+                      width: 220,
                       child: GestureDetector(
                         onTap: () {
                           _showAgentiDialog();
@@ -124,7 +124,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                selectedAgente?.nome ?? 'Seleziona Agente',
+                                selectedAgente?.nome ?? 'Seleziona Agente'.toString().toUpperCase(),
                                 style: TextStyle(fontSize: 16),
                               ),
                               Icon(Icons.arrow_drop_down),
@@ -136,7 +136,7 @@ class _RegistrazionePreventivoAmministrazionePageState
 
                     SizedBox(height: 20),
                     SizedBox(
-                      width: 160,
+                      width: 220,
                       child: GestureDetector(
                         onTap: () {
                           _showClientiDialog();
@@ -148,7 +148,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                             children: [
                               Text(
                                 selectedCliente?.denominazione ??
-                                    'Seleziona Cliente',
+                                    'Seleziona Cliente'.toString().toUpperCase(),
                                 style: TextStyle(fontSize: 16),
                               ),
                               Icon(Icons.arrow_drop_down),
@@ -159,7 +159,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                     ),
                     SizedBox(height: 20),
                     SizedBox(
-                      width: 200,
+                      width: 220,
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.push(
@@ -175,11 +175,11 @@ class _RegistrazionePreventivoAmministrazionePageState
                           onPrimary: Colors.white,
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                         ),
-                        child: Text('Crea nuovo cliente'),
+                        child: Text('CREA NUOVO CLIENTE'),
                       ),
                     ),
                     SizedBox(height: 20),
-                    SizedBox(width: 200, child: GestureDetector(
+                    SizedBox(width: 250, child: GestureDetector(
                       onTap: () {
                         _showDestinazioniDialog();
                       },
@@ -190,7 +190,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                           children: [
                             Text(
                               selectedDestinazione?.denominazione ??
-                                  'Seleziona Destinazione',
+                                  'Seleziona Destinazione'.toString().toUpperCase(),
                               style: TextStyle(fontSize: 16),
                             ),
                             Icon(Icons.arrow_drop_down),
@@ -202,7 +202,7 @@ class _RegistrazionePreventivoAmministrazionePageState
 
                     SizedBox(height: 20),
                     SizedBox(
-                      width: 210,
+                      width: 260,
                       child: ElevatedButton(
                         onPressed: () {
                           if(selectedCliente != null){
@@ -222,7 +222,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                           onPrimary: Colors.white,
                           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                         ),
-                        child: Text('Crea nuova destinazione'),
+                        child: Text('CREA NUOVA DESTINAZIONE'),
                       ),
                     ),
                     SizedBox(height: 20),
@@ -249,7 +249,7 @@ class _RegistrazionePreventivoAmministrazionePageState
                             child: Text(categoria),
                           );
                         }).toList(),
-                        hint: Text('Categoria Merceologica'),
+                        hint: Text('CATEGORIA MERCEOLOGICA'),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -275,12 +275,12 @@ class _RegistrazionePreventivoAmministrazionePageState
                             child: Text(listino),
                           );
                         }).toList(),
-                        hint: Text('Listino'),
+                        hint: Text('LISTINO'),
                       ),
                     ),
                     SizedBox(height: 16),
 
-                    SizedBox(height: 16),
+                    SizedBox(height: 20),
                     Container(
                       alignment: Alignment.center,
                       width: double.infinity,
@@ -297,13 +297,13 @@ class _RegistrazionePreventivoAmministrazionePageState
                           ),
                         ),
                         child: Text(
-                          'Salva',
+                          'SALVA',
                           style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
                       ),
                     ),
                     if(selectedCliente != null && allPreventiviByCliente.isEmpty)
-                      Text('Nessun preventivo associato a ${selectedCliente?.denominazione!} presente nel database.'),
+                      Text('Nessun preventivo associato a ${selectedCliente?.denominazione!} presente nel database.'.toString().toUpperCase()),
                     if(selectedCliente != null && allPreventiviByCliente.isNotEmpty)
                       Center(
                         child: Container(

@@ -90,11 +90,26 @@ class _MenuSopralluoghiPageState extends State<MenuSopralluoghiPage>{
 
   int _calculateHoveredIndex(Offset position) {
     final center = Offset(500 / 2, 500 / 2); // Use the same size as in CustomPaint
+    final dx = position.dx - center.dx;
+    final dy = position.dy - center.dy;
+
+    // Calcola l'angolo dell'offset rispetto al centro del cerchio
+    // in base alla posizione reale degli elementi del menu
+    final angle = math.atan2(dy, dx) * (math.pi / 2);
+
+    // Mappa l'angolo all'indice dell'elemento del menu
+    final hoveredIndex = (angle ~/ (math.pi / 2)) % 2;
+
+    return hoveredIndex;
+  }
+
+  /*int _calculateHoveredIndex(Offset position) {
+    final center = Offset(500 / 2, 500 / 2); // Use the same size as in CustomPaint
     final angle = (math.atan2(position.dy - center.dy, position.dx - center.dx) + math.pi * 2) % (math.pi * 2);
     final sectorAngle = (2 * math.pi) / 14; // 14 menu items
     final hoveredIndex = (angle ~/ sectorAngle) % 14;
     return hoveredIndex;
-  }
+  }*/
 
   void _navigateToPage(int index) {
     switch (index) {
@@ -153,10 +168,10 @@ class MenuPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
 
     // Draw the menu items
-    final angle = 2 * math.pi / _menuItems.length;
+    final angle = math.pi;//2 * math.pi / _menuItems.length;
     for (int i = 0; i < _menuItems.length; i++) {
       final menuItem = _menuItems[i];
-      final startAngle = i * angle;
+      final startAngle =  -math.pi / 2 + i * angle; //i * angle;
       final sweepAngle = angle - 0.02; // Add a small gap between each arc
 
       // Determine if this menu item is hovered
@@ -238,6 +253,28 @@ class MenuPainter extends CustomPainter {
   @override
   bool hitTest(Offset position) {
     final center = Offset(size.width / 2, size.height / 2);
+    final dx = position.dx - center.dx;
+    final dy = position.dy - center.dy;
+
+    // Verifica se l'offset è all'interno di una zona dell'onhover
+    // in base alla posizione reale degli elementi del menu
+    if (dx > 0 && dy > -50 && dy < 50) {
+      // Elemento del menu a destra
+      onHover(0);
+      return true;
+    } else if (dx < 0 && dy > -50 && dy < 50) {
+      // Elemento del menu a sinistra
+      onHover(1);
+      return true;
+    }
+
+    onHoverExit();
+    return false;
+  }
+
+  /*@override
+  bool hitTest(Offset position) {
+    final center = Offset(size.width / 2, size.height / 2);
     final distance = math.sqrt(math.pow(position.dx - center.dx, 2) + math.pow(position.dy - center.dy, 2));
     final radius = size.width / 2;
 
@@ -251,7 +288,7 @@ class MenuPainter extends CustomPainter {
     }
     onHoverExit(); // Call the onHoverExit callback
     return false;
-  }
+  }*/
 }
 
 class MenuItem {
