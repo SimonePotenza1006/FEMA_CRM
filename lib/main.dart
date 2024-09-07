@@ -166,6 +166,15 @@ class _LoginFormState extends State<LoginForm> {
           RuoloUtenteModel.fromJson(responseData['ruolo']),
           TipologiaInterventoModel.fromJson(responseData['tipologia_intervento']),
         );
+
+        if (utente.attivo == false) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Le credenziali sono errate, riprova!'),
+            ),
+          );
+          throw Exception('Login Failed');
+        } else
         return utente;
       }else {
         ScaffoldMessenger.of(context).showSnackBar(
