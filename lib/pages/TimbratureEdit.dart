@@ -756,7 +756,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 minLines: 2,
                 maxLines: null,
                 style: TextStyle(
-                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!newRow.indirizzoIngresso!.contains('73021') || !newRow.indirizzoIngresso!.contains('Via Europa')) ? !newRow.indirizzoIngresso!.contains('Via Europa') Colors.red : Colors.black),
+                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!newRow.indirizzoIngresso!.contains('73021') || !newRow.indirizzoIngresso!.contains('Via Europa')) ? !newRow.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.blue : Colors.black),
                 controller: _indirizzoIngressoController,//TextEditingController(text: newRow.indirizzoIngresso),
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
@@ -818,7 +818,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 minLines: 2,
                 maxLines: null,
                 style: TextStyle(
-                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !newRow.indirizzoIngresso!.contains('Puglia')  ? Colors.red : Colors.black),
+                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!newRow.indirizzoIngresso!.contains('73021') || !newRow.indirizzoIngresso!.contains('Via Europa')) ? !newRow.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.blue : Colors.black),
                 controller: _indirizzoUscitaController,
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
@@ -1247,7 +1247,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           minLines: 2,
           maxLines: null,
           style: TextStyle(
-              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoIngresso!.contains('Puglia')  ? Colors.red : Colors.black),
+              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso!.contains('73021') || !row.indirizzoIngresso!.contains('Via Europa')) ? !row.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.blue : Colors.black),
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
                 //focusNode: _focusNodes[_rows.indexOf(row)],
@@ -1319,7 +1319,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           minLines: 2,
           maxLines: null,
           style: TextStyle(
-              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoUscita!.contains('Puglia')  ? Colors.red : Colors.black),
+              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso!.contains('73021') || !row.indirizzoIngresso!.contains('Via Europa')) ? !row.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.blue : Colors.black),
                 decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                 initialValue: row.indirizzoUscita,
                 onChanged: (value) {
@@ -1381,7 +1381,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     minLines: 2,
                     maxLines: null,
                     style: TextStyle(
-                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoIngresso2!.contains('Puglia')  ? Colors.red : Colors.black),
+                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso!.contains('73021') || !row.indirizzoIngresso!.contains('Via Europa')) ? !row.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.blue : Colors.black),
                     //key: Key(_rows.indexOf(row).toString()),
                     //autofocus: false,
                     //focusNode: _focusNodes[_rows.indexOf(row)],
@@ -1453,7 +1453,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     minLines: 2,
                     maxLines: null,
                     style: TextStyle(
-                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !row.indirizzoUscita2!.contains('Puglia')  ? Colors.red : Colors.black),
+                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso!.contains('73021') || !row.indirizzoIngresso!.contains('Via Europa')) ? !row.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.blue : Colors.black),
                     decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                     initialValue: row.indirizzoUscita2,
                     onChanged: (value) {
