@@ -93,6 +93,7 @@ class _HomeFormAmministrazioneNewPageState
     getAllVeicoli().then((_) {
       getNote().whenComplete(() =>
         checkScadenzeVeicoli().then((_) {
+
           checkVeicoloScadenze(allVeicoli);
         })
       );

@@ -756,7 +756,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 minLines: 2,
                 maxLines: null,
                 style: TextStyle(
-                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: !newRow.indirizzoIngresso!.contains('Puglia')  ? Colors.red : Colors.black),
+                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!newRow.indirizzoIngresso!.contains('73021') || !newRow.indirizzoIngresso!.contains('Via Europa')) ? !newRow.indirizzoIngresso!.contains('Via Europa') Colors.red : Colors.black),
                 controller: _indirizzoIngressoController,//TextEditingController(text: newRow.indirizzoIngresso),
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
