@@ -908,7 +908,7 @@ class InterventoDataSource extends DataGridSource {
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
           DataGridCell<String>(
             columnName: 'id_intervento',
-            value: "${intervento.id}/${DateTime.now().year}",
+            value: "${intervento.id}/${intervento.data_apertura_intervento?.year != null ? intervento.data_apertura_intervento?.year : DateTime.now().year }",
           ),
           DataGridCell<String>(
             columnName: 'data_apertura_intervento',
