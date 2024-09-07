@@ -115,7 +115,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                       children: interventi.map((intervento) {
                         return ListTile(
                           leading: const Icon(Icons.settings),
-                          title: Text('${intervento.descrizione!}, importo: ${importo}'),
+                          title: Text('${intervento.descrizione!}, importo: ${intervento.importo_intervento != null ? intervento.importo_intervento!.toStringAsFixed(2)+"€" : "Importo non inserito" }'),
                           subtitle: Text(intervento.saldato! ? 'Saldato' : 'Non saldato'),
                           onTap: () {
                             setState(() {
