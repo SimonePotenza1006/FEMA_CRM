@@ -91,10 +91,12 @@ class _HomeFormAmministrazioneNewPageState
       };
     }
     getAllVeicoli().then((_) {
-      checkScadenzeVeicoli().then((_) {
-        getNote();
-        checkVeicoloScadenze(allVeicoli);
-      });
+      getNote().whenComplete(() =>
+        checkScadenzeVeicoli().then((_) {
+
+          checkVeicoloScadenze(allVeicoli);
+        })
+      );
     });
     getAllOrdini();
     _scheduleGetAllOrdini();
@@ -349,6 +351,7 @@ class _HomeFormAmministrazioneNewPageState
   }
 
   Future<void> checkScadenzeDate(VeicoloModel veicolo) async {
+
     // Controllo scadenza bollo
     if (veicolo.data_scadenza_bollo!= null) {
       final differenceBollo = veicolo.data_scadenza_bollo!.difference(today).inDays;
@@ -357,8 +360,13 @@ class _HomeFormAmministrazioneNewPageState
         if (_publishedNotes.containsKey(noteKey)) {
           return; // Note has already been published today
         }
+
+        bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha il bollo in scadenza tra ${differenceBollo} giorni!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
+
+        if(!trovato)
         try {
-          final response = await http.post(
+
+           final response = await http.post(
             Uri.parse('$ipaddress/api/noteTecnico'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
@@ -379,12 +387,18 @@ class _HomeFormAmministrazioneNewPageState
     if (veicolo.data_scadenza_polizza!= null) {
       final differencePolizza = veicolo.data_scadenza_polizza!.difference(today).inDays;
       if (differencePolizza <= 30) {
+        bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha la polizza in scadenza tra ${differencePolizza} giorni!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
+
         final noteKey = '${veicolo.id}_polizza_${today.toIso8601String()}';
         if (_publishedNotes.containsKey(noteKey)) {
           return; // Note has already been published today
         }
-        try {
-          final response = await http.post(
+
+
+        if(!trovato)
+          try {
+
+            final response = await http.post(
             Uri.parse('$ipaddress/api/noteTecnico'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
@@ -399,6 +413,7 @@ class _HomeFormAmministrazioneNewPageState
         } catch (e) {
           print("Errore nota scadenza polizza: $e");
         }
+
       }
     }
     // Controllo scadenza tagliando
@@ -409,8 +424,11 @@ class _HomeFormAmministrazioneNewPageState
         if (_publishedNotes.containsKey(noteKey)) {
           return; // Note has already been published today
         }
+
+        bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha superato i 700 giorni dall'ultimo tagliando!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
+
         try {
-          final response = await http.post(
+          if(!trovato) final response = await http.post(
             Uri.parse('$ipaddress/api/noteTecnico'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
@@ -604,6 +622,7 @@ class _HomeFormAmministrazioneNewPageState
           // Controlla se la stringa "Il veicolo" è presente in nota.nota
           if (nota.nota != null && nota.nota!.contains("Il veicolo")) {
             noteScadenze.add(nota);
+
           } else {
             note.add(nota);
           }

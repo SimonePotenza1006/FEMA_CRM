@@ -158,7 +158,7 @@ class _CreazioneInterventoByAmministrazionePageState
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Inserimento Intervento Tecnico', style: TextStyle(color: Colors.white)),
+          title: const Text('INSERIMENTO INTERVENTO TECNICO', style: TextStyle(color: Colors.white)),
           centerTitle: true,
           backgroundColor: Colors.red,
           leading: IconButton(
@@ -197,11 +197,11 @@ class _CreazioneInterventoByAmministrazionePageState
                           child: ElevatedButton(
                             onPressed: _selezionaData,
                             style: ElevatedButton.styleFrom(primary: Colors.red),
-                            child: const Text('Seleziona Data', style: TextStyle(color: Colors.white)),
+                            child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
                           ),
                         ),
                         if(selectedDate != null)
-                          Text('Data selezionata: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
+                          Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
                         const SizedBox(height: 20.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -214,7 +214,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                 });
                               },
                             ),
-                            Text("è disponibile un orario per l'appuntamento?"),
+                            Text("è disponibile un orario per l'appuntamento".toUpperCase()),
                           ],
                         ),
                         if (_orarioDisponibile)
@@ -231,17 +231,17 @@ class _CreazioneInterventoByAmministrazionePageState
                                     primary: Colors.red, // Colore di sfondo rosso
                                     onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
                                   ),
-                                  child: Text('Seleziona Orario'),
+                                  child: Text('Seleziona Orario'.toUpperCase()),
                                 ),
                                 SizedBox(height: 12),
-                                Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}')
+                                Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}'.toUpperCase())
                               ],
                             ),
                           ),
                         SizedBox(height: 15),
                         DropdownButton<TipologiaInterventoModel>(
                           value: _selectedTipologia,
-                          hint: const Text('Seleziona tipologia di intervento'),
+                          hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
                           onChanged: (TipologiaInterventoModel? newValue) {
                             setState(() {
                               _selectedTipologia = newValue;
@@ -261,7 +261,7 @@ class _CreazioneInterventoByAmministrazionePageState
                           child: TextFormField(
                             controller: _descrizioneController,
                             maxLines: null,
-                            decoration: const InputDecoration(labelText: 'Descrizione'),
+                            decoration:  InputDecoration(labelText: 'Descrizione'.toUpperCase()),
                             onChanged: (value) {
                               setState(() {
                                 _descrizione = value;
@@ -284,7 +284,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                                      Text(selectedCliente?.denominazione ?? 'Seleziona Cliente'.toUpperCase(), style: const TextStyle(fontSize: 16)),
                                       const Icon(Icons.arrow_drop_down),
                                     ],
                                   ),
@@ -309,7 +309,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                   onPrimary: Colors.white,
                                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                                 ),
-                                child: Text('Crea nuovo cliente'),
+                                child: Text('Crea nuovo cliente'.toUpperCase()),
                               ),
                             ),
                           ],
@@ -321,7 +321,7 @@ class _CreazioneInterventoByAmministrazionePageState
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 220,
+                              width: 240,
                               child: GestureDetector(
                                 onTap: () {
                                   _showDestinazioniDialog();
@@ -331,7 +331,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
+                                      Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione'.toUpperCase(), style: const TextStyle(fontSize: 16)),
                                       const Icon(Icons.arrow_drop_down),
                                     ],
                                   ),
@@ -362,7 +362,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                   onPrimary: Colors.white,
                                   padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                                 ),
-                                child: Text('Crea nuova destinazione'),
+                                child: Text('Crea nuova destinazione'.toUpperCase()),
                               ),
                             ),
                           ],
@@ -391,7 +391,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                 ),
                               ),
                               child: Text(
-                                'Seleziona tecnico',
+                                'Seleziona tecnico'.toUpperCase(),
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
@@ -415,7 +415,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                 ),
                               ),
                               child: Text(
-                                'Componi Squadra',
+                                'Componi Squadra'.toUpperCase(),
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
@@ -467,7 +467,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                                       });
                                                     },
                                                   ),
-                                                  Text("è richiesto un preventivo?"),
+                                                  Text("è richiesto un preventivo".toUpperCase()),
                                                 ],
                                               ),
                                             ),
@@ -480,7 +480,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                                 primary: Colors.red,
                                                 onPrimary: Colors.white,
                                               ),
-                                              child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                              child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                                             ),
                                             SizedBox(height: 15,),
                                             _buildImagePreview(),
@@ -507,7 +507,7 @@ class _CreazioneInterventoByAmministrazionePageState
                             }
                                 : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
                             style: ElevatedButton.styleFrom(primary: Colors.red),
-                            child: const Text('Salva Intervento', style: TextStyle(color: Colors.white)),
+                            child:  Text('Salva Intervento'.toUpperCase(), style: TextStyle(color: Colors.white)),
                           ),
                         ),
 
@@ -1226,7 +1226,7 @@ class _DisplayResponsabileUtentiWidgetState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Responsabile:',
+          'Responsabile:'.toUpperCase(),
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Text(
@@ -1234,7 +1234,7 @@ class _DisplayResponsabileUtentiWidgetState
         ),
         SizedBox(height: 30),
         Text(
-          'Utenti selezionati:',
+          'Utenti selezionati:'.toUpperCase(),
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         SizedBox(
@@ -1247,7 +1247,7 @@ class _DisplayResponsabileUtentiWidgetState
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: Chip(
-                  label: Text('${utente?.nome ?? ''} ${utente?.cognome ?? ''}'),
+                  label: Text('${utente?.nome ?? ''} ${utente?.cognome ?? ''}'.toUpperCase()),
                 ),
               );
             },

@@ -509,8 +509,8 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       'Ora Uscita',
       'GPS Entrata',
       'Ora Entrata',
-      'GPS Uscita',
-      'Ora Uscita',
+      //'GPS Uscita',
+      //'Ora Uscita',
     ]);
     // Map per tenere traccia delle somme delle differenze per utente e giorno
     Map<String, Map<DateTime, Duration>> userDayDifferences = {};
@@ -542,6 +542,9 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
           var cellStyleRed = ex.CellStyle(
             fontColorHex: "#FF0000",
           );
+          var cellStyleBlu = ex.CellStyle(
+            fontColorHex: "#1E90FF",//"#00AAFF",
+          );
           var cellStyleDefault = ex.CellStyle(
             fontColorHex: "#000000",
           );
@@ -571,19 +574,32 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
           }
           //evidenzio in rosso i gps non in sede
           bool redRow = false;
+          bool bluRow = false;
           for (int rowIndex = 2; rowIndex <= sheetObject.maxRows; rowIndex++) {
-            redRow = false; // Resetta il flag ad ogni iterazione di riga
+            redRow = false;
+            bluRow = false;// Resetta il flag ad ogni iterazione di riga
             for (var column in ['D', 'F', 'H', 'J', 'L', 'N']) {
               var cellValue = sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).value;
-              print('value '+cellValue.toString());
-              if (cellValue.toString() != 'null' && cellValue.toString() != '' && (!cellValue.toString().contains('Puglia') || !cellValue.toString().contains('Puglia'))) {
-                print('rig $rowIndex, colonn $column $cellValue');
-                sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleRed;
-                sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).cellStyle = cellStyleRed;
-                redRow = true; // Imposta il flag a true se almeno una delle celle Ã¨ rossa
+              print('Gvalue '+cellValue.toString());
+              if (cellValue.toString() != 'null' && cellValue.toString() != '' && (!cellValue.toString().contains('73021') || !cellValue.toString().contains('Via Europa'))) {
+                if (cellValue.toString() != 'null' && cellValue.toString() != '' && (!cellValue.toString().contains('Puglia') || !cellValue.toString().contains('Puglia'))) {
+                  print('red rig $rowIndex, colonn $column $cellValue');
+                 // sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleRed;
+                  sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).cellStyle = cellStyleRed;
+                  redRow = true; // Imposta il flag a true se almeno una delle celle Ã¨ rossa
+
+
+                } else {
+                  print(' bbluu rig $rowIndex, colonn $column $cellValue');
+                 // sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleBlu;
+                  sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).cellStyle = cellStyleBlu;
+                  bluRow = true; // Imposta il flag a true se almeno una delle celle Ã¨ rossa
+                }
+
+
               }
             }
-            if (!redRow) {
+            if (!redRow && !bluRow) {
               sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleDefault;
             }
           }
