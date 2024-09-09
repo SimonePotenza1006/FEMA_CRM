@@ -499,7 +499,7 @@ class _CreazioneInterventoByAmministrazionePageState
                                 ? () {
                               if (_selectedTipologia?.descrizione == "Riparazione Merce") {
                                 savePics();
-                              } else if (_responsabileSelezionato == null) {
+                              } else if ((responsabile == null)) {
                                 _alertDialog();
                               } else {
                                 saveRelations();
@@ -640,6 +640,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
+            'saldato_da_tecnico' : false,
             'note': null,
             'relazione_tecnico' : null,
             'firma_cliente': null,
@@ -775,6 +776,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
+            'saldato_da_tecnico' : false,
             'note': null,
             'relazione_tecnico' : null,
             'firma_cliente': null,
@@ -814,6 +816,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
+            'saldato_da_tecnico' : false,
             'note': null,
             'relazione_tecnico' : null,
             'firma_cliente': null,

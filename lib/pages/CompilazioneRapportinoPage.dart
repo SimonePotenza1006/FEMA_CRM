@@ -35,8 +35,6 @@ class _CompilazioneRapportinoPageState
   GlobalKey<SfSignaturePadState> _signaturePadKey =
       GlobalKey<SfSignaturePadState>();
   Uint8List? signatureBytes;
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
   TextEditingController noteController = TextEditingController();
   TextEditingController _descrizioneCredenzialiController = TextEditingController();
   late DateTime selectedDate;
@@ -213,6 +211,20 @@ class _CompilazioneRapportinoPageState
                   Text('L\'intervento è terminato?'),
                 ],
               ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  Checkbox(
+                    value: widget.intervento.saldato_da_tecnico ?? false,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        widget.intervento.saldato_da_tecnico = value;
+                      });
+                    },
+                  ),
+                  Text('L\'intervento è stato saldato?'),
+                ],
+              ),
               SizedBox(height: 30),
               Text(
                 'Inserisci la firma del cliente:',
@@ -276,55 +288,19 @@ class _CompilazioneRapportinoPageState
                 ),
               ),
               SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: takePicture,
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
-                  onPrimary: Colors.white,
-                ),
-                child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-              ),
-              _buildImagePreview(),
-              SizedBox(height: 20),
-              Text(
-                'Credenziali cliente:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: TextFormField(
-                  controller: _descrizioneCredenzialiController,
-                  decoration: InputDecoration(
-                    hintText: 'A cosa si riferiscono le credenziali?',
-                    border: OutlineInputBorder(),
+              Center(
+                child: ElevatedButton(
+                  onPressed: takePicture,
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    onPrimary: Colors.white,
                   ),
-                  onChanged: (value) {},
+                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                 ),
               ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: TextFormField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    hintText: 'Inserisci le credenziali del cliente (Username)',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {},
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                child: TextFormField(
-                  controller: passwordController,
-                  decoration: InputDecoration(
-                    hintText: 'Inserisci le credenziali del cliente (Password)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
+
+              if(pickedImages.isNotEmpty)
+                _buildImagePreview(),
               SizedBox(height: 20),
               Container(
                 width: double.infinity,
@@ -370,26 +346,6 @@ class _CompilazioneRapportinoPageState
     return dateTime.toIso8601String();
   }
 
-  Future<void> saveCredenziali() async {
-    try {
-      final response =
-          await http.post(Uri.parse('${ipaddress}/api/credenziali'),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({
-                'descrizione' : _descrizioneCredenzialiController.text,
-                'credenziali':
-                    "Username:${usernameController.text}, Password:${passwordController.text}",
-                'cliente': widget.intervento.cliente,
-                'utente': widget.intervento.utente
-              }));
-      if (response.statusCode == 201) {
-        print("EVVIVAAAAAAAA");
-      }
-    } catch (e) {
-      print('Errore: $e');
-    }
-  }
-
   Future<void> saveIntervento() async {
     try {
       final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
@@ -409,6 +365,7 @@ class _CompilazioneRapportinoPageState
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': true,
             'saldato': false,
+            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
             'note': widget.intervento.note,
             'relazione_tecnico' : noteController.text,
             'firma_cliente': signatureBytes,
@@ -430,10 +387,6 @@ class _CompilazioneRapportinoPageState
             duration: Duration(seconds: 5),
           ),
         );
-        if (usernameController.text.isNotEmpty &&
-            passwordController.text.isNotEmpty) {
-          saveCredenziali();
-        }
       }
     } catch (e) {
       print('Errore durante il salvataggio del preventivo');

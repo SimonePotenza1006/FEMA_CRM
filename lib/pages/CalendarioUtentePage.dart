@@ -194,7 +194,7 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
                                   builder: (context) {
                                     if (appointment.recurrenceId is InterventoModel) {
                                       InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                      return DettaglioInterventoByTecnicoPage(utente: widget.utente, intervento: intervento);
+                                      return DettaglioInterventoByTecnicoPage(utente: widget.utente!, intervento: intervento);
                                     } else {
                                       CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
                                       return DettaglioCommissioneTecnicoPage(commissione: commissione);

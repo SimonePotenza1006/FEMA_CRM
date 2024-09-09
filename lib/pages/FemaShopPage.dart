@@ -608,6 +608,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'conclusione_parziale' : false,
           'concluso': true,
           'saldato': true,
+          'saldato_da_tecnico' : false,
           'note': null,
           'relazione_tecnico' : _descrizioneController.text,
           'firma_cliente': null,

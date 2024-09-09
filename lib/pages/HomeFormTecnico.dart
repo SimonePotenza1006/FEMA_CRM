@@ -540,7 +540,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                               MaterialPageRoute(
                                 builder: (context) =>
                                     DettaglioInterventoByTecnicoPage(
-                                      utente: widget.userData,
+                                      utente: widget.userData!,
                                       intervento: intervento,
                                     ),
                               ),
@@ -618,7 +618,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
                             MaterialPageRoute(
                               builder: (context) =>
                                   DettaglioInterventoByTecnicoPage(
-                                    utente: widget.userData,
+                                    utente: widget.userData!,
                                     intervento: relazione.intervento!,
                                   ),
                             ),

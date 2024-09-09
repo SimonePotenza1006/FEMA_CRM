@@ -473,6 +473,7 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
           'saldato': intervento.saldato,
+          'saldato_da_tecnico' : intervento.saldato_da_tecnico,
           'note': intervento.note,
           'relazione_tecnico' : intervento.relazione_tecnico,
           'firma_cliente': intervento.firma_cliente,

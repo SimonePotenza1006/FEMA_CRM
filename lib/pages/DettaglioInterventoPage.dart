@@ -297,6 +297,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'conclusione_parziale' : widget.intervento.conclusione_parziale,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
           'note': widget.intervento.note,
           'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
@@ -763,6 +764,14 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             ),
                           ),
                           SizedBox(height: 15),
+                          SizedBox(
+                            width: 500,
+                            child: buildInfoRow(
+                              title: "Posizione gps",
+                              context: context,
+                              value : widget.intervento.posizione_gps ?? "N/A"
+                            ),
+                          ),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -1273,6 +1282,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'conclusione_parziale': widget.intervento.conclusione_parziale,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
           'note': widget.intervento.note,
           'relazione_tecnico': widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
@@ -1328,6 +1338,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': true,
             'saldato': false,
+            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
             'note': widget.intervento.note,
             'relazione_intervento' : widget.intervento.relazione_tecnico,
             'firma_cliente': widget.intervento.firma_cliente,
@@ -1371,6 +1382,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': widget.intervento.concluso,
             'saldato': widget.intervento.saldato,
+            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
             'note': widget.intervento.note,
             'relazione_tecnico' : widget.intervento.relazione_tecnico,
             'firma_cliente': widget.intervento.firma_cliente,
@@ -1440,6 +1452,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': widget.intervento.concluso,
             'saldato': true,
+            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
             'note': widget.intervento.note,
             'relazione_tecnico' : widget.intervento.relazione_tecnico,
             'firma_cliente': widget.intervento.firma_cliente,

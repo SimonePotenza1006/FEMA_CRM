@@ -25,6 +25,7 @@ class InterventoModel {
   bool? conclusione_parziale;
   bool? concluso;
   bool? saldato;
+  bool? saldato_da_tecnico;
   String? note;
   String? relazione_tecnico;
   String? firma_cliente;
@@ -54,6 +55,7 @@ class InterventoModel {
       this.conclusione_parziale,
       this.concluso,
       this.saldato,
+      this.saldato_da_tecnico,
       this.note,
       this.relazione_tecnico,
       this.firma_cliente,
@@ -85,6 +87,7 @@ class InterventoModel {
       'conclusione_parziale' : conclusione_parziale,
       'concluso': concluso,
       'saldato': saldato,
+      'saldato_da_tecnico' : saldato_da_tecnico,
       'note': note,
       'relazione_tecnico' : relazione_tecnico,
       'firma_cliente': firma_cliente,
@@ -119,6 +122,7 @@ class InterventoModel {
     conclusione_parziale = map['conclusione_parziale'];
     concluso = map['concluso'];
     saldato = map['saldato'];
+    saldato_da_tecnico = map['saldato_da_tecnico'];
     note = map['note'];
     relazione_tecnico = map['relazione_tecnico'];
     firma_cliente = map['firma_cliente'];
@@ -150,6 +154,7 @@ class InterventoModel {
     'conclusione_parziale' : conclusione_parziale,
     'concluso': concluso,
     'saldato': saldato,
+    'saldato_da_tecnico' : saldato_da_tecnico,
     'note': note,
     'relazione_tecnico' : relazione_tecnico,
     'firma_cliente': firma_cliente,
@@ -182,6 +187,7 @@ class InterventoModel {
       json['conclusione_parziale'],
       json['concluso'],
       json['saldato'],
+      json['saldato_da_tecnico'],
       json['note']?.toString(),
       json['relazione_tecnico']?.toString(),
       json['firma_cliente'],

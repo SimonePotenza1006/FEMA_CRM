@@ -40,46 +40,6 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
     }
   }
 
-  Future<void> savePosizione() async{
-    try{
-      final response = await http.post(Uri.parse('$ipaddress/api/posizioni'),
-        headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'cliente' : widget.intervento.cliente?.toMap(),
-            'indirizzo' : _gpsController.text,
-          }),
-      );
-      if(response.statusCode == 201){
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Posizione GPS salvata con successo!'),
-          ),
-        );
-        saveNotaPosizione();
-      }
-    } catch(e){
-      print('Errore durante il salvataggio della posizione: $e, ');
-    }
-  }
-
-  Future<void> saveNotaPosizione() async{
-    final now = DateTime.now().toIso8601String();
-    try{
-      final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'data': now,
-          'utente': widget.utente.toMap(),
-          'nota': "Una nuova posizione per il cliente ${widget.intervento.cliente?.denominazione} è stata registrata!",
-          'cliente' : widget.intervento.cliente?.toMap(),
-          'intervento' : widget.intervento.toMap()
-        }),
-      );
-    } catch(e){
-      print('Errore durante il salvataggio della nota $e');
-    }
-  }
 
   Future<void> saveNotaDestinazione() async {
     try{
@@ -215,30 +175,8 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
-                TextFormField(
-                  controller: _gpsController,
-                  decoration: InputDecoration(
-                    labelText: 'Posizione GPS',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
+                Text('${_indirizzo}'.toUpperCase(), style: TextStyle(fontSize: 22)),
                 SizedBox(height: 16),
-                SizedBox(height: 16),
-                Text(
-                  "Vuoi salvare la posizione GPS?",
-                  style: TextStyle(fontSize: 18),
-                ),
-                SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    savePosizione();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red, // Colore di sfondo rosso
-                    onPrimary: Colors.white, // Colore del testo bianco
-                  ),
-                  child: Text("Salva GPS"),
-                ),
                 SizedBox(height: 50),
                 // Spazio aggiunto tra il pulsante e il pulsante "Inizia intervento"
                 Column(
@@ -337,7 +275,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
-          'posizione_gps' : widget.intervento.posizione_gps,
+          'posizione_gps' : _indirizzo,
           'orario_inizio': DateTime.now().toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
@@ -346,6 +284,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
           'assegnato': widget.intervento.assegnato,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
           'note': widget.intervento.note,
           'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,

@@ -657,7 +657,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                               MaterialPageRoute(
                                 builder: (context) =>
                                     DettaglioInterventoByTecnicoPage(
-                                      utente: widget.userData,
+                                      utente: widget.userData!,
                                       intervento: intervento,
                                     ),
                               ),
@@ -735,7 +735,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                             MaterialPageRoute(
                               builder: (context) =>
                                   DettaglioInterventoByTecnicoPage(
-                                    utente: widget.userData,
+                                    utente: widget.userData!,
                                     intervento: relazione.intervento!,
                                   ),
                             ),

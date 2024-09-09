@@ -101,6 +101,7 @@ class _ModificaRelazioneRapportinoPageState extends State<ModificaRelazioneRappo
           'assegnato': widget.intervento.assegnato,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
           'note': widget.intervento.note,
           'relazione_tecnico' : _relazioneController.text,
           'firma_cliente': widget.intervento.firma_cliente,
