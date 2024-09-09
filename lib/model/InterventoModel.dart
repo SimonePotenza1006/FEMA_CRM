@@ -14,6 +14,7 @@ class InterventoModel {
   DateTime? data_apertura_intervento;
   DateTime? data;
   DateTime? orario_appuntamento;
+  String? posizione_gps;
   DateTime? orario_inizio;
   DateTime? orario_fine;
   String? descrizione;
@@ -42,6 +43,7 @@ class InterventoModel {
       this.data_apertura_intervento,
       this.data,
       this.orario_appuntamento,
+      this.posizione_gps,
       this.orario_inizio,
       this.orario_fine,
       this.descrizione,
@@ -72,6 +74,7 @@ class InterventoModel {
       'data_apertura_intervento': data_apertura_intervento?.toIso8601String(),
       'data': data?.toIso8601String(),
       'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
+      'posizione_gps' : posizione_gps,
       'orario_inizio': orario_inizio?.toIso8601String(),
       'orario_fine': orario_fine?.toIso8601String(),
       'descrizione': descrizione,
@@ -105,6 +108,7 @@ class InterventoModel {
     map['data_apertura_intervento'] != null ? DateTime.parse(map['data_apertura_intervento']) : null;
     map['data'] != null ? DateTime.parse(map['data']) : null;
     map['orario_appuntamento'] != null ? DateTime.parse(map['orario_appuntamento']) : null;
+    posizione_gps = map['posizione_gps'];
     map['orario_inizio'] != null ? DateTime.parse(map['orario_inizio']) : null;
     map['orario_fine'] != null ? DateTime.parse(map['orario_fine']) : null;
     descrizione = map['descrizione'];
@@ -135,6 +139,7 @@ class InterventoModel {
     'data_apertura_intervento' : data_apertura_intervento?.toIso8601String(),
     'data': data?.toIso8601String(),
     'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
+    'posizione_gps' : posizione_gps,
     'orario_inizio': orario_inizio?.toIso8601String(),
     'orario_fine': orario_fine?.toIso8601String(),
     'descrizione': descrizione,
@@ -166,6 +171,7 @@ class InterventoModel {
       json['data_apertura_intervento'] != null ? DateTime.parse(json['data_apertura_intervento']) : null,
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['orario_appuntamento'] != null ? DateTime.parse(json['orario_appuntamento']) : null,
+      json['posizione_gps'].toString(),
       json['orario_inizio'] != null ? DateTime.parse(json['orario_inizio']) : null,
       json['orario_fine'] != null ? DateTime.parse(json['orario_fine']) : null,
       json['descrizione']?.toString(),

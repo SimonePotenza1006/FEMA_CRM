@@ -598,6 +598,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'data': DateTime.now().toIso8601String(),
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'orario_appuntamento' : null,
+          'posizione_gps' : null,
           'orario_inizio': DateTime.now().toIso8601String(),
           'orario_fine': DateTime.now().toIso8601String(),
           'descrizione': _descrizioneController.text,

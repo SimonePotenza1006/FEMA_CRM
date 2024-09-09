@@ -463,6 +463,7 @@ class _ListaInterventiPageState extends State<ListaInterventiPage> {
           'id': intervento.id,
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : intervento.posizione_gps,
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,

@@ -399,6 +399,7 @@ class _CompilazioneRapportinoPageState
             'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+            'posizione_gps' : widget.intervento.posizione_gps,
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
             'orario_fine': DateTime.now().toIso8601String(),
             'descrizione': widget.intervento.descrizione,

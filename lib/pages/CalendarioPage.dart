@@ -53,7 +53,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
-        List<UtenteModel> utenti = []; 
+        List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
         }
