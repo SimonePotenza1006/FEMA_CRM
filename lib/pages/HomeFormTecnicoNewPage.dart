@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
 import 'package:fema_crm/pages/CalendarioUtentePage.dart';
+import 'package:fema_crm/pages/DettaglioCommissioneTecnicoPage.dart';
+import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'package:fema_crm/pages/FormOrdineFornitorePage.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/pages/CalendarioPage.dart';
@@ -118,30 +120,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     }
   }
 
-  Future<List<MerceInRiparazioneModel>> getMerceInRiparazione(String userId) async{
-    try {
-      String userId = widget.userData!.id.toString();
-      http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/merceInRiparazione/utente/$userId'));
-      if (response.statusCode == 200) {
-        var responseData = json.decode(response.body);
-        List<MerceInRiparazioneModel> allMerceByUtente = [];
-        for (var item in responseData) {
-          MerceInRiparazioneModel merce = MerceInRiparazioneModel.fromJson(item);
-          if (merce.data_conclusione == null) {
-            allMerceByUtente.add(merce);
-          }
-        }
-        return allMerceByUtente;
-      } else {
-        return [];
-      }
-    } catch (e) {
-      print('Error fetching interventi: $e');
-      return [];
-    }
-  }
-
   Future<List<RelazioneUtentiInterventiModel>> getAllRelazioniByUtente(String userId, DateTime date) async {
     try{
       String userId = widget.userData!.id.toString();
@@ -152,9 +130,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
         for(var item in responseData){
           RelazioneUtentiInterventiModel relazione = RelazioneUtentiInterventiModel.fromJson(item);
-
           allRelazioniByUtente.add(relazione);
-
         }
         return allRelazioniByUtente;
       }else {
@@ -163,6 +139,27 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     } catch (e) {
       print('Error fetching interventi: $e');
       return [];
+    }
+  }
+
+  Future<List<InterventoModel>> getMerce(String userId) async{
+    try{
+      String userId = widget.userData!.id.toString();
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
+      if(response.statusCode == 200){
+        var responseData = json.decode(response.body);
+        List<InterventoModel> interventi = [];
+        for(var interventoJson in responseData){
+          InterventoModel intervento = InterventoModel.fromJson(interventoJson);
+          interventi.add(intervento);
+        }
+        return interventi;
+      } else {
+        return [];
+      }
+    } catch(e){
+      print('Errore fetch merce: $e');
+      return[];
     }
   }
 
@@ -177,9 +174,9 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         for (var interventoJson in responseData) {
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           // Aggiungi il filtro per interventi non conclusi
-
-          allInterventiByUtente.add(intervento);
-
+          if(intervento.merce == null){
+            allInterventiByUtente.add(intervento);
+          }
         }
         return allInterventiByUtente;
       } else {
@@ -337,6 +334,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       ),
                     ),
                     const SizedBox(height: 10.0),
+
                     FutureBuilder<List<InterventoModel>>(
                       future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
                       builder: (context, snapshot) {
@@ -346,7 +344,16 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           return Center(child: Text('Errore: ${snapshot.error}'));
                         } else if (snapshot.hasData) {
                           List<InterventoModel> interventi = snapshot.data!;
+
+// Filtra ulteriormente nel FutureBuilder per sicurezza
+                          interventi = interventi.where((intervento) => intervento.merce == null).toList();
+
                           interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
+
+                          if (interventi.isEmpty) {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
+
                           return ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
@@ -354,7 +361,9 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             itemBuilder: (context, index) {
                               InterventoModel intervento = interventi[index];
                               Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
-                              TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                              TextStyle textStyle = intervento.concluso ?? false
+                                  ? TextStyle(color: Colors.white, fontSize: 15)
+                                  : TextStyle(color: Colors.black, fontSize: 15);
 
                               return Card(
                                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -366,13 +375,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     style: textStyle,
                                   ),
                                   subtitle: Text(
-                                    intervento.cliente?.denominazione.toString()?? '',
+                                    intervento.cliente?.denominazione.toString() ?? '',
                                     style: textStyle,
                                   ),
                                   trailing: Column(
                                     children: [
                                       Text(
-                                        intervento.data!= null
+                                        intervento.data != null
                                             ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                             : 'Data non disponibile',
                                         style: TextStyle(
@@ -381,7 +390,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         ),
                                       ),
                                       Text(
-                                        intervento.orario_appuntamento!= null
+                                        intervento.orario_appuntamento != null
                                             ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                             : 'Nessun orario di appuntamento',
                                         style: TextStyle(
@@ -395,11 +404,10 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData!,
-                                              intervento: intervento,
-                                            ),
+                                        builder: (context) => DettaglioInterventoByTecnicoPage(
+                                          utente: widget.userData!,
+                                          intervento: intervento,
+                                        ),
                                       ),
                                     );
                                   },
@@ -417,75 +425,77 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                         }
                       },
                     ),
-                    FutureBuilder<List<RelazioneUtentiInterventiModel>>(
-                      future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
-                      builder: (context, snapshot) {
+                    const SizedBox(height: 50.0),
+                    Center(
+                      child: Text(
+                        'Merce in riparazione',
+                        style: TextStyle(
+                            fontSize: 30.0, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                    FutureBuilder<List<InterventoModel>>(
+                      future: getMerce(
+                        widget.userData!.id.toString()
+                      ),
+                      builder:(context, snapshot){
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
                         } else if (snapshot.hasError) {
                           return Center(child: Text('Errore: ${snapshot.error}'));
                         } else if (snapshot.hasData) {
-                          List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
-                          relazioni = relazioni.where((relazione) => relazione.intervento!.data!.isSameDay(selectedDate)).toList();
+                          List<InterventoModel> merce = snapshot.data!;
+                          if(merce.isEmpty){
+                            return Center(child: Text('Nessuna mece in riparazione'));
+                          }
                           return ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            itemCount: relazioni.length,
-                            itemBuilder: (context, index) {
-                              RelazioneUtentiInterventiModel relazione = relazioni[index];
-                              Color backgroundColor = relazione.intervento!.concluso?? false? Colors.green : Colors.white;
-                              TextStyle textStyle = relazione.intervento!.concluso?? false? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
-                              return ListTile(
-                                title: Text(
-                                  '${relazione.intervento?.descrizione}',
-                                  style: textStyle,
+                            itemCount: merce.length,
+                            itemBuilder:(context, index){
+                              InterventoModel singolaMerce = merce[index];
+                              return Card(
+                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
+                                child: ListTile(
+                                  title: Text(
+                                    '${singolaMerce.merce?.articolo}',
+                                  ),
+                                  subtitle: Text(
+                                    '${singolaMerce.merce?.difetto_riscontrato}',
+                                  ),
+                                  trailing: Column(
+                                    children: [
+                                      Text('Data arrivo merce:'),
+                                      SizedBox(height: 3),
+                                      Text('${singolaMerce.data_apertura_intervento != null ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
+                                    ],
+                                  ),
+                                  onTap: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                            intervento: singolaMerce,
+                                            merce : singolaMerce.merce!,
+                                        ),
+                                      )
+                                    );
+                                  },
+                                  tileColor: Colors.white60,
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                subtitle: Text(
-                                  relazione.intervento?.cliente?.denominazione.toString()?? '',
-                                  style: textStyle,
-                                ),
-                                trailing: Column(
-                                  children: [
-                                    Text(
-                                      relazione.intervento?.data!= null
-                                          ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
-                                          : 'Data non disponibile',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: relazione.intervento!.concluso?? false? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                    Text(
-                                      relazione.intervento?.orario_appuntamento!= null
-                                          ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
-                                          : 'Nessun orario di appuntamento',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: relazione.intervento!.concluso?? false? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          DettaglioInterventoByTecnicoPage(
-                                            utente: widget.userData!,
-                                            intervento: relazione.intervento!,
-                                          ),
-                                    ),
-                                  );
-                                },
-                                tileColor: backgroundColor,
                               );
-                            },
+                            }
                           );
-                        } else {
-                          return Center(child: Text('Nessun intervento trovato'));
+                        } else{
+                          return Center(child: Text('Nessuna merce trovata'));
                         }
-                      },
+                      }
                     ),
                     const SizedBox(height: 50.0),
                     Center(
@@ -528,7 +538,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          DettaglioCommissioneAmministrazionePage(
+                                          DettaglioCommissioneTecnicoPage(
                                               commissione: commissione),
                                     ),
                                   );
@@ -563,7 +573,6 @@ class MenuPainter extends CustomPainter {
 
   MenuPainter(this.onHover, this.onHoverExit, this.context, {required this.size, required this.hoveredIndex});
 
-  // List of menu items
   final List<MenuItem> _menuItems = [
     MenuItem(icon: Icons.more_time, label: 'TIMBRATURA'),
     MenuItem(icon: Icons.snippet_folder_outlined, label: 'RICHIESTA ORDINE'),
@@ -624,7 +633,6 @@ class MenuPainter extends CustomPainter {
       path.close();
       canvas.drawPath(path, paint);
 
-      //Draw the icon in white
       final iconX = center.dx +
           (outerRadius * scaleFactor + (isHovered ? innerRadius * scaleFactor * 1.2 : innerRadius * scaleFactor)) /
               2 *
@@ -686,10 +694,10 @@ class MenuPainter extends CustomPainter {
       final section = (angle / (2 * math.pi / _menuItems.length)).floor();
 
       final newIndex = section % _menuItems.length;
-      onHover(newIndex); // Call the onHover callback
+      onHover(newIndex);
       return true;
     }
-    onHoverExit(); // Call the onHoverExit callback
+    onHoverExit();
     return false;
   }
 }

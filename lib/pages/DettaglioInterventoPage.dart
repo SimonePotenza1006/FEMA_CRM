@@ -514,7 +514,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   children: [
                                     buildInfoRow(
                                       title: 'Orario Inizio',
-                                      value: formatTime(widget.intervento.orario_inizio),
+                                      value: widget.intervento.orario_inizio != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
                                         context: context
                                     ),
                                     if (widget.intervento.orario_inizio == null)
@@ -546,7 +546,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   children: [
                                     buildInfoRow(
                                       title: 'Orario Fine',
-                                      value: formatTime(widget.intervento.orario_fine),
+                                        value: widget.intervento.orario_fine != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_fine!) : "N/A",
                                         context: context
                                     ),
                                     if (widget.intervento.orario_fine == null)

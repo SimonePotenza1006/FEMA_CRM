@@ -9,6 +9,7 @@ class MerceInRiparazioneModel{
   DateTime? data_presa_in_carico;
   String? password;
   String? dati;
+  bool? presenza_magazzino;
   bool? preventivo;
   double? importo_preventivato;
   DateTime? data_comunica_preventivo;
@@ -29,6 +30,7 @@ class MerceInRiparazioneModel{
       this.data_presa_in_carico,
       this.password,
       this.dati,
+      this.presenza_magazzino,
       this.preventivo,
       this.importo_preventivato,
       this.data_comunica_preventivo,
@@ -51,6 +53,7 @@ class MerceInRiparazioneModel{
       'data_presa_in_carico' : data_presa_in_carico?.toIso8601String(),
       'password' : password,
       'dati': dati,
+      'presenza_magazzino' : presenza_magazzino,
       'preventivo': preventivo,
       'importo_preventivato' : importo_preventivato,
       'data_comunica_preventivo' : data_comunica_preventivo?.toIso8601String(),
@@ -74,6 +77,7 @@ class MerceInRiparazioneModel{
     data_presa_in_carico = map['data_presa_in_carico'] != null ? DateTime.parse(map['data_presa_in_carico']) : null;
     password = map['password'];
     dati = map['dati'];
+    presenza_magazzino = map['presenza_magazzino'];
     preventivo = map['preventivo'];
     importo_preventivato = map['importo_preventivato'];
     data_comunica_preventivo = map['data_comunica_preventivo'] != null ? DateTime.parse(map['data_comunica_preventvo']) : null;
@@ -96,6 +100,7 @@ class MerceInRiparazioneModel{
     'data_presa_in_carico' : data_presa_in_carico?.toIso8601String(),
     'password': password,
     'dati' : dati,
+    'presenza_magazzino' : presenza_magazzino,
     'preventivo' : preventivo,
     'importo_preventivato' : importo_preventivato,
     'data_comunica_preventivo' : data_comunica_preventivo?.toIso8601String(),
@@ -118,6 +123,7 @@ class MerceInRiparazioneModel{
       json['data_presa_in_carico'] != null ? DateTime.parse(json['data_presa_in_carico']) : null,
       json['password']?.toString(),
       json['dati']?.toString(),
+      json['presenza_magazzino'],
       json['preventivo'],
       json['importo_preventivato']!= null ? double.parse(json['importo_preventivato'].toString()) : null,
       json['data_comunica_preventivo'] != null ? DateTime.parse(json['data_comunica_preventivo']) : null,

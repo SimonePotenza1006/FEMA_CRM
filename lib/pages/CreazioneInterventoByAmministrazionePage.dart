@@ -728,6 +728,7 @@ class _CreazioneInterventoByAmministrazionePageState
   }
 
   Future<http.Response?> saveMerce() async{
+    bool? magazzino = _selectedUtente != null ? true : false;
     late http.Response response;
     try{
       response = await http.post(
@@ -740,6 +741,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'difetto_riscontrato': _difettoController.text,
             'password' : _passwordController.text,
             'dati' : _datiController.text,
+            'presenza_magazzino' : magazzino,
             'preventivo' : _preventivoRichiesto,
             'utente' : responsabile?.toMap()
         }),

@@ -176,7 +176,7 @@ class InterventoModel {
       json['data_apertura_intervento'] != null ? DateTime.parse(json['data_apertura_intervento']) : null,
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['orario_appuntamento'] != null ? DateTime.parse(json['orario_appuntamento']) : null,
-      json['posizione_gps'].toString(),
+      json['posizione_gps'],
       json['orario_inizio'] != null ? DateTime.parse(json['orario_inizio']) : null,
       json['orario_fine'] != null ? DateTime.parse(json['orario_fine']) : null,
       json['descrizione']?.toString(),

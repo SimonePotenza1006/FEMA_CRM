@@ -163,7 +163,7 @@ class _SalvataggioCredenzialiClientePageState extends State<SalvataggioCredenzia
         );
       }
     } catch(e){
-      print("Qualcosa non vaa");
+      print("Qualcosa non va: $e");
     }
   }
 }

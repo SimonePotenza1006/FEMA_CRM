@@ -105,6 +105,7 @@ class _CompilazionePreventivoMerceInRiparazionePageState extends State<Compilazi
           'data_presa_in_carico': widget.merce.data_presa_in_carico?.toIso8601String(),
           'password': widget.merce.password,
           'dati': widget.merce.dati,
+          'presenza_magazzino' : widget.merce.presenza_magazzino,
           'preventivo': widget.merce.preventivo,
           'importo_preventivato': _importoPreventivatoController.text,
           'diagnosi': _diagnosiController.text,

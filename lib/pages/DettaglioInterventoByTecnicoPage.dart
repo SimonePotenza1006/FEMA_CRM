@@ -3,6 +3,7 @@ import 'package:fema_crm/model/DDTModel.dart';
 import 'package:fema_crm/model/NotaTecnicoModel.dart';
 import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
+import 'package:fema_crm/pages/CreazioneScadenzaPage.dart';
 import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'package:fema_crm/pages/SalvataggioCredenzialiClientePage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -257,7 +258,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CompilazioneRapportinoPage(intervento: widget.intervento),
+                      builder: (context) => CreazioneScadenzaPage(intervento: widget.intervento, cliente: widget.intervento.cliente!,),
                     ),
                   ),
                 ),
@@ -283,30 +284,6 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                     ),
                   ),
                 ),
-                if(widget.intervento.merce!= null && widget.intervento.merce?.preventivo == true)
-                SpeedDialChild(
-                  child: Icon(Icons.qr_code_outlined, color: Colors.white),
-                  backgroundColor: Colors.red,
-                  label: 'Compila preventivo'.toUpperCase(),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CompilazionePreventivoMerceInRiparazionePage(merce: widget.intervento.merce!),
-                    ),
-                  ),
-                ),
-                if(widget.intervento.merce!= null)
-                  SpeedDialChild(
-                    child: Icon(Icons.qr_code_outlined, color: Colors.white),
-                    backgroundColor: Colors.red,
-                    label: 'Compila preventivo'.toUpperCase(),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(intervento: widget.intervento),
-                      ),
-                    ),
-                  ),
                 SpeedDialChild(
                   child: Icon(Icons.qr_code_outlined, color: Colors.white),
                   backgroundColor: Colors.red,
