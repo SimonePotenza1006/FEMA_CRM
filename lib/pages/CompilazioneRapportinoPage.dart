@@ -36,6 +36,7 @@ class _CompilazioneRapportinoPageState
       GlobalKey<SfSignaturePadState>();
   Uint8List? signatureBytes;
   TextEditingController noteController = TextEditingController();
+  TextEditingController _importoController = TextEditingController();
   TextEditingController _descrizioneCredenzialiController = TextEditingController();
   late DateTime selectedDate;
   late TimeOfDay selectedStartTime;
@@ -44,6 +45,7 @@ class _CompilazioneRapportinoPageState
   CategoriaPrezzoListinoModel? selectedListino;
   List<DestinazioneModel> allDestinazioniByCliente = [];
   DestinazioneModel? selectedDestinazione;
+  bool acconto = false;
 
   @override
   void initState() {
@@ -72,7 +74,7 @@ class _CompilazioneRapportinoPageState
                       children: allDestinazioniByCliente.map((destinazione) {
                         return ListTile(
                           leading: const Icon(Icons.home_work_outlined),
-                          title: Text(destinazione.denominazione!),
+                          title: Text(destinazione.indirizzo != null ? destinazione.indirizzo! : "Indirizzo non disponibile"),
                           onTap: () {
                             setState(() {
                               selectedDestinazione = destinazione;
@@ -144,7 +146,9 @@ class _CompilazioneRapportinoPageState
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              Text('Data: ${DateFormat('dd/MM/yyyy').format(selectedDate)}'),
+              Text('Data: ${DateFormat('dd/MM/yyyy').format(selectedDate)}', style: TextStyle(fontSize: 17),),
+              SizedBox(height: 5,),
+              Text('Importo: ${widget.intervento.importo_intervento != null ? widget.intervento.importo_intervento!.toStringAsFixed(2) : "Importo non inserito"}', style: TextStyle(fontSize: 17),),
               SizedBox(height: 10),
               Text(
                 'Seleziona il veicolo:',
@@ -175,7 +179,7 @@ class _CompilazioneRapportinoPageState
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
+                      Text(selectedDestinazione?.indirizzo ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
                       const Icon(Icons.arrow_drop_down),
                     ],
                   ),
@@ -215,9 +219,10 @@ class _CompilazioneRapportinoPageState
               Row(
                 children: [
                   Checkbox(
-                    value: widget.intervento.saldato_da_tecnico ?? false,
+                    value: widget.intervento.saldato ?? false,
                     onChanged: (bool? value) {
                       setState(() {
+                        widget.intervento.saldato = value;
                         widget.intervento.saldato_da_tecnico = value;
                       });
                     },
@@ -225,6 +230,34 @@ class _CompilazioneRapportinoPageState
                   Text('L\'intervento è stato saldato?'),
                 ],
               ),
+              SizedBox(height: 12),
+              Row(crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Checkbox(
+                    value: acconto,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        acconto = value!;
+                      });
+                    },
+                  ),
+                  Text('Hai ricevuto un acconto?'),
+                  SizedBox(width: 30),
+                  // Mostra il TextFormField solo se saldato_da_tecnico è true
+                  if (acconto == true)
+                    SizedBox(
+                      width: 100, // Imposta la larghezza del TextFormField
+                      child: TextFormField(
+                        controller: _importoController,  // Il controller
+                        decoration: InputDecoration(
+                          labelText: 'Importo', // Testo del campo
+                        ),
+                        keyboardType: TextInputType.number, // Tipo di input per numeri
+                      ),
+                    ),
+                ],
+              ),
+
               SizedBox(height: 30),
               Text(
                 'Inserisci la firma del cliente:',
@@ -308,13 +341,20 @@ class _CompilazioneRapportinoPageState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        if(pickedImages.isNotEmpty){
-                          saveImageIntervento();
+                      onPressed: () async {
+                        // Controlla se l'acconto è stato ricevuto
+                        if (acconto == true && _importoController.text.isNotEmpty) {
+                          // Salva la nota se la checkbox di acconto è selezionata
+                          await saveNota();
+                        }
+                        // Controlla se ci sono immagini da caricare
+                        if (pickedImages.isNotEmpty) {
+                          await saveImageIntervento(); // Se ci sono immagini, salva intervento e immagini
                         } else {
-                          saveIntervento();
+                          await saveIntervento(); // Salva solo l'intervento
+                          Navigator.pop(context); // Torna alla pagina precedente
                           Navigator.pop(context);
-                          Navigator.pop(context);ScaffoldMessenger.of(context).showSnackBar(
+                          ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Rapportino registrato!'),
                             ),
@@ -345,6 +385,26 @@ class _CompilazioneRapportinoPageState
         now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
     return dateTime.toIso8601String();
   }
+  
+  Future<void> saveNota() async{
+    try{
+      final response = await http.post(Uri.parse('$ipaddress/api/noteTecnico'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'utente' : widget.intervento.utente!.toMap(),
+            'data' : DateTime.now().toIso8601String(),
+            'nota' : "Ricevuto un acconto pari a ${_importoController.text} €",
+            'intervento' : widget.intervento.toMap(),
+            'cliente' : widget.intervento.cliente?.toMap()
+          })
+      );
+      if(response.statusCode == 201 || response.statusCode == 201){
+        print('daje, nota creata');
+      }
+    } catch(e){
+      print('nota non pubblicata : $e');
+    }
+  }
 
   Future<void> saveIntervento() async {
     try {
@@ -359,12 +419,13 @@ class _CompilazioneRapportinoPageState
             'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
             'orario_fine': DateTime.now().toIso8601String(),
             'descrizione': widget.intervento.descrizione,
-            'importo_intervento': null,
+            'importo_intervento': widget.intervento.importo_intervento,
             'prezzo_ivato' : widget.intervento.prezzo_ivato,
-            'assegnato': true,
+            'acconto' : double.parse(_importoController.text),
+            'assegnato': widget.intervento.assegnato,
             'conclusione_parziale' : widget.intervento.conclusione_parziale,
             'concluso': true,
-            'saldato': false,
+            'saldato': widget.intervento.saldato,
             'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
             'note': widget.intervento.note,
             'relazione_tecnico' : noteController.text,

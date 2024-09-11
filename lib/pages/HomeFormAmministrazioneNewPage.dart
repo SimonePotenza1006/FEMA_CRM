@@ -608,7 +608,7 @@ class _HomeFormAmministrazioneNewPageState
   Future<List<NotaTecnicoModel>> getNote() async {
     try {
       http.Response response = await http.get(
-          Uri.parse('${ipaddress}/api/noteTecnico/ordered')
+          Uri.parse('${ipaddress}/api/noteTecnico/ordered'),
       );
 
       if (response.statusCode == 200) {

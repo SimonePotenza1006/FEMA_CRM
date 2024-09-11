@@ -284,7 +284,12 @@ class _CreazioneInterventoByAmministrazionePageState
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(selectedCliente?.denominazione ?? 'Seleziona Cliente'.toUpperCase(), style: const TextStyle(fontSize: 16)),
+                                      Text(
+                                        (selectedCliente?.denominazione != null && selectedCliente!.denominazione!.length > 15)
+                                            ? '${selectedCliente!.denominazione?.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                            : (selectedCliente?.denominazione ?? 'Seleziona Cliente').toUpperCase(),  // Testo di fallback
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
                                       const Icon(Icons.arrow_drop_down),
                                     ],
                                   ),
@@ -331,7 +336,12 @@ class _CreazioneInterventoByAmministrazionePageState
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(selectedDestinazione?.denominazione ?? 'Seleziona Destinazione'.toUpperCase(), style: const TextStyle(fontSize: 16)),
+                                      Text(
+                                        (selectedDestinazione?.denominazione != null && selectedDestinazione!.denominazione!.length > 15)
+                                            ? '${selectedDestinazione!.denominazione!.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                            : (selectedDestinazione?.denominazione ?? 'Seleziona Destinazione').toUpperCase(),  // Testo di fallback
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
                                       const Icon(Icons.arrow_drop_down),
                                     ],
                                   ),

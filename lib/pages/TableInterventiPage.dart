@@ -43,19 +43,19 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   late InterventoDataSource _dataSource;
   Map<String, double> _columnWidths = {
     'intervento' : 0,
-    'id_intervento' : 120,
-    'data_apertura_intervento': 120,
-    'data': 120,
+    'id_intervento' : 150,
+    'data_apertura_intervento': 200,
+    'data': 150,
     'cliente': 200,
-    'orario_appuntamento': 120,
+    'orario_appuntamento': 260,
     'descrizione': 300,
-    'responsabile' : 200,
-    'importo_intervento': 100,
-    'prezzo_ivato' : 100,
-    'acconto': 100,
-    'inserimento_importo' : 100,
-    'importo_restante' : 130,
-    'assegna_gruppo' : 100,
+    'responsabile' : 230,
+    'importo_intervento': 150,
+    'prezzo_ivato' : 130,
+    'acconto': 150,
+    'inserimento_importo' : 150,
+    'importo_restante' : 150,
+    'assegna_gruppo' : 130,
   };
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
 
@@ -431,6 +431,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             SizedBox(height: 10),
             Expanded(
               child: SfDataGrid(
+                allowPullToRefresh: true,
+                allowMultiColumnSorting: true,
                 allowSorting: true,
                 source: _dataSource,
                 columnWidthMode: ColumnWidthMode.auto,
@@ -474,13 +476,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'ID',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'ID',
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('id_intervento', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['id_intervento']?? double.nan,
-                    minimumWidth: 0,
+                    minimumWidth: 150,
                   ),
                   GridColumn(
                     columnName: 'data_apertura_intervento',
@@ -495,13 +501,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Data Apertura',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'Data apertura'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('data_apertura_intervento', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['data_apertura_intervento']?? double.nan,
-                    minimumWidth: 100, // Imposta la larghezza minima
+                    minimumWidth: 200, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'data',
@@ -516,13 +526,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Data',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'Data'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('data', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['data']?? double.nan,
-                    minimumWidth: 100, // Imposta la larghezza minima
+                    minimumWidth: 150,
                   ),
                   GridColumn(
                     columnName: 'cliente',
@@ -537,13 +551,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Cliente',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'Cliente'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('cliente', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['cliente']?? double.nan,
-                    minimumWidth: 150, // Imposta la larghezza minima
+                    minimumWidth: 200, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'orario_appuntamento',
@@ -558,9 +576,13 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Orario Appuntamento',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'Orario appuntamento'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('orario_appuntamento', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['orario_appuntamento']?? double.nan,
@@ -579,13 +601,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Descrizione',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'Descrizione'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('descrizione', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['descrizione']?? double.nan,
-                    minimumWidth: 200, // Imposta la larghezza minima
+                    minimumWidth: 300, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'responsabile',
@@ -600,13 +626,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Responsabile',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'Responsabile'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('responsabile', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['responsabile']?? double.nan,
-                    minimumWidth: 150,
+                    minimumWidth: 230,
                   ),
                   GridColumn(
                     columnName: 'importo_intervento',
@@ -621,13 +651,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Importo',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'importo'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('importo_intervento', filtro);
+                          });
+                        },
                       ),
                     ),
                     width: _columnWidths['importo_intervento']?? double.nan,
-                    minimumWidth: 80, // Imposta la larghezza minima
+                    minimumWidth: 150, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'inserimento_importo',
@@ -643,15 +677,15 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             )
                         ),
                         child: Text(
-                          'Inserimento Importo',
+                          'Inserimento Importo'.toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         )
                     ),
                     width: _columnWidths['inserimento_importo']?? double.nan,
-                    minimumWidth: 80,
+                    minimumWidth: 150,
                   ),
                   GridColumn(
-                    columnName: 'prezzo_ivato',
+                    columnName: 'prezzo_ivato'.toUpperCase(),
                     label: Container(
                       padding: EdgeInsets.all(8.0),
                       alignment: Alignment.center,
@@ -664,15 +698,15 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                         ),
                       ),
                       child: Text(
-                        'Prezzo Ivato',
+                        'Prezzo Ivato'.toUpperCase(),
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                     ),
                     width: _columnWidths['prezzo_ivato']?? double.nan,
-                    minimumWidth: 100, // Imposta la larghezza minima
+                    minimumWidth: 130, // Imposta la larghezza minima
                   ),
                   GridColumn(
-                    columnName: 'acconto',
+                    columnName: 'acconto'.toUpperCase(),
                     label: Container(
                       padding: EdgeInsets.all(8.0),
                       alignment: Alignment.center,
@@ -685,12 +719,12 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                         ),
                       ),
                       child: Text(
-                        'Acconto',
+                        'Acconto'.toUpperCase(),
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                     ),
                     width: _columnWidths['acconto']?? double.nan,
-                    minimumWidth: 80, // Imposta la larghezza minima
+                    minimumWidth: 150, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'importo_restante',
@@ -706,12 +740,12 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                         ),
                       ),
                       child: Text(
-                        'Importo restante',
+                        'Importo restante'.toUpperCase(),
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                     ),
                     width: _columnWidths['importo_restante']?? double.nan,
-                    minimumWidth: 130, // Imposta la larghezza minima
+                    minimumWidth: 150, // Imposta la larghezza minima
                   ),
                   GridColumn(
                       columnName: 'assegna_gruppo',
@@ -727,7 +761,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             )
                         ),
                         child: Text(
-                          'Seleziona Gruppo',
+                          'Seleziona Gruppo'.toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       )
@@ -744,73 +778,83 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _changeSheet(0),
-                  style: ElevatedButton.styleFrom(
-                    primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                    onPrimary: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    elevation: 2.0,
-                  ),
-                  child: Text('Tutti', style: TextStyle(color: Colors.white)),
-                ),
-                SizedBox(width: 5),
-                ElevatedButton(
-                  onPressed: () => _changeSheet(1),
-                  style: ElevatedButton.styleFrom(
-                    primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                    onPrimary: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    elevation: 2.0,
-                  ),
-                  child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
-                ),
-                SizedBox(width: 5),
-                ElevatedButton(
-                  onPressed: () => _changeSheet(2),
-                  style: ElevatedButton.styleFrom(
-                    primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
-                    onPrimary: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    elevation: 2.0,
-                  ),
-                  child: Text('Conclusi non saldati', style: TextStyle(color: Colors.white)),
-                ),
-                SizedBox(width: 5),
-                ElevatedButton(
-                  onPressed: () => _changeSheet(3),
-                  style: ElevatedButton.styleFrom(
-                    primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                    onPrimary: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    elevation: 2.0,
-                  ),
-                  child: Text('Conclusi e Saldati', style: TextStyle(color: Colors.white)),
-                ),
-                SizedBox(width: 5),
-                ElevatedButton(
-                  onPressed: () => _changeSheet(4),
-                  style: ElevatedButton.styleFrom(
-                    primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                    onPrimary: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    elevation: 2.0,
-                  ),
-                  child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
+                Container(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () => _changeSheet(0),
+                            style: ElevatedButton.styleFrom(
+                              primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                              onPrimary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2.0,
+                            ),
+                            child: Text('Tutti', style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: () => _changeSheet(1),
+                            style: ElevatedButton.styleFrom(
+                              primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                              onPrimary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2.0,
+                            ),
+                            child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: () => _changeSheet(2),
+                            style: ElevatedButton.styleFrom(
+                              primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                              onPrimary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2.0,
+                            ),
+                            child: Text('Conclusi non saldati', style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: () => _changeSheet(3),
+                            style: ElevatedButton.styleFrom(
+                              primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                              onPrimary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2.0,
+                            ),
+                            child: Text('Conclusi e Saldati', style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: () => _changeSheet(4),
+                            style: ElevatedButton.styleFrom(
+                              primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                              onPrimary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2.0,
+                            ),
+                            child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    )
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),
@@ -836,6 +880,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
 class InterventoDataSource extends DataGridSource {
   List<InterventoModel> _interventions = [];
+  List<InterventoModel> interventiFiltrati = [];
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   BuildContext context;
   TextEditingController importoController = TextEditingController();
@@ -848,14 +893,20 @@ class InterventoDataSource extends DataGridSource {
   bool prezzoIvato = false;
 
 
-  InterventoDataSource(this.context, List<InterventoModel> interventions, Map<int, List<UtenteModel>> interventoUtentiMap) {
-    _interventions = interventions;
+  InterventoDataSource(
+      this.context,
+      List<InterventoModel> interventions,
+      Map<int, List<UtenteModel>> interventoUtentiMap
+      ) {
+    _interventions = List.from(interventions);
+    interventiFiltrati = List.from(interventions);
     _interventoUtentiMap = interventoUtentiMap;
   }
 
   void updateData(List<InterventoModel> newInterventions, Map<int, List<UtenteModel>> newInterventoUtentiMap) {
     _interventions.clear();
     _interventions.addAll(newInterventions);
+    interventiFiltrati = List.from(newInterventions);  // Aggiorna anche la lista filtrata
     _interventoUtentiMap = newInterventoUtentiMap;
     notifyListeners();
   }
@@ -863,8 +914,8 @@ class InterventoDataSource extends DataGridSource {
   @override
   List<DataGridRow> get rows {
     List<DataGridRow> rows = [];
-    for (int i = 0; i < _interventions.length; i++) {
-      InterventoModel intervento = _interventions[i];
+    for (int i = 0; i < interventiFiltrati.length; i++) {
+      InterventoModel intervento = interventiFiltrati[i];
       Color? backgroundColor;
       switch (intervento.tipologia?.id) {
         case '7' :
@@ -1134,6 +1185,44 @@ class InterventoDataSource extends DataGridSource {
       ));
     }
     return rows;
+  }
+
+  void filtraColonna(String columnName, String filtro) {
+    if (filtro.isEmpty) {
+      interventiFiltrati = List.from(_interventions);
+    } else {
+      interventiFiltrati = _interventions.where((intervento) {
+        switch (columnName) {
+          case 'descrizione':
+            bool result = intervento.descrizione?.toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
+          case 'id_intervento':
+            bool result = intervento.id?.toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
+          case 'data_apertura_intervento':
+            bool result = intervento.data_apertura_intervento?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
+          case 'data':
+            bool result = intervento.data?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
+          case 'orario_appuntamento':
+            bool result = intervento.orario_appuntamento?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
+          case 'cliente':
+            bool result = intervento.cliente?.denominazione!.toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
+          case 'importo_intervento' :
+            bool result = intervento.importo_intervento?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
+          case 'responsabile':
+            return (intervento.utente?.nome?.toLowerCase().contains(filtro.toLowerCase()) ?? false) ||
+                (intervento.utente?.cognome?.toLowerCase().contains(filtro.toLowerCase()) ?? false);
+          default:
+            return true;
+        }
+      }).toList();
+    }
+    notifyListeners();
   }
 
   Future<void> addToGruppo(InterventoModel intervento) async {
@@ -1611,3 +1700,83 @@ void mostraRicercaInterventiDialog({
     },
   );
 }
+
+class ColumnFilter extends StatelessWidget {
+  final String columnName;
+  final Function(String filtro) onFilterApplied;
+
+  ColumnFilter({required this.columnName, required this.onFilterApplied});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          columnName,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        ),
+        SizedBox(width: 10),
+        GestureDetector(
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return ColumnFilterDialog(
+                  columnName: columnName,
+                  onFilterApplied: onFilterApplied,
+                );
+              },
+            );
+          },
+          child: Icon(
+            Icons.search,
+            size: 20,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ColumnFilterDialog extends StatefulWidget {
+  final String columnName;
+  final Function(String filtro) onFilterApplied;
+
+  ColumnFilterDialog({required this.columnName, required this.onFilterApplied});
+
+  @override
+  _ColumnFilterDialogState createState() => _ColumnFilterDialogState();
+}
+
+class _ColumnFilterDialogState extends State<ColumnFilterDialog> {
+  TextEditingController _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Filtra ${widget.columnName}'),
+      content: TextField(
+        controller: _controller,
+        decoration: InputDecoration(hintText: 'Inserisci un valore con cui filtrare'),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(); // Chiudi il dialog senza filtrare
+          },
+          child: Text('Annulla'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            widget.onFilterApplied(_controller.text);  // Applica il filtro
+            Navigator.of(context).pop();  // Chiudi il dialog
+          },
+          child: Text('Filtra'),
+        ),
+      ],
+    );
+  }
+}
+
+

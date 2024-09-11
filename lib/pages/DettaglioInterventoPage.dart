@@ -107,6 +107,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       setState(() {
         final now = DateTime.now();
         widget.intervento.orario_appuntamento = DateTime(widget.intervento.data!.year, widget.intervento.data!.month, widget.intervento.data!.day, pickedTime.hour, pickedTime.minute);
+        _selectedTimeAppuntamento = pickedTime;
       });
     }
   }
@@ -122,6 +123,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         widget.intervento.data = picked;
+        selectedDate = picked;
       });
     }
   }
@@ -267,33 +269,24 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
-  void _assegnaUtente(UtenteModel utenteSelezionato) async {
-    try {
-      widget.intervento.assegnato = true;
-      print(utenteSelezionato.toMap());
-      String? dataString = widget.intervento.data?.toIso8601String();
-      String? orarioInizioString = widget.intervento.orario_inizio != null
-          ? widget.intervento.orario_inizio?.toIso8601String()
-          : null;
-      String? orarioFineString = widget.intervento.orario_fine != null
-          ? widget.intervento.orario_fine?.toIso8601String()
-          : null;
+  void modificaDescrizione() async{
+    try{
       final response = await http.post(
         Uri.parse('${ipaddress}/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
-          'data': dataString,
+          'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'posizione_gps' : widget.intervento.posizione_gps,
-          'orario_inizio': orarioInizioString,
-          'orario_fine': orarioFineString,
-          'descrizione': widget.intervento.descrizione,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': descrizioneController.text.toUpperCase(),
           'importo_intervento': widget.intervento.importo_intervento,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
           'acconto' : widget.intervento.acconto,
-          'assegnato': true,
+          'assegnato': widget.intervento.assegnato,
           'conclusione_parziale' : widget.intervento.conclusione_parziale,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
@@ -301,29 +294,30 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'note': widget.intervento.note,
           'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
-          'utente': utenteSelezionato.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
           'cliente': widget.intervento.cliente?.toMap(),
           'veicolo': widget.intervento.veicolo?.toMap(),
           'merce' :widget.intervento.merce?.toMap(),
           'tipologia': widget.intervento.tipologia?.toMap(),
           'categoria_intervento_specifico':
-              widget.intervento.categoria_intervento_specifico?.toMap(),
+          widget.intervento.categoria_intervento_specifico?.toMap(),
           'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
           'destinazione': widget.intervento.destinazione?.toMap(),
           'gruppo' : widget.intervento.gruppo?.toMap()
         }),
       );
-      if(response.statusCode == 200){
+      if(response.statusCode == 201){
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Intervento assegnato con successo'),
+            content: Text('Descrizione cambiata con successo!'),
           ),
         );
+        setState(() {
+          widget.intervento.descrizione = descrizioneController.text;
+        });
       }
-    } catch (e) {
-      print('${widget.intervento.utente.toString()}');
-      print('${utenteSelezionato.nomeCompleto()}');
-      print('Errore durante l\'assegnazione dell\'intervento: $e, ');
+    } catch(e){
+      print('Qualcosa non va: $e');
     }
   }
 
@@ -398,16 +392,61 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                           if(modificaDescrizioneVisible)
                             SizedBox(
                               width: 500,
-                              child: TextFormField(
-                                controller: descrizioneController,
-                                decoration: InputDecoration(
-                                  labelText: 'Descrizione',
-                                  hintText: 'Aggiungi una descrizione',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: descrizioneController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Descrizione',
+                                        hintText: 'Aggiungi una descrizione',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                    ),
+                                    child: FloatingActionButton(
+                                      heroTag: "Tag2",
+                                      onPressed: () {
+                                        if(descrizioneController.text.isNotEmpty){
+                                          modificaDescrizione();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare una descrizione nulla!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica Descrizione'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
                             ),
                           SizedBox(height: 10),
                           Row(
@@ -502,7 +541,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 15),
                           IntrinsicHeight(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -571,14 +609,12 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
                                 title: 'Cliente',
                                 value: widget.intervento.cliente?.denominazione ?? 'N/A', context: context),
                           ),
-                          SizedBox(height: 10),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -587,7 +623,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 context: context
                             ),
                           ),
-                          SizedBox(height : 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -596,7 +631,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 context: context
                             ),
                           ),
-                          SizedBox(height : 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -605,7 +639,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 context: context
                             ),
                           ),
-                          SizedBox(height : 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -614,7 +647,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 context: context
                             ),
                           ),
-                          SizedBox(height : 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -623,7 +655,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 context: context
                             ),
                           ),
-                          SizedBox(height : 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -746,7 +777,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             ),
                           SizedBox(height: 15),
                           buildRelazioneForm(title: 'Relazione tecnico'),
-                          SizedBox(height: 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -755,7 +785,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 context: context
                             ),
                           ),
-                          SizedBox(height: 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -763,7 +792,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               value: booleanToString(widget.intervento.saldato ?? false),
                             ),
                           ),
-                          SizedBox(height: 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -780,7 +808,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 context: context
                             ),
                           ),
-                          SizedBox(height: 15),
                           SizedBox(
                             width: 500,
                             child: buildInfoRow(
@@ -813,7 +840,14 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 10),
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                    title: 'Presenza magazzino'.toUpperCase(),
+                                    value: widget.intervento.merce?.presenza_magazzino == true ? "SI" : "NO",
+                                    context: context
+                                  ),
+                                ),
                                 SizedBox(
                                   width: 500,
                                   child : buildInfoRow(
@@ -822,7 +856,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                       context: context
                                   ),
                                 ),
-                                SizedBox(height: 15),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
@@ -831,7 +864,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                       context: context
                                   ),
                                 ),
-                                SizedBox(height: 15),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
@@ -840,16 +872,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                       context: context
                                   ),
                                 ),
-                                SizedBox(height: 15),
-                                SizedBox(
-                                  width: 500,
-                                  child: buildInfoRow(
-                                    title: 'Diagnosi',
-                                    value: widget.intervento.merce?.diagnosi ?? 'N/A',
-                                      context: context
-                                  ),
-                                ),
-                                SizedBox(height: 15),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
@@ -858,7 +880,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                       context: context
                                   ),
                                 ),
-                                SizedBox(height: 15),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
@@ -867,7 +888,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                       context: context
                                   ),
                                 ),
-                                SizedBox(height: 15),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
@@ -876,7 +896,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                       context: context
                                   ),
                                 ),
-                                SizedBox(height: 15),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
@@ -884,7 +903,23 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     value: widget.intervento.merce?.dati ?? 'N/A',
                                       context: context
                                   ),
-                                )
+                                ),
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Diagnosi',
+                                      value: widget.intervento.merce?.diagnosi ?? 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Risoluzione',
+                                      value: widget.intervento.merce?.risoluzione ?? 'N/A',
+                                      context: context
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -1315,49 +1350,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   DateTime convertTimeOfDayToDateTime(TimeOfDay timeOfDay) {
     final now = DateTime.now();
     return DateTime(now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
-  }
-
-
-  Future<void> saveIntervento() async {
-    try {
-      final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'id': widget.intervento.id,
-            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
-            'data': widget.intervento.data?.toIso8601String(),
-            'orario_appuntamento' : null,
-            'posizione_gps' : widget.intervento.posizione_gps,
-            'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
-            'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
-            'descrizione': descrizioneController.text,
-            'importo_intervento': double.parse(importoController.text),
-            'prezzo_ivato' : widget.intervento.prezzo_ivato,
-            'acconto' : double.parse(widget.intervento.acconto.toString()),
-            'assegnato': true,
-            'conclusione_parziale' : widget.intervento.conclusione_parziale,
-            'concluso': true,
-            'saldato': false,
-            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
-            'note': widget.intervento.note,
-            'relazione_intervento' : widget.intervento.relazione_tecnico,
-            'firma_cliente': widget.intervento.firma_cliente,
-            'utente': widget.intervento.utente?.toMap(),
-            'cliente': widget.intervento.cliente?.toMap(),
-            'veicolo': widget.intervento.veicolo?.toMap(),
-            'merce': widget.intervento.merce?.toMap(),
-            'tipologia': widget.intervento.tipologia?.toMap(),
-            'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
-            'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-            'destinazione': widget.intervento.destinazione?.toMap(),
-            'gruppo': widget.intervento.gruppo?.toMap()
-          }));
-      if (response.statusCode == 201) {
-        print('EVVAIIIIIIII');
-      }
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'intervento: $e');
-    }
   }
 
   Future<void> assegna() async {

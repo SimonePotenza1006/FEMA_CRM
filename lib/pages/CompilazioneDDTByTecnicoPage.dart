@@ -246,13 +246,15 @@ class _CompilazioneDDTByTecnicoPageState
 
   Widget buildProdottoItem(int index) {
     final prodotto = widget.prodotti[index];
+    final descrizione = prodotto.descrizione != null ? prodotto.descrizione : "Descrizione non disponibile";
+    final codice = prodotto.codice_danea != null ? prodotto.codice_danea : "Codice non disponibile";
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              prodotto.descrizione ?? '',
+              '${codice} - ${descrizione}',
               style: TextStyle(fontSize: 16),
             ),
           ),
