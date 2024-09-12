@@ -1,12 +1,10 @@
 import 'dart:io';
-
-
 import 'package:intl/intl.dart';
-
 import 'CategoriaInterventoSpecificoModel.dart';
 import 'ClienteModel.dart';
 import 'ProdottoModel.dart';
 import 'TipologiaInterventoModel.dart';
+import 'UtenteModel.dart';
 
 class SopralluogoModel {
   String? id;
@@ -16,6 +14,7 @@ class SopralluogoModel {
   String? posizione;
   TipologiaInterventoModel? tipologia;
   CategoriaInterventoSpecificoModel? categoria;
+  UtenteModel? utente;
 
   SopralluogoModel(
       this.id,
@@ -25,6 +24,7 @@ class SopralluogoModel {
       this.posizione,
       this.tipologia,
       this.categoria,
+      this.utente
       );
 
   Map<String, dynamic> toMap() {
@@ -36,6 +36,7 @@ class SopralluogoModel {
       'posizione' : posizione,
       'tipologia': tipologia,
       'categoria': categoria,
+      'utente' : utente
     };
     return map;
   }
@@ -48,15 +49,17 @@ class SopralluogoModel {
       posizione = map['posizione'];
       tipologia = map['tipologia'] != null ? TipologiaInterventoModel.fromMap(map['tipologia']) : null;
       categoria = map['categoria'] != null ? CategoriaInterventoSpecificoModel.fromMap(map['categoria']) : null;
+      utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'descrizione': descrizione,
-        'cliente': cliente,
+        'cliente': cliente?.toJson(),
         'data': data != null ? DateFormat("yyyy-MM-ddTHH:mm:ss").format(data!) : null,
-        'tipologia': tipologia,
-        'categoria': categoria,
+        'tipologia': tipologia?.toJson(),
+        'categoria': categoria?.toJson(),
+        'utente' : utente?.toJson()
       };
 
   factory SopralluogoModel.fromJson(Map<String, dynamic> json) {
@@ -68,6 +71,7 @@ class SopralluogoModel {
         json['posizione']?.toString(),
         json['tipologia'] != null ? TipologiaInterventoModel.fromJson(json['tipologia']) : null,
         json['categoria'] != null ? CategoriaInterventoSpecificoModel.fromJson(json['categoria']) : null,
+        json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null
     );
   }
 }

@@ -10,6 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:intl/intl.dart';
 import '../model/SpesaVeicoloModel.dart';
+import '../model/TipologiaSpesaVeicoloModel.dart';
+import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
 
 class TableSpeseVeicoliPage extends StatefulWidget{
@@ -24,6 +26,9 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
   late SpesaDataSource _dataSource;
   VeicoloModel? _selectedVeicolo;
   List<SpesaVeicoloModel> allSpese = [];
+  List<SpesaVeicoloModel> _filteredSpese = [];
+  List<VeicoloModel> allVeicoli = [];
+  List<TipologiaSpesaVeicoloModel> allTipologie = [];
   int _selectedYear = DateTime.now().year;
   Map<String, double> _columnWidths ={
     'spesa' : 0,
@@ -104,6 +109,88 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
     super.initState();
     getAllSpese();
     _dataSource = SpesaDataSource(context, allSpese);
+    getAllVeicoli();
+    getAllTipologie();
+  }
+
+  Future<void> getAllTipologie() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaSpesaVeicolo');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<TipologiaSpesaVeicoloModel> tipologie = [];
+        for (var item in jsonData) {
+          tipologie.add(TipologiaSpesaVeicoloModel.fromJson(item));
+        }
+        setState(() {
+          allTipologie = tipologie;
+        });
+      } else {
+        throw Exception(
+            'Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Errore di connessione'),
+            content: Text(
+                'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> getAllVeicoli() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<VeicoloModel> veicoli = [];
+        for (var item in jsonData) {
+          veicoli.add(VeicoloModel.fromJson(item));
+        }
+        setState(() {
+          allVeicoli = veicoli;
+        });
+      } else {
+        throw Exception(
+            'Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Errore di connessione'),
+            content: Text(
+                'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Future<void> getAllSpese() async {
@@ -119,6 +206,7 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
         spese.sort((a, b) => a.veicolo!.id!.compareTo(b.veicolo!.id!));
         setState(() {
           allSpese = spese;
+          _filteredSpese = spese;
           _dataSource = SpesaDataSource(context, allSpese);
         });
       } else {
@@ -170,7 +258,7 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
               ),
               SizedBox(width: 20,)
             ],
-          )
+          ),
         ],
       ),
       body: Padding(
@@ -180,6 +268,8 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
             SizedBox(height: 10),
             Expanded(
                 child: SfDataGrid(
+                  allowTriStateSorting: true,
+                  allowMultiColumnSorting: true,
                   allowSorting: true,
                   source: _dataSource,
                   columnWidthMode: ColumnWidthMode.auto,
@@ -432,16 +522,49 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
-        onPressed: _showVehicleSelectionDialog,
-        child: Icon(
-          Icons.download,
-          color: Colors.white,
-        ),
-      ),
+      floatingActionButton:Stack(
+        children: [
+          Positioned(
+              bottom: 16,
+              right: 16,
+              child: Column(
+                children: [
+                  FloatingActionButton(
+                    backgroundColor: Colors.red,
+                    onPressed: _showVehicleSelectionDialog,
+                    child: Icon(
+                      Icons.download,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  FloatingActionButton(
+                    backgroundColor: Colors.red,
+                    onPressed: () {
+                      mostraRicercaInterventiDialog(
+                          context: context,
+                          spese: allSpese,
+                          veicoli: allVeicoli,
+                          tipologie: allTipologie,
+                          dataSource: _dataSource,
+                          onFiltrati: (speseFiltrate){
+                            _dataSource.updateData(speseFiltrate);
+                          }
+                      );
+                    },
+                    child: Icon(
+                      Icons.filter_alt_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              )
+          )
+        ],
+      )
     );
   }
+
 
   List<VeicoloModel> getUniqueVeicoli() {
     Map<int, VeicoloModel> veicoloMap = {}; // Usa una mappa per evitare duplicati
@@ -561,11 +684,18 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
 
 class SpesaDataSource extends DataGridSource {
   List<SpesaVeicoloModel> _spese = [];
+  List<SpesaVeicoloModel> _speseOriginali = [];
   BuildContext context;
   String ipaddres = 'http://gestione.femasistemi.it:8090';
 
   SpesaDataSource(this.context, List<SpesaVeicoloModel> spese) {
     _spese = spese;
+    _speseOriginali = List.from(spese);
+  }
+
+  void resetData() {
+    _spese = List.from(_speseOriginali); // Ripristina la lista originale
+    notifyListeners();
   }
 
   // Funzione per calcolare il totale per tipologia e veicolo
@@ -586,6 +716,12 @@ class SpesaDataSource extends DataGridSource {
       }
     }
     return totale;
+  }
+
+  void updateData(List<SpesaVeicoloModel> spese){
+    _spese.clear();
+    _spese.addAll(spese);
+    notifyListeners();
   }
 
 
@@ -674,3 +810,212 @@ class SpesaDataSource extends DataGridSource {
     );
   }
 }
+
+void mostraRicercaInterventiDialog({
+  required BuildContext context,
+  required List<TipologiaSpesaVeicoloModel> tipologie,
+  required List<VeicoloModel> veicoli,
+  required List<SpesaVeicoloModel> spese,
+  required Function(List<SpesaVeicoloModel>) onFiltrati,
+  required SpesaDataSource dataSource,
+}) {
+  DateTime? startDate;
+  DateTime? endDate;
+  TipologiaSpesaVeicoloModel? selectedTipologia;
+  VeicoloModel? selectedVeicolo;
+
+  // Funzioni di filtro (già presenti)
+  List<SpesaVeicoloModel> filtraPerVeicolo(List<SpesaVeicoloModel> spese, VeicoloModel veicolo) {
+    return spese.where((spesa) => spesa.veicolo?.id == veicolo.id).toList();
+  }
+
+  List<SpesaVeicoloModel> filtraPerTipologia(List<SpesaVeicoloModel> spese, TipologiaSpesaVeicoloModel tipologia) {
+    return spese.where((spesa) => spesa.tipologia_spesa?.id == tipologia.id).toList();
+  }
+
+  List<SpesaVeicoloModel> filtraPerIntervalloDate(List<SpesaVeicoloModel> spese, DateTime startDate, DateTime endDate) {
+    return spese.where((spesa) {
+      return spesa.data != null &&
+          spesa.data!.isAfter(startDate) &&
+          spesa.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<SpesaVeicoloModel> filtraPerVeicoloEIntervalloDate(List<SpesaVeicoloModel> spese, VeicoloModel veicolo, DateTime startDate, DateTime endDate) {
+    return spese.where((spesa) {
+      return spesa.veicolo?.id == veicolo.id &&
+          spesa.data != null &&
+          spesa.data!.isAfter(startDate) &&
+          spesa.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  List<SpesaVeicoloModel> filtraPerVeicoloTipologiaEIntervalloDate(List<SpesaVeicoloModel> spese, TipologiaSpesaVeicoloModel tipologia, VeicoloModel veicolo, DateTime startDate, DateTime endDate) {
+    return spese.where((spesa) {
+      return spesa.veicolo?.id == veicolo.id &&
+          spesa.tipologia_spesa?.id == tipologia.id &&
+          spesa.data != null &&
+          spesa.data!.isAfter(startDate) &&
+          spesa.data!.isBefore(endDate);
+    }).toList();
+  }
+
+  // Mostra dialog
+  showDialog(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text('Cerca Spese'.toUpperCase()),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Filtro per data inizio e fine
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                startDate = pickedDate;
+                              });
+                            }
+                          },
+                          child: InputDecorator(
+                            decoration: InputDecoration(labelText: 'Data Inizio'),
+                            child: Text(startDate == null
+                                ? 'Seleziona'.toUpperCase()
+                                : DateFormat('dd/MM/yyyy').format(startDate!)),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2100),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                endDate = pickedDate;
+                              });
+                            }
+                          },
+                          child: InputDecorator(
+                            decoration: InputDecoration(labelText: 'Data Fine'),
+                            child: Text(endDate == null
+                                ? 'Seleziona'.toUpperCase()
+                                : DateFormat('dd/MM/yyyy').format(endDate!)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  // Dropdown per veicolo
+                  DropdownButtonFormField<VeicoloModel>(
+                    decoration: InputDecoration(labelText: 'Seleziona Veicolo'.toUpperCase()),
+                    value: selectedVeicolo,
+                    items: veicoli.map((veicolo) {
+                      return DropdownMenuItem(
+                        value: veicolo,
+                        child: Text(veicolo.descrizione!),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        selectedVeicolo = val;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  // Dropdown per tipologia
+                  DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
+                    decoration: InputDecoration(labelText: 'Seleziona Tipologia'.toUpperCase()),
+                    value: selectedTipologia,
+                    items: tipologie.map((tipologia) {
+                      return DropdownMenuItem(
+                        value: tipologia,
+                        child: Text(tipologia.descrizione!),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        selectedTipologia = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              // Aggiungiamo il pulsante "Reset" per azzerare i filtri e ripristinare tutte le spese
+              TextButton(
+                onPressed: () {
+                  dataSource.resetData();  // Reset della lista delle spese
+                  dataSource.updateData(dataSource._speseOriginali);
+                  // Passa le spese originali alla funzione di callback
+                  Navigator.of(context).pop();  // Chiudi il dialog
+                },
+                child: Text('Reset Filtri'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Annulla'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  List<SpesaVeicoloModel> speseFiltrate = spese;
+
+                  // Filtro per veicolo
+                  if (selectedVeicolo != null) {
+                    speseFiltrate = filtraPerVeicolo(speseFiltrate, selectedVeicolo!);
+                  }
+
+                  // Filtro per tipologia
+                  if (selectedTipologia != null) {
+                    speseFiltrate = filtraPerTipologia(speseFiltrate, selectedTipologia!);
+                  }
+
+                  // Filtro per intervallo di date
+                  if (startDate != null && endDate != null) {
+                    if (selectedVeicolo != null && selectedTipologia != null) {
+                      speseFiltrate = filtraPerVeicoloTipologiaEIntervalloDate(
+                          speseFiltrate, selectedTipologia!, selectedVeicolo!, startDate!, endDate!);
+                    } else if (selectedVeicolo != null) {
+                      speseFiltrate = filtraPerVeicoloEIntervalloDate(
+                          speseFiltrate, selectedVeicolo!, startDate!, endDate!);
+                    } else {
+                      speseFiltrate = filtraPerIntervalloDate(speseFiltrate, startDate!, endDate!);
+                    }
+                  }
+                  onFiltrati(speseFiltrate);
+                  Navigator.of(context).pop();
+                },
+                child: Text('Cerca'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+

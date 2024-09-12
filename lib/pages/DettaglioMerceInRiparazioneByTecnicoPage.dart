@@ -1,4 +1,5 @@
 import 'package:fema_crm/model/InterventoModel.dart';
+import 'package:fema_crm/pages/AggiuntaNotaByTecnicoPage.dart';
 import 'package:flutter/material.dart';
 import 'package:fema_crm/model/MerceInRiparazioneModel.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -6,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../model/ProdottoModel.dart';
 import 'CreazioneScadenzaPage.dart';
 import 'SalvataggioCredenzialiClientePage.dart';
 
@@ -27,14 +29,85 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
   final TextEditingController risoluzioneController = TextEditingController();
   final TextEditingController prodottiInstallatiController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  List<ProdottoModel> allProdotti = [];
+  List<ProdottoModel> filteredProdotti = [];
+  List<ProdottoModel> selectedProdotti = [];
+  late TextEditingController searchController;
+  bool isSearching = false;
 
+
+  Widget _buildSearchField() {
+    return TextField(
+      controller: searchController,
+      autofocus: true,
+      decoration: InputDecoration(
+        hintText: 'Cerca prodotti...'.toUpperCase(),
+        border: InputBorder.none,
+        hintStyle: TextStyle(color: Colors.black),
+      ),
+      style: TextStyle(color: Colors.black),
+      onChanged: filterProdotti,
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    diagnosiController.text = widget.intervento.merce?.diagnosi ?? '';
-    risoluzioneController.text = widget.intervento.merce?.risoluzione ?? '';
-    prodottiInstallatiController.text = widget.intervento.merce?.prodotti_installati ?? '';
+    getAllProdotti();
+    searchController = TextEditingController();
+  }
+
+  void startSearch() {
+    setState(() {
+      isSearching = true;
+    });
+  }
+
+  void stopSearch() {
+    setState(() {
+      isSearching = false;
+      searchController.clear();
+      filteredProdotti = allProdotti; // Ripristina la lista dei prodotti filtrati
+    });
+  }
+
+  void filterProdotti(String query) {
+    final filtered = allProdotti.where((prodotto) {
+      final descrizione = prodotto.descrizione?.toLowerCase() ?? '';
+      final codProdForn = prodotto.cod_prod_forn?.toLowerCase() ?? '';
+      final codiceDanea = prodotto.codice_danea?.toLowerCase() ?? '';
+      final lottoSeriale = prodotto.lotto_seriale?.toLowerCase() ?? '';
+      final categoria = prodotto.categoria?.toUpperCase() ?? '';
+      return descrizione.contains(query.toLowerCase()) ||
+          codProdForn.contains(query.toLowerCase()) ||
+          codiceDanea.contains(query.toLowerCase()) ||
+          lottoSeriale.contains(query.toLowerCase()) ||
+          categoria.contains(query.toUpperCase());
+    }).toList();
+    setState(() {
+      filteredProdotti = filtered;
+    });
+  }
+
+  Future<void> getAllProdotti() async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<ProdottoModel> prodotti = [];
+        for (var item in jsonData) {
+          prodotti.add(ProdottoModel.fromJson(item));
+        }
+        setState(() {
+          allProdotti = prodotti;
+          filteredProdotti = prodotti;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
   }
 
   @override
@@ -65,14 +138,14 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildDetailRow(title:'Data arrivo', value: widget.intervento.data != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.intervento.merce!.data!) : '', context: context),
-                      _buildDetailRow(title: 'Data presa in carico', value: widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.merce.data_presa_in_carico!) : "NESSUNA DATA", context: context),
+                      _buildDetailRow(title: 'Presa in carico', value: widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.merce.data_presa_in_carico!) : "NESSUNA DATA", context: context),
                       _buildDetailRow(title:'Articolo', value: widget.intervento.merce?.articolo ?? '', context: context),
                       _buildDetailRow(title:'Accessori', value: widget.intervento.merce?.accessori ?? '', context: context),
                       _buildDetailRow(title:'Difetto Riscontrato', value: widget.intervento.merce?.difetto_riscontrato ?? '', context: context),
                       //_buildDetailRotitle:w('Data Presa in Carico:', widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_presa_in_carico!) : ''),
                       _buildDetailRow(title:'Password', value: widget.intervento.merce?.password ?? '', context: context),
                       _buildDetailRow(title:'Dati', value: widget.intervento.merce?.dati ?? '', context: context),
-                      _buildDetailRow(title:'Preventivo', value: widget.intervento.merce?.preventivo != null ? (widget.intervento.merce!.preventivo! ? 'Preventivo richiesto' : 'Preventivo non richiesto') : '', context: context),
+                      _buildDetailRow(title:'Preventivo', value: widget.intervento.merce?.preventivo != null ? (widget.intervento.merce!.preventivo! ? 'Richiesto' : 'non richiesto') : '', context: context),
                       if (widget.merce.preventivo != null && widget.merce.preventivo == true)
                         SizedBox(
                           child: Column(
@@ -80,7 +153,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                               _buildDetailRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito", context: context),
                               SizedBox(
                                   width: 500,
-                                  child: Row(
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       SizedBox(
@@ -94,7 +167,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 10),
+                                      SizedBox(height: 10),
                                       ElevatedButton(
                                         onPressed: () {
                                           if(importoPreventivatoController.text.isNotEmpty){
@@ -106,7 +179,6 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                                               ),
                                             );
                                           }
-
                                         },
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.red,
@@ -124,11 +196,11 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                       _buildDetailRow(title:'Diagnosi', value:widget.intervento.merce?.diagnosi ?? 'N/A', context: context),
                       SizedBox(
                         width: 500,
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(
-                              width: 210,
+                              width: 250,
                               child: TextFormField(
                                 controller: diagnosiController,
                                 decoration: InputDecoration(
@@ -141,6 +213,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                                 maxLines: null,
                               ),
                             ),
+                            SizedBox(height: 12),
                             ElevatedButton(
                               onPressed: () {
                                 if(diagnosiController.text.isNotEmpty){
@@ -152,7 +225,6 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                                     ),
                                   );
                                 }
-
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.red,
@@ -168,11 +240,11 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                       _buildDetailRow(title: 'Risoluzione', value: widget.intervento.merce?.risoluzione ?? 'N/A', context: context),
                       SizedBox(
                         width: 500,
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(
-                              width: 210,
+                              width: 250,
                               child: TextFormField(
                                 controller: risoluzioneController,
                                 decoration: InputDecoration(
@@ -185,6 +257,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                                 maxLines: null,
                               ),
                             ),
+                            SizedBox(height: 12),
                             ElevatedButton(
                               onPressed: () {
                                 if(risoluzioneController.text.isNotEmpty){
@@ -210,11 +283,11 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                       _buildDetailRow(title: 'Prodotti Installati', value: widget.intervento.merce?.prodotti_installati ?? 'N/A', context: context),
                       SizedBox(
                         width: 500,
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(
-                              width: 210,
+                              width: 250,
                               child: TextFormField(
                                 controller: prodottiInstallatiController,
                                 decoration: InputDecoration(
@@ -227,6 +300,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                                 maxLines: null,
                               ),
                             ),
+                            SizedBox(height: 12),
                             ElevatedButton(
                               onPressed: () {
                                 if(prodottiInstallatiController.text.isNotEmpty){
@@ -248,6 +322,114 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                           ],
                         ),
                       ),
+                      SizedBox(height: 20),
+                      SizedBox(height: 12),
+                      Center(
+                        child: Text('SELEZIONARE I PRODOTTI INSTALLATI SE PRESENTI IN MAGAZZINO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        width: 500,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _buildSearchField(),
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.search),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Container(
+                        width: 500,
+                        height: 400,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.grey[300]!),
+                          color: Colors.white
+                        ),
+                        child: FutureBuilder<List<ProdottoModel>>(
+                          future: Future.value(allProdotti),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<ProdottoModel> prodotti = filteredProdotti;
+                              return ListView.builder(
+                                itemCount: prodotti.length,
+                                itemBuilder: (context, index) {
+                                  ProdottoModel prodotto = prodotti[index];
+                                  final isSelected = selectedProdotti.contains(prodotto);
+
+                                  return CheckboxListTile(
+                                    title: Text(prodotto.descrizione!.toUpperCase()),
+                                    value: isSelected,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        if (value == true) {
+                                          // Aggiungi prodotto se selezionato
+                                          selectedProdotti.add(prodotto);
+                                        } else {
+                                          // Rimuovi prodotto se deselezionato
+                                          selectedProdotti.remove(prodotto);
+                                        }
+                                      });
+                                    },
+                                  );
+                                },
+                              );
+                            } else {
+                              return const Center(child: Text('Nessun prodotto nello storico'));
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      if(selectedProdotti.isNotEmpty)
+                        SizedBox(
+                          width: 400,
+                          child: ListaPuntataProdotti(selectedProdotti: selectedProdotti),
+                        ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: SizedBox(
+                          width: 200,
+                          child: Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                saveRelazioni().whenComplete(() =>
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Prodotti aggiunti correttamente alla riparazione'),
+                                    ),
+                                  )
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                                onPrimary: Colors.white,
+                                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text('salva'.toUpperCase()),
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -291,6 +473,17 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                     context,
                     MaterialPageRoute(
                       builder: (context) => SalvataggioCredenzialiClientePage(cliente: widget.intervento.cliente!, utente: widget.intervento.utente!),
+                    ),
+                  ),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.edit, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Lascia una nota'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AggiuntaNotaByTecnicoPage(intervento: widget.intervento, utente: widget.intervento.utente!,),
                     ),
                   ),
                 ),
@@ -342,6 +535,31 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
         ],
       ),
     );
+  }
+
+  Future<void> saveRelazioni() async{
+    try{
+      for(var prodotto in selectedProdotti){
+        try{
+          final response = await http.post(
+            Uri.parse('$ipaddress/api/relazioneProdottoIntervento'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'prodotto' : prodotto,
+              'intervento' : widget.intervento.toMap(),
+              'presenza_storico_utente' : true,
+            })
+          );
+        } catch(e){
+          print('1 Qualcosa non va:$e');
+        }
+      }
+      setState(() {
+        selectedProdotti.clear();
+      });
+    } catch(e){
+      print('2 Qualcosa non va:$e');
+    }
   }
 
 
@@ -559,7 +777,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
       );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Importo preventivato salvato'),
+          content: Text('Diagnosi salvata'),
         ),
       );
       setState(() {
@@ -731,7 +949,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                     Text(
                       title.toUpperCase() + ": ",
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87, // Colore contrastante per il testo
                       ),
@@ -745,7 +963,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
                       Text(
                         displayedValue.toUpperCase(),
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: Colors.black,
                           fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
                         ),
@@ -881,3 +1099,32 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
   }
 
 }
+
+class ListaPuntataProdotti extends StatelessWidget {
+  final List<ProdottoModel> selectedProdotti;
+
+  ListaPuntataProdotti({required this.selectedProdotti});
+
+  @override
+  Widget build(BuildContext context) {
+    // Se la lista dei prodotti selezionati è vuota, restituiamo un messaggio
+    if (selectedProdotti.isEmpty) {
+      return const Text('Nessun prodotto selezionato');
+    }
+
+    // Creiamo una colonna con i testi puntati
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: selectedProdotti.map((prodotto) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2.0),
+          child: Text(
+            '• ${prodotto.descrizione}',
+            style: const TextStyle(fontSize: 16),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+

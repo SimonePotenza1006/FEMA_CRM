@@ -775,85 +775,88 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 },
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            Flex(
+              // height: 60,
+              direction: Axis.horizontal,
               children: [
-                Container(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(width: 10),
-                          ElevatedButton(
-                            onPressed: () => _changeSheet(0),
-                            style: ElevatedButton.styleFrom(
-                              primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                              onPrimary: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                Expanded(
+                  child:
+                  Container(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => _changeSheet(0),
+                              style: ElevatedButton.styleFrom(
+                                primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                                onPrimary: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                elevation: 2.0,
                               ),
-                              elevation: 2.0,
+                              child: Text('Tutti', style: TextStyle(color: Colors.white)),
                             ),
-                            child: Text('Tutti', style: TextStyle(color: Colors.white)),
-                          ),
-                          SizedBox(width: 5),
-                          ElevatedButton(
-                            onPressed: () => _changeSheet(1),
-                            style: ElevatedButton.styleFrom(
-                              primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                              onPrimary: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                            SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () => _changeSheet(1),
+                              style: ElevatedButton.styleFrom(
+                                primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                                onPrimary: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                elevation: 2.0,
                               ),
-                              elevation: 2.0,
+                              child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
                             ),
-                            child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
-                          ),
-                          SizedBox(width: 5),
-                          ElevatedButton(
-                            onPressed: () => _changeSheet(2),
-                            style: ElevatedButton.styleFrom(
-                              primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
-                              onPrimary: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                            SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () => _changeSheet(2),
+                              style: ElevatedButton.styleFrom(
+                                primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                                onPrimary: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                elevation: 2.0,
                               ),
-                              elevation: 2.0,
+                              child: Text('Conclusi non saldati', style: TextStyle(color: Colors.white)),
                             ),
-                            child: Text('Conclusi non saldati', style: TextStyle(color: Colors.white)),
-                          ),
-                          SizedBox(width: 5),
-                          ElevatedButton(
-                            onPressed: () => _changeSheet(3),
-                            style: ElevatedButton.styleFrom(
-                              primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                              onPrimary: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                            SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () => _changeSheet(3),
+                              style: ElevatedButton.styleFrom(
+                                primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                onPrimary: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                elevation: 2.0,
                               ),
-                              elevation: 2.0,
+                              child: Text('Conclusi e Saldati', style: TextStyle(color: Colors.white)),
                             ),
-                            child: Text('Conclusi e Saldati', style: TextStyle(color: Colors.white)),
-                          ),
-                          SizedBox(width: 5),
-                          ElevatedButton(
-                            onPressed: () => _changeSheet(4),
-                            style: ElevatedButton.styleFrom(
-                              primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                              onPrimary: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                            SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () => _changeSheet(4),
+                              style: ElevatedButton.styleFrom(
+                                primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                onPrimary: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                elevation: 2.0,
                               ),
-                              elevation: 2.0,
+                              child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
                             ),
-                            child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
-                          ),
-                        ],
-                      ),
-                    )
-                ),
-              ],
+                          ],
+                        ),
+                      )
+                  ),
+                )
+              ]
             )
           ],
         ),

@@ -541,10 +541,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
             }),
           );
           if(response.statusCode == 201){
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Prodotto aggiunto correttamente all\'ordine'),
-                ),
-            );
+
             saveNota();
           }
         } catch(e){

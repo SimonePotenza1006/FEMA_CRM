@@ -375,7 +375,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'FEMASHOP',
+          'VENDITA AL BANCO',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red,

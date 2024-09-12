@@ -153,35 +153,37 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
                 future: _futureImages,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: snapshot.data!.map((imageData) {
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PhotoViewPage(
-                                  images: snapshot.data!,
-                                  initialIndex: snapshot.data!.indexOf(imageData),
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal, // Imposta lo scroll orizzontale
+                      child: Row(
+                        children: snapshot.data!.map((imageData) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PhotoViewPage(
+                                    images: snapshot.data!,
+                                    initialIndex: snapshot.data!.indexOf(imageData),
+                                  ),
                                 ),
+                              );
+                            },
+                            child: Container(
+                              width: 150, // aumenta la larghezza del container
+                              height: 170, // aumenta l'altezza del container
+                              margin: EdgeInsets.symmetric(horizontal: 8.0), // Margine tra le immagini
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 1), // Aggiungi un bordo al container
                               ),
-                            );
-                          },
-                          child: Container(
-                            width: 150, // aumenta la larghezza del container
-                            height: 170, // aumenta l'altezza del container
-                            decoration: BoxDecoration(
-                              border: Border.all(width: 1), // aggiungi bordo al container
+                              child: Image.memory(
+                                imageData,
+                                fit: BoxFit.cover, // Copri l'intero spazio del container
+                              ),
                             ),
-                            child: Image.memory(
-                              imageData,
-                              fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+                      ),
                     );
                   } else if (snapshot.hasError) {
                     return Text('Nessuna foto presente nel database!');
@@ -214,7 +216,23 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
           if (pickedImages.isNotEmpty)
             FloatingActionButton.extended(
               onPressed: () {
-                saveImageSopralluogo();
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: Row(
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(width: 20),
+                          Text('Attendere...'),
+                        ],
+                      ),
+                    );
+                  },
+                );
+                saveImageSopralluogo().whenComplete(() async{
+                  Navigator.pop(context);
+                });
               },
               label: Text(
                 'Salva foto',

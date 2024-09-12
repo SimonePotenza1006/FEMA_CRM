@@ -5,6 +5,7 @@ import 'package:excel/excel.dart' as ex;
 import 'package:fema_crm/model/MarcaTempoModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
+import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:fema_crm/pages/TimbratureSettimana.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -284,12 +285,23 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
           leading: BackButton(
-            onPressed: (){Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeFormAmministrazioneNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
-              ),
-            );},
+            onPressed: (){
+              if(widget.utente.ruolo?.id == "1" || widget.utente.ruolo?.id == "2"){
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
+                  ),
+                );
+                } else{
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomeFormAmministrazioneNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
+                  ),
+                );
+              }
+              },
             color: Colors.black, // <-- SEE HERE
           ),
           title: const Text(
@@ -467,7 +479,8 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          await _getCurrentLocation();
                           timbra();
                         },
                         style: ElevatedButton.styleFrom(

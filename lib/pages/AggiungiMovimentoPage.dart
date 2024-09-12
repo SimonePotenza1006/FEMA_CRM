@@ -402,6 +402,28 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                     Text('IL TECNICO HA EFFETTUATO LA MOVIMENTAZIONE?'), // Testo accanto alla checkbox
                   ],
                 ),
+                  SizedBox(height: 10),
+                if(tecnico == true)
+                  SizedBox(
+                    width: 400,
+                    child: DropdownButtonFormField<UtenteModel>(
+                      value: selectedUtente,
+                      onChanged: (UtenteModel? newValue){
+                        setState(() {
+                          selectedUtente = newValue;
+                        });
+                      },
+                      items: allUtenti.map((UtenteModel utente){
+                        return DropdownMenuItem<UtenteModel>(
+                          value: utente,
+                          child: Text(utente.nomeCompleto()!),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                          labelText: 'Seleziona tecnico'.toUpperCase()
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 40),
                   GestureDetector(
                     onTap: () {
@@ -516,34 +538,13 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                         child: signatureBytesIncaricato != null
                             ? Image.memory(signatureBytesIncaricato!)
                             : Text(
-                          'Firma cliente / tecnico'.toUpperCase(),
+                           tecnico == false ? 'Firma cliente'.toUpperCase() : 'Firma Tecnico'.toUpperCase(),
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
                     ),
                   ),
                   SizedBox(height: 20),
-                  if(tecnico == true)
-                    SizedBox(
-                      width: 400,
-                      child: DropdownButtonFormField<UtenteModel>(
-                        value: selectedUtente,
-                        onChanged: (UtenteModel? newValue){
-                          setState(() {
-                            selectedUtente = newValue;
-                          });
-                        },
-                        items: allUtenti.map((UtenteModel utente){
-                          return DropdownMenuItem<UtenteModel>(
-                            value: utente,
-                            child: Text(utente.nomeCompleto()!),
-                          );
-                        }).toList(),
-                        decoration: InputDecoration(
-                            labelText: 'Seleziona tecnico'.toUpperCase()
-                        ),
-                      ),
-                    ),
                 SizedBox(height: 30),
                   Column(
                     children: [

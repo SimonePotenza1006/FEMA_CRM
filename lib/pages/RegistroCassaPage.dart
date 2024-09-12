@@ -93,7 +93,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                 SpeedDialChild(
                   child: Icon(Icons.shopping_bag_outlined, color: Colors.white),
                   backgroundColor: Colors.red,
-                  label: 'FEMASHOP'.toUpperCase(),
+                  label: 'Vendita al banco'.toUpperCase(),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -149,7 +149,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                   SpeedDialChild(
                     child: Icon(Icons.arrow_upward_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
-                    label: 'Uscita'.toUpperCase(),
+                    label: 'prelievo per acquisto'.toUpperCase(),
                     onTap: () => _showUscitaDialog(),
                   ),
                   SpeedDialChild(

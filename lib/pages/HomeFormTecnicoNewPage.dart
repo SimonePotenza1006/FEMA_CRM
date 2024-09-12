@@ -44,7 +44,6 @@ import 'DettaglioInterventoByTecnicoPage.dart';
 import 'DettaglioInterventoPage.dart';
 import 'ListaNoteUtentiPage.dart';
 import 'ListaUtentiPage.dart';
-import 'ListaVeicoliPage.dart';
 import 'MagazzinoPage.dart';
 import 'MenuSopralluoghiTecnicoPage.dart';
 import 'RegistroCassaPage.dart';

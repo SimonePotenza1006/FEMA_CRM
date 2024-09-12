@@ -232,11 +232,26 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                     padding: EdgeInsets.symmetric(vertical: 16),
                     child: ElevatedButton(
                       onPressed: () {
-                        saveSopralluogoPlusPics();
+                        if (validateForm()) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                content: Row(
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(width: 20),
+                                    Text('Attendere...'),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                          saveSopralluogoPlusPics();
+                        }
                       },
                       style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.red),
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
                         padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                           EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                         ),
@@ -255,6 +270,39 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
       ),
     );
   }
+
+  bool validateForm() {
+    if (selectedCliente == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Seleziona un cliente')),
+      );
+      return false;
+    }
+
+    if (selectedTipologia == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Seleziona una tipologia di intervento')),
+      );
+      return false;
+    }
+
+    if (indirizzoController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Inserisci un indirizzo')),
+      );
+      return false;
+    }
+
+    if (descrizioneController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Inserisci una descrizione')),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
 
   Future<void> saveSopralluogoPlusPics() async {
     final data = await saveSopralluogo();
@@ -286,6 +334,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                   content: Text('Sopralluogo registrato!'),
                 ),
               );
+              Navigator.pop(context);
             } else {
               print('Errore durante l\'invio del file: ${response.statusCode}');
             }
@@ -339,9 +388,18 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
+
+        // Converti i dati ricevuti in oggetti TipologiaInterventoModel
         for (var item in jsonData) {
           tipologie.add(TipologiaInterventoModel.fromJson(item));
         }
+
+        // Filtro per escludere le tipologie con id 5, 6 o 7
+        tipologie = tipologie.where((tipologia) {
+          return !(tipologia.id == '5' || tipologia.id == '6' || tipologia.id == '7');
+        }).toList();
+
+        // Aggiorna lo stato con la lista filtrata
         setState(() {
           tipologieList = tipologie;
         });
@@ -353,6 +411,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
       _showErrorDialog();
     }
   }
+
 
   Future<void> getAllClienti() async {
     try {

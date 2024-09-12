@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:fema_crm/pages/TableSpeseVeicoliPage.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -109,6 +111,33 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
               );
             },
           ),
+        ],
+      ),
+      floatingActionButton: Stack(
+        children: [
+          Positioned(
+              bottom: 16,
+              right: 16,
+              child: SpeedDial(
+                heroTag: '1',
+                animatedIcon: AnimatedIcons.menu_close,
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                children: [
+                  SpeedDialChild(
+                    child: Icon(Icons.list, color: Colors.white),
+                    backgroundColor: Colors.red,
+                    label: 'Report spese'.toUpperCase(),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TableSpeseVeicoliPage(),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+          )
         ],
       ),
       body: Padding(

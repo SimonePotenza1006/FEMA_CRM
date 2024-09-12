@@ -276,8 +276,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                           borderSide: BorderSide(color: Colors.grey, width: 2.0),
                         ),
                       ),
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                      ],
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
                       validator: (value) =>
                       value == null || value.isEmpty ? 'Inserisci un importo valido' : null,
                     ),
@@ -302,7 +304,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       keyboardType: TextInputType.number,
                       validator: (value) =>
-                      value == null || value.isEmpty ? 'Inserisci un chilometraggio valido'.toString().toUpperCase() : null,
+                      value == null || value.isEmpty || double.parse(value) < double.parse(selectedVeicolo!.chilometraggio_attuale!.toString()) ? 'Inserisci un chilometraggio valido'.toString().toUpperCase() : null,
                     ),
                   ),
                   SizedBox(height: 20),
@@ -350,8 +352,25 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        checkScadenze();
-                        saveImmagine();
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(width: 20),
+                                  Text('Attendere...'),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                        checkScadenze().whenComplete(() async {
+                          await saveImmagine();
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        });
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -361,6 +380,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                     ),
                     child: Text('Salva spesa'.toString().toUpperCase()),
                   ),
+
                 ],
               ),
             ),

@@ -39,7 +39,6 @@ import 'DettaglioInterventoByTecnicoPage.dart';
 import 'DettaglioInterventoPage.dart';
 import 'ListaNoteUtentiPage.dart';
 import 'ListaUtentiPage.dart';
-import 'ListaVeicoliPage.dart';
 import 'MagazzinoPage.dart';
 import 'ParentFolderPage.dart';
 import 'RegistroCassaPage.dart';
@@ -874,16 +873,6 @@ class _HomeFormAmministrazioneNewPageState
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const ListaUtentiPage()),
-                        );
-                      },
-                    ),
-                  if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti" || widget.userData.cognome! == "Zaminga")
-                    ListTile(
-                      title: Text('Report spese su veicolo', style: TextStyle(color: Colors.white),),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => TableSpeseVeicoliPage()),
                         );
                       },
                     ),

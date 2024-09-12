@@ -199,28 +199,33 @@ class _ListaSopralluoghiTecnicoPageState extends State<ListaSopralluoghiTecnicoP
     );
   }
 
-  Future<void> getSopralluoghiByUtente() async{
-    try{
+  Future<void> getSopralluoghiByUtente() async {
+    try {
       http.Response response = await http.get(Uri.parse('${ipaddress}/api/sopralluogo/utente/${widget.utente.id}'));
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
-        List<SopralluogoModel> sopralluoghi =[];
-        for (var item in responseData){
+        List<SopralluogoModel> sopralluoghi = [];
+
+        for (var item in responseData) {
           sopralluoghi.add(SopralluogoModel.fromJson(item));
         }
+
+        // Ordina i sopralluoghi in ordine decrescente in base all'ID
+        sopralluoghi.sort((a, b) => b.id!.compareTo(a.id!));
+
         setState(() {
           sopralluoghiList = sopralluoghi;
-          originalSopralluoghiList =
-              List.from(sopralluoghi); // Salva la lista originale
+          originalSopralluoghiList = List.from(sopralluoghi); // Salva la lista originale
         });
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
-    } catch(e) {
+    } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
       _showErrorDialog();
     }
   }
+
   void _showErrorDialog() {
     showDialog(
       context: context,

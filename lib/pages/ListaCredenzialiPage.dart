@@ -149,33 +149,52 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
 
   Widget buildViewCredenziali(CredenzialiClienteModel credenziale) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      color: Colors.white.withOpacity(0.4),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      elevation: 5,
+      color: Colors.white.withOpacity(0.9),
       child: ListTile(
-        minLeadingWidth: 12,
-        visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         onTap: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      DettaglioCredenzialiPage(credenziale: credenziale)));
+            context,
+            MaterialPageRoute(
+                builder: (context) => DettaglioCredenzialiPage(credenziale: credenziale)),
+          );
         },
-        leading: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[Icon(Icons.lock_person)],
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.2), // Colore di sfondo dell'icona
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.lock_person, color: Colors.red),
         ),
-        trailing: Text('Id. ${credenziale.id}'),
+        trailing: Text(
+          'Id. ${credenziale.id}',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[700],
+          ),
+        ),
         title: Text(
           '${credenziale.cliente?.denominazione}',
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
         subtitle: Text(
-          'Descrizione: ${credenziale.credenziali} , utente incaricato: ${credenziale.utente?.cognome}',
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          'Descrizione: ${credenziale.descrizione}\nUtente: ${credenziale.utente?.cognome}',
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+          ),
         ),
       ),
     );
+
   }
 }

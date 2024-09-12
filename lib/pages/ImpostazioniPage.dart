@@ -6,7 +6,6 @@ import 'CreazioneNuovaCartaPage.dart';
 import 'CreazioneNuovoUtentePage.dart';
 import 'CreazioneNuovoVeicoloPage.dart';
 import 'ListaUtentiPage.dart';
-import 'ListaVeicoliPage.dart';
 import 'ReportSpeseVeicoloPage.dart';
 import 'StoricoMerciUtentiPage.dart';
 
@@ -53,17 +52,6 @@ class _ImpostazioniPageState extends State<ImpostazioniPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => CreazioneNuovoUtentePage()),
-                    );
-                  },
-                ),
-                SizedBox(height: 10),
-                buildMenuButton(
-                  icon: Icons.car_rental_outlined,
-                  text: 'Management veicoli',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ListaVeicoliPage()),
                     );
                   },
                 ),
