@@ -310,7 +310,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
           ),
           centerTitle: true,
           backgroundColor: Colors.red,
-          actions:  widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? <Widget>[
+          /*actions:  widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? <Widget>[
             IconButton(
                 color: Colors.white,
                 icon: Icon(Icons.edit), onPressed: () async {
@@ -410,7 +410,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               );
             }),
             SizedBox(width: 12,)
-          ] : null
+          ] : null*/
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -463,7 +463,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                   alignment: Alignment.bottomCenter,
                   padding: const EdgeInsets.only(bottom: 20.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
                         onPressed: () {
@@ -478,6 +478,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),
+                      SizedBox(width: 330),
                       ElevatedButton(
                         onPressed: () async {
                           await _getCurrentLocation();
@@ -556,7 +557,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             fontColorHex: "#FF0000",
           );
           var cellStyleBlu = ex.CellStyle(
-            fontColorHex: "#1E90FF",//"#00AAFF",
+            fontColorHex: "#F9A825",//"#1E90FF",//"#00AAFF",
           );
           var cellStyleDefault = ex.CellStyle(
             fontColorHex: "#000000",

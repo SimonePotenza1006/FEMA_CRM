@@ -318,8 +318,15 @@ class _PDFSettPageState extends State<PDFSettPage> {
       String text = textWidget.text.toPlainText();
       List<String> parts = text.split(' ');
       int settimanaA;
-      if (parts.length > 1) {
+      try {
+        settimanaA = getSettimana(DateFormat('dd/MM/yyyy').parse(parts[0].trim()));//int.parse(parts[1]);
+      } catch (e) {
+        // Handle the case where the week number cannot be parsed
+        settimanaA = 0; // or some other default value
+      }
+      /*if (parts.length > 1) {
         String valore = parts[1].trim(); // Rimuove gli spazi bianchi
+        print(parts.toString()+' asqwghio '+valore);
         if (valore.isNotEmpty && RegExp(r'^\d+$').hasMatch(valore)) { // Controlla se il valore è un numero
           settimanaA = int.parse(valore);
         } else {
@@ -329,13 +336,19 @@ class _PDFSettPageState extends State<PDFSettPage> {
       } else {
         // Handle the case where there's no space in the text
         settimanaA = 0; // or some other default value
-      }
+      }*/
 
       pw.Text textWidget2 = columnB.children.first as pw.Text;
       String text2 = textWidget2.text.toPlainText();
       List<String> parts2 = text2.split(' ');
       int settimanaB;
-      if (parts2.length > 1) {
+      try {
+        settimanaB = getSettimana(DateFormat('dd/MM/yyyy').parse(parts2[0].trim()));//int.parse(parts2[1]);
+      } catch (e) {
+        // Handle the case where the week number cannot be parsed
+        settimanaB = 0; // or some other default value
+      }
+      /*if (parts2.length > 1) {
         String valore = parts2[1].trim(); // Rimuove gli spazi bianchi
         if (valore.isNotEmpty && RegExp(r'^\d+$').hasMatch(valore)) { // Controlla se il valore è un numero
           settimanaB = int.parse(valore);
@@ -346,9 +359,9 @@ class _PDFSettPageState extends State<PDFSettPage> {
       } else {
         // Handle the case where there's no space in the text
         settimanaB = 0; // or some other default value
-      }
-
-      return settimanaB.compareTo(settimanaA);
+      }*/
+      print(settimanaA.toString()+' GT '+settimanaB.toString());
+      return settimanaA.compareTo(settimanaB);
     });
 
     // Mostra le tabelle

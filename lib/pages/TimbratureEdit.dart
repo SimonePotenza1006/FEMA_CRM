@@ -1,16 +1,21 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:excel/excel.dart' as ex;
 import 'package:fema_crm/pages/TimbraturaPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../model/MarcaTempoModel.dart';
 import '../model/UtenteModel.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:collection';
 
+import 'HomeFormAmministrazioneNewPage.dart';
+import 'PDFOggiPage.dart';
 import 'TimbratureSettimana.dart';
 
 
@@ -46,6 +51,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
   int? _editedRowIndex;
   List<UtenteModel> allUtenti = [];
   final FocusManager _focusManager = FocusManager();
+  TextEditingController _dateController = TextEditingController();
+  TextEditingController _marcatController = TextEditingController();
+  DateTime _selectedDate = DateTime.now().subtract(Duration(days: 1));
+  String? _selectedUtente = '1';
+  List<MarcaTempoModel> allTimbratureMonth = [];
 
 
   @override
@@ -58,10 +68,178 @@ class _TimbratureEditState extends State<TimbratureEdit> {
     }
    // _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate);
     //_marcatController.text = "";
+    _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate);
+    _marcatController.text = "";
+
     getAllMarcatempo().then((value) => groupAndSortTimbrature());
     getAllUtenti().whenComplete(() => addNewRow());
-
     //_getCurrentLocation();
+    getAllUtentiSearch();
+  }
+
+  int lastRow = 1; // Se il foglio Excel ha un'intestazione, partire da 1
+  int lastColumn = 3; // Numero di colonne che stai aggiungendo
+  void _generateExcel() async {
+    var excel = ex.Excel.createExcel();
+    ex.Sheet sheetObject = excel['Sheet1'];
+    sheetObject.appendRow([
+      'Utente',
+      'Data',
+      'Totale Ore',
+      'GPS Entrata',
+      'Ora Entrata',
+      'GPS Uscita',
+      'Ora Uscita',
+      'GPS Entrata',
+      'Ora Entrata',
+      'GPS Uscita',
+      'Ora Uscita',
+      'GPS Entrata',
+      'Ora Entrata',
+      //'GPS Uscita',
+      //'Ora Uscita',
+    ]);
+    // Map per tenere traccia delle somme delle differenze per utente e giorno
+    Map<String, Map<DateTime, Duration>> userDayDifferences = {};
+    // Calcola le differenze e aggiungi i dati al foglio Excel
+    for (var timbratura in allTimbratureMonth) {
+      // Verifica se l'utente e il giorno corrente sono giÃ  stati inseriti nella mappa
+      String? userId = timbratura.utente?.id;
+      DateTime? dayKey = DateTime(timbratura.data!.year, timbratura.data!.month, timbratura.data!.day);
+      if (userId != null && dayKey != null) {
+        userDayDifferences.putIfAbsent(userId, () => {});
+        userDayDifferences[userId]!.update(dayKey, (value) => value + (timbratura.datau?.difference(timbratura.data!) ?? Duration.zero), ifAbsent: () => timbratura.datau?.difference(timbratura.data!) ?? Duration.zero);
+      }
+    }
+    // Aggiungi i dati al foglio Excel utilizzando le somme delle differenze
+    for (var entry in userDayDifferences.entries) {
+      String userId = entry.key;
+      Map<DateTime, Duration> dayMap = entry.value;
+      dayMap.forEach((day, difference) {
+        // Ottieni le informazioni sulla timbratura corrispondente
+        List<MarcaTempoModel?> matchingTimbraturas = allTimbratureMonth.where((timbratura) =>
+        timbratura.utente?.id == userId &&
+            timbratura.data?.year == day.year &&
+            timbratura.data?.month == day.month &&
+            timbratura.data?.day == day.day).toList();
+        if (matchingTimbraturas != null) {
+          // Ottieni il nome completo dell'utente
+          String userFullName = matchingTimbraturas.first!.utente?.nomeCompleto() ?? '';
+          Map<String, List<dynamic>> groupedRows = {};
+          var cellStyleRed = ex.CellStyle(
+            fontColorHex: "#FF0000",
+          );
+          var cellStyleBlu = ex.CellStyle(
+            fontColorHex: "#F9A825",//"#1E90FF",//"#00AAFF",
+          );
+          var cellStyleDefault = ex.CellStyle(
+            fontColorHex: "#000000",
+          );
+          for (var timbratura in matchingTimbraturas) {
+            String key = '${userFullName}_${day.day}/${day.month}/${day.year}';
+            // Se non esiste ancora una lista per questa chiave, creala
+            groupedRows.putIfAbsent(key, () => [
+              userFullName,
+              DateFormat('dd-MM-yyyy').format(day),
+              //"${day.day}/${day.month}/${day.year}",
+              '${difference.inHours.toString().padLeft(2, '0')}:${difference.inMinutes.remainder(60).toString().padLeft(2, '0')}',
+            ]);
+            // Aggiungi i dati specifici della timbratura alla lista per questa chiave
+            groupedRows[key]!.addAll([
+              timbratura!.gps == null || timbratura!.gps == '' ? '' : timbratura.edit ? '*'+timbratura!.gps! : timbratura!.gps!,
+              timbratura.edit ? '*'+DateFormat('HH:mm').format(timbratura.data!) : DateFormat('HH:mm').format(timbratura.data!),
+              //'${timbratura.data!.hour.toString()}:${timbratura.data!.minute.toString()}',
+              timbratura!.gpsu == null || timbratura!.gpsu == '' ? '' : timbratura.editu ? '*'+timbratura!.gpsu! : timbratura!.gpsu!,
+              timbratura.datau != null ? timbratura.editu ? '*'+DateFormat('HH:mm').format(timbratura.datau!) : DateFormat('HH:mm').format(timbratura.datau!) : '',
+              //timbratura.editu ? '*'+DateFormat('HH:mm').format(timbratura.datau!) : DateFormat('HH:mm').format(timbratura.datau!),
+              //timbratura.datau != null ? '${timbratura.datau!.hour.toString()}:${timbratura.datau!.minute.toString()}' : '',
+            ]);
+          }
+          // Aggiungi tutte le righe raggruppate alla tabella
+          for (var row in groupedRows.values) {
+            sheetObject.appendRow(row);
+          }
+          //evidenzio in rosso i gps non in sede
+          bool redRow = false;
+          bool bluRow = false;
+          for (int rowIndex = 2; rowIndex <= sheetObject.maxRows; rowIndex++) {
+            redRow = false;
+            bluRow = false;// Resetta il flag ad ogni iterazione di riga
+            for (var column in ['D', 'F', 'H', 'J', 'L', 'N']) {
+              var cellValue = sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).value;
+              print('Gvalue '+cellValue.toString());
+              if (cellValue.toString() != 'null' && cellValue.toString() != '' && (!cellValue.toString().contains('73021') || !cellValue.toString().contains('Via Europa'))) {
+                if (cellValue.toString() != 'null' && cellValue.toString() != '' && (!cellValue.toString().contains('Puglia') || !cellValue.toString().contains('Puglia'))) {
+                  print('red rig $rowIndex, colonn $column $cellValue');
+                  // sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleRed;
+                  sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).cellStyle = cellStyleRed;
+                  redRow = true; // Imposta il flag a true se almeno una delle celle Ã¨ rossa
+
+
+                } else {
+                  print(' bbluu rig $rowIndex, colonn $column $cellValue');
+                  // sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleBlu;
+                  sheetObject.cell(ex.CellIndex.indexByString("$column$rowIndex")).cellStyle = cellStyleBlu;
+                  bluRow = true; // Imposta il flag a true se almeno una delle celle Ã¨ rossa
+                }
+
+
+              }
+            }
+            if (!redRow && !bluRow) {
+              sheetObject.cell(ex.CellIndex.indexByString("C$rowIndex")).cellStyle = cellStyleDefault;
+            }
+          }
+        }
+      });
+    }
+    try {
+      // Codifica il file Excel e salvalo
+      late String filePath;
+      if (Platform.isWindows) {
+        String appDocumentsPath = 'C:\\ReportTimbrature';
+        filePath = '$appDocumentsPath\\report_timbrature.xlsx';
+      } else if (Platform.isAndroid) {
+        Directory? externalStorageDir = await getExternalStorageDirectory();
+        if (externalStorageDir != null) {
+          String appDocumentsPath = externalStorageDir.path;
+          filePath = '$appDocumentsPath/report_timbrature.xlsx';
+        } else {
+          throw Exception('Impossibile ottenere il percorso di salvataggio.');
+        }
+      }
+      var excelBytes = await excel.encode();
+      if (excelBytes != null) {
+        await File(filePath).create(recursive: true).then((file) {
+          file.writeAsBytesSync(excelBytes);
+          OpenFilex.open(file?.path);
+        });
+
+        // Notifica all'utente che il file Ã¨ stato salvato con successo
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Excel salvato in $filePath')));
+      } else {
+        print('Errore durante la codifica del file Excel');
+      }
+    } catch (error) {
+      print('Errore durante il salvataggio del file Excel: $error');
+    }
+  }
+
+  Future<void> _showDatePicker() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(_selectedDate.year, _selectedDate.month - 1, 1),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _marcatController.text = "";
+        _selectedDate = picked;
+        _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate);
+      });
+    }
   }
 
   int getSettimana(DateTime date) {
@@ -244,6 +422,123 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   }
 
+  Future<void> getAllMarcatempoDataUtente(DateTime data, String utenteid) async {
+    try {
+      var apiUrl = Uri.parse('${ipaddress}/marcatempo');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<MarcaTempoModel> allMarcatemposDU = [];
+
+        for (var item in jsonData) {
+          MarcaTempoModel marcatempo = MarcaTempoModel.fromJson(item);
+          print(DateFormat('yyyy-MM-dd').format(marcatempo.data!)+' '+DateFormat('yyyy-MM-dd').format(data)+' '+marcatempo.utente!.id.toString()+' '+int.parse(utenteid).toString());
+          if (marcatempo.data != null &&
+              DateFormat('yyyy-MM-dd').format(marcatempo.data!) == DateFormat('yyyy-MM-dd').format(data) && marcatempo.utente!.id == utenteid) {
+            allMarcatemposDU.add(marcatempo);
+          }
+        }
+        setState(() {
+          allTimbratureDU = allMarcatemposDU;
+          if (allMarcatemposDU.isNotEmpty) {
+            for (var item in allMarcatemposDU) {
+              _marcatController.text = allMarcatemposDU.map(
+                      (item) =>
+                  (DateFormat('HH:mm').format(item.data!) + ' ' + item.gps! +
+                      ' - '
+                      + (item.datau != null ? DateFormat('HH:mm').format(item.datau!) + ' ' + item.gpsu! : '     /      ')
+                  )).join('\n');
+            }
+          } else _marcatController.text= '- nessun risultato -';
+        });
+        print('mmmm '+_marcatController.text);
+      }
+    } catch (e) {
+      print('Errore durante il recupero dei marcatempo: $e');
+    }
+  }
+
+  Future<void> getAllMarcatempoToday() async {
+    try {
+      var apiUrl = Uri.parse('${ipaddress}/marcatempo/pres/1/2');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<MarcaTempoModel> allMarcatempos = [];
+
+        DateTime now = DateTime.now();
+        DateTime? firstDayOfMonth = null;
+        DateTime? lastDayOfMonth = null;
+
+        // Ottieni la data di inizio e fine del mese precedente
+        firstDayOfMonth = DateTime(now.year, now.month, now.day);
+        lastDayOfMonth = now.add(Duration(days: 1));//DateTime(now.year, now.month, 0);
+
+        for (var item in jsonData) {
+          MarcaTempoModel marcatempo = MarcaTempoModel.fromJson(item);
+          // Controlla se la data del marcatempo Ã¨ nel mese corrente
+          if (marcatempo.data != null &&
+              (marcatempo.data!.isAfter(firstDayOfMonth!) || marcatempo.data == firstDayOfMonth) &&
+              (marcatempo.data!.isBefore(lastDayOfMonth!) || marcatempo.data == lastDayOfMonth)) {
+            allMarcatempos.add(marcatempo);
+          }
+          /*if (marcatempo.data != null &&
+              marcatempo.data!.isAfter(firstDayOfMonth!) &&
+              marcatempo.data!.isBefore(lastDayOfMonth!)) {
+            allMarcatempos.add(marcatempo);
+          }*/
+        }
+        // Imposta il valore di allTimbratureMonth a allMarcatempos utilizzando setState
+        setState(() {
+          timbratureOdierne = allMarcatempos;
+          print('timbr oggi '+allMarcatempos.toString());
+        });
+      }
+    } catch (e) {
+      print('Errore durante il recupero dei marcatempo: $e');
+    }
+  }
+
+  Future<void> getAllMarcatempoMonth(int current) async {
+    try {
+      var apiUrl = Uri.parse('${ipaddress}/marcatempo');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<MarcaTempoModel> allMarcatempos = [];
+
+        DateTime now = DateTime.now();
+        DateTime? firstDayOfMonth = null;
+        DateTime? lastDayOfMonth = null;
+
+        if(current == 1) {
+          // Ottieni la data di inizio e fine del mese corrente
+          firstDayOfMonth = DateTime(now.year, now.month, 1);
+          lastDayOfMonth = DateTime(now.year, now.month + 1, 1);
+        } else if (current ==2){
+          // Ottieni la data di inizio e fine del mese precedente
+          firstDayOfMonth = DateTime(now.year, now.month - 1, 1);
+          lastDayOfMonth = DateTime(now.year, now.month, 1);
+        }
+        for (var item in jsonData) {
+          MarcaTempoModel marcatempo = MarcaTempoModel.fromJson(item);
+          // Controlla se la data del marcatempo Ã¨ nel mese corrente
+          if (marcatempo.data != null &&
+              (marcatempo.data!.isAfter(firstDayOfMonth!) || marcatempo.data == firstDayOfMonth) &&
+              (marcatempo.data!.isBefore(lastDayOfMonth!) || marcatempo.data == lastDayOfMonth)) {
+            allMarcatempos.add(marcatempo);
+          }
+        }
+        setState(() {
+          allTimbratureMonth = allMarcatempos;
+          print('timbr '+allMarcatempos.toString());
+        });
+      }
+    } catch (e) {
+      print('Errore durante il recupero dei marcatempo: $e');
+    }
+  }
+
   Future<void> getAllMarcatempo() async {
     try {
       var apiUrl = Uri.parse('${ipaddress}/marcatempo/ordered');
@@ -301,7 +596,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
     );
 
     try {
-      print(row.idmt!+' d fdfd');
+      print(row.idmt!+' FGJ kj '+row.oraUscita.toString());
       if (true){//tipoTimbratura == "INGRESSO") {
         print(DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String()+' '+DateTime.now().toIso8601String());
 
@@ -313,7 +608,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
             'gps': row.indirizzoIngresso,
             'data': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String(),//DateTime.now().toIso8601String(),
             'gpsu': row.indirizzoUscita,
-            'datau': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita}').toIso8601String(),//DateTime.now().toIso8601String(),
+            'datau': row.oraUscita != '' ? DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita}').toIso8601String() : null,//DateTime.now().toIso8601String(),
             'utente': row.utente!,//widget.utente.toMap(),
             'viaggio': {
               'id': 2,
@@ -338,7 +633,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               'gps': row.indirizzoIngresso2,
               'data': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso2}').toIso8601String(),//DateTime.now().toIso8601String(),
               'gpsu': row.indirizzoUscita2,
-              'datau': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita2}').toIso8601String(),//DateTime.now().toIso8601String(),
+              'datau': row.oraUscita2 != '' ? DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita2}').toIso8601String() : null,//DateTime.now().toIso8601String(),
               'utente': row.utente!,//widget.utente.toMap(),
               'viaggio': {
                 'id': 2,
@@ -351,7 +646,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               'utenteEdit': widget.utente!//row.utenteEdit != null ? row.utenteEdit!.toMap() : null,
             }),
           );
-        } else if (row.oraIngresso2 != null) {
+        } else if (row.oraIngresso2 != null && row.oraIngresso2 != '') {
           print('3');
           response3 = await http.post(
             Uri.parse('${ipaddress}/marcatempo'),
@@ -361,7 +656,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
               'gps': row.indirizzoIngresso2,
               'data': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso2}').toIso8601String(),//DateTime.now().toIso8601String(),
               'gpsu': row.indirizzoUscita2,
-              'datau': DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita2}').toIso8601String(),//DateTime.now().toIso8601String(),
+              'datau': row.oraUscita2 != '' ? DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraUscita2}').toIso8601String() : null,//DateTime.now().toIso8601String(),
               'utente': row.utente!,//widget.utente.toMap(),
               'viaggio': {
                 'id': 2,
@@ -533,6 +828,25 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           utenti.add(UtenteModel.fromJson(item));
         }
         print('lopjhg '+utenti.length.toString());
+        return utenti;
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata API: $e');
+      return null; // Ritorna null in caso di errore
+    }
+  }
+
+  Future<List<UtenteModel>?> getAllUtentiSearch() async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for (var item in jsonData) {
+          utenti.add(UtenteModel.fromJson(item));
+        }
         return utenti;
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -818,7 +1132,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 minLines: 2,
                 maxLines: null,
                 style: TextStyle(
-                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!newRow.indirizzoIngresso!.contains('73021') || !newRow.indirizzoIngresso!.contains('Via Europa')) ? !newRow.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
+                    height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!newRow.indirizzoUscita!.contains('73021') || !newRow.indirizzoUscita!.contains('Via Europa')) ? !newRow.indirizzoUscita!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
                 controller: _indirizzoUscitaController,
                 //key: Key(_rows.indexOf(row).toString()),
                 //autofocus: false,
@@ -947,17 +1261,154 @@ class _TimbratureEditState extends State<TimbratureEdit> {
     });
   }
 
+  Future<void> _showDialog() async {
+    setState(() {
+      _marcatController.text = '';
+    });
+
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              content: Container(
+                  width: 865.0, // Imposta la larghezza desiderata
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'SELEZIONA DATA E UTENTE',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            width: 230,
+                            child: ListTile(
+                              //title: Text('Data:'),
+                              subtitle: TextField(
+                                controller: _dateController,
+                                readOnly: true,
+                                onTap: _showDatePicker,
+                                decoration: InputDecoration(
+                                  suffixIcon: Icon(Icons.calendar_today),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[200],
+                                ),
+                              ),
+                              onTap: () async {
+                                setState(() {
+                                  _marcatController.text = "";
+                                });
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: _selectedDate,
+                                  firstDate: DateTime(_selectedDate.year, _selectedDate.month - 1, 1),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (picked != null) {
+                                  setState(() {
+                                    _marcatController.text = '';
+                                    _selectedDate = picked;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          SizedBox(width: 50),
+                          Text(
+                            'UTENTE:',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          SizedBox(width: 10),
+                          FutureBuilder(
+                            future: getAllUtentiSearch(),
+                            builder: (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text("${snapshot.error}");
+                              } else if (snapshot.hasData && snapshot.data != null) {
+                                return DropdownButton<String>(
+                                  value: _selectedUtente,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      _selectedUtente = newValue;
+                                      _marcatController.text = '';
+                                    });
+                                  },
+                                  items: snapshot.data.map<DropdownMenuItem<String>>((value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value.id,
+                                      child: Text(
+                                        value.nome! + ' ' + value.cognome!,
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                              } else {
+                                return Text("Nessun dato disponibile");
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+              ),
+              actions: <Widget>[
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          getAllMarcatempoDataUtente(_selectedDate, _selectedUtente!);
+                          // Navigator.of(context).pop(); // Chiudi l'AlertDialog
+                        },
+                        child: Text('CERCA', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          padding: EdgeInsets.all(20),
+                        ),
+                      ),
+                    ]),
+                SizedBox(height: 12),
+                TextFormField(
+                  maxLines: 5,
+                  controller: _marcatController,
+                  readOnly: true,
+                  showCursor: false,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    // labelText: 'Testo',
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    List<Widget> settimane = [];
+    List<int> settimane = groupedRows.keys.toList();
+    settimane.sort((a, b) => b.compareTo(a));
+    //List<Widget> settimane = [];
     return Scaffold(
         appBar: AppBar(
           leading: BackButton(
             onPressed: (){Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => TimbraturaPage(utente: widget.utente),
+                builder: (context) => HomeFormAmministrazioneNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
               ),
             );},
             color: Colors.black, // <-- SEE HERE
@@ -982,6 +1433,96 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                 //setState(() {});//getAllMarcatempo();
               },
             ),*/
+            //SizedBox(width: 23),
+            IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.assignment_outlined), onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => TimbratureSettimana(utente: widget.utente)),
+              );
+            }),
+            SizedBox(width: 23),
+
+            IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.download), onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("SCARICA IL RESOCONTO DELLE PRESENZE"),
+                    actions: [
+                      Center(
+                        child:  Column(
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                getAllMarcatempoMonth(2).whenComplete(() => _generateExcel());
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("MESE PRECEDENTE"), //no
+                            ),
+                            SizedBox(width: 45,),
+                            TextButton(
+                              onPressed: () {
+                                getAllMarcatempoMonth(1).whenComplete(() =>  _generateExcel());
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("MESE CORRENTE"), //si
+                            ),
+                            SizedBox(width: 80,),
+                            TextButton(
+                              onPressed: () {
+                                getAllMarcatempoToday().whenComplete(() {
+                                  if (timbratureOdierne.isNotEmpty)
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PDFOggiPage(timbrature: timbratureOdierne),
+                                      ),
+                                    ); else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Ancora nessuna timbratura in data odierna')));
+                                  }
+                                });
+                              },
+                              child: Text("OGGI"), //si
+                            ),
+                            /*TextButton(
+                              onPressed: () {
+                                getAllMarcatempoToday().whenComplete(() {
+                                  if (timbratureOdierne.isNotEmpty)
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PDFOggiPage(timbrature: timbratureOdierne),
+                                      ),
+                                    ); else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Ancora nessuna timbratura in data odierna')));
+                                  }
+                                });
+                              },
+                              child: Text("Modifica"), //si
+                            ),*/
+                          ],
+                        ),
+                      )
+                    ],
+                  );
+                },
+              );
+            }),
+            SizedBox(width: 23,),
+            IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.search), onPressed: () async {
+              _showDialog();
+            }),
             SizedBox(width: 23),
             IconButton(
               icon: Icon(
@@ -1083,7 +1624,8 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                       mainAxisSize: MainAxisSize.min,
                       children: [Divider(thickness: 20),]),
                         //SizedBox(height: 12),
-                        for (int settimana in groupedRows.keys.toList().reversed)
+                        //for (int settimana in groupedRows.keys.toList())
+                          for (int settimana in settimane)
             Flexible(child:
             Container(
                 alignment: Alignment.centerLeft,
@@ -1319,7 +1861,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           minLines: 2,
           maxLines: null,
           style: TextStyle(
-              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso!.contains('73021') || !row.indirizzoIngresso!.contains('Via Europa')) ? !row.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
+              height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoUscita!.contains('73021') || !row.indirizzoUscita!.contains('Via Europa')) ? !row.indirizzoUscita!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
                 decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                 initialValue: row.indirizzoUscita,
                 onChanged: (value) {
@@ -1381,7 +1923,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     minLines: 2,
                     maxLines: null,
                     style: TextStyle(
-                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso!.contains('73021') || !row.indirizzoIngresso!.contains('Via Europa')) ? !row.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
+                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso2!.contains('73021') || !row.indirizzoIngresso2!.contains('Via Europa')) ? !row.indirizzoIngresso2!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
                     //key: Key(_rows.indexOf(row).toString()),
                     //autofocus: false,
                     //focusNode: _focusNodes[_rows.indexOf(row)],
@@ -1453,7 +1995,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
                     minLines: 2,
                     maxLines: null,
                     style: TextStyle(
-                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoIngresso!.contains('73021') || !row.indirizzoIngresso!.contains('Via Europa')) ? !row.indirizzoIngresso!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
+                        height: 1, overflow: TextOverflow.visible, fontSize: 13, color: (!row.indirizzoUscita2!.contains('73021') || !row.indirizzoUscita2!.contains('Via Europa')) ? !row.indirizzoUscita2!.contains('Puglia') ? Colors.red : Colors.yellow[800] : Colors.black),
                     decoration: InputDecoration(border: InputBorder.none,contentPadding: EdgeInsets.only(top: 2.0)),
                     initialValue: row.indirizzoUscita2,
                     onChanged: (value) {
