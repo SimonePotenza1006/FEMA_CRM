@@ -28,11 +28,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   List<ClienteModel> clientiList = [];
   List<TipologiaInterventoModel> tipologieList = [];
   List<UtenteModel> utentiList = [];
-  DateTime? _startDate;
-  DateTime? _endDate;
-  UtenteModel? _selectedUtente;
-  ClienteModel? _selecedCliente;
-  TipologiaInterventoModel? _selectedTipologia;
   TextEditingController importoController = TextEditingController();
   bool isSearching = false;
   int _currentSheet = 0;

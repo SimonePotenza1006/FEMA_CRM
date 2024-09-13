@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/TableMagazzinoPage.dart';
 import 'package:fema_crm/pages/TableMerceInRiparazionePage.dart';
 import 'package:fema_crm/pages/TableSpeseVeicoliPage.dart';
 import 'package:fema_crm/pages/TableVeicoliPage.dart';
@@ -735,7 +736,7 @@ class _HomeFormAmministrazioneNewPageState
         case 10:
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MagazzinoPage()),
+            MaterialPageRoute(builder: (context) => TableMagazzinoPage()),
           );
           break;
         case 11:

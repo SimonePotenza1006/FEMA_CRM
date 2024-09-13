@@ -1,5 +1,6 @@
 import 'package:fema_crm/pages/MenuCommissioniPage.dart';
 import 'package:fema_crm/pages/SopralluogoTecnicoForm.dart';
+import 'package:fema_crm/pages/TableSopralluoghiPage.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../model/UtenteModel.dart';
@@ -123,7 +124,7 @@ class _MenuSopralluoghiPageState extends State<MenuSopralluoghiPage>{
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) =>
-              ReportSopralluoghiPage()),
+              TableSopralluoghiPage()),
         );
         break;
     }

@@ -53,7 +53,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dettaglio ${widget.cliente.denominazione}',
+        title: Text('DETTAGLIO ${widget.cliente.denominazione}',
             style: const TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
@@ -64,21 +64,21 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                    _buildInfoText('Indirizzo: ${widget.cliente.indirizzo}'),
-                    _buildInfoText('Partita Iva: ${widget.cliente.partita_iva}'),
-                    _buildInfoText('Cap: ${widget.cliente.cap}'),
-                    _buildInfoText('Città: ${widget.cliente.citta}'),
-                    _buildInfoText('Provincia: ${widget.cliente.provincia}'),
-                    _buildInfoText('Nazione: ${widget.cliente.nazione}'),
-                    _buildInfoText('Recapito fatturazione elettronica: ${widget.cliente.recapito_fatturazione_elettronica}'),
-                    _buildInfoText('Riferimento amministrativo: ${widget.cliente.riferimento_amministrativo}'),
-                    _buildInfoText('Referente: ${widget.cliente.referente}'),
-                    _buildInfoText('Fax: ${widget.cliente.fax}'),
-                    _buildInfoText('Telefono: ${widget.cliente.telefono}'),
-                    _buildInfoText('Cellulare: ${widget.cliente.cellulare}'),
-                    _buildInfoText('Email: ${widget.cliente.email}'),
-                    _buildInfoText('PEC: ${widget.cliente.pec}'),
-                    _buildInfoText('Note: ${widget.cliente.note}'),
+                    _buildInfoText(title:'Indirizzo', value: widget.cliente.indirizzo != null ? widget.cliente.indirizzo! : "Non inserito"),
+                    _buildInfoText(title:'Partita Iva', value:widget.cliente.partita_iva != null ? widget.cliente.partita_iva! : "Non inserito"),
+                    _buildInfoText(title:'Cap', value:widget.cliente.cap != null ? widget.cliente.cap!: "Non inserito"),
+                    _buildInfoText(title:'Città', value:widget.cliente.citta != null ? widget.cliente.citta!: "Non inserito"),
+                    _buildInfoText(title:'Provincia', value:widget.cliente.provincia != null ? widget.cliente.provincia!: "Non inserito"),
+                    _buildInfoText(title:'Nazione', value:widget.cliente.nazione != null ? widget.cliente.nazione!: "Non inserito"),
+                    _buildInfoText(title:'Recapito fatturazione elettronica', value:widget.cliente.recapito_fatturazione_elettronica != null ? widget.cliente.recapito_fatturazione_elettronica!: "Non inserito"),
+                    _buildInfoText(title:'Riferimento amministrativo', value:widget.cliente.riferimento_amministrativo != null ? widget.cliente.riferimento_amministrativo!: "Non inserito"),
+                    _buildInfoText(title:'Referente', value:widget.cliente.referente != null ? widget.cliente.referente!: "Non inserito"),
+                    _buildInfoText(title:'Fax', value:widget.cliente.fax != null ? widget.cliente.fax!: "Non inserito"),
+                    _buildInfoText(title:'Telefono', value:widget.cliente.telefono != null ? widget.cliente.telefono!: "Non inserito"),
+                    _buildInfoText(title:'Cellulare', value:widget.cliente.cellulare != null ? widget.cliente.cellulare!: "Non inserito"),
+                    _buildInfoText(title:'Email', value:widget.cliente.email != null ? widget.cliente.email!: "Non inserito"),
+                    _buildInfoText(title:'PEC', value:widget.cliente.pec != null ? widget.cliente.pec!: "Non inserito"),
+                    _buildInfoText(title:'Note', value: widget.cliente.note != null ? widget.cliente.note!: "Non inserito"),
                     if(allPosizioni.isNotEmpty)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,33 +135,87 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
     );
   }
 
-  Widget _buildInfoText(String text) {
-    // Divide il testo in due parti: etichetta e dato
-    final parts = text.split(':');
-    final labelText = parts[0];
-    final dataText = parts[1];
-
-    return Column(
-      children: [
-        Row(
+  Widget _buildInfoText({required String title, required String value, BuildContext? context}) {
+    // Verifica se il valore supera i 25 caratteri
+    bool isValueTooLong = value.length > 25;
+    String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+    return SizedBox(
+      width:600,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, ),
+        child: Column(
           children: [
-            Text(
-              '$labelText: ',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        displayedValue.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (isValueTooLong && context != null)
+                        IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("${title.toUpperCase()}"),
+                                  content: Text(value),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Text(
-              dataText.trim(), // Rimuove eventuali spazi bianchi aggiunti
-              style: TextStyle(
-                fontSize: 20,
-              ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
             ),
+            SizedBox(width: 50)
           ],
         ),
-        Divider(color: Colors.grey[300], thickness: 0.5),
-      ],
+      ),
     );
   }
 

@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../databaseHandler/DbHelper.dart';
 import '../model/ClienteModel.dart';
 import 'DettaglioClientePage.dart';
 import 'CreazioneClientePage.dart';
+import 'package:http/http.dart' as http;
 
 class ListaClientiPage extends StatefulWidget {
   const ListaClientiPage({Key? key}) : super(key: key);
@@ -23,21 +26,31 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
   @override
   void initState() {
     dbHelper = DbHelper();
-    init();
     super.initState();
+    getAllClienti();
   }
 
-  Future<void> init() async {
-    print("Tiro giù tutti i clienti");
-    allClienti = await dbHelper?.getAllClienti() ?? [];
-    print("Numero totale di clienti: ${allClienti.length}");
-    setState(() {
-      filteredClienti = allClienti;
-      isLoading = false;
-    });
+  Future<void> getAllClienti() async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<ClienteModel> clienti = [];
+        for (var item in jsonData) {
+          clienti.add(ClienteModel.fromJson(item));
+        }
+        setState(() {
+          allClienti = clienti;
+          filteredClienti = clienti;
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
   }
-
-
 
   void filterClienti(String query) {
     setState(() {
@@ -62,7 +75,6 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
       }).toList();
     });
   }
-
 
   void startSearch() {
     setState(() {
@@ -156,31 +168,72 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
 
   Widget buildViewClienti(ClienteModel cliente) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      color: Colors.white.withOpacity(0.4),
-      child: ListTile(
-        minLeadingWidth: 12,
-        visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DettaglioClientePage(cliente: cliente)),
-          );
-        },
-        leading: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[Icon(Icons.account_circle_rounded)],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // Arrotondamento del bordo
+      ),
+      elevation: 5, // Aggiunge un'ombra per creare profondità
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Più spazio tra le card
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey.shade300], // Aggiunge un gradiente di colore
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15), // Arrotondamento anche per il contenitore interno
         ),
-        trailing: Text('Id. ${cliente.id}'),
-        title: Text(
-          '${cliente.denominazione}',
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          'Codice Fiscale: ${cliente.codice_fiscale}',
-          style: const TextStyle(fontWeight: FontWeight.w600),
+        child: ListTile(
+          minLeadingWidth: 20, // Aumenta la larghezza minima per maggiore spaziatura
+          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16), // Più padding interno
+          visualDensity: const VisualDensity(horizontal: 0, vertical: -2), // Riduce leggermente la densità verticale
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DettaglioClientePage(cliente: cliente)),
+            );
+          },
+          leading: CircleAvatar(
+            radius: 25, // Aumenta la dimensione dell'icona
+            backgroundColor: Colors.red, // Cambia il colore dello sfondo dell'icona
+            child: Icon(Icons.account_circle_rounded, color: Colors.white, size: 30), // Icona più grande e bianca
+          ),
+          trailing: Text(
+            'Id. ${cliente.id}'.toUpperCase(),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black, // Colore più discreto per l'id
+            ),
+          ),
+          title: Text(
+            cliente.denominazione!,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16, // Dimensione del testo leggermente più grande
+            ),
+          ),
+          subtitle:Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Codice Fiscale: ${cliente.codice_fiscale != null ? cliente.codice_fiscale! : 'Non inserito'}'.toUpperCase(),
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Colors.black // Colore del testo del sottotitolo
+                ),
+              ),
+              SizedBox(height: 3),
+              Text(
+                'Telefono: ${cliente.cellulare != null ? cliente.cellulare! : "Non inserito"}'.toUpperCase(),
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Colors.black // Colore del testo del sottotitolo
+                ),
+              ),
+            ],
+          )
         ),
       ),
     );

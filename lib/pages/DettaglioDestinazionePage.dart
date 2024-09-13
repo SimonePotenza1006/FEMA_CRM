@@ -26,7 +26,7 @@ class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dettaglio ${widget.destinazione.denominazione}',
+        title: Text('DETTAGLIO ${widget.destinazione.denominazione}',
             style: const TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
@@ -49,38 +49,14 @@ class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Indirizzo: ${widget.destinazione.indirizzo}',
-          style: const TextStyle(fontSize: 20),
-        ),
-        Text(
-          'CAP: ${widget.destinazione.cap}',
-          style: const TextStyle(fontSize: 20),
-        ),
-        Text(
-          'Città: ${widget.destinazione.citta}',
-          style: const TextStyle(fontSize: 20),
-        ),
-        Text(
-          'Provincia: ${widget.destinazione.provincia}',
-          style: const TextStyle(fontSize: 20),
-        ),
-        Text(
-          'Codice Fiscale: ${widget.destinazione.codice_fiscale}',
-          style: const TextStyle(fontSize: 20),
-        ),
-        Text(
-          'Partita IVA: ${widget.destinazione.partita_iva}',
-          style: const TextStyle(fontSize: 20),
-        ),
-        Text(
-          'Telefono: ${widget.destinazione.telefono}',
-          style: const TextStyle(fontSize: 20),
-        ),
-        Text(
-          'Cellulare: ${widget.destinazione.cellulare}',
-          style: const TextStyle(fontSize: 20),
-        ),
+        _buildInfoText(title: 'indirizzo', value: widget.destinazione.indirizzo != null ? widget.destinazione.indirizzo! : 'non inserito'.toUpperCase()),
+        _buildInfoText(title: 'cap', value: widget.destinazione.cap != null ? widget.destinazione.cap! : 'non inserito'.toUpperCase()),
+        _buildInfoText(title: 'città', value: widget.destinazione.citta != null ? widget.destinazione.citta! : 'non inserito'.toUpperCase()),
+        _buildInfoText(title: 'provincia', value: widget.destinazione.provincia != null ? widget.destinazione.provincia! : 'non inserito'.toUpperCase()),
+        _buildInfoText(title: 'codice fiscale', value: widget.destinazione.codice_fiscale != null ? widget.destinazione.codice_fiscale! : 'non inserito'.toUpperCase()),
+        _buildInfoText(title: 'partita iva', value: widget.destinazione.partita_iva != null ? widget.destinazione.partita_iva! : 'non inserito'.toUpperCase()),
+        _buildInfoText(title: 'telefono', value: widget.destinazione.telefono != null ? widget.destinazione.telefono! : 'non inserito'.toUpperCase()),
+        _buildInfoText(title: 'cellulare', value: widget.destinazione.cellulare != null ?  widget.destinazione.cellulare! : 'non inserito'.toUpperCase()),
       ],
     );
   }
@@ -110,6 +86,90 @@ class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage> {
           color: Colors.red,
         ),
       ],
+    );
+  }
+
+  Widget _buildInfoText({required String title, required String value, BuildContext? context}) {
+    // Verifica se il valore supera i 25 caratteri
+    bool isValueTooLong = value.length > 25;
+    String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+    return SizedBox(
+      width:600,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        displayedValue.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (isValueTooLong && context != null)
+                        IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("${title.toUpperCase()}"),
+                                  content: Text(value),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+            SizedBox(width: 50)
+          ],
+        ),
+      ),
     );
   }
 

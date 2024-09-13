@@ -98,40 +98,44 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTextField('Codice Fiscale', _codiceFiscaleController),
-            _buildTextField('Partita IVA', _partitaIvaController),
-            _buildTextField('Denominazione', _denominazioneController),
-            _buildTextField('Indirizzo', _indirizzoController),
-            _buildTextField('Cap', _capController),
-            _buildTextField('Città', _cittaController),
-            _buildTextField('Provincia', _provinciaController),
-            _buildTextField('Nazione', _nazioneController),
-            _buildTextField('Recapito fatturazione Elettronica', _fatturazioneElettronicaController),
-            _buildTextField('Riferimento Amministrativo', _riferimentoAmministrativoController),
-            _buildTextField('Referente', _referenteController),
-            _buildTextField('Fax', _faxController),
-            _buildTextField('Telefono', _telefonoController),
-            _buildTextField('Cellulare', _cellulareController),
-            _buildTextField('Email', _emailController),
-            _buildTextField('Pec', _pecController),
-            _buildTextField('Note', _noteController),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: updateCliente,
-              child: const Text('Salva Modifiche'),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red,
-                onPrimary: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildTextField('Codice Fiscale', _codiceFiscaleController),
+              _buildTextField('Partita IVA', _partitaIvaController),
+              _buildTextField('Denominazione', _denominazioneController),
+              _buildTextField('Indirizzo', _indirizzoController),
+              _buildTextField('Cap', _capController),
+              _buildTextField('Città', _cittaController),
+              _buildTextField('Provincia', _provinciaController),
+              _buildTextField('Nazione', _nazioneController),
+              _buildTextField('Recapito fatturazione Elettronica', _fatturazioneElettronicaController),
+              _buildTextField('Riferimento Amministrativo', _riferimentoAmministrativoController),
+              _buildTextField('Referente', _referenteController),
+              _buildTextField('Fax', _faxController),
+              _buildTextField('Telefono', _telefonoController),
+              _buildTextField('Cellulare', _cellulareController),
+              _buildTextField('Email', _emailController),
+              _buildTextField('Pec', _pecController),
+              _buildTextField('Note', _noteController),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: updateCliente,
+                  child: const Text('Salva Modifiche'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    onPrimary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ),
+              )
+            ],
+          ),
+        )
       ),
     );
   }
@@ -139,15 +143,18 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
   Widget _buildTextField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+      child: SizedBox(
+        width: 400,
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         ),
-      ),
+      )
     );
   }
 

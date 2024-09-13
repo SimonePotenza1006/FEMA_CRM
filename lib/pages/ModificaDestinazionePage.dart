@@ -68,57 +68,56 @@ class _ModificaDestinazionePageState extends State<ModificaDestinazionePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modifica destinazione'),
+        title:Text('Modifica destinazione'.toUpperCase(), style: TextStyle(color: Colors.white),),
+        centerTitle: true,
+        backgroundColor: Colors.red,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _denominazioneController,
-              decoration: const InputDecoration(labelText: 'Denominazione'),
-            ),
-            TextField(
-              controller: _indirizzoController,
-              decoration: const InputDecoration(labelText: 'Indirizzo'),
-            ),
-            TextField(
-              controller: _capController,
-              decoration: const InputDecoration(labelText: 'CAP'),
-            ),
-            TextField(
-              controller: _cittaController,
-              decoration: const InputDecoration(labelText: 'Città'),
-            ),
-            TextField(
-              controller: _provinciaController,
-              decoration: const InputDecoration(labelText: 'Provincia'),
-            ),
-            TextField(
-              controller: _codiceFiscaleController,
-              decoration: const InputDecoration(labelText: 'Codice Fiscale'),
-            ),
-            TextField(
-              controller: _partitaIvaController,
-              decoration: const InputDecoration(labelText: 'Partita IVA'),
-            ),
-            TextField(
-              controller: _telefonoController,
-              decoration: const InputDecoration(labelText: 'Telefono'),
-            ),
-            TextField(
-              controller: _cellulareController,
-              decoration: const InputDecoration(labelText: 'Cellulare'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: updateDestinazione,
-              child: const Text('Salva Modifiche'),
-            ),
-          ],
-        ),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildTextField('denominazione', _denominazioneController),
+              _buildTextField('indirizzo', _indirizzoController),
+              _buildTextField('cap', _capController),
+              _buildTextField('città', _cittaController),
+              _buildTextField('provincia', _provinciaController),
+              _buildTextField('codice fiscale', _codiceFiscaleController),
+              _buildTextField('partita iva', _partitaIvaController),
+              _buildTextField('telefono', _telefonoController),
+              _buildTextField('cellulare', _cellulareController),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: updateDestinazione,
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red, // Colore di sfondo rosso
+                  onPrimary: Colors.white, // Colore del testo bianco
+                ),
+                child: const Text('Salva Modifiche'),
+              )
+            ],
+          ),
+        )
       ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: SizedBox(
+          width: 400,
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: label.toUpperCase(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        )
     );
   }
 
@@ -126,9 +125,8 @@ class _ModificaDestinazionePageState extends State<ModificaDestinazionePage> {
     late http.Response response;
     try {
       print('${widget.destinazione.toJson()}');
-      response = await http.put(Uri.parse('${ipaddress}/api/destinazione'),
+      response = await http.post(Uri.parse('${ipaddress}/api/destinazione'),
           headers: {
-            "Accept": "application/json",
             "Content-Type": "application/json"
           },
           body: json.encode({
@@ -144,8 +142,11 @@ class _ModificaDestinazionePageState extends State<ModificaDestinazionePage> {
             'cellulare': _cellulareController.text.toString(),
             'cliente': widget.destinazione.cliente?.toJson(),
           }));
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         print("Destinazione modificata correttamente!");
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Destinazione modificata correttamente!')));
       } else {
         print("Hai toppato!!");
         print("${widget.destinazione.cliente?.toJson()}");

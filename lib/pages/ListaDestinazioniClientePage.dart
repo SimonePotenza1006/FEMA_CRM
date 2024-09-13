@@ -107,29 +107,76 @@ class _ListaDestinazioniClientePageState
     }
   }
 
-  Widget? buildViewDestinazioni(DestinazioneModel destinazione) {
+  Widget buildViewDestinazioni(DestinazioneModel destinazione) {
     return Card(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-        color: Colors.white.withOpacity(0.4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15), // Arrotondamento del bordo
+      ),
+      elevation: 5, // Aggiunge un'ombra per creare profondità
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Più spazio tra le card
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey.shade300], // Aggiunge un gradiente di colore
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15), // Arrotondamento anche per il contenitore interno
+        ),
         child: ListTile(
-            minLeadingWidth: 12,
-            visualDensity: const VisualDensity(horizontal: 0, vertical: 4),
+            minLeadingWidth: 20, // Aumenta la larghezza minima per maggiore spaziatura
+            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16), // Più padding interno
+            visualDensity: const VisualDensity(horizontal: 0, vertical: -2), // Riduce leggermente la densità verticale
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DettaglioDestinazionePage(destinazione: destinazione),
-                  ));
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DettaglioDestinazionePage(destinazione: destinazione)),
+              );
             },
-            leading: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[Icon(Icons.house_outlined, size: 40)],
+            leading: CircleAvatar(
+              radius: 25, // Aumenta la dimensione dell'icona
+              backgroundColor: Colors.red, // Cambia il colore dello sfondo dell'icona
+              child: Icon(Icons.account_circle_rounded, color: Colors.white, size: 30), // Icona più grande e bianca
+            ),
+            trailing: Text(
+              'Id. ${destinazione.id}'.toUpperCase(),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black, // Colore più discreto per l'id
+              ),
             ),
             title: Text(
-              '${destinazione.denominazione}',
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 25),
-            )));
+              destinazione.denominazione!,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16, // Dimensione del testo leggermente più grande
+              ),
+            ),
+            subtitle:Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Codice Fiscale: ${destinazione.codice_fiscale != null ? destinazione.codice_fiscale! : 'Non inserito'}'.toUpperCase(),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Colors.black // Colore del testo del sottotitolo
+                  ),
+                ),
+                SizedBox(height: 3),
+                Text(
+                  'Telefono: ${destinazione.cellulare != null ? destinazione.cellulare! : "Non inserito"}'.toUpperCase(),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Colors.black // Colore del testo del sottotitolo
+                  ),
+                ),
+              ],
+            )
+        ),
+      ),
+    );
   }
 }

@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import '../model/ClienteModel.dart';
+import '../model/TipologiaInterventoModel.dart';
+import '../model/UtenteModel.dart';
 import 'GalleriaFotoInterventoPage.dart';
 
 class DettaglioSopralluogoPage extends StatefulWidget {
@@ -25,8 +28,62 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   Future<List<Uint8List>>? _futureImages;
   List<XFile> pickedImages =  [];
+  List<TipologiaInterventoModel> tipologieList = [];
+  List<ClienteModel> clientiList = [];
+  List<ClienteModel> filteredClientiList = [];
 
+  Future<void> getAllTipologie() async {
+    try {
+      var apiUrl = Uri.parse('${ipaddress}/api/tipologiaIntervento');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<TipologiaInterventoModel> tipologie = [];
 
+        // Converti i dati ricevuti in oggetti TipologiaInterventoModel
+        for (var item in jsonData) {
+          tipologie.add(TipologiaInterventoModel.fromJson(item));
+        }
+
+        // Filtro per escludere le tipologie con id 5, 6 o 7
+        tipologie = tipologie.where((tipologia) {
+          return !(tipologia.id == '5' || tipologia.id == '6' || tipologia.id == '7');
+        }).toList();
+
+        // Aggiorna lo stato con la lista filtrata
+        setState(() {
+          tipologieList = tipologie;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
+  }
+
+  Future<void> getAllClienti() async {
+    try {
+      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
+      var response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<ClienteModel> clienti = [];
+        for (var item in jsonData) {
+          clienti.add(ClienteModel.fromJson(item));
+        }
+        setState(() {
+          clientiList = clienti;
+          filteredClientiList = clienti;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
+  }
 
   Widget _buildImagePreview() {
     return SizedBox(
@@ -123,31 +180,10 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'Data del sopralluogo: $formattedDate',
-                style: const TextStyle(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Tipologia: ${widget.sopralluogo.tipologia?.descrizione}',
-                style: const TextStyle(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Cliente: ${widget.sopralluogo.cliente?.denominazione}',
-                style: const TextStyle(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Posizione GPS: ${widget.sopralluogo.posizione}',
-                style: const TextStyle(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Descrizione: ${widget.sopralluogo.descrizione}',
-                style: const TextStyle(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
+              buildInfoRow(title: 'data', value: widget.sopralluogo.data != null ? DateFormat('dd/MM/yyyy').format(widget.sopralluogo.data!) : 'N/A'),
+              buildInfoRow(title: 'tipologia', value: widget.sopralluogo.tipologia != null ? widget.sopralluogo.tipologia!.descrizione! : "N/A"),
+              buildInfoRow(title: 'cliente', value: widget.sopralluogo.cliente != null ? widget.sopralluogo.cliente!.denominazione! : 'N/A'),
+              buildInfoRow(title: 'descrizione', value: widget.sopralluogo.descrizione != null ? widget.sopralluogo.descrizione! : "N/A"),
               SizedBox(height: 30),
               FutureBuilder<List<Uint8List>>(
                 future: _futureImages,
@@ -298,3 +334,88 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
     }
   }
 }
+
+Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
+  // Verifica se il valore supera i 25 caratteri
+  bool isValueTooLong = value.length > 25;
+  String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+  return SizedBox(
+    width:280,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 4, // Linea di accento colorata
+                    height: 24,
+                    color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    title.toUpperCase() + ": ",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87, // Colore contrastante per il testo
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      displayedValue.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (isValueTooLong && context != null)
+                      IconButton(
+                        icon: Icon(Icons.info_outline),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("${title.toUpperCase()}"),
+                                content: Text(value),
+                                actions: [
+                                  TextButton(
+                                    child: Text("Chiudi"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Divider( // Linea di separazione tra i widget
+            color: Colors.grey[400],
+            thickness: 1,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
