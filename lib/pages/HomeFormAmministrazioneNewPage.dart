@@ -6,6 +6,7 @@ import 'package:fema_crm/pages/TableMagazzinoPage.dart';
 import 'package:fema_crm/pages/TableMerceInRiparazionePage.dart';
 import 'package:fema_crm/pages/TableSpeseVeicoliPage.dart';
 import 'package:fema_crm/pages/TableVeicoliPage.dart';
+import 'package:fema_crm/pages/TimbratureEdit.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/pages/CalendarioPage.dart';
 import 'package:fema_crm/pages/ListaClientiPage.dart';
@@ -684,7 +685,9 @@ class _HomeFormAmministrazioneNewPageState
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => TimbraturaPage(utente: widget.userData)),
+                builder: (context) => (widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti") ?
+                    TimbratureEdit(utente: widget.userData) : TimbraturaPage(utente: widget.userData)
+            ),
           );
           break;
         case 3:

@@ -12,6 +12,7 @@ import 'dart:collection';
 
 import 'PDFSettPage.dart';
 import 'TimbraturaPage.dart';
+import 'TimbratureEdit.dart';
 
 
 class TimbratureSettimana extends StatefulWidget {
@@ -315,8 +316,8 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
     });
 
     // Ordino la lista di tabelle in ordine decrescente di settimana
-    tabelle.sort((a, b) {
-      Column columnA = a as Column;
+
+      /*Column columnA = a as Column;
       Column columnB = b as Column;
 
       //int meseA = int.parse((columnA.children.first as Text).data!.split(' ')[1]);
@@ -350,11 +351,34 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
       } else {
         // Handle the case where there's no space in the text
         settimanaB = 0; // or some other default value
+      }*/
+    tabelle.sort((a, b) {
+      Column columnA = a as Column;
+      Column columnB = b as Column;
+
+      Text textWidget = columnA.children.first as Text;
+      List<String> parts = textWidget.data!.split(' ');
+      print('ppaart '+parts[0].toString());
+      int settimanaA;
+      try {
+        settimanaA = getSettimana(DateFormat('dd/MM/yyyy').parse(parts[0].trim()));//int.parse(parts[1]);
+      } catch (e) {
+        // Handle the case where the week number cannot be parsed
+        settimanaA = 0; // or some other default value
+      }
+print('ssA '+settimanaA.toString());
+      Text textWidget2 = columnB.children.first as Text;
+      List<String> parts2 = textWidget2.data!.split(' ');
+      int settimanaB;
+      try {
+        settimanaB = getSettimana(DateFormat('dd/MM/yyyy').parse(parts2[0].trim()));//int.parse(parts2[1]);
+      } catch (e) {
+        // Handle the case where the week number cannot be parsed
+        settimanaB = 0; // or some other default value
       }
 
-      return settimanaB.compareTo(settimanaA);
+      return settimanaA.compareTo(settimanaB);
     });
-
     // Mostra le tabelle
     // ...
   }
@@ -938,6 +962,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
 
   @override
   Widget build(BuildContext context) {
+
     /*Duration getTotalHours(String userId) {
       _RowData? row;
       try {
@@ -954,7 +979,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
             onPressed: (){Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => TimbraturaPage(utente: widget.utente),
+                builder: (context) => TimbratureEdit(utente: widget.utente),
               ),
             );},
             color: Colors.black, // <-- SEE HERE
@@ -981,7 +1006,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
             ),*/
             IconButton(
                 color: Colors.white,
-                icon: Icon(Icons.print), onPressed: () async {
+                icon: Icon(Icons.download), onPressed: () async {
               Navigator.push(
                 context,
                 MaterialPageRoute(
