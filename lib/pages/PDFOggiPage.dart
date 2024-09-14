@@ -161,7 +161,7 @@ class _PDFOggiPageState extends State<PDFOggiPage> {
                     ),
                     cellStyle: const pw.TextStyle(color: PdfColors.black),
                     data: [
-                      ['Ingresso', 'Gps Ingresso', 'Uscita', 'Gps Uscita', 'Durata'],
+                      ['ING', 'Gps Ingresso', 'USC', 'Gps Uscita', 'Durata'],
                       ...marcasss
                           .where((marca) => marca.utente!.id == user.id)
                           .map((marca) => [
@@ -170,7 +170,7 @@ class _PDFOggiPageState extends State<PDFOggiPage> {
                           child:
                           pw.Text(DateFormat('HH:mm').format(marca.data!),
                               style: pw.TextStyle(
-                                  fontSize: 18
+                                  fontSize: 15
                               )),
                           //'dd/MM/yyyy HH:mm'
                         ),
@@ -181,15 +181,23 @@ class _PDFOggiPageState extends State<PDFOggiPage> {
                           child:
                           pw.Text(DateFormat('HH:mm').format(marca.datau!),
                               style: pw.TextStyle(
-                                  fontSize: 18
+                                  fontSize: 15
                               )),
                           //'dd/MM/yyyy HH:mm'
                         ) //'dd/MM/yyyy HH:mm'
                             : 'Uscita non timbrata',
                         marca.gpsu != null ? marca.gpsu! : '-',
-                        marca.datau != null
-                            ? '${marca.datau!.difference(marca.data!).inHours} ore e ${marca.datau!.difference(marca.data!).inMinutes % 60} minuti'
-                            : '-',
+    pw.Container(
+    width: 66, // Imposta la larghezza del contenitore
+    child:
+    pw.Text(style: pw.TextStyle(
+    fontSize: 15
+    ),
+                        marca.datau != null ?
+                        getTimeString(marca.datau!.difference(marca.data!).inMinutes)
+                             //'${marca.datau!.difference(marca.data!).inHours} ore e ${marca.datau!.difference(marca.data!).inMinutes % 60} minuti'
+                            : '-'))
+                        ,
                       ]),
                     ],
                   ),

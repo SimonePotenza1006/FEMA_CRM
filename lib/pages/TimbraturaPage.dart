@@ -44,6 +44,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   final _marcatControllers = <TextEditingController>[];
   final _focusNodes = <FocusNode>[];
   final _isEdited = <bool>[];
+  bool _isLoading = false;
 
   Future<String> getAddressFromCoordinates(
       double latitude, double longitude) async {
@@ -279,6 +280,18 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
     );
   }
 
+  Future<void> _handleTimbraButtonPress() async {
+    setState(() {
+      _isLoading = true;
+    });
+    //await Future.delayed(Duration(seconds: 2));
+    await _getCurrentLocation();
+    await timbra();
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -482,18 +495,27 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                       ),
                       screenWidth > 760 ? SizedBox(width: 330) : SizedBox(width: 5),
                       ElevatedButton(
-                        onPressed: () async {
+                        onPressed: _isLoading ? null : _handleTimbraButtonPress,
+                        /*() async {
                           await _getCurrentLocation();
                           timbra();
-                        },
+                        },*/
                         style: ElevatedButton.styleFrom(
                           primary: Colors.red,
                           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                         ),
-                        child: const Text(
+                        child:
+                        _isLoading
+                            ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(Colors.white),
+                        )
+                            : const Text(
                           '  TIMBRA  ',
                           style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
+                        ),/*const Text(
+                          '  TIMBRA  ',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),*/
                       ),
                     ],
                   ),
