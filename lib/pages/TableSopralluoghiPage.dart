@@ -398,6 +398,7 @@ class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
             onFiltrati: (sopralluoghiFiltrati) {
               _dataSource.updateData(sopralluoghiFiltrati);
             },
+            dataSource: _dataSource,
           );
         },
         child: Icon(Icons.filter_list, color: Colors.white,),
@@ -509,6 +510,7 @@ void mostraRicercaSopralluoghiDialog({
   required List<TipologiaInterventoModel> tipologie,
   required List<SopralluogoModel> sopralluoghi,
   required Function(List<SopralluogoModel>) onFiltrati,
+  required SopralluogoDataSource dataSource,
 }) {
   DateTime? startDate;
   DateTime? endDate;
@@ -723,6 +725,15 @@ void mostraRicercaSopralluoghiDialog({
                 },
                 child: Text('Annulla'),
               ),
+              TextButton(
+                onPressed: () {
+                  dataSource.resetData();  // Reset della lista delle spese
+                  dataSource.updateData(dataSource._originalSopralluoghi);
+                  // Passa le spese originali alla funzione di callback
+                  Navigator.of(context).pop();  // Chiudi il dialog
+                },
+                child: Text('Reset Filtri'),
+              ),
               ElevatedButton(
                 onPressed: () {
                   List<SopralluogoModel> sopralluoghiFiltrati = sopralluoghi;
@@ -783,4 +794,6 @@ void mostraRicercaSopralluoghiDialog({
       );
     },
   );
+
+
 }

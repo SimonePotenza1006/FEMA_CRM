@@ -33,188 +33,61 @@ class DettaglioProdottoPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                'Codice Danea:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.codice_danea ?? 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Descrizione:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.descrizione ?? 'N/A'),
-              SizedBox(height: 20.0),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 1,
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Tipologia:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(prodotto.tipologia ?? 'N/A'),
+                        buildInfoRow(title: 'codice danea', value: prodotto.codice_danea != null ? prodotto.codice_danea.toString() : "N?A"),
+                        buildInfoRow(title: 'prodotto', value: prodotto.descrizione != null ? prodotto.descrizione! : "N/A ", context: context),
+                        buildInfoRow(title: 'tipologia', value: prodotto.tipologia != null ? prodotto.tipologia! : "N/A", context: context),
+                        buildInfoRow(title: 'Unità di misura', value: prodotto.unita_misura != null ? prodotto.unita_misura! : "N/A"),
+                        buildInfoRow(title: "iva", value: prodotto.iva != null ? prodotto.iva! : 'N/A'),
+                        buildInfoRow(title: 'note', value: prodotto.note != null ? prodotto.note! : 'N/A'),
+                        buildInfoRow(title: 'codice a barre danea', value: prodotto.cod_barre_danea != null ? prodotto.cod_barre_danea! : "N/A"),
                       ],
                     ),
                   ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Categoria:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(prodotto.categoria ?? 'N/A'),
-                      ],
+                  SizedBox(width: 10),
+                  Container(
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    flex: 1,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Sottocategoria:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(prodotto.sottocategoria ?? 'N/A'),
+                        buildInfoRow(title: 'produttore', value: prodotto.produttore != null? prodotto.produttore! : "N/A"),
+                        buildInfoRow(title: 'fornitore', value: prodotto.fornitore != null ? prodotto.fornitore! : "N/A"),
+                        buildInfoRow(title: 'Cod. fornitore', value: prodotto.cod_fornitore != null ? prodotto.cod_fornitore! : "N/A"),
+                        buildInfoRow(title: "cod. prodotto fornitore", value: prodotto.cod_prod_forn != null ? prodotto.cod_prod_forn! : "N/A"),
+                        buildInfoRow(title: 'prezzo fornitore', value: prodotto.prezzo_fornitore != null ? prodotto.prezzo_fornitore!.toString() : "N/A", context: context),
+                        buildInfoRow(title: 'note fornitura', value: prodotto.note_fornitura != null ? prodotto.note_fornitura! : "N/A", context: context),
+                        buildInfoRow(title: 'quantità giacenza' , value: prodotto.qta_giacenza != null ? prodotto.qta_giacenza!.toString() : "N/A", context: context),
+                        buildInfoRow(title: 'quantità impegnata', value: prodotto.qta_impegnata != null ? prodotto.qta_impegnata!.toString() : "N/A", context: context),
+                        buildInfoRow(title: 'ultimo costo acquisto', value: prodotto.ultimo_costo_acquisto != null ? prodotto.ultimo_costo_acquisto!.toString() : "N/A", context: context),
+                        buildInfoRow(title: 'prezzo medio vendita', value: prodotto.prezzo_medio_vendita != null ? prodotto.prezzo_medio_vendita!.toString() : "N/A", context: context),
+                        buildInfoRow(title: 'lotto/seriale', value: prodotto.lotto_seriale != null ? prodotto.lotto_seriale! : "N/A", context: context),
                       ],
                     ),
                   ),
                 ],
-              ),
-              SizedBox(height: 20.0),
-              Text(
-                'Unità di misura:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.unita_misura ?? 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'IVA:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.iva ?? 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Note:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.note ?? 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Codice a Barre Danea:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.cod_barre_danea ?? 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Produttore:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.produttore ?? 'N/A'),
-              SizedBox(height: 20.0),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Codice Fornitore:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(prodotto.cod_fornitore ?? 'N/A'),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Fornitore:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(prodotto.fornitore ?? 'N/A'),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Codice Prodotto Fornitore:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(prodotto.cod_prod_forn ?? 'N/A'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20.0),
-              Text(
-                'Prezzo Fornitore:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.prezzo_fornitore != null ? '${prodotto.prezzo_fornitore} €' : 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Note Fornitura:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.note_fornitura ?? 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Quantità Giacenza:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.qta_giacenza != null ? '${prodotto.qta_giacenza}' : 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Quantità Impegnata:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.qta_impegnata != null ? '${prodotto.qta_impegnata}' : 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Ultimo Costo Acquisto:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.ultimo_costo_acquisto != null ? '${prodotto.ultimo_costo_acquisto} €' : 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Prezzo Medio Vendita:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.prezzo_medio_vendita != null ? '${prodotto.prezzo_medio_vendita} €' : 'N/A'),
-              SizedBox(height: 20.0),
-              Text(
-                'Lotto/Seriale:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(prodotto.lotto_seriale ?? 'N/A'),
+              )
             ],
           ),
         ),
@@ -239,4 +112,88 @@ class DettaglioProdottoPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
+    // Verifica se il valore supera i 25 caratteri
+    bool isValueTooLong = value.length > 25;
+    String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+    return SizedBox(
+      width:500,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        displayedValue.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (isValueTooLong && context != null)
+                        IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("${title.toUpperCase()}"),
+                                  content: Text(value),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

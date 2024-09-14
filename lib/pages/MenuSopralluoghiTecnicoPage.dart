@@ -21,7 +21,7 @@ class _MenuSopralluoghiTecnicoPageState extends State<MenuSopralluoghiTecnicoPag
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SOPRALLUOGHI', style: TextStyle(color: Colors.white)),
+        title: const Text('SOPRALLUOGHI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
@@ -55,7 +55,7 @@ class _MenuSopralluoghiTecnicoPageState extends State<MenuSopralluoghiTecnicoPag
                     );
                   },
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 20),
                 buildMenuButton(
                   icon: Icons.folder_shared_outlined,
                   text: 'I tuoi sopralluoghi',
@@ -76,25 +76,47 @@ class _MenuSopralluoghiTecnicoPageState extends State<MenuSopralluoghiTecnicoPag
 
   Widget buildMenuButton(
       {required IconData icon, required String text, required VoidCallback onPressed}) {
-    return SizedBox(
-      width: double.infinity,
-      height: 100,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          primary: Colors.red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red.shade400, Colors.red.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
         ),
-        icon: Icon(
-          icon,
-          color: Colors.white,
-          size: 50,
-        ),
-        label: Text(
-          text,
-          style: TextStyle(color: Colors.white, fontSize: 30),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                color: Colors.white,
+                size: 40,
+              ),
+              SizedBox(width: 20),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

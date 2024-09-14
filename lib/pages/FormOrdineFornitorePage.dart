@@ -41,6 +41,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
   late DateTime selectedDate2;
   bool isSearching = false;
   bool _prodottoNonPresente = false;
+  bool prodottiVisibili = false;
 
 
   Future<void> getAllProdotti() async{
@@ -321,73 +322,80 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _buildSearchField(),
-                          ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.search),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    height: 400,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: FutureBuilder<List<ProdottoModel>>(
-                      future: Future.value(allProdotti),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Errore: ${snapshot.error}'));
-                        } else if (snapshot.hasData) {
-                          List<ProdottoModel> prodotti = filteredProdotti;
-                          return ListView.builder(
-                            itemCount: prodotti.length,
-                            itemBuilder: (context, index) {
-                              ProdottoModel prodotto = prodotti[index];
-                              return CheckboxListTile(
-                                title: Text('${prodotto.descrizione}'),
-                                value: prodottiOrdinati.contains(prodotto),
-                                onChanged: (value) {
-                                  setState(() {
-                                    if (value!) {
-                                      prodottiOrdinati.add(prodotto);
-                                    } else {
-                                      prodottiOrdinati.remove(prodotto);
-                                    }
-                                  });
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          return Center(child: Text('Nessun prodotto nello storico'));
-                        }
-                      },
-                    ),
-                  ),
-                ],
+              SizedBox(
+                height: 20,
               ),
+                SizedBox(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _buildSearchField(),
+                                ),
+                                IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(Icons.search),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          height: 300,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: FutureBuilder<List<ProdottoModel>>(
+                            future: Future.value(allProdotti),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Errore: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                List<ProdottoModel> prodotti = filteredProdotti;
+                                return ListView.builder(
+                                  itemCount: prodotti.length,
+                                  itemBuilder: (context, index) {
+                                    ProdottoModel prodotto = prodotti[index];
+                                    return CheckboxListTile(
+                                      title: Text('${prodotto.descrizione}'),
+                                      value: prodottiOrdinati.contains(prodotto),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          if (value!) {
+                                            prodottiOrdinati.add(prodotto);
+                                          } else {
+                                            prodottiOrdinati.remove(prodotto);
+                                          }
+                                        });
+                                      },
+                                    );
+                                  },
+                                );
+                              } else {
+                                return Center(child: Text('Nessun prodotto nello storico'));
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               SizedBox(height: 12),
               if (prodottiOrdinati.isNotEmpty)
                 Padding(
