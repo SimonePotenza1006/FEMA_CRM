@@ -227,7 +227,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Homepage di ${widget.userData!.nomeCompleto().toString()}',
+          'Home ${widget.userData!.nomeCompleto().toString()}',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,

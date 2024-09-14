@@ -281,6 +281,8 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    print('screenwidth: '+screenWidth.toString());
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -478,7 +480,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),
-                      SizedBox(width: 330),
+                      screenWidth > 760 ? SizedBox(width: 330) : SizedBox(width: 5),
                       ElevatedButton(
                         onPressed: () async {
                           await _getCurrentLocation();
