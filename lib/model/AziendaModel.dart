@@ -2,6 +2,7 @@ class AziendaModel {
   String? id;
   String? nome;
   String? luogo_di_lavoro;
+  String? sede_legale;
   String? partita_iva;
   String? pec;
   String? recapito_fatturazione_elettronica;
@@ -13,6 +14,7 @@ class AziendaModel {
       this.id,
       this.nome,
       this.luogo_di_lavoro,
+      this.sede_legale,
       this.partita_iva,
       this.pec,
       this.recapito_fatturazione_elettronica,
@@ -26,6 +28,7 @@ class AziendaModel {
       'id': id,
       'nome': nome.toString(),
       'luogo_di_lavoro': luogo_di_lavoro,
+      'sede_legale' : sede_legale,
       'partita_iva': partita_iva,
       'pec': pec,
       'recapito_fatturazione_elettronica': recapito_fatturazione_elettronica,
@@ -40,6 +43,7 @@ class AziendaModel {
     id = map['id'];
     nome = map['nome'].toString();
     luogo_di_lavoro = map['luogo_di_lavoro'];
+    sede_legale = map['sede_legale'];
     partita_iva = map['partita_iva'];
     pec = map['pec'];
     recapito_fatturazione_elettronica = map['recapito_fatturazione_elettronica'];
@@ -52,6 +56,7 @@ class AziendaModel {
     'id': id,
     'nome': nome,
     'luogo_di_lavoro' : luogo_di_lavoro,
+    'sede_legale' : sede_legale,
     'partita_iva': partita_iva,
     'pec': pec,
     'recapito_fatturazione_elettronica': recapito_fatturazione_elettronica,
@@ -65,6 +70,7 @@ class AziendaModel {
       json['id']?.toString(),
       json['nome']?.toString(),
       json['luogo_di_lavoro']?.toString(),
+      json['sede_legale']?.toString(),
       json['partita_iva']?.toString(),
       json['pec']?.toString(),
       json['recapito_fatturazione_elettronica']?.toString(),

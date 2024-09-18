@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:fema_crm/pages/PreventivoServiziPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
@@ -132,6 +133,12 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ReportPreventiviPerAgentePage()),
+        );
+        break;
+      case 5:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PreventivoServiziPage(utente: widget.userData)),
         );
         break;
     }
@@ -779,6 +786,7 @@ class MenuPainter extends CustomPainter {
     MenuItem(icon: Icons.playlist_add_outlined, label: 'REGISTRA PREVENTIVO'),
     MenuItem(icon: Icons.bar_chart_outlined, label: 'REPORT PREVENTIVI'),
     MenuItem(icon: Icons.folder_shared_outlined, label: 'REPORT PREVENTIVI/AGENTE'),
+    MenuItem(icon: Icons.edit_outlined, label: 'PREVENTIVO SERVIZI')
   ];
 
   TextPainter labelPainter = TextPainter(
