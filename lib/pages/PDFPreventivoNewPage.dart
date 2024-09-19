@@ -328,11 +328,11 @@ class _PDFPreventivoNewPageState extends State<PDFPreventivoNewPage>{
     final file = io.File('${dir.path}/Noleggio_Auto_${dateora.millisecondsSinceEpoch}.pdf');
     await file.writeAsBytes(bytes);
     await fileAss.writeAsBytes(await pdfAss.save().whenComplete(() async {
-      await Future.delayed(Duration(seconds: 2)).then((val) async {
-        dbHelper?.uploadPdfNoleggio((fileAss.path), fileAss).whenComplete(() {
-          //alertDialog('Pdf salvato con successo');
-        });
-      });
+      // await Future.delayed(Duration(seconds: 2)).then((val) async {
+      //   dbHelper?.uploadPdfNoleggio((fileAss.path), fileAss).whenComplete(() {
+      //     //alertDialog('Pdf salvato con successo');
+      //   });
+      // });
     }));
     return file;
   }

@@ -57,7 +57,7 @@ dependencies:
   geolocator: ^11.0.0
   qr_code_scanner: ^1.0.1
   excel: ^2.0.0
-
+  overlay_support: ^2.1.0
   flutter_screenutil: ^5.0.0
   geocoding: ^2.1.0
   address_search_field: ^5.0.3

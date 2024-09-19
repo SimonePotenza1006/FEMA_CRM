@@ -202,6 +202,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                     width: 400,
                     child: TextFormField(
                       controller: descrizioneController,
+                      maxLines: null,
                       decoration: InputDecoration(
                         labelText: 'Descrizione',
                         hintText: 'Aggiungi una descrizione',

@@ -10,6 +10,8 @@ import '../model/ClienteModel.dart';
 import '../model/UtenteModel.dart';
 import 'package:http/http.dart' as http;
 
+import 'PreventivoServiziPdfPage.dart';
+
 class PreventivoServiziPage extends StatefulWidget{
   final UtenteModel utente;
   final String? path;
@@ -565,7 +567,27 @@ class _PreventivoServiziPageState extends State<PreventivoServiziPage> with Widg
                   child: Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
                   backgroundColor: Colors.red,
                   label: 'Genera pdf'.toUpperCase(),
-                  onTap: () => print('ciaooo'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PreventivoServiziPdfPage(utente : widget.utente,
+                          azienda: selectedAzienda!,
+                          servizi: estraiServizi(),
+                          totaleImponibile: _totaleImponibile.toStringAsFixed(2),
+                          totaleIva: _totaleIva.toStringAsFixed(2),
+                          totaleDocumento: _totaleDocumento.toStringAsFixed(2),
+                          numeroPreventivo: _conNumeroPreventivo.text.isNotEmpty ? _conNumeroPreventivo.text : "//",
+                          dataPreventivo: _conDataPreventivo.text.isNotEmpty ? _conDataPreventivo.text : null,
+                          denomDestinatario: _conDenomDestinatario.text.isNotEmpty ? _conDenomDestinatario.text : null,
+                          denomDestinazione: _conDenomDestinazione.text.isNotEmpty ? _conDenomDestinazione.text : null,
+                          indirizzoDestinatario: _conIndirizzoDestinatario.text.isNotEmpty ? _conIndirizzoDestinatario.text : null,
+                          indirizzoDestinazione: _conIndirizzoDestinazione.text.isNotEmpty ? _conIndirizzoDestinazione.text : null,
+                          cittaDestinatario: _conCittaDestinatario.text.isNotEmpty ? _conCittaDestinatario.text : null,
+                          cittaDestinazione: _conCittaDestinazione.text.isNotEmpty ? _conCittaDestinazione.text : null,
+                          codFisc: _conCFDestinatario.text.isNotEmpty ? _conCFDestinatario.text : null,
+                      ),
+                    ),
+                  ),
                 ),
                 SpeedDialChild(
                   child: Icon(Icons.person_add_alt_1_outlined, color: Colors.white),
@@ -587,6 +609,19 @@ class _PreventivoServiziPageState extends State<PreventivoServiziPage> with Widg
               ],
             ),
           ),
+          Positioned(
+            right: 16,
+              bottom: 90,
+              child: FloatingActionButton(
+                onPressed: _aggiungiProdotto,
+                backgroundColor: Colors.red,
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+              )
+
+          )
         ],
       ),
 
@@ -770,6 +805,10 @@ class _PreventivoServiziPageState extends State<PreventivoServiziPage> with Widg
     );
   }
 
+  List<Servizio> estraiServizi(){
+    return prodotti.map((prodotto) => prodotto.toModel()).toList();
+  }
+
   Future<void> getAllAziende() async{
     try{
       var apiUrl = Uri.parse('${ipaddress}/api/azienda');
@@ -874,4 +913,37 @@ class Prodotto {
     required this.importoController,
     required this.ivaController,
   });
+
+  Servizio toModel(){
+    return Servizio(
+      codice: codiceController.text.isNotEmpty ? codiceController.text.toString() : "N/A",
+      descrizione: descrizioneController.text.isNotEmpty ? descrizioneController.text.toString() : "N/A",
+      quantita: quantitaController.text.isNotEmpty ? quantitaController.text.toString() : "0",
+      prezzo: prezzoController.text.isNotEmpty ? prezzoController.text.toString() : "0",
+      sconto: scontoController.text.isNotEmpty ? scontoController.text.toString() : "",
+      importo: importoController.text.isNotEmpty ? importoController.text.toString() : "",
+      iva: ivaController.text.isNotEmpty ? ivaController.text.toString() + "%" : "0%",
+    );
+  }
+}
+
+class Servizio{
+  String codice;
+  String descrizione;
+  String quantita;
+  String prezzo;
+  String sconto;
+  String importo;
+  String iva;
+
+  Servizio({
+    required this.codice,
+    required this.descrizione,
+    required this.quantita,
+    required this.prezzo,
+    required this.sconto,
+    required this.importo,
+    required this.iva
+  });
+
 }
