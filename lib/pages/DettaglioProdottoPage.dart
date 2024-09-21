@@ -138,7 +138,7 @@ class DettaglioProdottoPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                Expanded( 
+                Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

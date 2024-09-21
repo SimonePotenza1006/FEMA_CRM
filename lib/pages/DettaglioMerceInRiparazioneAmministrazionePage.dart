@@ -481,6 +481,13 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
                       label: "Preventivo accettato".toUpperCase(),
                       onTap: () => accettazionePreventivo(),
                     ),
+                  if(widget.merce.data_comunica_preventivo != null && widget.merce.data_accettazione_preventivo == null)
+                    SpeedDialChild(
+                      child: Icon(Icons.dangerous_outlined, color: Colors.white),
+                      backgroundColor: Colors.red,
+                      label: "Preventivo rifiutato".toUpperCase(),
+                      onTap: () => accettazionePreventivo(),
+                    ),
                   SpeedDialChild(
                     child: Icon(Icons.fact_check_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
@@ -681,6 +688,50 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
           'data_comunica_preventivo' : dataComunicazionePreventivo,
           'preventivo_accettato' : widget.merce.preventivo_accettato,
           'data_accettazione_preventivo' : DateTime.now().toIso8601String(),
+          'diagnosi': widget.merce.diagnosi,
+          'risoluzione': widget.merce.risoluzione,
+          'data_conclusione': dataConclusione,
+          'prodotti_installati': widget.merce.prodotti_installati,
+          'data_consegna': dataConsegna,
+        }),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Il preventivo è stato accettato!'),
+        ),
+      );
+      setState(() {
+        widget.merce.data_accettazione_preventivo= DateTime.now();
+      });
+    } catch (e) {
+      print('Errore durante il salvataggio dell\'importo preventivato: $e');
+    }
+  }
+
+  Future<void> rifiutoPreventivo() async {
+    try {
+      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
+      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
+      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
+      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
+      final response = await http.post(
+        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.merce.id,
+          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
+          'articolo': widget.merce.articolo,
+          'accessori': widget.merce.accessori,
+          'difetto_riscontrato': widget.merce.difetto_riscontrato,
+          'data_presa_in_carico': dataPresaInCarico,
+          'password': widget.merce.password,
+          'dati': widget.merce.dati,
+          'presenza_magazzino' : widget.merce.presenza_magazzino,
+          'preventivo': widget.merce.preventivo,
+          'importo_preventivato': widget.merce.importo_preventivato,
+          'data_comunica_preventivo' : dataComunicazionePreventivo,
+          'preventivo_accettato' : false,
+          'data_accettazione_preventivo' : null,
           'diagnosi': widget.merce.diagnosi,
           'risoluzione': widget.merce.risoluzione,
           'data_conclusione': dataConclusione,

@@ -75,6 +75,111 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
+          MouseRegion(
+            onEnter: (event) {
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Legenda colori:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 8),
+                            Text('Presenza in magazzino'),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.grey[300],
+                            ),
+                            SizedBox(width: 8),
+                            Text('Presa in carico'),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.orange[300],
+                            ),
+                            SizedBox(width: 8),
+                            Text('Preventivo comunicato, in attesa di accettazione'),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.red[300],
+                            ),
+                            SizedBox(width: 8),
+                            Text('Preventivo rifiutato'),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.blue[300],
+                            ),
+                            SizedBox(width: 8),
+                            Text('Preventivo accettato, riparazione in corso'),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.green[300],
+                            ),
+                            SizedBox(width: 8),
+                            Text('Riparazione conclusa'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            child: IconButton(
+              icon: Icon(Icons.info),
+              color: Colors.white,
+              onPressed: () {},
+            ),
+          ),
           IconButton(
             icon: Icon(
               Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -486,7 +591,27 @@ class MerceDataSource extends DataGridSource{
     final MerceInRiparazioneModel merce = row.getCells().firstWhere(
             (cell) => cell.columnName == 'merce',
     ).value as MerceInRiparazioneModel;
+
+    Color backgroundColor;
+
+    if (merce.presenza_magazzino == true) {
+      backgroundColor = Colors.white; // Bianco
+    } else if (merce.data_presa_in_carico != null) {
+      backgroundColor = Colors.grey[300]!; // Grigio chiaro
+    } else if (merce.preventivo == true && merce.data_comunica_preventivo != null && merce.preventivo_accettato == null) {
+      backgroundColor = Colors.orange[300]!; // Arancione
+    } else if (merce.preventivo == true && merce.preventivo_accettato == false) {
+      backgroundColor = Colors.red[300]!; // Rosso
+    } else if (merce.preventivo == true && merce.preventivo_accettato == true && merce.data_conclusione == null) {
+      backgroundColor = Colors.blue[300]!; // Blu
+    } else if (merce.data_conclusione != null) {
+      backgroundColor = Colors.green[300]!; // Verde
+    } else {
+      backgroundColor = Colors.white; // Default to white if none of the conditions are met
+    }
+
     return DataGridRowAdapter(
+      color: backgroundColor,
         cells: row.getCells().map<Widget>((dataGridCell){
           if (dataGridCell.columnName == 'merce') {
             // Cella invisibile per l'oggetto InterventoModel
