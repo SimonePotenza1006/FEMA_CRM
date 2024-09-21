@@ -83,20 +83,26 @@ class _PdfPreventivoServizioState extends State<PdfPreventivoServizio>{
           appBar: AppBar(
             backgroundColor: Colors.red,
             centerTitle: true,
-            title: Text(widget.filename.replaceFirst("xyz0", "\\"),//'file - '+widget.utente.nome!+' '+widget.utente.cognome!,
+            title: Text(widget.filename.replaceFirst("xyz0", "\\"),
               style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                   fontSize: 20.0),),
             automaticallyImplyLeading: false,
-            // leading: IconButton(
-            //   onPressed: () {
-            //     //Navigator.pop(context);
-            //   }, icon: Icon(
-            //   Icons.arrow_back, color: Colors.white,
-            // ),
-            //
-            // ),
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) =>
+                      CassettoPreventiviServiziPage(widget.utente, widget.listfilename)),
+                );
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              ),
+            ),
+
             actions: [
               IconButton(
                 icon: Icon(Icons.share, color: Colors.white),

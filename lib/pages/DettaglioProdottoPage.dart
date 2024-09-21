@@ -92,29 +92,23 @@ class DettaglioProdottoPage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ModificaDettaglioProdottoPage(prodotto: prodotto),
-              ),
-            );
-          },
-          icon: Icon(Icons.build, color: Colors.white),
-          label: Text('MODIFICA', style: TextStyle(color: Colors.white)),
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ModificaDettaglioProdottoPage(prodotto: prodotto),
           ),
-        ),
+        );
+      },
+        child: Icon(Icons.build, color: Colors.white),
+        backgroundColor: Colors.red,
       ),
+
     );
   }
 
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
-    // Verifica se il valore supera i 25 caratteri
     bool isValueTooLong = value.length > 25;
     String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
     return SizedBox(
@@ -129,9 +123,9 @@ class DettaglioProdottoPage extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 4, // Linea di accento colorata
+                      width: 4,
                       height: 24,
-                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                      color: Colors.redAccent,
                     ),
                     SizedBox(width: 10),
                     Text(
@@ -139,12 +133,12 @@ class DettaglioProdottoPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87, // Colore contrastante per il testo
+                        color: Colors.black87,
                       ),
                     ),
                   ],
                 ),
-                Expanded(
+                Expanded( 
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -153,7 +147,7 @@ class DettaglioProdottoPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.black,
-                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                          fontWeight: FontWeight.bold,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
