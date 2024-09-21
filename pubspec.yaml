@@ -39,6 +39,7 @@ dependencies:
   mailer: ^6.1.0
   #pdf_image_renderer: ^0.6.0
   shared_preferences:
+  share_plus: ^6.3.0
   #toast: ^0.1.5 #^0.2.9
   fluttertoast: ^8.2.1
   flutter_email_sender: ^6.0.2

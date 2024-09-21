@@ -39,6 +39,39 @@ class DbHelper{
   List<TipologiaInterventoModel> allTipologie = [];
   List<UtenteModel> allUtenti = [];
 
+  Future<Uint8List> getPdfNoleggio(String filename)  async {
+    final response =
+    await http.get(Uri.parse('$ipaddress/api/pdf/preventiviServizi/$filename'));
+    http.MultipartRequest request;
+    return response.bodyBytes;
+  }
+
+  Future<List<String>> getFilesnameNoleggio() async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/pdf/preventiviServizi'));
+
+      // Aggiungi questa riga per vedere il corpo della risposta.
+      print('Risposta del server: ${response.body}');
+
+      if (response.statusCode == 200) {
+        List<String> ruoli = [];
+        var responseData = json.decode(response.body.toString());
+
+        for (var singleRuolo in responseData) {
+          ruoli.add(singleRuolo);
+        }
+
+        return ruoli;
+      } else {
+        throw Exception('Failed to load ruoli');
+      }
+    } catch (e) {
+      print('Errore: $e');
+      throw Exception(e);
+    }
+  }
+
+
   Future<void> uploadPdfPreventivoServizi(String uploadimage, io.File? uploadimageF) async {
     // Controlla se il file passato è null
     if (uploadimageF == null) {

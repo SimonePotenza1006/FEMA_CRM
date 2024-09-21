@@ -12,12 +12,14 @@ import '../model/UtenteModel.dart';
 import 'PreventivoServiziPage.dart';
 import 'package:path/path.dart' as p;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:io' show Platform;
 import 'package:overlay_support/overlay_support.dart' as over;
 
 class PreventivoServiziPdfPage extends StatefulWidget{
+  final String? filename;
   final UtenteModel utente;
-  final AziendaModel azienda;
+  final AziendaModel? azienda;
   List<Servizio> servizi;
   final String? totaleImponibile;
   final String? totaleIva;
@@ -32,7 +34,7 @@ class PreventivoServiziPdfPage extends StatefulWidget{
   final String? cittaDestinazione;
   final String? codFisc;
 
-  PreventivoServiziPdfPage({Key? key, required this.utente, required this.azienda, required this.servizi, required this.totaleImponibile, required this.totaleIva,
+  PreventivoServiziPdfPage({Key? key, this.filename, required this.utente, required this.azienda, required this.servizi, required this.totaleImponibile, required this.totaleIva,
     required this.totaleDocumento, required this.numeroPreventivo,required this.dataPreventivo, required this.denomDestinatario,required this.denomDestinazione,
     required this.indirizzoDestinatario, required this.indirizzoDestinazione, required this.cittaDestinatario, required this.cittaDestinazione, required this.codFisc,
   }) : super(key:key);
@@ -47,6 +49,8 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
   late String path;
   Future<io.File>? _pdfFileFuture;
   bool _isFileInitialized = false;
+  late io.File file;
+  Uint8List unita = Uint8List(0);
 
   @override
   void initState(){
@@ -76,14 +80,14 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
   Future<io.File> makePdfAss() async{
     dateora = DateTime.now();
     String formattedDate = DateFormat('ddMMyy_HHmmss').format(dateora);
-    String nomeAzienda = widget.azienda.nome!;
-    String sedeLegale = widget.azienda.sede_legale!;
-    String luogoLavoro = widget.azienda.luogo_di_lavoro!;
-    String telefono = widget.azienda.telefono!;
-    String partitaIva = widget.azienda.partita_iva!;
-    String recapitoFatturazioneElettronica = widget.azienda.recapito_fatturazione_elettronica!;
-    String sito = widget.azienda.sito!;
-    String mail = widget.azienda.email!;
+    String nomeAzienda = widget.azienda!.nome!;
+    String sedeLegale = widget.azienda!.sede_legale!;
+    String luogoLavoro = widget.azienda!.luogo_di_lavoro!;
+    String telefono = widget.azienda!.telefono!;
+    String partitaIva = widget.azienda!.partita_iva!;
+    String recapitoFatturazioneElettronica = widget.azienda!.recapito_fatturazione_elettronica!;
+    String sito = widget.azienda!.sito!;
+    String mail = widget.azienda!.email!;
     final pdfAss = pdfw.Document();
     final logoFema = pdfw.MemoryImage(
         (await rootBundle.load('assets/images/logo_no_bg.png'))
@@ -326,14 +330,21 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
     final file = io.File(p.join(dir.path, 'Preventivo_Servizi_${formattedDate}.pdf'));
 
     // Scrivi il file e aggiorna lo stato dopo la scrittura
-    await file.writeAsBytes(bytes).whenComplete(() {
+    await file.writeAsBytes(bytes).whenComplete(() async {
       setState(() {
         _isFileInitialized = true; // Imposta il flag che indica che il file è pronto
         fileAss = file; // Aggiorna il riferimento al file appena generato
       });
+      await Future.delayed(Duration(seconds: 2)).then((val) async{
+        dbHelper?.uploadPdfPreventivoServizi(p.basename(fileAss.path),fileAss).whenComplete(() => print('ok'));
+      });
     });
 
     return file;
+  }
+
+  List<String> splitFileMetadata(String metadata) {
+    return metadata.split('|');
   }
 
   pdfw.Table _buildPdfTable(List<Servizio> servizi) {
@@ -415,6 +426,20 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
           'Preventivo N ${widget.numeroPreventivo}',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 22, color: Colors.white),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.share, color: Colors.white),
+            onPressed: () async {
+              try {
+                // Condividi il PDF utilizzando il file generato
+                await Share.shareXFiles([XFile(fileAss.path)],
+                    text: 'Ecco il preventivo in allegato');
+              } catch (e) {
+                print('Errore nella condivisione: $e');
+              }
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<io.File>(
         future: _pdfFileFuture,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:fema_crm/pages/MenuPreventiviLiberiPage.dart';
 import 'package:fema_crm/pages/PreventivoServiziPage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -138,7 +139,7 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
       case 5:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => PreventivoServiziPage(utente: widget.userData)),
+          MaterialPageRoute(builder: (context) => MenuPreventiviLiberiPage(utente: widget.userData)),
         );
         break;
     }
