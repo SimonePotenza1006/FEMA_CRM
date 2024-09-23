@@ -678,8 +678,6 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
       print('Nope $e');
     }
   }
-
-
 }
 
 class SpesaDataSource extends DataGridSource {
