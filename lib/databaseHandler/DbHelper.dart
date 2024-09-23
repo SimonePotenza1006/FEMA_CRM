@@ -46,6 +46,24 @@ class DbHelper{
     return response.bodyBytes;
   }
 
+  Future<List<ClienteModel>> getAllClienti() async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      if(response.statusCode == 200){
+        final jsonData = jsonDecode(response.body);
+        List<ClienteModel> clienti = [];
+        for(var item in jsonData){
+          clienti.add(ClienteModel.fromJson(item));
+        }
+        return clienti;
+      }
+      return [];
+    } catch(e){
+      print("Errore fetching clienti:$e");
+      return [];
+    }
+  }
+
   Future<List<String>> getFilesnameNoleggio() async {
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/pdf/preventiviServizi'));
@@ -143,7 +161,6 @@ class DbHelper{
       return;
     }
   }
-
 
   Future<List<TipologiaInterventoModel>> getAllTipologieIntervento() async{
     try{

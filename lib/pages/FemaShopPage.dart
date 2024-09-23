@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:core';
+import 'package:fema_crm/databaseHandler/DbHelper.dart';
 import 'package:fema_crm/model/DDTModel.dart';
 import 'package:fema_crm/model/InterventoModel.dart';
+import 'package:fema_crm/model/RelazioneClientiProdottiModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -22,13 +24,13 @@ class FemaShopPage extends StatefulWidget {
 }
 
 class _FemaShopPageState extends State<FemaShopPage> {
+  DbHelper? dbhelper;
   Map<String, int> productQuantities = {};
   Map<String, double> productPrices = {};
   Map<String, TextEditingController> priceControllers = {};
   Map<String, TextEditingController> quantityControllers = {};
   Map<String, SelezioneProdotto> selectedProductsMap = {};
   late TextEditingController searchController;
-  //late double totaleVendita = 0;
   bool isSearching = false;
   List<ProdottoModel> allProdotti = [];
   List<ProdottoModel> filteredProdotti = [];
@@ -36,11 +38,32 @@ class _FemaShopPageState extends State<FemaShopPage> {
   List<ClienteModel> allClienti = [];
   List<ClienteModel> filteredClienti = [];
   List<DestinazioneModel> destinazioni = [];
+  List<RelazioneClientiProdottiModel> relazioniVecchieVendite = [];
   DestinazioneModel? selectedDestinazione;
   final TextEditingController _descrizioneController = TextEditingController();
   ClienteModel? selectedCliente;
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+
+  Future<void> getAllRelazioniVendite(String clienteId) async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioniClientiProdotti/cliente/$clienteId'));
+      if(response.statusCode == 200){
+        final jsonData = jsonDecode(response.body);
+        List<RelazioneClientiProdottiModel> relazioni = [];
+        for(var item in jsonData){
+          relazioni.add(RelazioneClientiProdottiModel.fromJson(item));
+        }
+        setState(() {
+          relazioniVecchieVendite = relazioni;
+        });
+      } else{
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Errore durante la chiamata all\'API: $e');
+    }
+  }
 
   Future<void> getAllClienti() async {
     try {
@@ -81,7 +104,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
   }
 
 
-  Widget _buildSelectedProducts() {
+  Widget _buildSelectedProducts(List<RelazioneClientiProdottiModel> relazioniCliente) {
     if (selectedProductsMap.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -107,15 +130,28 @@ class _FemaShopPageState extends State<FemaShopPage> {
               quantityControllers[key] = TextEditingController(text: selezione.quantity.toString());
             }
 
+            // Ottieni l'ultimo prezzo del prodotto per il cliente
+            final ultimoPrezzo = _getUltimoPrezzoProdotto(selezione.prodotto, relazioniCliente);
+
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(
-                      selezione.prodotto.descrizione?.toUpperCase() ?? '',
-                      style: const TextStyle(fontSize: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          selezione.prodotto.descrizione?.toUpperCase() ?? '',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        if (ultimoPrezzo != null) // Se esiste un prezzo, mostralo
+                          Text(
+                            ' - Ultimo prezzo: €${ultimoPrezzo.toStringAsFixed(2)}',
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -131,8 +167,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
                       onChanged: (value) {
                         final double? prezzo = double.tryParse(value);
                         setState(() {
-                          // Permettere il prezzo a 0 senza restrizioni
-                          selezione.price = prezzo ?? 0.00; // Se il valore non è valido, imposta a 0.00
+                          selezione.price = prezzo ?? 0.00;
                           selectedProductsMap[key] = selezione;
                         });
                       },
@@ -156,8 +191,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
                       onChanged: (value) {
                         final int? quantity = int.tryParse(value);
                         setState(() {
-                          // Permettere quantità pari a 0 senza restrizioni
-                          selezione.quantity = quantity ?? 0; // Se il valore non è valido, imposta a 0
+                          selezione.quantity = quantity ?? 0;
                           selectedProductsMap[key] = selezione;
                         });
                       },
@@ -166,7 +200,6 @@ class _FemaShopPageState extends State<FemaShopPage> {
                           selezione.quantity = int.tryParse(quantityControllers[key]?.text ?? "0") ?? 0;
                         });
                       },
-
                     ),
                   ),
                 ],
@@ -177,6 +210,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
       ],
     );
   }
+
 
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
@@ -239,6 +273,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
                                 setState(() {
                                   selectedCliente = cliente;
                                   getAllDestinazioniByCliente(cliente.id!);
+                                  getAllRelazioniVendite(cliente.id!);
                                 });
                                 Navigator.of(context).pop();
                               },
@@ -366,6 +401,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
   void initState() {
     super.initState();
     searchController = TextEditingController();
+    dbhelper = DbHelper();
     getAllClienti();
     getAllProdotti();
   }
@@ -513,7 +549,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildSelectedProducts(),
+                  _buildSelectedProducts(relazioniVecchieVendite),
                   const SizedBox(height: 20),
                   _buildTotalDisplay(),
                   const SizedBox(height: 20),
@@ -536,6 +572,17 @@ class _FemaShopPageState extends State<FemaShopPage> {
         ),
       ),
     );
+  }
+
+  double? _getUltimoPrezzoProdotto(ProdottoModel prodotto, List<RelazioneClientiProdottiModel> relazioniCliente) {
+    final relazioniProdotto = relazioniCliente
+        .where((relazione) => relazione.prodotto?.id == prodotto.id)
+        .toList();
+    if (relazioniProdotto.isEmpty) {
+      return null; // Nessun prezzo trovato
+    }
+    relazioniProdotto.sort((a, b) => b.data!.compareTo(a.data!));
+    return relazioniProdotto.first.prezzo;
   }
 
   void _confermaDialog(){
@@ -562,6 +609,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
             actions: <Widget>[
               TextButton(
                 onPressed: (){
+                  savePrezzi();
                   saveMovimento();
                 },
                 child: Text('Conferma vendita'.toUpperCase()),
@@ -676,22 +724,39 @@ class _FemaShopPageState extends State<FemaShopPage> {
     }
   }
 
+  Future<void> savePrezzi() async{
+    try{
+      for(final entry in selectedProductsMap.entries){
+        final selezione = entry.value;
+        final relazione = {
+          'prodotto' : selezione.prodotto.toMap(),
+          'cliente' : selectedCliente?.toMap(),
+          'prezzo' : selezione.price,
+          'data' : DateTime.now().toIso8601String()
+        };
+        final response = await http.post(
+          Uri.parse('$ipaddress/api/relazioniClientiProdotti'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(relazione),
+        );
+        if(response.statusCode == 201 || response.statusCode == 200){
+          print('dajeeee');
+        }
+      }
+    } catch(e){
+      print('Qualcosa non va');
+    }
+  }
+
   Future<List<RelazioneProdottiInterventoModel>?> saveRelazioni() async {
     final ddtResponse = await saveDdt(); // Recupera il DDT
     try {
       if (ddtResponse == null) {
         throw Exception('Dati del DDT non disponibili.');
       }
-
-      // Crea l'oggetto DDT dal JSON della risposta
       final ddt = DDTModel.fromJson(jsonDecode(ddtResponse.body));
-
-      // Estrai l'intervento dal DDT
       final intervento = ddt.intervento;
-
-      // Crea le relazioni prodotto-intervento
       final List<RelazioneProdottiInterventoModel> relazioniCreate = [];
-
       for (final entry in selectedProductsMap.entries) {
         final selezione = entry.value;
         final relazione = {
@@ -703,16 +768,12 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'presenza_storico_utente': false,
           'seriale': selezione.prodotto.lotto_seriale,
         };
-
-        // Invia ogni relazione come una singola richiesta
         final response = await http.post(
           Uri.parse('$ipaddress/api/relazioneProdottoIntervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(relazione),
         );
-
         if (response.statusCode == 200) {
-          // Decodifica la risposta e aggiungi alla lista di relazioni create
           final relazioneCreata = RelazioneProdottiInterventoModel.fromJson(jsonDecode(response.body));
           relazioniCreate.add(relazioneCreata);
         } else {
@@ -731,20 +792,16 @@ class _FemaShopPageState extends State<FemaShopPage> {
 
 
   Future<void> saveMovimento() async {
-    // Salva le relazioni e ottieni le relazioni create
     final relazioniCreate = await saveRelazioni();
-
     try {
       if (relazioniCreate == null || relazioniCreate.isEmpty) {
         throw Exception('Dati delle relazioni non disponibili.');
       }
-      // Ottieni l'intervento dalla prima relazione (presumendo che tutte le relazioni abbiano lo stesso intervento)
       final intervento = relazioniCreate.first.intervento;
       if (intervento == null) {
         throw Exception('Intervento non disponibile.');
       }
       double totaleVendita = calcolaTotaleSelezionati();
-      // Ora utilizzi l'intervento per salvare il movimento
       final response = await http.post(
         Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
@@ -775,9 +832,6 @@ class _FemaShopPageState extends State<FemaShopPage> {
       print('Errore nel salvataggio del movimento: $e');
     }
   }
-
-
-
 
   Widget _buildTotalDisplay() {
     double totale = calcolaTotaleSelezionati();

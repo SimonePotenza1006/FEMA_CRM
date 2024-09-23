@@ -32,7 +32,7 @@ class _TableMagazzinoPageState extends State<TableMagazzinoPage>{
     'lotto_seriale' : 200
   };
   int _rowsPerPage = 20; // Definisce il numero di righe per pagina
-  int _pageCount =0;
+  int _pageCount = 0;
   bool isSearching = false;
   late TextEditingController searchController;
 

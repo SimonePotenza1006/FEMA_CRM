@@ -93,12 +93,12 @@ class _HomeFormAmministrazioneNewPageState
       };
     }
     getAllVeicoli().then((_) {
-      getNote().whenComplete(() =>
-        checkScadenzeVeicoli().then((_) {
-
-          checkVeicoloScadenze(allVeicoli);
-        })
-      );
+       getNote();//.whenComplete(() =>
+      //   checkScadenzeVeicoli().then((_) {
+      //
+      //     checkVeicoloScadenze(allVeicoli);
+      //   })
+      // );
     });
     getAllOrdini();
     _scheduleGetAllOrdini();
@@ -346,108 +346,108 @@ class _HomeFormAmministrazioneNewPageState
     return hoveredIndex;
   }
 
-  Future<void> checkScadenzeVeicoli() async {
-    for (var veicolo in allVeicoli) {
-      await checkScadenzeDate(veicolo);
-    }
-  }
+  // Future<void> checkScadenzeVeicoli() async {
+  //   for (var veicolo in allVeicoli) {
+  //     await checkScadenzeDate(veicolo);
+  //   }
+  // }
 
-  Future<void> checkScadenzeDate(VeicoloModel veicolo) async {
-
-    // Controllo scadenza bollo
-    if (veicolo.data_scadenza_bollo!= null) {
-      final differenceBollo = veicolo.data_scadenza_bollo!.difference(today).inDays;
-      if (differenceBollo <= 30) {
-        final noteKey = '${veicolo.id}_bollo_${today.toIso8601String()}';
-        if (_publishedNotes.containsKey(noteKey)) {
-          return; // Note has already been published today
-        }
-
-        bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha il bollo in scadenza tra ${differenceBollo} giorni!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
-
-        if(!trovato)
-        try {
-
-           final response = await http.post(
-            Uri.parse('$ipaddress/api/noteTecnico'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'utente': widget.userData.toMap(),
-              'data': DateTime.now().toIso8601String(),
-              'nota': "Il veicolo ${veicolo.descrizione} ha il bollo in scadenza tra ${differenceBollo} giorni!",
-            }),
-          );
-          print("Nota scadenza bollo creata!");
-          // Mark note as published today
-          _publishedNotes[noteKey] = true;
-        } catch (e) {
-          print("Errore nota scadenza bollo: $e");
-        }
-      }
-    }
-    // Controllo scadenza polizza
-    if (veicolo.data_scadenza_polizza!= null) {
-      final differencePolizza = veicolo.data_scadenza_polizza!.difference(today).inDays;
-      if (differencePolizza <= 30) {
-        bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha la polizza in scadenza tra ${differencePolizza} giorni!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
-
-        final noteKey = '${veicolo.id}_polizza_${today.toIso8601String()}';
-        if (_publishedNotes.containsKey(noteKey)) {
-          return; // Note has already been published today
-        }
-
-
-        if(!trovato)
-          try {
-
-            final response = await http.post(
-            Uri.parse('$ipaddress/api/noteTecnico'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'utente': widget.userData.toMap(),
-              'data': DateTime.now().toIso8601String(),
-              'nota': "Il veicolo ${veicolo.descrizione} ha la polizza in scadenza tra ${differencePolizza} giorni!",
-            }),
-          );
-          print("Nota scadenza polizza creata!");
-          // Mark note as published today
-          _publishedNotes[noteKey] = true;
-        } catch (e) {
-          print("Errore nota scadenza polizza: $e");
-        }
-
-      }
-    }
-    // Controllo scadenza tagliando
-    if (veicolo.data_tagliando!= null) {
-      final differenceTagliando = today.difference(veicolo.data_tagliando!).inDays;
-      if (differenceTagliando >= 700) {
-        final noteKey = '${veicolo.id}_tagliando_${today.toIso8601String()}';
-        if (_publishedNotes.containsKey(noteKey)) {
-          return; // Note has already been published today
-        }
-
-        bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha superato i 700 giorni dall'ultimo tagliando!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
-
-        try {
-          if(!trovato) final response = await http.post(
-            Uri.parse('$ipaddress/api/noteTecnico'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'utente': widget.userData.toMap(),
-              'data': DateTime.now().toIso8601String(),
-              'nota': "Il veicolo ${veicolo.descrizione} ha superato i 700 giorni dall'ultimo tagliando!",
-            }),
-          );
-          print("Nota promemoria tagliando creata!");
-          // Mark note as published today
-          _publishedNotes[noteKey] = true;
-        } catch (e) {
-          print("Errore nota promemoria tagliando: $e");
-        }
-      }
-    }
-  }
+  // Future<void> checkScadenzeDate(VeicoloModel veicolo) async {
+  //
+  //   // Controllo scadenza bollo
+  //   if (veicolo.data_scadenza_bollo!= null) {
+  //     final differenceBollo = veicolo.data_scadenza_bollo!.difference(today).inDays;
+  //     if (differenceBollo <= 30) {
+  //       final noteKey = '${veicolo.id}_bollo_${today.toIso8601String()}';
+  //       if (_publishedNotes.containsKey(noteKey)) {
+  //         return; // Note has already been published today
+  //       }
+  //
+  //       bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha il bollo in scadenza tra ${differenceBollo} giorni!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
+  //
+  //       if(!trovato)
+  //       try {
+  //
+  //          final response = await http.post(
+  //           Uri.parse('$ipaddress/api/noteTecnico'),
+  //           headers: {'Content-Type': 'application/json'},
+  //           body: jsonEncode({
+  //             'utente': widget.userData.toMap(),
+  //             'data': DateTime.now().toIso8601String(),
+  //             'nota': "Il veicolo ${veicolo.descrizione} ha il bollo in scadenza tra ${differenceBollo} giorni!",
+  //           }),
+  //         );
+  //         print("Nota scadenza bollo creata!");
+  //         // Mark note as published today
+  //         _publishedNotes[noteKey] = true;
+  //       } catch (e) {
+  //         print("Errore nota scadenza bollo: $e");
+  //       }
+  //     }
+  //   }
+  //   // Controllo scadenza polizza
+  //   if (veicolo.data_scadenza_polizza!= null) {
+  //     final differencePolizza = veicolo.data_scadenza_polizza!.difference(today).inDays;
+  //     if (differencePolizza <= 30) {
+  //       bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha la polizza in scadenza tra ${differencePolizza} giorni!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
+  //
+  //       final noteKey = '${veicolo.id}_polizza_${today.toIso8601String()}';
+  //       if (_publishedNotes.containsKey(noteKey)) {
+  //         return; // Note has already been published today
+  //       }
+  //
+  //
+  //       if(!trovato)
+  //         try {
+  //
+  //           final response = await http.post(
+  //           Uri.parse('$ipaddress/api/noteTecnico'),
+  //           headers: {'Content-Type': 'application/json'},
+  //           body: jsonEncode({
+  //             'utente': widget.userData.toMap(),
+  //             'data': DateTime.now().toIso8601String(),
+  //             'nota': "Il veicolo ${veicolo.descrizione} ha la polizza in scadenza tra ${differencePolizza} giorni!",
+  //           }),
+  //         );
+  //         print("Nota scadenza polizza creata!");
+  //         // Mark note as published today
+  //         _publishedNotes[noteKey] = true;
+  //       } catch (e) {
+  //         print("Errore nota scadenza polizza: $e");
+  //       }
+  //
+  //     }
+  //   }
+  //   // Controllo scadenza tagliando
+  //   if (veicolo.data_tagliando!= null) {
+  //     final differenceTagliando = today.difference(veicolo.data_tagliando!).inDays;
+  //     if (differenceTagliando >= 700) {
+  //       final noteKey = '${veicolo.id}_tagliando_${today.toIso8601String()}';
+  //       if (_publishedNotes.containsKey(noteKey)) {
+  //         return; // Note has already been published today
+  //       }
+  //
+  //       bool trovato = allNoteScadenze.any((nota) => nota.nota == "Il veicolo ${veicolo.descrizione} ha superato i 700 giorni dall'ultimo tagliando!" && nota.data != null && nota.data!.toString().startsWith(today.toString().substring(0, 10)));
+  //
+  //       try {
+  //         if(!trovato) final response = await http.post(
+  //           Uri.parse('$ipaddress/api/noteTecnico'),
+  //           headers: {'Content-Type': 'application/json'},
+  //           body: jsonEncode({
+  //             'utente': widget.userData.toMap(),
+  //             'data': DateTime.now().toIso8601String(),
+  //             'nota': "Il veicolo ${veicolo.descrizione} ha superato i 700 giorni dall'ultimo tagliando!",
+  //           }),
+  //         );
+  //         print("Nota promemoria tagliando creata!");
+  //         // Mark note as published today
+  //         _publishedNotes[noteKey] = true;
+  //       } catch (e) {
+  //         print("Errore nota promemoria tagliando: $e");
+  //       }
+  //     }
+  //   }
+  // }
 
   Future<void> getAllUtenti() async {
     try {
