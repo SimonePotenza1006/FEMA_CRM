@@ -687,7 +687,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'gps': _indirizzo.toString(),
-              'data': DateTime.now().toIso8601String(),
+              'data': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()),//DateTime.now().toIso8601String(),
               'utente': widget.utente.toMap(),
               'viaggio': {
                 'id': 2,
@@ -716,7 +716,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               'gps': timbratureOdierne.last.gps,
               'gpsu': _indirizzo.toString(),
               'data': timbratureOdierne.last.data!.toIso8601String(),
-              'datau': DateTime.now().toIso8601String(),
+              'datau': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()),//DateTime.now().toIso8601String(),
               'viaggio': {
                 'id': 2,
                 'destinazione': 'Calimera',
