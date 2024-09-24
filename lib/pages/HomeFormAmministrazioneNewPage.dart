@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/MenuInterventiPage.dart';
 import 'package:fema_crm/pages/TableAccessiApplicazionePage.dart';
 import 'package:fema_crm/pages/TableMagazzinoPage.dart';
 import 'package:fema_crm/pages/TableMerceInRiparazionePage.dart';
@@ -695,7 +696,7 @@ class _HomeFormAmministrazioneNewPageState
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) =>
-                TableInterventiPage()), //ListaInterventiFinalPage()),
+                MenuInterventiPage(utente: widget.userData)), //ListaInterventiFinalPage()),
           );
           break;
         case 4:
