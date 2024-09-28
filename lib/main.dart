@@ -17,6 +17,9 @@ import 'model/RuoloUtenteModel.dart';
 import 'model/TipologiaInterventoModel.dart';
 import 'model/UtenteModel.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_udid/flutter_udid.dart';
+import '../model/DeviceModel.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -111,19 +114,191 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
-
+  final GlobalKey<FormState> _formKeyLice = GlobalKey<FormState>();
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   final _conUserId = TextEditingController();
   final _conPassword = TextEditingController();
+  final _conLicenza = TextEditingController();
   late Future<UtenteModel> _futureAlbum;
   var dbHelper;
+  String? idd = null;
+  List<String> dispositivi = [];
+  String? platform = null;
+  bool licenzaerrata = false;
+  List<String> licenze = [];
 
   @override
   void initState() {
-    super.initState();
     dbHelper = DbHelper();
+    initPlatformState().whenComplete(() =>
+        getUserData()
+    );
+    super.initState();
+
     _loadSavedCredentials();
+  }
+
+  Future<void> initPlatformState() async {
+    String udid;
+    try {
+      udid = await FlutterUdid.consistentUdid;
+    } on PlatformException {
+      udid = 'Failed to get UDID.';
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      idd = udid;//_udid = udid;
+    });
+    (udid != null) ? print('nuovo id '+  udid!) : print('nuovo id null');
+  }
+
+  Future<void> getUserData() async {
+    dispositivi=await dbHelper.getAllDevice();
+
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isWindows) {
+      print('windows');
+      WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+      //idd = windowsInfo.deviceId.toString();
+      platform='windows';
+      print('Running on '
+      //  '${androidInfo.model.toString()} ${androidInfo.id.toString()} '
+          '${windowsInfo.computerName.toString()} ${windowsInfo.deviceId.toString()}'
+      );
+    } else if (Platform.isAndroid) {
+      print('android');
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      //idd= androidInfo.id.toString();
+      platform='android';
+      print('Running on '
+          '${androidInfo.model.toString()} ${androidInfo.serialNumber.toString()} '
+
+      );
+    }
+    if (dispositivi.contains(idd)) {print('okok');} else {
+
+      DeviceModel uModel = DeviceModel('', idd);
+      await insertLicenza(uModel);
+
+    }
+
+
+    SharedPreferences sp = await _pref;
+
+    setState(() {
+      idd=idd;
+    });
+  }
+
+  Future<bool> insertLicenza(DeviceModel device) async {
+    //bool licenzaerrata = false;
+    //licenze=await dbHelper.getAllLicenze();
+    return (await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: new Text('Numero di licenza', style: TextStyle(fontWeight: FontWeight.w600),),
+        content: new Text('Dispositivo non ancora registrato: Inserisci il numero di licenza per utilizzare l\'applicazione Fema'),
+        actions: <Widget>[
+          Form(
+              key: _formKeyLice,
+              //autovalidateMode: AutovalidateMode.onUserInteraction,
+              child:
+              Column(
+                //scrollDirection: Axis.vertical,
+                //direction: Axis.vertical,
+                  children: [
+                    TextFormField(
+                      controller: _conLicenza,
+                      obscureText: false,
+                      enabled: true,
+                      //autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) //=> value!.length ==0 ? '' : null,
+                      {
+                        print("jytg? 22");
+
+                        if (value == null || value.isEmpty || licenzaerrata) {
+                          print("nuuuuuuuuuuuuuuul");
+                          return 'Inserisci un codice di licenza valido';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700], fontSize: 17.0),
+                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        //floatingLabelBehavior: FloatingLabelBehavior.never,
+                        enabledBorder: UnderlineInputBorder(//OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          borderSide: BorderSide(color: Colors.transparent),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        //prefixIcon: Icon(icon),
+                        //hintText: hintName,
+                        labelText: 'Numero di licenza',
+                        fillColor: Colors.grey[200],
+                        errorStyle: TextStyle(color: Colors.black),
+                        //hintStyle: TextStyle(fontWeight: FontWeight.w800),
+                        labelStyle: TextStyle(fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.italic, color: Colors.black),
+                        focusColor: Colors.grey,
+                        //hoverColor: Colors.black,
+                        filled: true,
+                      ),
+                    ),
+                    TextButton(
+
+                      onPressed: resetLicenza, //<-- SEE HERE
+                      child: new Text('RESET', style: TextStyle(fontWeight: FontWeight.w600),),
+
+
+                    ),
+
+                    TextButton(
+                      onPressed: () async =>
+                      { if (_formKeyLice.currentState!.validate()) {
+                        licenze=await dbHelper.getAllLicenze(),
+                        if (licenze.contains(_conLicenza.text)) {
+                          setState(() {
+                            licenzaerrata = false;
+                          }),
+
+                          await dbHelper.saveDevice(DeviceModel('', idd)),
+                          await dbHelper.saveLicenzaNo(_conLicenza.text),
+                          Navigator.pop(context)
+                          //print('okok')
+                        } else {
+
+                          setState(() {
+                            licenzaerrata = true;
+                          })
+
+                        },
+
+                      } },//Navigator.of(context).pop(true), // <-- SEE HERE
+                      child: new Text('OK', style: TextStyle(
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.w600),),
+                    ),
+
+                  ]))
+
+        ],
+      ),
+    )) ??
+        false;
+  }
+
+  resetLicenza(){
+    _conLicenza.text = '';
+    setState(() {
+      licenzaerrata = false;
+    });
   }
 
   Future<void> setSP(UtenteModel user) async {
@@ -416,5 +591,7 @@ class _LoginFormState extends State<LoginForm> {
       ),
     );
   }
+
+
 
 }

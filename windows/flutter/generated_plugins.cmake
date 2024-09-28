@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   address_search_field
   file_selector_windows
   flutter_localization
+  flutter_udid
   geolocator_windows
   permission_handler_windows
   printing
