@@ -5,50 +5,23 @@ import 'package:fema_crm/pages/CalendarioUtentePage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneTecnicoPage.dart';
 import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'package:fema_crm/pages/FormOrdineFornitorePage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:fema_crm/pages/CalendarioPage.dart';
-import 'package:fema_crm/pages/ListaClientiPage.dart';
-import 'package:fema_crm/pages/ListaCredenzialiPage.dart';
-import 'package:fema_crm/pages/ListaInterventiFinalPage.dart';
-import 'package:fema_crm/pages/LogisticaPreventiviHomepage.dart';
-import 'package:fema_crm/pages/MenuCommissioniPage.dart';
-import 'package:fema_crm/pages/MenuOrdiniFornitorePage.dart';
-import 'package:fema_crm/pages/MenuSopralluoghiPage.dart';
-import 'package:fema_crm/pages/ScannerQrCodeAmministrazionePage.dart';
 import 'package:fema_crm/pages/SpesaSuVeicoloPage.dart';
 import 'package:fema_crm/pages/TimbraturaPage.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';// as intl;
 import 'package:intl/intl.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'dart:math' as math;
-import '../pages/HomeFormAmministrazioneNewPage.dart';
 import 'dart:ui' as ui;
-
 import '../main.dart';
 import '../model/CommissioneModel.dart';
-import '../model/CustomAppointmentModel.dart';
 import '../model/InterventoModel.dart';
-import '../model/MerceInRiparazioneModel.dart';
-import '../model/NotaTecnicoModel.dart';
-import '../model/OrdinePerInterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
-import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
-import '../model/VeicoloModel.dart';
-import 'ControlloAccessiApplicazionePage.dart';
-import 'CreazioneNuovaCartaPage.dart';
-import 'CreazioneNuovoUtentePage.dart';
-import 'DettaglioCommissioneAmministrazionePage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
-import 'DettaglioInterventoPage.dart';
-import 'ListaNoteUtentiPage.dart';
-import 'ListaUtentiPage.dart';
-import 'MagazzinoPage.dart';
 import 'MenuSopralluoghiTecnicoPage.dart';
-import 'RegistroCassaPage.dart';
-import 'ReportSpeseVeicoloPage.dart';
-import 'StoricoMerciUtentiPage.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class HomeFormTecnicoNewPage extends StatefulWidget{
   final UtenteModel? userData;
@@ -64,12 +37,188 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
+  // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+  // Map<String, dynamic> _deviceData = <String, dynamic>{};
 
   @override
   void initState() {
     super.initState();
     saveIngresso();
+    //initPlatformState().whenComplete(() => print('$_deviceData'));
   }
+
+  // Future<void> initPlatformState() async {
+  //   print('inizia');
+  //   var deviceData = <String, dynamic>{};
+  //   try {
+  //     if (kIsWeb) {
+  //       deviceData = _readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
+  //     } else {
+  //       switch (defaultTargetPlatform) {
+  //         case TargetPlatform.android:
+  //           deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+  //           break;
+  //         case TargetPlatform.iOS:
+  //           deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+  //           break;
+  //         case TargetPlatform.linux:
+  //           deviceData = _readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
+  //           break;
+  //         case TargetPlatform.windows:
+  //           deviceData = _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
+  //           break;
+  //         case TargetPlatform.macOS:
+  //           deviceData = _readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
+  //           break;
+  //         case TargetPlatform.fuchsia:
+  //           deviceData = <String, dynamic>{ 'Error:': 'Fuchsia platform isn\'t supported' };
+  //           break;
+  //         default:
+  //           deviceData = <String, dynamic>{ 'Error:': 'Unknown platform' };
+  //       }
+  //     }
+  //   } on PlatformException {
+  //     deviceData = <String, dynamic>{ 'Error:': 'Failed to get platform version.' };
+  //   }
+  //
+  //   if (!mounted) return;
+  //   setState(() {
+  //     _deviceData = deviceData;
+  //   });
+  // }
+  //
+  // Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
+  //   return <String, dynamic>{
+  //     // 'version.securityPatch': build.version.securityPatch,
+  //     // 'version.sdkInt': build.version.sdkInt,
+  //     // 'version.release': build.version.release,
+  //     // 'version.previewSdkInt': build.version.previewSdkInt,
+  //     // 'version.incremental': build.version.incremental,
+  //     // 'version.codename': build.version.codename,
+  //     // 'version.baseOS': build.version.baseOS,
+  //     // 'board': build.board,
+  //     // 'bootloader': build.bootloader,
+  //     // 'brand': build.brand,
+  //     // 'device': build.device,
+  //     // 'display': build.display,
+  //     // 'fingerprint': build.fingerprint,
+  //      'hardware': build.hardware,
+  //     // 'host': build.host,
+  //     // 'id': build.id,
+  //     // 'manufacturer': build.manufacturer,
+  //     // 'model': build.model,
+  //      'product': build.product,
+  //     // 'supported32BitAbis': build.supported32BitAbis,
+  //     // 'supported64BitAbis': build.supported64BitAbis,
+  //     // 'supportedAbis': build.supportedAbis,
+  //     // 'tags': build.tags,
+  //     // 'type': build.type,
+  //     // 'isPhysicalDevice': build.isPhysicalDevice,
+  //     // 'systemFeatures': build.systemFeatures,
+  //     // 'serialNumber': build.serialNumber,
+  //   };
+  // }
+  //
+  // Map<String, dynamic> _readIosDeviceInfo(IosDeviceInfo data) {
+  //   return <String, dynamic>{
+  //     'name': data.name,
+  //     'systemName': data.systemName,
+  //     'systemVersion': data.systemVersion,
+  //     'model': data.model,
+  //     'localizedModel': data.localizedModel,
+  //     'identifierForVendor': data.identifierForVendor,
+  //     'isPhysicalDevice': data.isPhysicalDevice,
+  //     'utsname.sysname:': data.utsname.sysname,
+  //     'utsname.nodename:': data.utsname.nodename,
+  //     'utsname.release:': data.utsname.release,
+  //     'utsname.version:': data.utsname.version,
+  //     'utsname.machine:': data.utsname.machine,
+  //   };
+  // }
+  //
+  // Map<String, dynamic> _readLinuxDeviceInfo(LinuxDeviceInfo data) {
+  //   return <String, dynamic>{
+  //     'name': data.name,
+  //     'version': data.version,
+  //     'id': data.id,
+  //     'idLike': data.idLike,
+  //     'versionCodename': data.versionCodename,
+  //     'versionId': data.versionId,
+  //     'prettyName': data.prettyName,
+  //     'buildId': data.buildId,
+  //     'variant': data.variant,
+  //     'variantId': data.variantId,
+  //     'machineId': data.machineId,
+  //   };
+  // }
+  //
+  // Map<String, dynamic> _readWebBrowserInfo(WebBrowserInfo data) {
+  //   return <String, dynamic>{
+  //     'browserName': data.browserName.name,
+  //     'appCodeName': data.appCodeName,
+  //     'appName': data.appName,
+  //     'appVersion': data.appVersion,
+  //     'deviceMemory': data.deviceMemory,
+  //     'language': data.language,
+  //     'languages': data.languages,
+  //     'platform': data.platform,
+  //     'product': data.product,
+  //     'productSub': data.productSub,
+  //     'userAgent': data.userAgent,
+  //     'vendor': data.vendor,
+  //     'vendorSub': data.vendorSub,
+  //     'hardwareConcurrency': data.hardwareConcurrency,
+  //     'maxTouchPoints': data.maxTouchPoints,
+  //   };
+  // }
+  //
+  // Map<String, dynamic> _readMacOsDeviceInfo(MacOsDeviceInfo data) {
+  //   return <String, dynamic>{
+  //     'computerName': data.computerName,
+  //     'hostName': data.hostName,
+  //     'arch': data.arch,
+  //     'model': data.model,
+  //     'kernelVersion': data.kernelVersion,
+  //     'majorVersion': data.majorVersion,
+  //     'minorVersion': data.minorVersion,
+  //     'patchVersion': data.patchVersion,
+  //     'osRelease': data.osRelease,
+  //     'activeCPUs': data.activeCPUs,
+  //     'memorySize': data.memorySize,
+  //     'cpuFrequency': data.cpuFrequency,
+  //     'systemGUID': data.systemGUID,
+  //   };
+  // }
+  //
+  // Map<String, dynamic> _readWindowsDeviceInfo(WindowsDeviceInfo data) {
+  //   return <String, dynamic>{
+  //     'numberOfCores': data.numberOfCores,
+  //     'computerName': data.computerName,
+  //     'systemMemoryInMegabytes': data.systemMemoryInMegabytes,
+  //     'userName': data.userName,
+  //     'majorVersion': data.majorVersion,
+  //     'minorVersion': data.minorVersion,
+  //     'buildNumber': data.buildNumber,
+  //     'platformId': data.platformId,
+  //     'csdVersion': data.csdVersion,
+  //     'servicePackMajor': data.servicePackMajor,
+  //     'servicePackMinor': data.servicePackMinor,
+  //     'suitMask': data.suitMask,
+  //     'productType': data.productType,
+  //     'reserved': data.reserved,
+  //     'buildLab': data.buildLab,
+  //     'buildLabEx': data.buildLabEx,
+  //     'digitalProductId': data.digitalProductId,
+  //     'displayVersion': data.displayVersion,
+  //     'editionId': data.editionId,
+  //     'installDate': data.installDate,
+  //     'productId': data.productId,
+  //     'productName': data.productName,
+  //     'registeredOwner': data.registeredOwner,
+  //     'releaseId': data.releaseId,
+  //     'deviceId': data.deviceId,
+  //   };
+  // }
 
   int _calculateHoveredIndex(Offset position) {
     final center = Offset(650 / 2, 650 / 2); // Use the same size as in CustomPaint
@@ -302,6 +451,11 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       ],
                     ),
                     SizedBox(height: 25),
+                    // Center(
+                    //   child: Text(_deviceData.isEmpty
+                    //       ? 'No device data'
+                    //       : _deviceData.toString()),
+                    // ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: Row(
@@ -333,7 +487,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       ),
                     ),
                     const SizedBox(height: 10.0),
-
                     FutureBuilder<List<InterventoModel>>(
                       future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
                       builder: (context, snapshot) {

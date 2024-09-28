@@ -36,6 +36,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   List<GruppoInterventiModel> filteredGruppi = [];
   List<GruppoInterventiModel> allGruppiConclusi = [];
   late InterventoDataSource _dataSource;
+  TextEditingController _descrizioneController = TextEditingController();
+  TextEditingController _noteController = TextEditingController();
+  ClienteModel? selectedCliente;
+  List<ClienteModel> filteredClientiList = [];
   Map<String, double> _columnWidths = {
     'intervento' : 0,
     'id_intervento' : 150,
@@ -165,7 +169,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         setState(() {
           _allInterventi = interventi;
           _filteredInterventi = interventi.toList();
-          _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap);
+          _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
         });
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -215,7 +219,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           _filteredInterventi = _allInterventi.where((intervento) => !(intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
           break;
       }
-      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap);
+      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap, filteredGruppi);
     });
   }
 
@@ -256,21 +260,82 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             tipologia.contains(lowerCaseQuery) ||
             descrizione.contains(lowerCaseQuery);
       }).toList();
-      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap);
+      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap, filteredGruppi);
     });
+  }
+
+  void _showClientiDialog() {
+    TextEditingController searchController = TextEditingController(); // Aggiungi un controller
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) { // Usa StatefulBuilder per aggiornare lo stato del dialogo
+            return AlertDialog(
+              title: const Text('Seleziona Cliente', textAlign: TextAlign.center),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController, // Aggiungi il controller
+                      onChanged: (value) {
+                        setState(() {
+                          filteredClientiList = clientiList
+                              .where((cliente) => cliente.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Cerca Cliente',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: filteredClientiList.map((cliente) {
+                            return ListTile(
+                              leading: const Icon(Icons.contact_page_outlined),
+                              title: Text(
+                                  '${cliente.denominazione}'),
+                              onTap: () {
+                                setState(() {
+                                  selectedCliente = cliente;
+                                });
+                                Navigator.of(context).pop();
+                                print('${selectedCliente?.denominazione}');
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    _dataSource = InterventoDataSource(context, _filteredInterventi, {});
+    _dataSource = InterventoDataSource(context, _filteredInterventi, {}, filteredGruppi);
     getAllInterventi();
     getAllGruppi();
     getAllClienti().whenComplete(() => print('Clienti ok'));
     getAllTipologie().whenComplete(() => print('Tipologie ok'));
     getAllUtenti().whenComplete(() => print('Utenti ok'));
     _filteredInterventi = _allInterventi.toList();
-
     _changeSheet(0);
   }
 
@@ -387,26 +452,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
               icon: Icon(Icons.info),
               color: Colors.white, onPressed: () {  },
             ),
-          ),
-          IconButton(
-            icon: Icon(Icons.person_add_alt_1, size: 40, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ListaClientiPage()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.add, size: 40, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CreazioneInterventoByAmministrazionePage(),
-                ),
-              );
-            },
           ),
           IconButton(
             icon: Icon(
@@ -856,23 +901,112 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          mostraRicercaInterventiDialog(
-            context: context,
-            utenti: utentiList,
-            clienti: clientiList,
-            tipologie: tipologieList,
-            interventi: _allInterventi,
-            onFiltrati: (interventiFiltrati) {
-              _dataSource.updateData(interventiFiltrati, _interventoUtentiMap);
+      floatingActionButton:Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: (){
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context){
+                    return AlertDialog(
+                      title: Text('Crea un nuovo gruppo', style: TextStyle(fontWeight: FontWeight.bold)),
+                      actions: <Widget>[
+                        TextFormField(
+                          controller: _descrizioneController,
+                          decoration: InputDecoration(
+                            labelText: 'Nome del nuovo gruppo',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        TextFormField(
+                          controller: _noteController,
+                          decoration: InputDecoration(
+                            labelText: 'Inserisci una nota al gruppo',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Container(
+                          child: GestureDetector(
+                            onTap: () {
+                              _showClientiDialog();
+                            },
+                            child: SizedBox(
+                              height: 50,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                                  const Icon(Icons.arrow_drop_down),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        TextButton(
+                          onPressed: () {
+                            saveGruppo();
+                          },
+                          child: Text('Salva gruppo'),
+                        ),
+                      ],
+                    );
+                  });
             },
-          );
-        },
-        child: Icon(Icons.filter_list, color: Colors.white,),
-        backgroundColor: Colors.red,
-      ),
+            backgroundColor: Colors.red,
+            child: Icon(Icons.create_new_folder, color: Colors.white),
+            heroTag: "Tag2",
+          ),
+          SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: () {
+              mostraRicercaInterventiDialog(
+                context: context,
+                utenti: utentiList,
+                clienti: clientiList,
+                tipologie: tipologieList,
+                interventi: _allInterventi,
+                onFiltrati: (interventiFiltrati) {
+                  _dataSource.updateData(interventiFiltrati, _interventoUtentiMap, filteredGruppi);
+                },
+              );
+            },
+            child: Icon(Icons.filter_list, color: Colors.white,),
+            backgroundColor: Colors.red,
+          ),
+        ],
+      )
     );
+  }
+
+  Future<void> saveGruppo() async{
+    try{
+      final response = await http.post(
+          Uri.parse('$ipaddress/api/gruppi'),
+          headers: {'Content-Type' : 'application/json'},
+          body: jsonEncode({
+            'descrizione' : _descrizioneController.text,
+            'note' : _noteController.text,
+            'importo' : null,
+            'concluso' : false,
+            'cliente' : selectedCliente?.toMap()
+          })
+      );
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Nuova gruppo registrato con successo!'),
+        ),
+      );
+      getAllGruppi();
+      getAllInterventi();
+    } catch(e){
+      print('Errore: $e');
+    }
   }
 }
 
@@ -894,18 +1028,21 @@ class InterventoDataSource extends DataGridSource {
   InterventoDataSource(
       this.context,
       List<InterventoModel> interventions,
-      Map<int, List<UtenteModel>> interventoUtentiMap
+      Map<int, List<UtenteModel>> interventoUtentiMap,
+      List<GruppoInterventiModel> gruppi
       ) {
     _interventions = List.from(interventions);
     interventiFiltrati = List.from(interventions);
     _interventoUtentiMap = interventoUtentiMap;
+    filteredGruppi = gruppi;
   }
 
-  void updateData(List<InterventoModel> newInterventions, Map<int, List<UtenteModel>> newInterventoUtentiMap) {
+  void updateData(List<InterventoModel> newInterventions, Map<int, List<UtenteModel>> newInterventoUtentiMap, List<GruppoInterventiModel> gruppi) {
     _interventions.clear();
     _interventions.addAll(newInterventions);
     interventiFiltrati = List.from(newInterventions);  // Aggiorna anche la lista filtrata
     _interventoUtentiMap = newInterventoUtentiMap;
+    filteredGruppi = gruppi;
     notifyListeners();
   }
 
@@ -1260,8 +1397,6 @@ class InterventoDataSource extends DataGridSource {
       );
       if (response.statusCode == 201) {
         print('EVVAIIIIIIII');
-        //getAllInterventi();
-        //getAllGruppi();
       }
     } catch(e){
       print('Errore durante il salvataggio del intervento: $e');

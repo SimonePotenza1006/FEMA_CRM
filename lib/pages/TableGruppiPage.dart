@@ -10,6 +10,7 @@ import 'dart:io';
 
 import '../model/GruppoInterventiModel.dart';
 import '../model/InterventoModel.dart';
+import 'DettaglioGruppoPage.dart';
 
 class TableGruppiPage extends StatefulWidget{
   TableGruppiPage({Key? key}) : super(key:key);
@@ -27,6 +28,7 @@ class _TableGruppiPageState extends State<TableGruppiPage>{
     'cliente' : 400,
     'descrizione' : 450,
     'importo' : 150,
+    'inserimento_importo' : 150,
     'importo_singoli_interventi' : 150,
   };
 
@@ -67,6 +69,17 @@ class _TableGruppiPageState extends State<TableGruppiPage>{
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              getAllGruppi();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(10),
@@ -171,6 +184,27 @@ class _TableGruppiPageState extends State<TableGruppiPage>{
                       minimumWidth: 0,
                     ),
                     GridColumn(
+                      columnName: 'inserimento_importo',
+                      label : Container(
+                          padding: EdgeInsets.all(8),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  right : BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1,
+                                  )
+                              )
+                          ),
+                          child: Text(
+                            'Inserimento Importo'.toUpperCase(),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          )
+                      ),
+                      width: _columnWidths['inserimento_importo']?? double.nan,
+                      minimumWidth: 150,
+                    ),
+                    GridColumn(
                       columnName: 'importo_singoli_interventi',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -211,6 +245,7 @@ class GruppoDataSource extends DataGridSource{
   List<GruppoInterventiModel> _gruppi =[];
   BuildContext context;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  TextEditingController importoController = TextEditingController();
 
   GruppoDataSource(this.context, List<GruppoInterventiModel> gruppi){
     _gruppi = gruppi;
@@ -252,11 +287,79 @@ class GruppoDataSource extends DataGridSource{
         DataGridCell<GruppoInterventiModel>(columnName: 'gruppo', value: gruppo),
         DataGridCell<String>(columnName: 'cliente', value: cliente),
         DataGridCell<String>(columnName: 'descrizione', value: gruppo.descrizione),
-        DataGridCell<String>(columnName: 'importo', value: gruppo.importo?.toStringAsFixed(2)),
+        DataGridCell<String>(columnName: 'importo', value: gruppo.importo != null ? '${gruppo.importo?.toStringAsFixed(2)}€' : 'N/A'),
+        DataGridCell<Widget>(
+          columnName: 'inserimento_importo',
+          value: IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return
+                    StatefulBuilder(
+                        builder: (context, setState){
+                          return AlertDialog(
+                            title: Text('Inserisci un importo'),
+                            actions: <Widget>[
+                              TextFormField(
+                                controller: importoController,
+                                decoration: InputDecoration(
+                                  labelText: 'Importo',
+                                  border: OutlineInputBorder(),
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                                ],
+                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  saveImporto(gruppo).then((_) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => TableGruppiPage()),
+                                    );
+                                  });
+                                },
+                                child: Text('Salva importo'),
+                              ),
+                            ],
+                          );
+                        }
+                    );
+                },
+              );
+            },
+            icon: Icon(Icons.create, color: Colors.grey),
+          ),
+        ),
         DataGridCell<Future<List<InterventoModel>>>(columnName: 'importo_singoli_interventi', value: interventi)
       ]));
     }
     return rows;
+  }
+
+  Future<void> saveImporto(GruppoInterventiModel gruppo) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ipaddress}/api/gruppi'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': gruppo.id,
+          'descrizione': gruppo.descrizione,
+          'importo': double.parse(importoController.text),
+          'concluso': gruppo.concluso,
+          'note': gruppo.note,
+          'cliente': gruppo.cliente?.toMap(),
+        }),
+      );
+      if (response.statusCode == 201) {
+        print('EVVAIIIIIIII');
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      print('Errore durante il salvataggio del intervento: $e');
+    }
   }
 
   @override
@@ -271,34 +374,76 @@ class GruppoDataSource extends DataGridSource{
         final String columnName = dataGridCell.columnName;
         final value = dataGridCell.value;
 
-        if (columnName == 'importo_singoli_interventi') {
-          // Usa FutureBuilder per ottenere il totale degli interventi
-          return FutureBuilder<List<InterventoModel>>(
-            future: value, // La lista di interventi viene dal DataGridCell
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Mostra un caricamento mentre aspetti la risposta
-              } else if (snapshot.hasError) {
-                return Text("Errore"); // Gestisci gli errori
-              } else if (snapshot.hasData) {
-                double totaleInterventi = 0.0;
-                for (var intervento in snapshot.data!) {
-                  totaleInterventi += intervento.importo_intervento ?? 0;
-                }
-                return Text(totaleInterventi.toStringAsFixed(2));
-              } else {
-                return Text("0.00");
-              }
-            },
-          );
-        } else {
+        if (dataGridCell.value is Widget) {
           return Container(
             alignment: Alignment.center,
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              value.toString(),
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.black),
+            child: dataGridCell.value,
+          );
+        }
+
+        if (columnName == 'importo_singoli_interventi') {
+          // Usa FutureBuilder per ottenere il totale degli interventi
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FutureBuilder<List<InterventoModel>>(
+                future: value, // La lista di interventi viene dal DataGridCell
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator(); // Mostra un caricamento mentre aspetti la risposta
+                    } else if (snapshot.hasError) {
+                      return Text("Errore"); // Gestisci gli errori
+                    } else if (snapshot.hasData) {
+                      double totaleInterventi = 0.0;
+                      bool hasNullImporto = false;
+
+                      // Somma gli importi e controlla se esiste un importo nullo
+                      for (var intervento in snapshot.data!) {
+                        if (intervento.importo_intervento == null) {
+                          hasNullImporto = true; // Trovato un importo nullo
+                        } else {
+                          totaleInterventi += intervento.importo_intervento!;
+                        }
+                      }
+
+                      // Cambia il colore in rosso se c'è un importo nullo
+                      Color textColor = hasNullImporto ? Colors.red : Colors.black;
+                      FontWeight weight = hasNullImporto ? FontWeight.bold : FontWeight.normal;
+
+                      return Text(
+                        totaleInterventi.toStringAsFixed(2) + "€",
+                        style: TextStyle(color: textColor, fontWeight: weight),
+                      );
+                    } else {
+                      return Text(
+                        "0.00",
+                        style: TextStyle(color: Colors.black),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          );
+        } else {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DettaglioGruppoPage(gruppo: gruppo),
+                ),
+              );
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                value.toString(),
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           );
         }

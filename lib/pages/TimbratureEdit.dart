@@ -94,8 +94,8 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       'Ora Entrata',
       'GPS Uscita',
       'Ora Uscita',
-      'GPS Entrata',
-      'Ora Entrata',
+      // 'GPS Entrata',
+      // 'Ora Entrata',
       //'GPS Uscita',
       //'Ora Uscita',
     ]);
