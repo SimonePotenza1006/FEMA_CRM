@@ -20,6 +20,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 
+import '../model/DeviceModel.dart';
+import '../model/LicenzaModel.dart';
 import '../model/OrdinePerInterventoModel.dart';
 import '../model/RuoloUtenteModel.dart';
 import '../model/TipologiaInterventoModel.dart';
@@ -38,6 +40,168 @@ class DbHelper{
   List<VeicoloModel> allVeicoli = [];
   List<TipologiaInterventoModel> allTipologie = [];
   List<UtenteModel> allUtenti = [];
+
+  Future<List<String>> getAllDevice() async {
+    print("gelalldevice");
+    try{
+      http.Response response =
+      await http
+          .get(Uri.parse('$ipaddress/api/device'));
+      var responseData = json.decode(response.body.toString());
+      if (response.statusCode == 200) {
+
+        print(responseData.toString());
+        //Creating a list to store input data;
+        List<String> ruoli = [];
+
+        print(ruoli.toString());
+        for (var singleRuolo in responseData) {
+          //responseData.forEach((singleRuolo) {
+          DeviceModel ruolo = DeviceModel(
+
+              singleRuolo['id'].toString(),
+              singleRuolo['descrizione']
+          );
+          //print("ooooruoaldiookkppp");//singleRuolo["descrizione"]);
+          //Adding interv to the list.
+          ruoli.add(ruolo.descrizione!);
+        };
+
+        return ruoli;
+      }
+      else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        throw Exception('Failed to load ruoli');
+      }} catch(e){throw Exception(e);}
+  }
+
+  Future<http.Response> saveLicenzaNo(String user) async {
+    late http.Response response;
+    print('ppppppeetrr6sssasadppppppp');
+    try {
+      response = await http.post(
+
+          Uri.parse('$ipaddress/api/licenza',),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: user
+
+          ,
+          encoding: Encoding.getByName('utf-8')
+      );
+      print(response.toString());
+
+    } catch (e) {
+      print(e.toString());
+    }
+    return response;
+  }
+
+  Future<http.Response> saveDevice(DeviceModel user) async {
+    late http.Response response;
+    print('ppppppdevicpppppp');
+    try {
+      response = await http.post(
+
+          Uri.parse('$ipaddress/api/device',),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: json.encode({
+            'id': user.id,
+            'descrizione': user.descrizione
+          }),
+          encoding: Encoding.getByName('utf-8')
+      );
+      print(response.toString());
+      /*if(response.statusCode == 200){
+
+        var data = jsonDecode(response.body.toString());
+        //print(data['token']);
+        print('Login successfully');
+
+      }else {
+        print('faileddd'+response.statusCode.toString());
+      }*/
+    } catch (e) {
+      print(e.toString());
+    }
+    return response;
+  }
+
+  Future<http.Response> saveLicenza(LicenzaModel user) async {
+    late http.Response response;
+    print('ppppppdevicpppppp');
+    try {
+      response = await http.post(
+
+          Uri.parse('$ipaddress/api/licenza'),
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: json.encode({
+            'id': user.id,
+            'descrizione': user.descrizione,
+            'utilizzato': true,
+          }),
+          encoding: Encoding.getByName('utf-8')
+      );
+      print(response.toString());
+      /*if(response.statusCode == 200){
+
+        var data = jsonDecode(response.body.toString());
+        //print(data['token']);
+        print('Login successfully');
+
+      }else {
+        print('faileddd'+response.statusCode.toString());
+      }*/
+    } catch (e) {
+      print(e.toString());
+    }
+    return response;
+  }
+
+  Future<List<String>> getAllLicenze() async {
+    try{
+      http.Response response =
+      await http
+          .get(Uri.parse('$ipaddress/api/licenza'));
+      var responseData = json.decode(response.body.toString());
+      if (response.statusCode == 200) {
+        print("gf45tr54");
+        print(responseData.toString());
+        //Creating a list to store input data;
+        List<String> ruoli = [];
+        //ruoli = List<RuoloModel>.from(responseData['data'].map( (x) => RuoloModel.fromJson(x)));
+        print(ruoli.toString());
+        for (var singleRuolo in responseData) {
+          //responseData.forEach((singleRuolo) {
+          LicenzaModel ruolo = LicenzaModel(
+
+              singleRuolo['id'].toString(),
+              singleRuolo['descrizione'],
+              singleRuolo['utilizzato']
+          );
+          //print("ooooruoaldiookkppp");//singleRuolo["descrizione"]);
+          //Adding interv to the list.
+          ruoli.add(ruolo.descrizione!);
+        };
+        print(ruoli.toString());
+        print("blicea1");
+        return ruoli;
+      }
+      else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        throw Exception('Failed to load lice');
+      }} catch(e){throw Exception(e);}
+  }
 
   Future<Uint8List> getPdfNoleggio(String filename)  async {
     final response =
