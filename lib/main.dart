@@ -135,7 +135,6 @@ class _LoginFormState extends State<LoginForm> {
         getUserData()
     );
     super.initState();
-
     _loadSavedCredentials();
   }
 
@@ -165,7 +164,6 @@ class _LoginFormState extends State<LoginForm> {
       //idd = windowsInfo.deviceId.toString();
       platform='windows';
       print('Running on '
-      //  '${androidInfo.model.toString()} ${androidInfo.id.toString()} '
           '${windowsInfo.computerName.toString()} ${windowsInfo.deviceId.toString()}'
       );
     } else if (Platform.isAndroid) {
@@ -175,27 +173,19 @@ class _LoginFormState extends State<LoginForm> {
       platform='android';
       print('Running on '
           '${androidInfo.model.toString()} ${androidInfo.serialNumber.toString()} '
-
       );
     }
     if (dispositivi.contains(idd)) {print('okok');} else {
-
       DeviceModel uModel = DeviceModel('', idd);
       await insertLicenza(uModel);
-
     }
-
-
     SharedPreferences sp = await _pref;
-
     setState(() {
       idd=idd;
     });
   }
 
   Future<bool> insertLicenza(DeviceModel device) async {
-    //bool licenzaerrata = false;
-    //licenze=await dbHelper.getAllLicenze();
     return (await showDialog(
       barrierDismissible: false,
       context: context,
