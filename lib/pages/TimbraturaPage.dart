@@ -36,7 +36,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   late String nomeUtente = "${widget.utente.nome} ${widget.utente.cognome}";
   String tipoTimbratura = "";
   late String _gps;
-  late String _indirizzo;
+  String _indirizzo = "";
   late int idMarcatempo;
   late List<MarcaTempoModel> timbratureOdierne = [];
   List<MarcaTempoModel> allTimbratureMonth = [];
@@ -325,107 +325,6 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
           ),
           centerTitle: true,
           backgroundColor: Colors.red,
-          /*actions:  widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? <Widget>[
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.edit), onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => TimbratureEdit(utente: widget.utente)),
-              );
-            }),
-            SizedBox(width: 23),
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.assignment_outlined), onPressed: () async {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TimbratureSettimana(utente: widget.utente)),
-                  );
-            }),
-            SizedBox(width: 23),
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.search), onPressed: () async {
-              _showDialog();
-            }),
-            SizedBox(width: 23),
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.download), onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("SCARICA IL RESOCONTO DELLE PRESENZE"),
-                    actions: [
-                      Center(
-                        child:  Column(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                getAllMarcatempoMonth(2).whenComplete(() => _generateExcel());
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("MESE PRECEDENTE"), //no
-                            ),
-                            SizedBox(width: 45,),
-                            TextButton(
-                              onPressed: () {
-                                getAllMarcatempoMonth(1).whenComplete(() =>  _generateExcel());
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("MESE CORRENTE"), //si
-                            ),
-                            SizedBox(width: 80,),
-                            TextButton(
-                              onPressed: () {
-                                getAllMarcatempoToday().whenComplete(() {
-                                  if (timbratureOdierne.isNotEmpty)
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            PDFOggiPage(timbrature: timbratureOdierne),
-                                      ),
-                                    ); else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Ancora nessuna timbratura in data odierna')));
-                                  }
-                                });
-                              },
-                              child: Text("OGGI"), //si
-                            ),
-                            /*TextButton(
-                              onPressed: () {
-                                getAllMarcatempoToday().whenComplete(() {
-                                  if (timbratureOdierne.isNotEmpty)
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            PDFOggiPage(timbrature: timbratureOdierne),
-                                      ),
-                                    ); else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Ancora nessuna timbratura in data odierna')));
-                                  }
-                                });
-                              },
-                              child: Text("Modifica"), //si
-                            ),*/
-                          ],
-                        ),
-                      )
-                    ],
-                  );
-                },
-              );
-            }),
-            SizedBox(width: 12,)
-          ] : null*/
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -437,17 +336,17 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               children: [
                 Center(
                   child: SizedBox(
-                    width: 300,
-                    height: 150,
+                    width: 250,
+                    height: 100,
                     child: Image(image: AssetImage('assets/images/logo.png')),
                   ),
                 ),
-                const SizedBox(height: 10.0),
+                //const SizedBox(height: 10.0),
                 Text(
                   '${nomeUtente}'.toUpperCase(),
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 25),
+                SizedBox(height: 10),
                 Text(
                   '${tipoTimbratura}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -457,9 +356,10 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                   '${dataOdierna}',
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 50),
+                SizedBox(height: 30),
                 tipoTimbratura != 'TIMBRATURE ODIERNE TERMINATE' ? SizedBox(
                   width: 650,
+                  height: 250,
                   child: Container(
                     decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
                     child: SfSignaturePad(
@@ -473,7 +373,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                         maximumStrokeWidth: 4.0),
                   ),
                 ) : Container(),
-                SizedBox(height: 30),
+                SizedBox(height: 20),
                 tipoTimbratura != 'TIMBRATURE ODIERNE TERMINATE' ? Container(
                   alignment: Alignment.bottomCenter,
                   padding: const EdgeInsets.only(bottom: 20.0),
@@ -495,27 +395,23 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                       ),
                       screenWidth > 760 ? SizedBox(width: 330) : SizedBox(width: 5),
                       ElevatedButton(
-                        onPressed: _isLoading ? null : _handleTimbraButtonPress,
-                        /*() async {
-                          await _getCurrentLocation();
-                          timbra();
-                        },*/
+                        onPressed: (_indirizzo != "" && _indirizzo.isNotEmpty && !_isLoading)
+                            ? _handleTimbraButtonPress
+                            : null, // Disabilita il pulsante se _indirizzo è null o vuoto
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          primary: (_indirizzo != "" && _indirizzo.isNotEmpty)
+                              ? Colors.red
+                              : Colors.grey, // Cambia il colore se disabilitato
                           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                         ),
-                        child:
-                        _isLoading
+                        child: _isLoading
                             ? const CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation(Colors.white),
                         )
                             : const Text(
                           '  TIMBRA  ',
                           style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),/*const Text(
-                          '  TIMBRA  ',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),*/
+                        ),
                       ),
                     ],
                   ),
