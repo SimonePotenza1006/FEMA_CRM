@@ -299,26 +299,6 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          leading: BackButton(
-            onPressed: (){
-              if(widget.utente.ruolo?.id == "1" || widget.utente.ruolo?.id == "2"){
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
-                  ),
-                );
-                } else{
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomeFormAmministrazioneNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
-                  ),
-                );
-              }
-              },
-            color: Colors.black, // <-- SEE HERE
-          ),
           title: const Text(
             'TIMBRATURA',
             style: TextStyle(color: Colors.white),
@@ -576,6 +556,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   Future<void> timbra() async {
     if (_isSigned == true) {
       try {
+        String tipoMessaggio = ''; // Variabile per il tipo di messaggio
         if (tipoTimbratura == "INGRESSO") {
           print('${tipoTimbratura}');
           final response = await http.post(
@@ -583,7 +564,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'gps': _indirizzo.toString(),
-              'data': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()),//DateTime.now().toIso8601String(),
+              'data': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()), //DateTime.now().toIso8601String(),
               'utente': widget.utente.toMap(),
               'viaggio': {
                 'id': 2,
@@ -593,15 +574,10 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               },
               'edit': false,
               'editu': false,
-              'utenteEdit': null//widget.utente.toMap(),
+              'utenteEdit': null //widget.utente.toMap(),
             }),
           );
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Timbratura di INGRESSO registrata con successo!'),
-            ),
-          );
+          tipoMessaggio = 'INGRESSO';
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
@@ -612,7 +588,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               'gps': timbratureOdierne.last.gps,
               'gpsu': _indirizzo.toString(),
               'data': timbratureOdierne.last.data!.toIso8601String(),
-              'datau': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()),//DateTime.now().toIso8601String(),
+              'datau': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()), //DateTime.now().toIso8601String(),
               'viaggio': {
                 'id': 2,
                 'destinazione': 'Calimera',
@@ -625,13 +601,28 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               'utenteEdit': null
             }),
           );
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Timbratura di USCITA registrata con successo!'),
-            ),
-          );
-        };
+          tipoMessaggio = 'USCITA';
+        }
+
+        // Mostra un AlertDialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Timbratura registrata'),
+              content: Text('Timbratura di $tipoMessaggio registrata con successo!'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Chiude l'AlertDialog
+                    Navigator.pop(context); // Torna alla pagina precedente
+                  },
+                ),
+              ],
+            );
+          },
+        );
       } catch (e) {
         print('Errore durante il salvataggio del marcatempo: $e');
       }
@@ -643,6 +634,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       );
     }
   }
+
 
   void resetFirma() {
     signatureGlobalKey.currentState?.clear();

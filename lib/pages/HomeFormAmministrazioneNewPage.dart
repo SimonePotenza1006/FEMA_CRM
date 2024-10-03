@@ -6,14 +6,12 @@ import 'package:fema_crm/pages/MenuInterventiPage.dart';
 import 'package:fema_crm/pages/TableAccessiApplicazionePage.dart';
 import 'package:fema_crm/pages/TableMagazzinoPage.dart';
 import 'package:fema_crm/pages/TableMerceInRiparazionePage.dart';
-import 'package:fema_crm/pages/TableSpeseVeicoliPage.dart';
 import 'package:fema_crm/pages/TableVeicoliPage.dart';
 import 'package:fema_crm/pages/TimbratureEdit.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/pages/CalendarioPage.dart';
 import 'package:fema_crm/pages/ListaClientiPage.dart';
 import 'package:fema_crm/pages/ListaCredenzialiPage.dart';
-import 'package:fema_crm/pages/ListaInterventiFinalPage.dart';
 import 'package:fema_crm/pages/LogisticaPreventiviHomepage.dart';
 import 'package:fema_crm/pages/MenuCommissioniPage.dart';
 import 'package:fema_crm/pages/MenuOrdiniFornitorePage.dart';
@@ -35,7 +33,7 @@ import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
-import 'ControlloAccessiApplicazionePage.dart';
+import 'CertificazioniPage.dart';
 import 'CreazioneNuovaCartaPage.dart';
 import 'CreazioneNuovoUtentePage.dart';
 import 'DettaglioCommissioneAmministrazionePage.dart';
@@ -43,12 +41,9 @@ import 'DettaglioInterventoByTecnicoPage.dart';
 import 'DettaglioInterventoPage.dart';
 import 'ListaNoteUtentiPage.dart';
 import 'ListaUtentiPage.dart';
-import 'MagazzinoPage.dart';
 import 'ParentFolderPage.dart';
 import 'RegistroCassaPage.dart';
-import 'ReportSpeseVeicoloPage.dart';
 import 'StoricoMerciUtentiPage.dart';
-import 'TableInterventiPage.dart';
 
 class HomeFormAmministrazioneNewPage extends StatefulWidget {
   final UtenteModel userData;
@@ -844,11 +839,11 @@ class _HomeFormAmministrazioneNewPageState
                   ListTile(
                     title: Text('Certificazioni', style: TextStyle(color: Colors.white),),
                     onTap: (){
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const CertificazioniFormPage()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CertificazioniPage(utente: widget.userData!)),
+                      );
                     },
                   ),
                   if(widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti")

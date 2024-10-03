@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 import '../model/AziendaModel.dart';
 
@@ -29,6 +30,15 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
   List<ClienteModel> allClienti = [];
   ClienteModel? selectedCliente;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  TextEditingController _impiantoController = TextEditingController();
+
+  @override
+  void initState(){
+    super.initState();
+    getAllAziende();
+    getAllClienti();
+    getAllTipologie();
+  }
 
   Future<void> getAllClienti() async{
     try{
@@ -47,26 +57,6 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
       }
     } catch(e){
       print('Errore durante la chiamataa all\'API getAllClienti: $e');
-    }
-  }
-
-  Future<void> getAllUtenti() async{
-    try{
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
-      if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
-        List<UtenteModel> utenti = [];
-        for(var item in jsonData){
-          utenti.add(UtenteModel.fromJson(item));
-        }
-        setState(() {
-          allUtenti = utenti;
-        });
-      } else {
-        throw Exception('Failed to load data from API: ${response.statusCode}');
-      }
-    } catch(e){
-      print('Errore durante la chiamataa all\'API getAllUtenti: $e');
     }
   }
 
@@ -143,6 +133,71 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
                     }).toList(),
                     hint: Text('Azienda'),
                   ),
+                  SizedBox(height: 20),
+                  DropdownButton<TipologiaInterventoModel>(
+                    value: selectedTipologia,
+                    onChanged: (TipologiaInterventoModel? newValue){
+                      setState(() {
+                        selectedTipologia = newValue;
+                      });
+                    },
+                    items: allTipologie.map((TipologiaInterventoModel tipologia){
+                      return DropdownMenuItem<TipologiaInterventoModel>(
+                          value: tipologia,
+                          child: Text(tipologia.descrizione!)
+                      );
+                    }).toList(),
+                    hint: Text('Tipologia di intervento'),
+                  ),
+                  const SizedBox(height: 20.0),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 220,
+                    child: DropdownSearch<ClienteModel>(
+                      items: allClienti,
+                      itemAsString: (ClienteModel cliente) => cliente.denominazione ?? '',
+                      selectedItem: selectedCliente,
+                      dropdownDecoratorProps: DropDownDecoratorProps(
+                        dropdownSearchDecoration: InputDecoration(
+                          labelText: "Cliente",
+                          hintText: "Seleziona un cliente",
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                        ),
+                      ),
+                      onChanged: (ClienteModel? newValue) {
+                        setState(() {
+                          selectedCliente = newValue;
+                        });
+                      },
+                      validator: (ClienteModel? value) {
+                        if (value == null) {
+                          return 'Seleziona un cliente';
+                        }
+                        return null;
+                      },
+                      popupProps: PopupProps.dialog( // Gestisce il popup come dialogo
+                        showSearchBox: true, // Mostra il campo di ricerca
+                        searchFieldProps: TextFieldProps(
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            labelText: 'Cerca cliente',
+                          ),
+                        ),
+                        itemBuilder: (context, ClienteModel cliente, bool isSelected) {
+                          return ListTile(
+                            title: Text(cliente.denominazione ?? ''),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 30),
+                  _buildTextField('Inserisci la descrizione dell\'impianto', _impiantoController)
                 ],
               ),
             ),
@@ -152,4 +207,23 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
     );
   }
 
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: SizedBox(
+          width: 600,
+          child: TextField(
+            maxLines: 5,
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: label,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        )
+    );
+  }
 }
