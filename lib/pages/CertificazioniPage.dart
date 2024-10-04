@@ -9,6 +9,7 @@ import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:io' as io;
 import '../model/FileModel.dart';
+import 'CertificazioneImpiantoFormPage.dart';
 import 'CertificazioniFormPage.dart';
 
 class CertificazioniPage extends StatefulWidget{
@@ -72,7 +73,7 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => CertificazioniFormPage()),
+                    builder: (context) => CertificazioneImpiantoFormPage()),
               );
             },
           )

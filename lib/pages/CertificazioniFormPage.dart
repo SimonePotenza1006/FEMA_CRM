@@ -207,7 +207,6 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
     );
   }
 
-
   Widget _buildTextField(String label, TextEditingController controller) {
     return Padding(
         padding: const EdgeInsets.only(bottom: 16.0),
