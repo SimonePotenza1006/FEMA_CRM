@@ -341,7 +341,7 @@ class _CompilazioneRapportinoPageState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () async {
+                      onPressed: _isSaveButtonEnabled() ? () async {
                         // Controlla se l'acconto è stato ricevuto
                         if (acconto == true && _importoController.text.isNotEmpty) {
                           // Salva la nota se la checkbox di acconto è selezionata
@@ -351,16 +351,17 @@ class _CompilazioneRapportinoPageState
                         if (pickedImages.isNotEmpty) {
                           await saveImageIntervento(); // Se ci sono immagini, salva intervento e immagini
                         } else {
-                          await saveIntervento(); // Salva solo l'intervento
-                          Navigator.pop(context); // Torna alla pagina precedente
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Rapportino registrato!'),
-                            ),
-                          );
+                          saveIntervento(); // Salva solo l'intervento
                         }
-                      },
+
+                        // Torna alla pagina precedente
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Rapportino registrato!'),
+                          ),
+                        );
+                      } : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
                       style: ElevatedButton.styleFrom(
                         primary: Colors.red,
                         onPrimary: Colors.white,
@@ -378,6 +379,12 @@ class _CompilazioneRapportinoPageState
     );
   }
 
+  bool _isSaveButtonEnabled() {
+    return pickedImages.isNotEmpty &&
+        noteController.text.isNotEmpty &&
+        signatureBytes != null &&
+        selectedDestinazione != null;
+  }
 
   String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
     final now = DateTime.now();
@@ -385,7 +392,7 @@ class _CompilazioneRapportinoPageState
         now.year, now.month, now.day, timeOfDay.hour, timeOfDay.minute);
     return dateTime.toIso8601String();
   }
-  
+
   Future<void> saveNota() async{
     try{
       final response = await http.post(Uri.parse('$ipaddress/api/noteTecnico'),
@@ -408,38 +415,42 @@ class _CompilazioneRapportinoPageState
 
   Future<void> saveIntervento() async {
     try {
-      final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'id': widget.intervento.id,
-            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
-            'data': widget.intervento.data?.toIso8601String(),
-            'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
-            'posizione_gps' : widget.intervento.posizione_gps,
-            'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
-            'orario_fine': DateTime.now().toIso8601String(),
-            'descrizione': widget.intervento.descrizione,
-            'importo_intervento': widget.intervento.importo_intervento,
-            'prezzo_ivato' : widget.intervento.prezzo_ivato,
-            'acconto' : double.parse(_importoController.text),
-            'assegnato': widget.intervento.assegnato,
-            'conclusione_parziale' : widget.intervento.conclusione_parziale,
-            'concluso': true,
-            'saldato': widget.intervento.saldato,
-            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
-            'note': widget.intervento.note,
-            'relazione_tecnico' : noteController.text,
-            'firma_cliente': signatureBytes,
-            'utente': widget.intervento.utente?.toMap(),
-            'cliente': widget.intervento.cliente?.toMap(),
-            'veicolo': selectedVeicolo?.toMap(),
-            'merce' : widget.intervento.merce?.toMap(),
-            'tipologia': widget.intervento.tipologia,
-            'categoria': widget.intervento.categoria_intervento_specifico,
-            'tipologia_pagamento': widget.intervento.tipologia_pagamento,
-            'destinazione': selectedDestinazione?.toMap(),
-            'gruppo' : widget.intervento.gruppo?.toMap(),
-          }));
+      final response = await http.post(
+        Uri.parse('${ipaddress}/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id,
+          'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento': widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps': widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': DateTime.now().toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'acconto': _importoController.text.isNotEmpty
+              ? double.parse(_importoController.text)
+              : (widget.intervento.acconto ?? 0.0), // Usa 0.0 se acconto è null
+          'assegnato': widget.intervento.assegnato,
+          'conclusione_parziale': widget.intervento.conclusione_parziale,
+          'concluso': true,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico': widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico': noteController.text,
+          'firma_cliente': signatureBytes,
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': selectedVeicolo?.toMap(),
+          'merce': widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia,
+          'categoria': widget.intervento.categoria_intervento_specifico,
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento,
+          'destinazione': selectedDestinazione?.toMap(),
+          'gruppo': widget.intervento.gruppo?.toMap(),
+        }),
+      );
       if (response.statusCode == 201) {
         print('EVVAIIIIIIII');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -450,7 +461,7 @@ class _CompilazioneRapportinoPageState
         );
       }
     } catch (e) {
-      print('Errore durante il salvataggio del preventivo');
+      print('Errore durante il salvataggio del preventivo $e');
     }
   }
 
@@ -490,16 +501,13 @@ class _CompilazioneRapportinoPageState
                 content: Text('Rapportino registrato!'),
               ),
             );
-
           } else {
             print('Errore durante l\'invio del file: ${response.statusCode}');
           }
         } else {
-          // Gestisci il caso in cui il percorso del file non è valido
           print('Errore: Il percorso del file non è valido');
         }
       }
-      Navigator.pop(context);
       Navigator.pop(context);
     } catch (e) {
       print('Errore durante la chiamata HTTP: $e');
@@ -527,7 +535,6 @@ class _CompilazioneRapportinoPageState
       });
     }
   }
-
 
   Future<void> getAllVeicoli() async {
     http.Response response =

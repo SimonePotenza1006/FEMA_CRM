@@ -336,7 +336,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
                               TextStyle textStyle = intervento.concluso ?? false
                                   ? TextStyle(color: Colors.white, fontSize: 15)
-                                  : TextStyle(color: Colors.black, fontSize: 15);
+                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                               return Card(
                                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

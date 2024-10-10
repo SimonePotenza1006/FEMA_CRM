@@ -31,6 +31,10 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
   final _pianoClienteController = TextEditingController();
   final _internoClienteController = TextEditingController();
   final _proprietaClienteController = TextEditingController();
+  final _progettistaController = TextEditingController();
+  final _alboProgettistaController = TextEditingController();
+  final  _responsabileTecnicoImpresaController = TextEditingController();
+  final  _normaController = TextEditingController();
 
   bool? iscrizioneRegistroDitte = true;
   bool? iscrizioneAlboProvinciale = true;
@@ -43,7 +47,18 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
   bool? civile = false;
   bool? commercio = false;
   bool? altriUsi = false;
-
+  bool? progettista = false;
+  bool? responsabileTecnicoImpresa = false;
+  bool? checkNorma = false;
+  bool? installazioneComponenti = false;
+  bool? controlloImpianto = false;
+  bool? verificaImpianto = false;
+  bool? progetto = false;
+  bool? relazione = false;
+  bool? schema = false;
+  bool? riferimento = false;
+  bool? visura = false;
+  bool? conformita = false;
 
   @override
   Widget build(BuildContext context){
@@ -66,587 +81,815 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
                   padding: EdgeInsets.all(85),
                   color: Colors.white,
                   child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'DICHIARAZIONE DI CONFORMITA\' DELL\'IMPIANTO A REGOLA D\'ARTE',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                                ),
-                                Text(
-                                  'Decreto Ministeriale 22 Gennaio 2008, numero 37',
-                                  style: TextStyle(fontSize: 14),
-                                )
-                              ],
-                            ),
-                            Container(
-                              width: 200,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(width: 2,),
-                                      Text(
-                                        'Prot. n. (1)'
-                                      ),
-                                      RichText(text: TextSpan(
-                                        children: <InlineSpan>[
-                                          WidgetSpan(child: ConstrainedBox(
-                                            constraints: BoxConstraints(maxWidth: 120),
-                                            child: IntrinsicWidth(
-                                              child: getTextFormFieldSmall(
-                                                controller: _protocolloController,
-                                                width: 120,
-                                                inputType: TextInputType.text,
-                                                hintName: 'Numero protocollo *',
-                                              ),
-                                            ),
-                                          ))
-                                        ]
-                                      ))
 
-                                    ],
+                    child: SizedBox(
+                      width: 1000,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'DICHIARAZIONE DI CONFORMITA\' DELL\'IMPIANTO A REGOLA D\'ARTE',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                  ),
+                                  Text(
+                                    'Decreto Ministeriale 22 Gennaio 2008, numero 37',
+                                    style: TextStyle(fontSize: 14),
                                   )
                                 ],
                               ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                    style: TextStyle(color: Colors.black, fontSize: 17),
-                                    text: 'Il Sottoscritto MAZZEI FEDERICO, titolare o legale rappresentante dell\'impresa  ',
+                              Container(
+                                width: 200,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
                                 ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 250),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 250,
-                                      controller: _aziendaController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Nome azienda *',
-                                    ),
-                                  ),
-                                )),
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: ' ,',
-                                ),
-                              ],
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(width: 2,),
+                                        Text(
+                                            'Prot. n. (1)'
+                                        ),
+                                        RichText(text: TextSpan(
+                                            children: <InlineSpan>[
+                                              WidgetSpan(child: ConstrainedBox(
+                                                constraints: BoxConstraints(maxWidth: 120),
+                                                child: IntrinsicWidth(
+                                                  child: getTextFormFieldSmall(
+                                                    controller: _protocolloController,
+                                                    width: 120,
+                                                    inputType: TextInputType.text,
+                                                    hintName: 'Numero protocollo *',
+                                                  ),
+                                                ),
+                                              ))
+                                            ]
+                                        ))
 
-                            ),)
-                          ],
-                        ),
-                        SizedBox(height:2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: 'operante nel settore  ',
+                                      ],
+                                    )
+                                  ],
                                 ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 100),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      controller: _tipologiaController,
-                                      width: 180,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Tipologia intervento *',
-                                    ),
-                                  ),
-                                )),
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: '  con sede in  ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 100),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      controller: _indirizzoAziendaController,
-                                      width: 395,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Indirizzo azienda',
-                                    ),
-                                  ),
-                                )),
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: ' ,',
-                                ),
-                              ]
-                            ))
-                          ],
-                        ),
-                        SizedBox(height:2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: 'tel. '
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: const BoxConstraints(minWidth: 150),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 150,
-                                      controller: _conTelefonoAzienda,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Telefono azienda *',
-                                    ),
-                                  ),
-                                ),
-                                ),
-                                TextSpan(
-                                    style: TextStyle(color: Colors.black, fontSize: 17),
-                                    text: ' , P.IVA  '
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: const BoxConstraints(minWidth: 150),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 150,
-                                      controller: _conPIvaAzienda,
-                                      inputType: TextInputType.text,
-                                      hintName: 'P.IVA azienda *',
-                                    ),
-                                  ),
-                                ),
-                                ),
-                              ]
-                            ))
-                          ],
-                        ),
-                        SizedBox(height: 2),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value : iscrizioneRegistroDitte,
-                              onChanged : (value) => setState(() => iscrizioneRegistroDitte = value),
-                            ),
-                            SizedBox(width : 1),
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 14),
-                                  text: ' iscritta nel registro delle ditte (DPR 07/12/1995, n 581) della camera C.I.A.A. di ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 150),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 150,
-                                      controller: _cittaRegistroDittaController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Città registro ditta *',
-                                    ),
-                                  ),
-                                )),
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 14),
-                                  text: ' n. ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 150),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 150,
-                                      controller: _codRegistroDittaController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Codice registro ditta *',
-                                    ),
-                                  ),
-                                )),
-                              ],
-
-                            ),)
-                          ],
-                        ),
-                        SizedBox(height: 2),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value : iscrizioneAlboProvinciale,
-                              onChanged : (value) => setState(() => iscrizioneAlboProvinciale = value),
-                            ),
-                            SizedBox(width : 1),
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 14),
-                                  text: ' iscritta all\'Albo Provinciale delle Imprese Artigiane (L: 8/8/1985, n 443) di ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 180),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 180,
-                                      controller: _cittaAlboProvincialeController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Città registrazione albo provinciale *',
-                                    ),
-                                  ),
-                                )),
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 14),
-                                  text: ' n. ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 150),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 150,
-                                      controller: _codAlboProvincialeController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Codice albo provinciale *',
-                                    ),
-                                  ),
-                                )),
-                              ],
-                            ),)
-                          ],
-                        ),
-                        SizedBox(height: 2),
-                        Row(
-                          children: [
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: 'Esecutrice dell\'impianto (2): ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 630),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 630,
-                                      controller: _descrizioneImpiantoController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Codice albo provinciale *',
-                                    ),
-                                  ),
-                                )),
-                              ]
-                            ))
-                          ],
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Nota - Per gli impianti a gas specificare il tipo di gas distibuito: canalizzato 1, 2, 3 famiglia: GPL da serbatoio fisso',
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        Text(
-                          'Per gli impianti elettrici specificare la potenza massima impiegata',
-                          style: TextStyle(fontSize: 11),
-                        ),
-                        Text(
-                          'Inteso come:',
-                          style: TextStyle(fontSize: 17),
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value : nuovoImpianto,
-                              onChanged : (value) => setState(() => nuovoImpianto= value),
-                            ),
-                            SizedBox(width: 2),
-                            Text('nuovo impianto;')
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value : trasformazione,
-                              onChanged : (value) => setState(() => trasformazione= value),
-                            ),
-                            SizedBox(width: 2),
-                            Text('trasformazione;')
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value : ampliamento,
-                              onChanged : (value) => setState(() => ampliamento= value),
-                            ),
-                            SizedBox(width: 2),
-                            Text('ampliamento;')
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value : manutenzioneStraordinaria,
-                              onChanged : (value) => setState(() => manutenzioneStraordinaria= value),
-                            ),
-                            SizedBox(width: 2),
-                            Text('manutenzione straordinaria;')
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value : altro,
-                              onChanged : (value) => setState(() => altro = value),
-                            ),
-                            SizedBox(width: 2),
-                            Text('altro (3)  '),
-                            ConstrainedBox(
-                              constraints: BoxConstraints(minWidth: 150),
-                              child: IntrinsicWidth(
-                                child: getTextFormFieldSmall(
-                                  width: 150,
-                                  controller: _altroController,
-                                  inputType: TextInputType.text,
-                                  hintName: 'Altro *',
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 2),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: 'Commissionato da: ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 260),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 260,
-                                      controller: _denominazioneClienteController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Denominazione cliente *',
-                                    ),
-                                  ),
-                                )),
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: ' Installato nei locali siti nel Comune di  ',
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 140),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 140,
-                                      controller: _comuneClienteController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Comune *',
-                                    ),
-                                  ),
-                                )),
-                              ]
-                            )),
-                          ],
-                        ),
-                        Row(
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               RichText(text: TextSpan(
                                 children: <InlineSpan>[
                                   TextSpan(
                                     style: TextStyle(color: Colors.black, fontSize: 17),
-                                    text: '(prov. '
+                                    text: 'Il Sottoscritto MAZZEI FEDERICO, titolare o legale rappresentante dell\'impresa  ',
                                   ),
                                   WidgetSpan(child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 30),
+                                    constraints: BoxConstraints(minWidth: 250),
                                     child: IntrinsicWidth(
                                       child: getTextFormFieldSmall(
-                                        width: 30,
-                                        controller: _provinciaClienteController,
+                                        width: 250,
+                                        controller: _aziendaController,
                                         inputType: TextInputType.text,
-                                        hintName: 'Provincia *',
+                                        hintName: 'Nome azienda *',
                                       ),
                                     ),
                                   )),
                                   TextSpan(
-                                      style: TextStyle(color: Colors.black, fontSize: 17),
-                                      text: ') Via '
-                                  ),
-                                  WidgetSpan(child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 220),
-                                    child: IntrinsicWidth(
-                                      child: getTextFormFieldSmall(
-                                        width: 220,
-                                        controller: _viaClienteController,
-                                        inputType: TextInputType.text,
-                                        hintName: 'Via *',
-                                      ),
-                                    ),
-                                  )),
-                                  TextSpan(
-                                      style: TextStyle(color: Colors.black, fontSize: 17),
-                                      text: ' n. '
-                                  ),
-                                  WidgetSpan(child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 30),
-                                    child: IntrinsicWidth(
-                                      child: getTextFormFieldSmall(
-                                        width: 30,
-                                        controller: _numeroClienteController,
-                                        inputType: TextInputType.text,
-                                        hintName: 'Numero *',
-                                      ),
-                                    ),
-                                  )),
-                                  TextSpan(
-                                      style: TextStyle(color: Colors.black, fontSize: 17),
-                                      text: ' scala '
-                                  ),
-                                  WidgetSpan(child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 50),
-                                    child: IntrinsicWidth(
-                                      child: getTextFormFieldSmall(
-                                        width: 50,
-                                        controller: _scalaClienteController,
-                                        inputType: TextInputType.text,
-                                        hintName: 'Scala *',
-                                      ),
-                                    ),
-                                  )),
-                                  TextSpan(
-                                      style: TextStyle(color: Colors.black, fontSize: 17),
-                                      text: ' piano '
-                                  ),
-                                  WidgetSpan(child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 50),
-                                    child: IntrinsicWidth(
-                                      child: getTextFormFieldSmall(
-                                        width: 50,
-                                        controller: _pianoClienteController,
-                                        inputType: TextInputType.text,
-                                        hintName: 'Piano *',
-                                      ),
-                                    ),
-                                  )),
-                                  TextSpan(
-                                      style: TextStyle(color: Colors.black, fontSize: 17),
-                                      text: ' interno '
-                                  ),
-                                  WidgetSpan(child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 50),
-                                    child: IntrinsicWidth(
-                                      child: getTextFormFieldSmall(
-                                        width: 50,
-                                        controller: _internoClienteController,
-                                        inputType: TextInputType.text,
-                                        hintName: 'Interno *',
-                                      ),
-                                    ),
-                                  )),
-                                ]
-                              ))
-                            ]
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            RichText(text: TextSpan(
-                              children: <InlineSpan>[
-                                TextSpan(
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
-                                  text: 'di proprietà di '
-                                ),
-                                WidgetSpan(child: ConstrainedBox(
-                                  constraints: BoxConstraints(minWidth: 400),
-                                  child: IntrinsicWidth(
-                                    child: getTextFormFieldSmall(
-                                      width: 400,
-                                      controller: _proprietaClienteController,
-                                      inputType: TextInputType.text,
-                                      hintName: 'Proprietà *',
-                                    ),
-                                  ),
-                                )),
-                                TextSpan(
                                     style: TextStyle(color: Colors.black, fontSize: 17),
-                                    text: ' in edificio adibito ad uso : '
-                                ),
-                              ]
-                            ))
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(value: industriale,
-                                onChanged: (value) => setState(() => industriale = value),
-                            ),
-                            SizedBox(width: 2),
-                            Text(
-                              'industriale;'
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(value: civile,
-                                onChanged: (value) => setState(() => civile = value),
-                            ),
-                            SizedBox(width: 2),
-                            Text(
-                                'civile;'
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(value: commercio,
-                                onChanged: (value) => setState(() => commercio = value),
-                            ),
-                            SizedBox(width: 2),
-                            Text(
-                                'commercio;'
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Checkbox(value: altriUsi,
-                                onChanged: (value) => setState(() => altriUsi = value),
-                            ),
-                            SizedBox(width: 2),
-                            Text(
-                                'altri usi;'
-                            ),
-                          ],
-                        ),
-                        Center(
-                          child: Text(
-                            'DICHIARA', style: TextStyle(fontWeight: FontWeight.bold),
+                                    text: ' ,',
+                                  ),
+                                ],
+
+                              ),)
+                            ],
                           ),
-                        ),
-                        SizedBox(height: 2),
-                      ],
-                    ),
+                          SizedBox(height:2),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              RichText(text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      text: 'operante nel settore  ',
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 100),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          controller: _tipologiaController,
+                                          width: 180,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Tipologia intervento *',
+                                        ),
+                                      ),
+                                    )),
+                                    TextSpan(
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      text: '  con sede in  ',
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 100),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          controller: _indirizzoAziendaController,
+                                          width: 395,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Indirizzo azienda',
+                                        ),
+                                      ),
+                                    )),
+                                    TextSpan(
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      text: ' ,',
+                                    ),
+                                  ]
+                              ))
+                            ],
+                          ),
+                          SizedBox(height:2),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              RichText(text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 17),
+                                        text: 'tel. '
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: const BoxConstraints(minWidth: 150),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 150,
+                                          controller: _conTelefonoAzienda,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Telefono azienda *',
+                                        ),
+                                      ),
+                                    ),
+                                    ),
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 17),
+                                        text: ' , P.IVA  '
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: const BoxConstraints(minWidth: 150),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 150,
+                                          controller: _conPIvaAzienda,
+                                          inputType: TextInputType.text,
+                                          hintName: 'P.IVA azienda *',
+                                        ),
+                                      ),
+                                    ),
+                                    ),
+                                  ]
+                              ))
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value : iscrizioneRegistroDitte,
+                                onChanged : (value) => setState(() => iscrizioneRegistroDitte = value),
+                              ),
+                              SizedBox(width : 1),
+                              RichText(text: TextSpan(
+                                children: <InlineSpan>[
+                                  TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 14),
+                                    text: ' iscritta nel registro delle ditte (DPR 07/12/1995, n 581) della camera C.I.A.A. di ',
+                                  ),
+                                  WidgetSpan(child: ConstrainedBox(
+                                    constraints: BoxConstraints(minWidth: 150),
+                                    child: IntrinsicWidth(
+                                      child: getTextFormFieldSmall(
+                                        width: 150,
+                                        controller: _cittaRegistroDittaController,
+                                        inputType: TextInputType.text,
+                                        hintName: 'Città registro ditta *',
+                                      ),
+                                    ),
+                                  )),
+                                  TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 14),
+                                    text: ' n. ',
+                                  ),
+                                  WidgetSpan(child: ConstrainedBox(
+                                    constraints: BoxConstraints(minWidth: 150),
+                                    child: IntrinsicWidth(
+                                      child: getTextFormFieldSmall(
+                                        width: 150,
+                                        controller: _codRegistroDittaController,
+                                        inputType: TextInputType.text,
+                                        hintName: 'Codice registro ditta *',
+                                      ),
+                                    ),
+                                  )),
+                                ],
+
+                              ),)
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value : iscrizioneAlboProvinciale,
+                                onChanged : (value) => setState(() => iscrizioneAlboProvinciale = value),
+                              ),
+                              SizedBox(width : 1),
+                              RichText(text: TextSpan(
+                                children: <InlineSpan>[
+                                  TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 14),
+                                    text: ' iscritta all\'Albo Provinciale delle Imprese Artigiane (L: 8/8/1985, n 443) di ',
+                                  ),
+                                  WidgetSpan(child: ConstrainedBox(
+                                    constraints: BoxConstraints(minWidth: 180),
+                                    child: IntrinsicWidth(
+                                      child: getTextFormFieldSmall(
+                                        width: 180,
+                                        controller: _cittaAlboProvincialeController,
+                                        inputType: TextInputType.text,
+                                        hintName: 'Città registrazione albo provinciale *',
+                                      ),
+                                    ),
+                                  )),
+                                  TextSpan(
+                                    style: TextStyle(color: Colors.black, fontSize: 14),
+                                    text: ' n. ',
+                                  ),
+                                  WidgetSpan(child: ConstrainedBox(
+                                    constraints: BoxConstraints(minWidth: 150),
+                                    child: IntrinsicWidth(
+                                      child: getTextFormFieldSmall(
+                                        width: 150,
+                                        controller: _codAlboProvincialeController,
+                                        inputType: TextInputType.text,
+                                        hintName: 'Codice albo provinciale *',
+                                      ),
+                                    ),
+                                  )),
+                                ],
+                              ),)
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Row(
+                            children: [
+                              RichText(text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      text: 'Esecutrice dell\'impianto (2): ',
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 630),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 630,
+                                          controller: _descrizioneImpiantoController,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Codice albo provinciale *',
+                                        ),
+                                      ),
+                                    )),
+                                  ]
+                              ))
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Nota - Per gli impianti a gas specificare il tipo di gas distibuito: canalizzato 1, 2, 3 famiglia: GPL da serbatoio fisso',
+                            style: TextStyle(fontSize: 11),
+                          ),
+                          Text(
+                            'Per gli impianti elettrici specificare la potenza massima impiegata',
+                            style: TextStyle(fontSize: 11),
+                          ),
+                          Text(
+                            'Inteso come:',
+                            style: TextStyle(fontSize: 17),
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value : nuovoImpianto,
+                                onChanged : (value) => setState(() => nuovoImpianto= value),
+                              ),
+                              SizedBox(width: 2),
+                              Text('nuovo impianto;')
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value : trasformazione,
+                                onChanged : (value) => setState(() => trasformazione= value),
+                              ),
+                              SizedBox(width: 2),
+                              Text('trasformazione;')
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value : ampliamento,
+                                onChanged : (value) => setState(() => ampliamento= value),
+                              ),
+                              SizedBox(width: 2),
+                              Text('ampliamento;')
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value : manutenzioneStraordinaria,
+                                onChanged : (value) => setState(() => manutenzioneStraordinaria= value),
+                              ),
+                              SizedBox(width: 2),
+                              Text('manutenzione straordinaria;')
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value : altro,
+                                onChanged : (value) => setState(() => altro = value),
+                              ),
+                              SizedBox(width: 2),
+                              Text('altro (3)  '),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(minWidth: 150),
+                                child: IntrinsicWidth(
+                                  child: getTextFormFieldSmall(
+                                    width: 150,
+                                    controller: _altroController,
+                                    inputType: TextInputType.text,
+                                    hintName: 'Altro *',
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              RichText(text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      text: 'Commissionato da: ',
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 260),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 260,
+                                          controller: _denominazioneClienteController,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Denominazione cliente *',
+                                        ),
+                                      ),
+                                    )),
+                                    TextSpan(
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      text: ' Installato nei locali siti nel Comune di  ',
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 140),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 140,
+                                          controller: _comuneClienteController,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Comune *',
+                                        ),
+                                      ),
+                                    )),
+                                  ]
+                              )),
+                            ],
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                RichText(text: TextSpan(
+                                    children: <InlineSpan>[
+                                      TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 17),
+                                          text: '(prov. '
+                                      ),
+                                      WidgetSpan(child: ConstrainedBox(
+                                        constraints: BoxConstraints(minWidth: 30),
+                                        child: IntrinsicWidth(
+                                          child: getTextFormFieldSmall(
+                                            width: 30,
+                                            controller: _provinciaClienteController,
+                                            inputType: TextInputType.text,
+                                            hintName: 'Provincia *',
+                                          ),
+                                        ),
+                                      )),
+                                      TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 17),
+                                          text: ') Via '
+                                      ),
+                                      WidgetSpan(child: ConstrainedBox(
+                                        constraints: BoxConstraints(minWidth: 220),
+                                        child: IntrinsicWidth(
+                                          child: getTextFormFieldSmall(
+                                            width: 220,
+                                            controller: _viaClienteController,
+                                            inputType: TextInputType.text,
+                                            hintName: 'Via *',
+                                          ),
+                                        ),
+                                      )),
+                                      TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 17),
+                                          text: ' n. '
+                                      ),
+                                      WidgetSpan(child: ConstrainedBox(
+                                        constraints: BoxConstraints(minWidth: 30),
+                                        child: IntrinsicWidth(
+                                          child: getTextFormFieldSmall(
+                                            width: 30,
+                                            controller: _numeroClienteController,
+                                            inputType: TextInputType.text,
+                                            hintName: 'Numero *',
+                                          ),
+                                        ),
+                                      )),
+                                      TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 17),
+                                          text: ' scala '
+                                      ),
+                                      WidgetSpan(child: ConstrainedBox(
+                                        constraints: BoxConstraints(minWidth: 50),
+                                        child: IntrinsicWidth(
+                                          child: getTextFormFieldSmall(
+                                            width: 50,
+                                            controller: _scalaClienteController,
+                                            inputType: TextInputType.text,
+                                            hintName: 'Scala *',
+                                          ),
+                                        ),
+                                      )),
+                                      TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 17),
+                                          text: ' piano '
+                                      ),
+                                      WidgetSpan(child: ConstrainedBox(
+                                        constraints: BoxConstraints(minWidth: 50),
+                                        child: IntrinsicWidth(
+                                          child: getTextFormFieldSmall(
+                                            width: 50,
+                                            controller: _pianoClienteController,
+                                            inputType: TextInputType.text,
+                                            hintName: 'Piano *',
+                                          ),
+                                        ),
+                                      )),
+                                      TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 17),
+                                          text: ' interno '
+                                      ),
+                                      WidgetSpan(child: ConstrainedBox(
+                                        constraints: BoxConstraints(minWidth: 50),
+                                        child: IntrinsicWidth(
+                                          child: getTextFormFieldSmall(
+                                            width: 50,
+                                            controller: _internoClienteController,
+                                            inputType: TextInputType.text,
+                                            hintName: 'Interno *',
+                                          ),
+                                        ),
+                                      )),
+                                    ]
+                                ))
+                              ]
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              RichText(text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 17),
+                                        text: 'di proprietà di '
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 400),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 400,
+                                          controller: _proprietaClienteController,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Proprietà *',
+                                        ),
+                                      ),
+                                    )),
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 17),
+                                        text: ' in edificio adibito ad uso : '
+                                    ),
+                                  ]
+                              ))
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: industriale,
+                                onChanged: (value) => setState(() => industriale = value),
+                              ),
+                              SizedBox(width: 2),
+                              Text(
+                                  'industriale;'
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: civile,
+                                onChanged: (value) => setState(() => civile = value),
+                              ),
+                              SizedBox(width: 2),
+                              Text(
+                                  'civile;'
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: commercio,
+                                onChanged: (value) => setState(() => commercio = value),
+                              ),
+                              SizedBox(width: 2),
+                              Text(
+                                  'commercio;'
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: altriUsi,
+                                onChanged: (value) => setState(() => altriUsi = value),
+                              ),
+                              SizedBox(width: 2),
+                              Text(
+                                  'altri usi;'
+                              ),
+                            ],
+                          ),
+                          Center(
+                            child: Text(
+                              'DICHIARA', style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                              style: TextStyle(color: Colors.black, fontSize: 17),
+                              'sotto la propria personale responsabilità, che l\'impianto è stato realizzato in modo conforme alla regola d\'arte, secondo\n'
+                                  'quanto previsto previsto dall\'art. 6, tenuto conto delle condizioni di esercizio e degli usi a cui è destinato l\'edificio, avendo\n in particolare:'
+                          ),
+                          SizedBox(height:2),
+                          Row(
+                            children: [
+                              Icon(
+                                  Icons.arrow_right_alt
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                  'rispettato il progetto redatto all\'articolo 5 dal (5):'
+                              ),
+                            ],
+                          ),
+                          Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Checkbox(value: progettista, onChanged: (value) => setState(() => progettista = value)),
+                                    SizedBox(width: 3),
+                                    RichText(text: TextSpan(
+                                        children: <InlineSpan>[
+                                          TextSpan(
+                                            style: TextStyle(color: Colors.black, fontSize: 17),
+                                            text: 'Progettista '
+                                          ),
+                                          WidgetSpan(child: ConstrainedBox(
+                                            constraints: BoxConstraints(minWidth: 160),
+                                            child: IntrinsicWidth(
+                                              child: getTextFormFieldSmall(
+                                                width: 160,
+                                                controller: _progettistaController,
+                                                inputType: TextInputType.text,
+                                                hintName: 'Nome progettista *',
+                                              ),
+                                            ),
+                                          )),
+                                          TextSpan(
+                                              style: TextStyle(color: Colors.black, fontSize: 17),
+                                              text: ' nr. Iscrizione Albo '
+                                          ),
+                                          WidgetSpan(child: ConstrainedBox(
+                                            constraints: BoxConstraints(minWidth: 160),
+                                            child: IntrinsicWidth(
+                                              child: getTextFormFieldSmall(
+                                                width: 160,
+                                                controller: _alboProgettistaController,
+                                                inputType: TextInputType.text,
+                                                hintName: 'Nome progettista *',
+                                              ),
+                                            ),
+                                          )),
+                                          TextSpan(
+                                              style: TextStyle(color: Colors.black, fontSize: 17),
+                                              text: ' ;'
+                                          ),
+                                        ]
+                                    ))
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Checkbox(value: responsabileTecnicoImpresa, onChanged: (value) => setState(() => responsabileTecnicoImpresa = value)),
+                                    SizedBox(width: 3),
+                                    RichText(text: TextSpan(
+                                      children: <InlineSpan>[
+                                        TextSpan(
+                                          style: TextStyle(color: Colors.black, fontSize: 17),
+                                          text: 'Responsabile Tecnico dell\'impresa '
+                                        ),
+                                        WidgetSpan(child: ConstrainedBox(
+                                          constraints: BoxConstraints(minWidth: 292),
+                                          child: IntrinsicWidth(
+                                            child: getTextFormFieldSmall(
+                                              width: 292,
+                                              controller: _responsabileTecnicoImpresaController,
+                                              inputType: TextInputType.text,
+                                              hintName: 'Nome responsabile tecnico*',
+                                            ),
+                                          ),
+                                        )),
+                                        TextSpan(
+                                            style: TextStyle(color: Colors.black, fontSize: 17),
+                                            text: ' ;'
+                                        ),
+                                      ]
+                                    ))
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(value: checkNorma, onChanged: (value) => setState(() => checkNorma = value)),
+                                    SizedBox(width: 3),
+                                    RichText(text: TextSpan(
+                                        children: <InlineSpan>[
+                                          TextSpan(
+                                              style: TextStyle(color: Colors.black, fontSize: 17),
+                                              text: 'seguito la norma tecnica applicabile all\'impiego: (6) '
+                                          ),
+                                          WidgetSpan(child: ConstrainedBox(
+                                            constraints: BoxConstraints(minWidth: 292),
+                                            child: IntrinsicWidth(
+                                              child: getTextFormFieldSmall(
+                                                width: 292,
+                                                controller: _normaController,
+                                                inputType: TextInputType.text,
+                                                hintName: 'Norma *',
+                                              ),
+                                            ),
+                                          )),
+                                          TextSpan(
+                                              style: TextStyle(color: Colors.black, fontSize: 17),
+                                              text: ' ;'
+                                          ),
+                                        ]
+                                    ))
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(value: installazioneComponenti, onChanged: (value) => setState(() => installazioneComponenti = value)),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                      'installato componenti e materiali adatti al luogo di installazione;'
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Checkbox(value: controlloImpianto, onChanged: (value) => setState(() => controlloImpianto = value)),
+                                    SizedBox(width: 3),
+                                    Text(
+                                        style: TextStyle(color: Colors.black, fontSize: 17),
+                                        'controllato l\'impianto ai fini della sicurezza e della funzionalità con esito positivo, avendo eseguito \n le verifiche richieste dalle norme e dalle disposizioni di legge;'
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Checkbox(value: verificaImpianto, onChanged: (value) => setState(() => verificaImpianto = value)),
+                                    SizedBox(width: 3),
+                                    Text(
+                                        style: TextStyle(color: Colors.black, fontSize: 17),
+                                        'Verificato la compatibilità tecnicca con l\'impianto preesistente (solo per rifacimenti parziali);'
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text('Allegati obbligatori:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          Row(
+                            children: [
+                              Checkbox(value: progetto, onChanged: (value) => setState(() => progetto = value)),
+                              SizedBox(width: 3),
+                              Text('Progetto (ai sensi dell\'art. 5 e 7); (7)',style: TextStyle(fontSize: 17))
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: relazione, onChanged: (value) => setState(() => relazione = value)),
+                              SizedBox(width: 3),
+                              Text('Relazione con tipologie dei materiali utilizzati; (8)',style: TextStyle(fontSize: 17))
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: schema, onChanged: (value) => setState(() => schema = value)),
+                              SizedBox(width: 3),
+                              Text('Schema di impianto realizzato; (9)',style: TextStyle(fontSize: 17))
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: riferimento, onChanged: (value) => setState(() => riferimento = value)),
+                              SizedBox(width: 3),
+                              Text('Riferimento a dichiarazioni di conformità precedenti o parziali già esistenti; (10)',style: TextStyle(fontSize: 17))
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: visura, onChanged: (value) => setState(() => visura = value)),
+                              SizedBox(width: 3),
+                              Text('Copia del certificato di riconoscimento dei requisiti tecnico-professionali',style: TextStyle(fontSize: 17))
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Checkbox(value: conformita, onChanged: (value) => setState(() => conformita = value)),
+                              SizedBox(width: 3),
+                              Text('Attestazione di conformità per impianto realizzatto con materiali o sistemi non normalizzati. (11)',style: TextStyle(fontSize: 17))
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Text('Allegati facoltativi: (12)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          SizedBox(height: 15),
+                          Container(
+                            width: 900,
+                            height: 2,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black)
+                            ),
+                          ),
+                          SizedBox(height: 8 ),
+                          Center(
+                            child: Text(
+                                'DECLINA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)
+                            ),
+                          ),
+                          Text(
+                            style: TextStyle(fontSize: 17),
+                            'Ogni responsabilità per sinistri a persone o a cose derivanti da manomissione dell\'impianto da parte di terzi \n'
+                                'ovvero da carenza di manutenzione o riparazione.'
+                          )
+                        ],
+                      ),
+                    )
                   ),
                 ),
               ),

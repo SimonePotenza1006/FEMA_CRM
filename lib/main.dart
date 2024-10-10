@@ -147,7 +147,6 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     if (!mounted) return;
-
     setState(() {
       idd = udid;//_udid = udid;
     });
@@ -198,8 +197,6 @@ class _LoginFormState extends State<LoginForm> {
               //autovalidateMode: AutovalidateMode.onUserInteraction,
               child:
               Column(
-                //scrollDirection: Axis.vertical,
-                //direction: Axis.vertical,
                   children: [
                     TextFormField(
                       controller: _conLicenza,
@@ -209,7 +206,6 @@ class _LoginFormState extends State<LoginForm> {
                       validator: (value) //=> value!.length ==0 ? '' : null,
                       {
                         print("jytg? 22");
-
                         if (value == null || value.isEmpty || licenzaerrata) {
                           print("nuuuuuuuuuuuuuuul");
                           return 'Inserisci un codice di licenza valido';
@@ -220,7 +216,7 @@ class _LoginFormState extends State<LoginForm> {
                         floatingLabelStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700], fontSize: 17.0),
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
                         //floatingLabelBehavior: FloatingLabelBehavior.never,
-                        enabledBorder: UnderlineInputBorder(//OutlineInputBorder(
+                        enabledBorder: UnderlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
                           borderSide: BorderSide(color: Colors.transparent),
                         ),
@@ -228,25 +224,18 @@ class _LoginFormState extends State<LoginForm> {
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
                           borderSide: BorderSide(color: Colors.grey),
                         ),
-                        //prefixIcon: Icon(icon),
-                        //hintText: hintName,
                         labelText: 'Numero di licenza',
                         fillColor: Colors.grey[200],
                         errorStyle: TextStyle(color: Colors.black),
-                        //hintStyle: TextStyle(fontWeight: FontWeight.w800),
                         labelStyle: TextStyle(fontWeight: FontWeight.w500,
                             fontStyle: FontStyle.italic, color: Colors.black),
                         focusColor: Colors.grey,
-                        //hoverColor: Colors.black,
                         filled: true,
                       ),
                     ),
                     TextButton(
-
                       onPressed: resetLicenza, //<-- SEE HERE
                       child: new Text('RESET', style: TextStyle(fontWeight: FontWeight.w600),),
-
-
                     ),
 
                     TextButton(
@@ -450,8 +439,6 @@ class _LoginFormState extends State<LoginForm> {
       MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: userData)),
     );
   }
-
-
 
   Future<void> _saveCredentials(String username, String password) async {
     final SharedPreferences sp = await _pref;

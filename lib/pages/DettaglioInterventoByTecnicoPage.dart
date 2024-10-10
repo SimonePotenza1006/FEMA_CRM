@@ -215,7 +215,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
               children : [
-                if (widget.intervento.utente?.id == widget.utente?.id)
+                if (widget.intervento.utente?.id == widget.utente.id)
                   if (widget.intervento.orario_inizio == null)
                     SpeedDialChild(
                       child: Icon(Icons.lock_clock_outlined, color: Colors.white),
@@ -224,7 +224,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => InizioInterventoPage(intervento: widget.intervento, utente: widget.utente!),
+                          builder: (context) => InizioInterventoPage(intervento: widget.intervento, utente: widget.utente),
                         ),
                       ),
                     ),
@@ -602,7 +602,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                       Text(
                         displayedValue.toUpperCase(),
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           color: Colors.black,
                           fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
                         ),
