@@ -88,8 +88,8 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
       child: Column(
         children: [
           Text(
-                prodotto.prodotto?.descrizione ?? '',
-                style: TextStyle(fontSize: 16),
+             prodotto.prodotto?.descrizione ?? '',
+             style: TextStyle(fontSize: 16),
           ),
           SizedBox(height: 12),
           Text(
