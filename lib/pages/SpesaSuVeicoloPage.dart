@@ -308,11 +308,6 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  // Text(
-                  //   'Scatta una foto:'.toString().toUpperCase(),
-                  //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  // ),
-                  SizedBox(height: 10),
                   Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -350,7 +345,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   ),
                   SizedBox(height: 24,),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: pickedImage != null
+                        ? () {
                       if (_formKey.currentState!.validate()) {
                         showDialog(
                           context: context,
@@ -372,15 +368,15 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                           Navigator.pop(context);
                         });
                       }
-                    },
+                    }
+                        : null, // Se pickedImage è null, il pulsante è disabilitato
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      primary: pickedImage != null ? Colors.red : Colors.grey, // Cambia il colore quando è disabilitato
                       onPrimary: Colors.white,
                       textStyle: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     child: Text('Salva spesa'.toString().toUpperCase()),
                   ),
-
                 ],
               ),
             ),

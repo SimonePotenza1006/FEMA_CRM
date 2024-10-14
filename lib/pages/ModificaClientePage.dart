@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'dart:io' as io;
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import '../model/ClienteModel.dart';
 
 class ModificaClientePage extends StatefulWidget {
@@ -34,6 +35,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
   late TextEditingController _pecController;
   late TextEditingController _noteController;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  io.File? selectedFile;
 
   @override
   void initState() {
@@ -121,6 +123,32 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
               _buildTextField('Note', _noteController),
               const SizedBox(height: 20),
               Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment : MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.attach_file, color: Colors.black,),
+                          onPressed: _pickFile,
+                          tooltip: 'Seleziona un file',
+                        ),
+                        SizedBox(width: 5),
+                        Text('Seleziona un file')
+                      ],
+                    ),
+
+                    if(selectedFile != null) // Mostra il nome del file se selezionato
+                      Text(
+                        'File selezionato: ${selectedFile!.path.split('/').last}',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
                 child: ElevatedButton(
                   onPressed: updateCliente,
                   child: const Text('Salva Modifiche'),
@@ -138,6 +166,24 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
         )
       ),
     );
+  }
+
+  Future<void> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null && result.files.single.path != null) {
+        setState(() {
+          // Salva il file selezionato come un oggetto File
+          selectedFile = io.File(result.files.single.path!);
+        });
+        print("File selezionato: ${selectedFile!.path}");
+      } else {
+        // L'utente ha annullato la selezione
+        print("Nessun file selezionato.");
+      }
+    } catch (e) {
+      print("Errore durante la selezione del file: $e");
+    }
   }
 
   Widget _buildTextField(String label, TextEditingController controller) {
@@ -158,9 +204,11 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
     );
   }
 
-  Future<http.Response> updateCliente() async {
+  Future<void> updateCliente() async {
     late http.Response response;
+
     try {
+      // Prima aggiorna il cliente esistente
       response = await http.put(
         Uri.parse('${ipaddress}/api/cliente/${widget.cliente.id}'),
         headers: {
@@ -191,17 +239,53 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
           'tipologie_interventi': widget.cliente.tipologie_interventi,
         }),
       );
-      if (response.statusCode == 201) {
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
         print("Cliente modificato correttamente!");
+
+        // Ora carica il file selezionato se esiste
+        if (selectedFile != null) {
+          await uploadFile(selectedFile!);
+        }
         Navigator.pop(context);
-        Navigator.pop(context);
+
       } else {
-        print("Hai toppato :(");
-        print(response.toString());
+        print("Errore durante la modifica del cliente: ${response.body}");
       }
     } catch (e) {
-      print(e.toString());
+      print("Errore: $e");
     }
-    return response;
+  }
+
+  Future<void> uploadFile(io.File file) async {
+    try {
+      // Crea una richiesta multipart per l'upload del file
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${ipaddress}/pdfu/certificazioni/clienti'),
+      );
+
+      // Aggiungi il nome del cliente come parametro
+      request.fields['cliente'] = _denominazioneController.text.isNotEmpty ? _denominazioneController.text : widget.cliente.denominazione!;
+
+      // Aggiungi il file come MultipartFile
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'pdf', // Nome del parametro nel controller
+          file.path,
+        ),
+      );
+
+      // Invia la richiesta
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print("File caricato con successo!");
+      } else {
+        print("Errore durante il caricamento del file: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Errore durante il caricamento del file: $e");
+    }
   }
 }

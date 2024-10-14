@@ -5,50 +5,23 @@ import 'package:fema_crm/pages/CalendarioUtentePage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneTecnicoPage.dart';
 import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'package:fema_crm/pages/FormOrdineFornitorePage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:fema_crm/pages/CalendarioPage.dart';
-import 'package:fema_crm/pages/ListaClientiPage.dart';
-import 'package:fema_crm/pages/ListaCredenzialiPage.dart';
-import 'package:fema_crm/pages/ListaInterventiFinalPage.dart';
-import 'package:fema_crm/pages/LogisticaPreventiviHomepage.dart';
-import 'package:fema_crm/pages/MenuCommissioniPage.dart';
-import 'package:fema_crm/pages/MenuOrdiniFornitorePage.dart';
-import 'package:fema_crm/pages/MenuSopralluoghiPage.dart';
-import 'package:fema_crm/pages/ScannerQrCodeAmministrazionePage.dart';
 import 'package:fema_crm/pages/SpesaSuVeicoloPage.dart';
 import 'package:fema_crm/pages/TimbraturaPage.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';// as intl;
 import 'package:intl/intl.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'dart:math' as math;
-import '../pages/HomeFormAmministrazioneNewPage.dart';
 import 'dart:ui' as ui;
-
 import '../main.dart';
 import '../model/CommissioneModel.dart';
-import '../model/CustomAppointmentModel.dart';
 import '../model/InterventoModel.dart';
-import '../model/MerceInRiparazioneModel.dart';
-import '../model/NotaTecnicoModel.dart';
-import '../model/OrdinePerInterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
-import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
-import '../model/VeicoloModel.dart';
-import 'ControlloAccessiApplicazionePage.dart';
-import 'CreazioneNuovaCartaPage.dart';
-import 'CreazioneNuovoUtentePage.dart';
-import 'DettaglioCommissioneAmministrazionePage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
-import 'DettaglioInterventoPage.dart';
-import 'ListaNoteUtentiPage.dart';
-import 'ListaUtentiPage.dart';
-import 'MagazzinoPage.dart';
 import 'MenuSopralluoghiTecnicoPage.dart';
-import 'RegistroCassaPage.dart';
-import 'ReportSpeseVeicoloPage.dart';
-import 'StoricoMerciUtentiPage.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class HomeFormTecnicoNewPage extends StatefulWidget{
   final UtenteModel? userData;
@@ -64,6 +37,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
+  // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+  // Map<String, dynamic> _deviceData = <String, dynamic>{};
 
   @override
   void initState() {
@@ -333,7 +308,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       ),
                     ),
                     const SizedBox(height: 10.0),
-
                     FutureBuilder<List<InterventoModel>>(
                       future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
                       builder: (context, snapshot) {
@@ -362,7 +336,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
                               TextStyle textStyle = intervento.concluso ?? false
                                   ? TextStyle(color: Colors.white, fontSize: 15)
-                                  : TextStyle(color: Colors.black, fontSize: 15);
+                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                               return Card(
                                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

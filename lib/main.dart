@@ -218,10 +218,10 @@ class _LoginFormState extends State<LoginForm> {
                       //autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) //=> value!.length ==0 ? '' : null,
                       {
-
+                        print("jytg? 22");
 
                         if (value == null || value.isEmpty || licenzaerrata) {
-                          print("licenza errata");
+                          print("nuuuuuuuuuuuuuuul");
                           return 'Inserisci un codice di licenza valido';
                         }
                         return null;

@@ -36,7 +36,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   late String nomeUtente = "${widget.utente.nome} ${widget.utente.cognome}";
   String tipoTimbratura = "";
   late String _gps;
-  late String _indirizzo;
+  String _indirizzo = "";
   late int idMarcatempo;
   late List<MarcaTempoModel> timbratureOdierne = [];
   List<MarcaTempoModel> allTimbratureMonth = [];
@@ -299,133 +299,12 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          leading: BackButton(
-            onPressed: (){
-              if(widget.utente.ruolo?.id == "1" || widget.utente.ruolo?.id == "2"){
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
-                  ),
-                );
-                } else{
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => HomeFormAmministrazioneNewPage(userData: widget.utente)//TimbraturaPage(utente: widget.utente),
-                  ),
-                );
-              }
-              },
-            color: Colors.black, // <-- SEE HERE
-          ),
           title: const Text(
             'TIMBRATURA',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
           backgroundColor: Colors.red,
-          /*actions:  widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? <Widget>[
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.edit), onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => TimbratureEdit(utente: widget.utente)),
-              );
-            }),
-            SizedBox(width: 23),
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.assignment_outlined), onPressed: () async {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TimbratureSettimana(utente: widget.utente)),
-                  );
-            }),
-            SizedBox(width: 23),
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.search), onPressed: () async {
-              _showDialog();
-            }),
-            SizedBox(width: 23),
-            IconButton(
-                color: Colors.white,
-                icon: Icon(Icons.download), onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("SCARICA IL RESOCONTO DELLE PRESENZE"),
-                    actions: [
-                      Center(
-                        child:  Column(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                getAllMarcatempoMonth(2).whenComplete(() => _generateExcel());
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("MESE PRECEDENTE"), //no
-                            ),
-                            SizedBox(width: 45,),
-                            TextButton(
-                              onPressed: () {
-                                getAllMarcatempoMonth(1).whenComplete(() =>  _generateExcel());
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("MESE CORRENTE"), //si
-                            ),
-                            SizedBox(width: 80,),
-                            TextButton(
-                              onPressed: () {
-                                getAllMarcatempoToday().whenComplete(() {
-                                  if (timbratureOdierne.isNotEmpty)
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            PDFOggiPage(timbrature: timbratureOdierne),
-                                      ),
-                                    ); else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Ancora nessuna timbratura in data odierna')));
-                                  }
-                                });
-                              },
-                              child: Text("OGGI"), //si
-                            ),
-                            /*TextButton(
-                              onPressed: () {
-                                getAllMarcatempoToday().whenComplete(() {
-                                  if (timbratureOdierne.isNotEmpty)
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            PDFOggiPage(timbrature: timbratureOdierne),
-                                      ),
-                                    ); else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Ancora nessuna timbratura in data odierna')));
-                                  }
-                                });
-                              },
-                              child: Text("Modifica"), //si
-                            ),*/
-                          ],
-                        ),
-                      )
-                    ],
-                  );
-                },
-              );
-            }),
-            SizedBox(width: 12,)
-          ] : null*/
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -437,17 +316,17 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               children: [
                 Center(
                   child: SizedBox(
-                    width: 300,
-                    height: 150,
+                    width: 250,
+                    height: 100,
                     child: Image(image: AssetImage('assets/images/logo.png')),
                   ),
                 ),
-                const SizedBox(height: 10.0),
+                //const SizedBox(height: 10.0),
                 Text(
                   '${nomeUtente}'.toUpperCase(),
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 25),
+                SizedBox(height: 10),
                 Text(
                   '${tipoTimbratura}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -457,9 +336,10 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                   '${dataOdierna}',
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 50),
+                SizedBox(height: 30),
                 tipoTimbratura != 'TIMBRATURE ODIERNE TERMINATE' ? SizedBox(
                   width: 650,
+                  height: 250,
                   child: Container(
                     decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
                     child: SfSignaturePad(
@@ -473,7 +353,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                         maximumStrokeWidth: 4.0),
                   ),
                 ) : Container(),
-                SizedBox(height: 30),
+                SizedBox(height: 20),
                 tipoTimbratura != 'TIMBRATURE ODIERNE TERMINATE' ? Container(
                   alignment: Alignment.bottomCenter,
                   padding: const EdgeInsets.only(bottom: 20.0),
@@ -495,27 +375,23 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                       ),
                       screenWidth > 760 ? SizedBox(width: 330) : SizedBox(width: 5),
                       ElevatedButton(
-                        onPressed: _isLoading ? null : _handleTimbraButtonPress,
-                        /*() async {
-                          await _getCurrentLocation();
-                          timbra();
-                        },*/
+                        onPressed: (_indirizzo != "" && _indirizzo.isNotEmpty && !_isLoading)
+                            ? _handleTimbraButtonPress
+                            : null, // Disabilita il pulsante se _indirizzo è null o vuoto
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          primary: (_indirizzo != "" && _indirizzo.isNotEmpty)
+                              ? Colors.red
+                              : Colors.grey, // Cambia il colore se disabilitato
                           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                         ),
-                        child:
-                        _isLoading
+                        child: _isLoading
                             ? const CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation(Colors.white),
                         )
                             : const Text(
                           '  TIMBRA  ',
                           style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),/*const Text(
-                          '  TIMBRA  ',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),*/
+                        ),
                       ),
                     ],
                   ),
@@ -680,6 +556,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   Future<void> timbra() async {
     if (_isSigned == true) {
       try {
+        String tipoMessaggio = ''; // Variabile per il tipo di messaggio
         if (tipoTimbratura == "INGRESSO") {
           print('${tipoTimbratura}');
           final response = await http.post(
@@ -687,7 +564,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'gps': _indirizzo.toString(),
-              'data': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()),//DateTime.now().toIso8601String(),
+              'data': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()), //DateTime.now().toIso8601String(),
               'utente': widget.utente.toMap(),
               'viaggio': {
                 'id': 2,
@@ -697,15 +574,10 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               },
               'edit': false,
               'editu': false,
-              'utenteEdit': null//widget.utente.toMap(),
+              'utenteEdit': null //widget.utente.toMap(),
             }),
           );
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Timbratura di INGRESSO registrata con successo!'),
-            ),
-          );
+          tipoMessaggio = 'INGRESSO';
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
@@ -716,7 +588,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               'gps': timbratureOdierne.last.gps,
               'gpsu': _indirizzo.toString(),
               'data': timbratureOdierne.last.data!.toIso8601String(),
-              'datau': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()),//DateTime.now().toIso8601String(),
+              'datau': DateFormat('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'').format(DateTime.now()), //DateTime.now().toIso8601String(),
               'viaggio': {
                 'id': 2,
                 'destinazione': 'Calimera',
@@ -729,13 +601,28 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               'utenteEdit': null
             }),
           );
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Timbratura di USCITA registrata con successo!'),
-            ),
-          );
-        };
+          tipoMessaggio = 'USCITA';
+        }
+
+        // Mostra un AlertDialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Timbratura registrata'),
+              content: Text('Timbratura di $tipoMessaggio registrata con successo!'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Chiude l'AlertDialog
+                    Navigator.pop(context); // Torna alla pagina precedente
+                  },
+                ),
+              ],
+            );
+          },
+        );
       } catch (e) {
         print('Errore durante il salvataggio del marcatempo: $e');
       }
@@ -747,6 +634,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       );
     }
   }
+
 
   void resetFirma() {
     signatureGlobalKey.currentState?.clear();

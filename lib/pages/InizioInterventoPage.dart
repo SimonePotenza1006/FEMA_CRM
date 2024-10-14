@@ -150,7 +150,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
               children: [
                 SizedBox(height: 12),
                 Text(
-                  'Le informazioni attuali sulla destinazione sono:',
+                  'Informazioni attuali:'.toUpperCase(),
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -171,13 +171,12 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
                 ),
                 SizedBox(height: 15),
                 Text(
-                  "La tua posizione corrente è:",
+                  "La tua posizione corrente è:".toUpperCase(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text('${_indirizzo}'.toUpperCase(), style: TextStyle(fontSize: 22)),
                 SizedBox(height: 16),
-                SizedBox(height: 50),
                 // Spazio aggiunto tra il pulsante e il pulsante "Inizia intervento"
                 Column(
                   children: [
@@ -190,25 +189,25 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
                       ),
                     ),
                     SizedBox(height: 16), // Add some space between TextFormField and ElevatedButton
-                    ElevatedButton(
-                      onPressed: () {
-                        saveNotaDestinazione();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Set padding
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Set border radius
+                      ElevatedButton(
+                        onPressed: () {
+                          saveNotaDestinazione();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Set padding
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8), // Set border radius
+                          ),
+                        ),
+                        child: Text(
+                          'Salva nota destinazione'.toUpperCase(),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      child: Text(
-                        'Salva nota destinazione',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
                   ],
                 ),
-                SizedBox(height: 100),
+                SizedBox(height: 30),
                 // Spazio aggiunto tra il pulsante e il pulsante "Inizia intervento"
                 Column(
                   children: [
@@ -221,23 +220,22 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
                       ),
                     ),
                     SizedBox(height: 16), // Add some space between TextFormField and ElevatedButton
-                    ElevatedButton(
-                      onPressed: () {
-                        saveNotaCliente();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Set padding
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8), // Set border radius
+                      ElevatedButton(
+                        onPressed: () {
+                          saveNotaCliente();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          padding: EdgeInsets.symmetric(horizontal: 28, vertical: 14), // Set padding
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8), // Set border radius
+                          ),
+                        ),
+                        child: Text(
+                          'Salva nota cliente'.toUpperCase(),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      child: Text(
-                        'Salva nota cliente',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(height: 60),
                   ],
                 ),
               ],
@@ -249,7 +247,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
         onPressed: saveIntervento,
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
-        label: Text("Inizia intervento"),
+        label: Text("Inizia intervento".toUpperCase()),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
