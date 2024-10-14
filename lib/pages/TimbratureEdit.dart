@@ -455,6 +455,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
   }
 
@@ -496,6 +501,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
   }
 
@@ -536,6 +546,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
   }
 
@@ -581,6 +596,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
 
   }
@@ -709,6 +729,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
        // }
       }} catch (e) {
       print('Errore durante il salvataggio del marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
       }
 
     }
@@ -801,6 +826,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         };
       } catch (e) {
         print('Errore durante il salvataggio del marcatempo: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Problemi di rete. Riprova più tardi'),
+          ),
+        );
       }
     /*} else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -834,6 +864,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
     } catch (e) {
       print('Errore durante la chiamata API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
       return null; // Ritorna null in caso di errore
     }
   }
@@ -853,6 +888,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
     } catch (e) {
       print('Errore durante la chiamata API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
       return null; // Ritorna null in caso di errore
     }
   }
@@ -872,6 +912,11 @@ class _TimbratureEditState extends State<TimbratureEdit> {
       }
     } catch (e) {
       print('Errore durante la chiamata API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
       //return null; // Ritorna null in caso di errore
     }
   }

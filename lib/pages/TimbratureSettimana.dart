@@ -724,6 +724,11 @@ print('ssA '+settimanaA.toString());
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
 
   }
@@ -841,6 +846,11 @@ print('ssA '+settimanaA.toString());
         };
       } catch (e) {
         print('Errore durante il salvataggio del marcatempo: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Problemi di rete. Riprova più tardi'),
+          ),
+        );
       }
     /*} else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -866,9 +876,15 @@ print('ssA '+settimanaA.toString());
       }
     } catch (e) {
       print('Errore durante la chiamata API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
       //return null; // Ritorna null in caso di errore
     }
   }
+
   List<DataTable> _tables = [];
   void addNewRow() {
     setState(() {
