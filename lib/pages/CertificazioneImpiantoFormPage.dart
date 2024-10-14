@@ -1,5 +1,10 @@
+import 'package:fema_crm/databaseHandler/DbHelper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:intl/intl.dart';
 import '../Util/getTextFormFieldSmall.dart';
+import '../model/AziendaModel.dart';
+import '../model/TipologiaInterventoModel.dart';
 
 class CertificazioneImpiantoFormPage extends StatefulWidget{
   const CertificazioneImpiantoFormPage({Key? key}) : super(key:key);
@@ -9,6 +14,8 @@ class CertificazioneImpiantoFormPage extends StatefulWidget{
 }
 
 class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoFormPage>{
+
+  DbHelper? dbHelper;
 
   final _protocolloController = TextEditingController();
   final _aziendaController = TextEditingController();
@@ -35,6 +42,8 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
   final _alboProgettistaController = TextEditingController();
   final  _responsabileTecnicoImpresaController = TextEditingController();
   final  _normaController = TextEditingController();
+  final _dataController = TextEditingController();
+  final _sottoscrittoController = TextEditingController();
 
   bool? iscrizioneRegistroDitte = true;
   bool? iscrizioneAlboProvinciale = true;
@@ -60,6 +69,93 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
   bool? visura = false;
   bool? conformita = false;
 
+  List<TipologiaInterventoModel> allTipologie = [];
+  List<AziendaModel> allAziende = [];
+  AziendaModel? selectedAzienda;
+  TipologiaInterventoModel? selectedTipologia;
+
+  @override
+  void initState() {
+    dbHelper = DbHelper();
+    init();
+    super.initState();
+    _dataController.text = DateFormat("dd/MM/yyyy").format(DateTime.now());
+  }
+
+  Future<void> init() async {
+    allTipologie = await dbHelper?.getAllTipologieIntervento() ?? [];
+    allAziende = await dbHelper?.getAllAziende() ?? [];
+  }
+
+  void _openTipologiaDialog(){
+    showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: Text('SELEZIONA TIPOLOGIA IMPIANTO'),
+          content: Container(
+            height: 400,
+            width: 390,
+            child: ListView.builder(
+                itemCount: allTipologie.length,
+                itemBuilder: (BuildContext context, int index){
+                  final tipologia = allTipologie[index];
+                  return ListTile(
+                    title: Text(tipologia.descrizione!),
+                    onTap: (){
+                      setState(() {
+                        selectedTipologia = tipologia;
+                        _tipologiaController.text = tipologia.descrizione!;
+                      });
+                    },
+                  );
+                }
+            ),
+          ),
+        );
+      }
+    );
+  }
+
+  void _openAziendeDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Seleziona azienda emettitrice'.toUpperCase()),
+          content: Container(
+            // Limitiamo l'altezza del dialogo per evitare che cresca troppo
+            height: 300,
+            width: 390,
+            child: ListView.builder(
+              itemCount: allAziende.length,
+              itemBuilder: (BuildContext context, int index) {
+                final azienda = allAziende[index];
+                return ListTile(
+                  title: Text(azienda.nome!),
+                  onTap: () {
+                    setState(() {
+                      selectedAzienda = azienda;
+                      _aziendaController.text = azienda.nome!;
+                      _indirizzoAziendaController.text = azienda.sede_legale!;
+                      _conTelefonoAzienda.text = azienda.telefono!;
+                      _conPIvaAzienda.text = azienda.partita_iva!;
+                      _cittaAlboProvincialeController.text = azienda.citta_albo!;
+                      _cittaRegistroDittaController.text = azienda.citta_rea!;
+                      _codRegistroDittaController.text = "${azienda.citta_rea!.substring(0,2)} - ${azienda.numero_rea}";
+                      _codAlboProvincialeController.text = "${azienda.citta_albo!.substring(0,2)} - ${azienda.numero_albo != null ? azienda.numero_albo : ''}";
+                    });
+                    Navigator.of(context).pop(); // Chiude il dialogo
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -67,6 +163,33 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
         centerTitle: true,
         backgroundColor: Colors.red,
         title: Text('Compilazione certificazione impianto', style: TextStyle(color: Colors.white)),
+      ),
+      floatingActionButton: Stack(
+        children: [
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: SpeedDial(
+              animatedIcon: AnimatedIcons.menu_close,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              children: [
+                SpeedDialChild(
+                  child: Icon(Icons.warehouse_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Seleziona azienda'.toUpperCase(),
+                  onTap: () => _openAziendeDialog(),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.build, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Seleziona tipologia'.toUpperCase(),
+                  onTap: () => _openTipologiaDialog(),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
       body: Form(
         child: Stack(
@@ -274,10 +397,10 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
                                     text: ' iscritta nel registro delle ditte (DPR 07/12/1995, n 581) della camera C.I.A.A. di ',
                                   ),
                                   WidgetSpan(child: ConstrainedBox(
-                                    constraints: BoxConstraints(minWidth: 150),
+                                    constraints: BoxConstraints(minWidth: 100),
                                     child: IntrinsicWidth(
                                       child: getTextFormFieldSmall(
-                                        width: 150,
+                                        width: 100,
                                         controller: _cittaRegistroDittaController,
                                         inputType: TextInputType.text,
                                         hintName: 'Città registro ditta *',
@@ -870,7 +993,7 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
                           Text('Allegati facoltativi: (12)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                           SizedBox(height: 15),
                           Container(
-                            width: 900,
+                            width: 1200,
                             height: 2,
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.black)
@@ -886,7 +1009,133 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
                             style: TextStyle(fontSize: 17),
                             'Ogni responsabilità per sinistri a persone o a cose derivanti da manomissione dell\'impianto da parte di terzi \n'
                                 'ovvero da carenza di manutenzione o riparazione.'
-                          )
+                          ),
+                          SizedBox(height: 10),
+                          SizedBox(
+                            height: 150,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  child: Row(
+                                      children:[
+                                        RichText(
+                                            text: TextSpan(
+                                                children: <InlineSpan>[
+                                                  TextSpan(
+                                                      style: TextStyle(color: Colors.black, fontSize: 17),
+                                                      text: 'Data '
+                                                  ),
+                                                  WidgetSpan(child: ConstrainedBox(
+                                                    constraints: BoxConstraints(minWidth: 80),
+                                                    child: IntrinsicWidth(
+                                                      child: getTextFormFieldSmall(
+                                                        width: 80,
+                                                        controller: _dataController,
+                                                        inputType: TextInputType.text,
+                                                        hintName: 'Data *',
+                                                      ),
+                                                    ),
+                                                  )),
+                                                ]
+                                            )
+                                        )
+                                      ]
+                                  ),
+                                ),
+                                //fine data
+                                //inizo box con firma
+                                Container(
+                                  width: 280,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black, width: 1
+                                    )
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(height: 10),
+                                      Text('Il responsabile tecnico', style: TextStyle(fontSize: 15)),
+                                      Text('(Firma leggibile)(13)', style: TextStyle(fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                                //Fine container firma responsabile tecnico
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 14),
+                                    Text('Il dichiarante', style: TextStyle(fontSize: 15)),
+                                    Text('Timbro e Firma leggibile', style: TextStyle(fontSize: 12)),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          RichText(
+                              text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.bold),
+                                        text: 'AVVERTENZE PER IL COMMITTENTE:  '
+                                    ),
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 14),
+                                        text: 'il committente o proprietario è tenuto ad affidare i lavori di installazione, di trasformazione, \n'
+                                            'di ampliamento e di manutenzione degli impianti ad imprese abilitate'
+                                    ),
+                                  ]
+                              )
+                          ),
+                          SizedBox(height: 2),
+                          RichText(
+                              text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 15),
+                                        text: 'il sottoscritto (14) '
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 190),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 190,
+                                          controller: _sottoscrittoController,
+                                          inputType: TextInputType.text,
+                                          hintName: 'Sottoscritto *',
+                                        ),
+                                      ),
+                                    )),
+                                  ]
+                              )
+                          ),
+                          RichText(
+                              text: TextSpan(
+                                  children: <InlineSpan>[
+                                    TextSpan(
+                                        style: TextStyle(color: Colors.black, fontSize: 15),
+                                        text: 'committente dei lavori, dichiara di aver ricevuto copia della presente, corredata dagli allegati indicati in data(15) '
+                                    ),
+                                    WidgetSpan(child: ConstrainedBox(
+                                      constraints: BoxConstraints(minWidth: 100),
+                                      child: IntrinsicWidth(
+                                        child: getTextFormFieldSmall(
+                                          width: 100,
+                                          controller: _dataController,
+                                          inputType: TextInputType.text,
+                                          hintName: 'data *',
+                                        ),
+                                      ),
+                                    )),
+                                  ]
+                              )
+                          ),
                         ],
                       ),
                     )

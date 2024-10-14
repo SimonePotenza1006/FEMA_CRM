@@ -165,7 +165,6 @@ class _LoginFormState extends State<LoginForm> {
       //idd = windowsInfo.deviceId.toString();
       platform='windows';
       print('Running on '
-      //  '${androidInfo.model.toString()} ${androidInfo.id.toString()} '
           '${windowsInfo.computerName.toString()} ${windowsInfo.deviceId.toString()}'
       );
     } else if (Platform.isAndroid) {
@@ -175,11 +174,9 @@ class _LoginFormState extends State<LoginForm> {
       platform='android';
       print('Running on '
           '${androidInfo.model.toString()} ${androidInfo.serialNumber.toString()} '
-
       );
     }
     if (dispositivi.contains(idd)) {print('okok');} else {
-
       DeviceModel uModel = DeviceModel('', idd);
       await insertLicenza(uModel);
 
@@ -208,15 +205,12 @@ class _LoginFormState extends State<LoginForm> {
               //autovalidateMode: AutovalidateMode.onUserInteraction,
               child:
               Column(
-                //scrollDirection: Axis.vertical,
-                //direction: Axis.vertical,
                   children: [
                     TextFormField(
                       controller: _conLicenza,
                       obscureText: false,
                       enabled: true,
-                      //autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) //=> value!.length ==0 ? '' : null,
+                      validator: (value)
                       {
                         print("jytg? 22");
 

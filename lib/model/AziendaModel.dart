@@ -9,6 +9,10 @@ class AziendaModel {
   String? email;
   String? telefono;
   String? sito;
+  String? citta_albo;
+  String? citta_rea;
+  String? numero_albo;
+  String? numero_rea;
 
   AziendaModel(
       this.id,
@@ -20,7 +24,11 @@ class AziendaModel {
       this.recapito_fatturazione_elettronica,
       this.email,
       this.telefono,
-      this.sito
+      this.sito,
+      this.citta_albo,
+      this.citta_rea,
+      this.numero_albo,
+      this.numero_rea,
       );
 
   Map<String, dynamic> toMap(){
@@ -34,7 +42,11 @@ class AziendaModel {
       'recapito_fatturazione_elettronica': recapito_fatturazione_elettronica,
       'email': email,
       'telefono' : telefono,
-      'sito': sito
+      'sito': sito,
+      'citta_albo': citta_albo,
+      'citta_rea': citta_rea,
+      'numero_albo':numero_albo,
+      'numero_rea':numero_rea,
     };
     return map;
   }
@@ -50,6 +62,10 @@ class AziendaModel {
     email = map['email'];
     telefono = map['telefono'];
     sito = map['sito'];
+    citta_albo = map['citta_albo'];
+    citta_rea = map['citta_rea'];
+    numero_albo = map['numero_albo'];
+    numero_rea = map['numero_rea'];
   }
 
   Map<String, dynamic> toJson() => {
@@ -63,6 +79,10 @@ class AziendaModel {
     'email': email,
     'telefono' : telefono,
     'sito' : sito,
+    'citta_albo' : citta_albo,
+    'citta_rea' : citta_rea,
+    'numero_albo' : numero_albo,
+    'numero_rea' : numero_rea,
   };
 
   factory AziendaModel.fromJson(Map<String, dynamic> json){
@@ -76,7 +96,11 @@ class AziendaModel {
       json['recapito_fatturazione_elettronica']?.toString(),
       json['email']?.toString(),
       json['telefono']?.toString(),
-      json['sito']?.toString()
+      json['sito']?.toString(),
+      json['citta_albo']?.toString(),
+      json['citta_rea']?.toString(),
+      json['numero_albo']?.toString(),
+      json['numero_rea']?.toString(),
     );
   }
 }

@@ -21,6 +21,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/cupertino.dart';
 
 
+import '../model/AziendaModel.dart';
 import '../model/DeviceModel.dart';
 import '../model/LicenzaModel.dart';
 import '../model/OrdinePerInterventoModel.dart';
@@ -50,7 +51,6 @@ class DbHelper{
           .get(Uri.parse('$ipaddress/api/device'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
-
         print(responseData.toString());
         //Creating a list to store input data;
         List<String> ruoli = [];
@@ -167,6 +167,8 @@ class DbHelper{
     }
     return response;
   }
+
+
 
   Future<List<String>> getAllLicenze() async {
     try{
@@ -327,9 +329,23 @@ class DbHelper{
     }
   }
 
-  // Future<List<RestituzioneMerceModel>> getAllRestituzioni() async{
-  //
-  // }
+  Future<List<AziendaModel>> getAllAziende() async{
+    try{
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/azienda'));
+      var responseData = json.decode(response.body);
+      if(response.statusCode == 200){
+        List<AziendaModel> allAziende = [];
+        for(var azieda in responseData){
+          allAziende.add(AziendaModel.fromJson(azieda));
+        }
+        return allAziende;
+      }
+      return [];
+    } catch(e){
+      print('Errore nel buttare giù le aziende: $e');
+      return [];
+    }
+  }
 
   Future<List<TipologiaInterventoModel>> getAllTipologieIntervento() async{
     try{
