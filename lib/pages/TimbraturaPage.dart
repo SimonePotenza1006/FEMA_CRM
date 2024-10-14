@@ -120,6 +120,11 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       }
     } catch (e) {
       print('Errore durante la chiamata API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
       return null; // Ritorna null in caso di errore
     }
   }
@@ -305,6 +310,21 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
           ),
           centerTitle: true,
           backgroundColor: Colors.red,
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => TimbraturaPage(utente: widget.utente)),
+                );
+                //setState(() {});//getAllMarcatempo();
+              },
+            ),
+          ]
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -625,6 +645,11 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
         );
       } catch (e) {
         print('Errore durante il salvataggio del marcatempo: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Problemi di rete. Riprova più tardi'),
+          ),
+        );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -674,6 +699,11 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
   }
 
@@ -715,6 +745,11 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
   }
 
@@ -755,6 +790,11 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       }
     } catch (e) {
       print('Errore durante il recupero dei marcatempo: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
   }
 
@@ -801,6 +841,11 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       }
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Problemi di rete. Riprova più tardi'),
+        ),
+      );
     }
   }
 }

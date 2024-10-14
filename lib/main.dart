@@ -155,47 +155,76 @@ class _LoginFormState extends State<LoginForm> {
     (udid != null) ? print('nuovo id '+  udid!) : print('nuovo id null');
   }
 
-  Future<void> getUserData() async {
+  Future<void> getDev() async {
     dispositivi=await dbHelper.getAllDevice();
+  }
+
+  Future<void> getUserData() async {
+    //dispositivi=await dbHelper.getAllDevice();
+
+    getDev().whenComplete(() async {
 
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isWindows) {
       print('windows');
       WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
       //idd = windowsInfo.deviceId.toString();
-      platform='windows';
+      platform = 'windows';
       print('Running on '
       //  '${androidInfo.model.toString()} ${androidInfo.id.toString()} '
-          '${windowsInfo.computerName.toString()} ${windowsInfo.deviceId.toString()}'
+          '${windowsInfo.computerName.toString()} ${windowsInfo.deviceId
+          .toString()}'
       );
     } else if (Platform.isAndroid) {
       print('android');
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       //idd= androidInfo.id.toString();
-      platform='android';
+      platform = 'android';
       print('Running on '
-          '${androidInfo.model.toString()} ${androidInfo.serialNumber.toString()} '
+          '${androidInfo.model.toString()} ${androidInfo.serialNumber
+          .toString()} '
 
       );
     }
-    if (dispositivi.contains(idd)) {print('okok');} else {
-
-      DeviceModel uModel = DeviceModel('', idd);
-      await insertLicenza(uModel);
-
-    }
+    /*if (dispositivi.contains(idd)) {
+      print('okok');
+    } else {*/
+      //DeviceModel uModel = DeviceModel('', idd);
+      await insertLicenza();
+    //}
 
 
     SharedPreferences sp = await _pref;
 
     setState(() {
-      idd=idd;
+      idd = idd;
     });
+  });
   }
 
-  Future<bool> insertLicenza(DeviceModel device) async {
+  Future<void> insertLicenza() async {
     //bool licenzaerrata = false;
     //licenze=await dbHelper.getAllLicenze();
+    if (dispositivi.isEmpty) {
+      return (await showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => AlertDialog(
+              title: new Text('Errore di rete', style: TextStyle(fontWeight: FontWeight.w600),),
+              content: new Text("Siamo spiacenti ma al momento non è possibile utilizzare l\'applicazione in quanto sono presenti dei problemi di rete. "
+                  "Riprova più tardi"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () { exit(0); }, //<-- SEE HERE
+                  child: new Text('OK', style: TextStyle(fontWeight: FontWeight.w600),),
+                )
+              ]
+          ))
+      );
+    } else
+    if (dispositivi.contains(idd)) return;
+    //Navigator.of(context).pop(false);
+    else {
     return (await showDialog(
       barrierDismissible: false,
       context: context,
@@ -290,8 +319,7 @@ class _LoginFormState extends State<LoginForm> {
 
         ],
       ),
-    )) ??
-        false;
+    ));} //?? false;
   }
 
   resetLicenza(){
