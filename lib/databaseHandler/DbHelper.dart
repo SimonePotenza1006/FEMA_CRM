@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fema_crm/model/RestituzioneMerceModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -325,6 +326,10 @@ class DbHelper{
       return;
     }
   }
+
+  // Future<List<RestituzioneMerceModel>> getAllRestituzioni() async{
+  //
+  // }
 
   Future<List<TipologiaInterventoModel>> getAllTipologieIntervento() async{
     try{
