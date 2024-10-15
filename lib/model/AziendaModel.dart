@@ -13,6 +13,7 @@ class AziendaModel {
   String? citta_rea;
   String? numero_albo;
   String? numero_rea;
+  
 
   AziendaModel(
       this.id,

@@ -442,7 +442,7 @@ class _CompilazioneRapportinoPageState
           'firma_cliente': signatureBytes,
           'utente': widget.intervento.utente?.toMap(),
           'cliente': widget.intervento.cliente?.toMap(),
-          'veicolo': selectedVeicolo?.toMap(),
+          'veicolo': selectedVeicolo != null ? selectedVeicolo?.toMap() : null,
           'merce': widget.intervento.merce?.toMap(),
           'tipologia': widget.intervento.tipologia,
           'categoria': widget.intervento.categoria_intervento_specifico,

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -363,9 +364,13 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                           },
                         );
                         checkScadenze().whenComplete(() async {
-                          await saveImmagine();
-                          Navigator.pop(context);
-                          Navigator.pop(context);
+                          await saveImmagine().whenComplete(() => 
+                              Navigator.pushReplacement(
+                              context,
+                                MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente))
+                            )
+                          );
+                          
                         });
                       }
                     }

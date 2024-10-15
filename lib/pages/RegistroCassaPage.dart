@@ -43,6 +43,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   final TextEditingController _pagamentoController = TextEditingController();
   final TextEditingController _prelievoController = TextEditingController();
   final TextEditingController  _descrizioneUscitaController = TextEditingController();
+  final TextEditingController _causaleVersamentoController = TextEditingController();
 
 
 
@@ -694,12 +695,25 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('INSERISCI L\'IMPORTO DEL VERSAMENTO'),
+          title: Text('INSERISCI L\'IMPORTO DEL VERSAMENTO E LA CAUSALE'),
           content: Form( // Avvolgi tutto dentro un Form
             key: _formKeyVersamento,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                TextFormField(
+                  controller: _causaleVersamentoController,
+                  decoration: InputDecoration(
+                    labelText: 'Causale versamento'.toUpperCase(),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) { // Aggiungi validatore
+                    if (value == null || value.isEmpty) {
+                      return 'Inserisci una causale valida';
+                    }
+                  },
+                ),
+                SizedBox(height: 5),
                 TextFormField(
                   controller: _versamentoController,
                   decoration: InputDecoration(
@@ -822,7 +836,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
-          'descrizione': "Versamento del ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}".toUpperCase(),
+          'descrizione': _causaleVersamentoController.text,
           'tipo_movimentazione': "Versamento",
           'importo': double.parse(_versamentoController.text.toString()),
           'utente': widget.userData.toMap()
