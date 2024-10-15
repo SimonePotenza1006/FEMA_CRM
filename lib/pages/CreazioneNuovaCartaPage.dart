@@ -67,7 +67,6 @@ class _CreazioneNuovaCartaPageState extends State<CreazioneNuovaCartaPage>{
                         }).toList(),
                   ),
                 ),
-
                 SizedBox(height: 50),
                 Container(
                   alignment: Alignment.center,

@@ -1,4 +1,5 @@
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/CertificazioneImpiantoPdfPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
@@ -163,6 +164,71 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
         centerTitle: true,
         backgroundColor: Colors.red,
         title: Text('Compilazione certificazione impianto', style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context)=> CertificazioneImpiantoPdfPage(
+                        protocollo : _protocolloController.text,
+                        azienda: _aziendaController.text,
+                        tipologia : _tipologiaController.text,
+                        indirizzo_azienda: _indirizzoAziendaController.text,
+                        telefono_azienda: _conTelefonoAzienda.text,
+                        p_iva_azienda: _conPIvaAzienda.text,
+                        citta_registro_ditta: _cittaRegistroDittaController.text,
+                        cod_registro_ditta: _codRegistroDittaController.text,
+                        citta_albo: _cittaAlboProvincialeController.text,
+                        cod_albo: _codAlboProvincialeController.text,
+                        impianto: _descrizioneImpiantoController.text,
+                        altro: _altroController.text,
+                        denom_cliente: _denominazioneClienteController.text,
+                        comune_cliente: _comuneClienteController.text,
+                        provincia_cliente: _provinciaClienteController.text,
+                        via_cliente: _viaClienteController.text,
+                        numero_cliente: _numeroClienteController.text,
+                        scala_cliente: _scalaClienteController.text,
+                        piano_cliente: _pianoClienteController.text,
+                        interno_cliente: _internoClienteController.text,
+                        proprieta_cliente: _proprietaClienteController.text,
+                        progettista: _progettistaController.text,
+                        albo_progettista: _alboProgettistaController.text,
+                        responsabile_tecnico: _responsabileTecnicoImpresaController.text,
+                        norma: _normaController.text,
+                        data: _dataController.text,
+                        sottoscritto: _sottoscrittoController.text,
+                        iscrizione_registro: iscrizioneRegistroDitte,
+                        iscrizione_albo: iscrizioneAlboProvinciale,
+                        nuovo_impianto: nuovoImpianto,
+                        trasformazione: trasformazione,
+                        ampliamento: ampliamento,
+                        manutenzione: manutenzioneStraordinaria,
+                        bool_altro: altro,
+                        industriale: industriale,
+                        civile: civile,
+                        commercio: commercio,
+                        altri_usi: altriUsi,
+                        bool_progettista: progettista,
+                        bool_responsabile: responsabileTecnicoImpresa,
+                        bool_norma: checkNorma,
+                        installazione: installazioneComponenti,
+                        controllo: controlloImpianto,
+                        verifica: verificaImpianto,
+                        progetto: progetto,
+                        relazione: relazione,
+                        schema: schema,
+                        riferimento: riferimento,
+                        visura: visura,
+                        conformita: conformita,
+                    ))
+              );
+            },
+            child: Text(
+              'Genera Pdf', style : TextStyle(color : Colors.white,fontSize: 17),
+            ),
+          )
+        ],
       ),
       floatingActionButton: Stack(
         children: [

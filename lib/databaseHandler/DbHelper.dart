@@ -43,6 +43,72 @@ class DbHelper{
   List<TipologiaInterventoModel> allTipologie = [];
   List<UtenteModel> allUtenti = [];
 
+
+  Future<void> uploadCertificazioneImpianto(
+      String uploadImage,
+      io.File? uploadImageF,
+      String clienteNome
+      ) async {
+    final directory = await getApplicationSupportDirectory();
+    String path = directory.path;
+    io.File? fileD = uploadImageF;
+
+    if (!fileD!.existsSync()) {
+      throw Exception("File does not exist");
+    }
+
+    int retryCount = 0;
+    int maxRetry = 3;
+
+    // Ciclo di retry per tentare l'upload
+    while (retryCount < maxRetry) {
+      try {
+        // Ricrea un nuovo MultipartRequest ad ogni tentativo
+        var postUri = Uri.parse('$ipaddress/pdfu/certificazioni/clienti'); // Endpoint corretto
+        http.MultipartRequest request = http.MultipartRequest('POST', postUri);
+
+        // Leggi il file come bytes
+        List<int> fileBytes = await fileD.readAsBytes();
+        http.MultipartFile multipartFile = http.MultipartFile.fromBytes(
+          'pdf',
+          fileBytes,
+          filename: basename(uploadImage),
+        );
+        request.files.add(multipartFile);
+
+        // Formatta il nome del cliente e invialo come campo del form
+        String formattedNomeCliente = clienteNome.replaceAll(' ', '').toUpperCase();
+        request.fields['cliente'] = formattedNomeCliente; // Nome campo corretto
+
+        Map<String, String> headers = {
+          "Content-Type": "multipart/form-data"
+        };
+        request.headers.addAll(headers);
+
+        // Invia la richiesta
+        var res = await request.send();
+
+        // Controlla se l'upload è andato a buon fine
+        if (res.statusCode == 200) {
+          print('Upload completato con successo');
+          break;
+        } else {
+          retryCount++;
+          if (retryCount == maxRetry) {
+            throw Exception('Errore: Impossibile caricare il file dopo $retryCount tentativi.');
+          }
+        }
+      } catch (e) {
+        retryCount++;
+        if (retryCount == maxRetry) {
+          throw Exception("Upload fallito dopo $maxRetry tentativi: $e");
+        }
+      }
+    }
+  }
+
+
+
   Future<List<String>> getAllDevice() async {
     print("gelalldevice");
     try{
