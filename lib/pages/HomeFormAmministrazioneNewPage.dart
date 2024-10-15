@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/CreazioneRMAPage.dart';
 import 'package:fema_crm/pages/MenuInterventiPage.dart';
 import 'package:fema_crm/pages/TableAccessiApplicazionePage.dart';
 import 'package:fema_crm/pages/TableMagazzinoPage.dart';
@@ -44,6 +45,7 @@ import 'ListaUtentiPage.dart';
 import 'ParentFolderPage.dart';
 import 'RegistroCassaPage.dart';
 import 'StoricoMerciUtentiPage.dart';
+import 'TableRMAPage.dart';
 
 class HomeFormAmministrazioneNewPage extends StatefulWidget {
   final UtenteModel userData;
@@ -887,6 +889,24 @@ class _HomeFormAmministrazioneNewPageState
                         );
                       },
                     ),
+                  ListTile(
+                    title: Text('Lista RMA', style: TextStyle(color: Colors.white)),
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TableRMAPage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Aggiungi RMA', style: TextStyle(color: Colors.white)),
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CreazioneRMAPage()),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
