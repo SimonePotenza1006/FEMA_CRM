@@ -30,7 +30,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   List<UtenteModel> allUtenti = [];
   InterventoModel? interventoAssociato;
-
+  DateTime _dataOdierna = DateTime.now();
   UtenteModel? selectedUtente;
   Future<List<Uint8List>>? _futureImages;
   final _formKeyConclusione = GlobalKey<FormState>();
@@ -40,6 +40,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   final TextEditingController  _prodottiController = TextEditingController();
   final TextEditingController difettoController = TextEditingController();
   bool modificaDifettoVisible = false;
+  DateTime? selectedDateRicon = null;
 
   /*Future<http.Response?> getIntervento() async {
     try {
@@ -113,13 +114,14 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   @override
   void initState() {
     super.initState();
+    difettoController.text = widget.merce.difetto_riscontrato!;
     _futureImages = fetchImages();
     importoPreventivatoController = TextEditingController(text: '');//widget.merce.importo_preventivato.toString());
   }
 
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
-    bool isValueTooLong = value.length > 25;
-    String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+    bool isValueTooLong = value.length > 20;
+    String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
     return SizedBox(
       width: 500,
       child: Padding(
@@ -287,6 +289,21 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
     }
   }
 
+  Future<void> _selezionaDataRicon() async {
+    final DateTime? dataSelezionata = await showDatePicker(
+      locale: const Locale('it', 'IT'),
+      context: context,
+      initialDate: widget.merce.data_riconsegna == null ? _dataOdierna : widget.merce.data_riconsegna,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
+      setState(() {
+        selectedDateRicon = dataSelezionata;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -319,7 +336,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                           children: [
                             Text('Info merce RMA'.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
                             SizedBox(height: 10.0),
-                            buildInfoRow(title: 'ID MERCE', value: widget.merce.id!, context: context),
+                            buildInfoRow(title: 'ID MERCE RMA', value: widget.merce.id!, context: context),
                             SizedBox(height: 10.0),
                             /*buildInterventoRow(title: "Intervento", valueWidget: GestureDetector(
                               onTap: () {
@@ -452,9 +469,97 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                             SizedBox(height: 10.0),
                             buildInfoRow(title: 'fornitore', value: widget.merce.fornitore!.denominazione!, context: context),
                             SizedBox(height: 10.0),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child:
+                                  buildInfoRow(
+                                      title: "data riconsegna",
+                                      value: selectedDateRicon != null ? DateFormat('dd/MM/yyyy').format(selectedDateRicon!) : 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    _selezionaDataRicon();
+                                    /*setState(() {
+                                      modificaDifettoVisible = !modificaDifettoVisible;
+                                    });*/
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: 15),
+                            /*if(modificaDifettoVisible)
+                              SizedBox(
+                                  width: 500,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 300,
+                                        child: TextFormField(
+                                          maxLines: null,
+                                          controller: difettoController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Difetto riscontrato',
+                                            hintText: 'Aggiungi difetto',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 170,
+                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                        decoration: BoxDecoration(
+                                          // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                        ),
+                                        child: FloatingActionButton(
+                                          heroTag: "Tag2",
+                                          onPressed: () {
+                                            if(difettoController.text.isNotEmpty){
+                                              modificaDescrizione();
+                                            } else {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('Non è possibile salvare un difetto nullo!'),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          backgroundColor: Colors.red,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                                child: Text(
+                                                  'Modifica Difetto'.toUpperCase(),
+                                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                                  textAlign: TextAlign.center, // Centra il testo
+                                                  softWrap: true, // Permette al testo di andare a capo
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),*/
                             buildInfoRow(title: "data riconsegna", value: (widget.merce.data_riconsegna != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_riconsegna!) : "N/A"), context: context),
                             SizedBox(height: 10.0),
-                            buildInfoRow(title: "utente Riconsegna", value: widget.merce.utenteRiconsegna!.nome!+' '+widget.merce.utenteRiconsegna!.cognome!, context: context),
+                            buildInfoRow(title: "utente Riconsegna", value: widget.merce.utenteRiconsegna != null ? widget.merce.utenteRiconsegna!.nome!+' '+widget.merce.utenteRiconsegna!.cognome! : 'N/A', context: context),
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "rimborso", value: widget.merce.rimborso != null ? (widget.merce.rimborso != true ? "NO" : "SI"): "N/A", context: context),
                             SizedBox(height: 10.0),
@@ -462,10 +567,55 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "data rientro ufficio", value: (widget.merce.data_rientro_ufficio != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_rientro_ufficio!) : "N/A"), context: context),
                             SizedBox(height: 10.0),
-                            buildInfoRow(title: "utente Ritiro", value: widget.merce.utenteRitiro!.nome!+' '+widget.merce.utenteRitiro!.cognome!, context: context),
+                            buildInfoRow(title: "utente Ritiro", value: widget.merce.utenteRitiro != null ? widget.merce.utenteRitiro!.nome!+' '+widget.merce.utenteRitiro!.cognome! : 'N/A', context: context),
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "concluso", value: widget.merce.concluso != null ? (widget.merce.concluso != true ? "NO" : "SI"): "N/A", context: context),
-
+                            Container(
+                              child: SizedBox(
+                                width: 400,
+                                child: FutureBuilder<List<Uint8List>>(
+                                  future: _futureImages,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return Wrap(
+                                        spacing: 16,
+                                        runSpacing: 16,
+                                        children: snapshot.data!.map((imageData) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => PhotoViewPage(
+                                                    images: snapshot.data!,
+                                                    initialIndex: snapshot.data!.indexOf(imageData),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              width: 150, // aumenta la larghezza del container
+                                              height: 170, // aumenta l'altezza del container
+                                              decoration: BoxDecoration(
+                                                border: Border.all(width: 1), // aggiungi bordo al container
+                                              ),
+                                              child: Image.memory(
+                                                imageData,
+                                                fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text('Nessuna foto presente nel database!');
+                                    } else {
+                                      return Center(child: CircularProgressIndicator());
+                                    }
+                                  },
+                                ),
+                              ),
+                            )
                             /*buildInfoRow(title: "Richiesta preventivo", value: widget.merce.preventivo != null ? (widget.merce.preventivo != true ? "NO" : "SI"): "N/A", context: context),
                             if (widget.merce.preventivo != null && widget.merce.preventivo == true)
                               buildInfoRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito", context: context),
@@ -538,53 +688,8 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                         ],
                       ),
                     ),*/
-                    SizedBox(width: 10,),
-                    Container(
-                      child: SizedBox(
-                        width: 400,
-                        child: FutureBuilder<List<Uint8List>>(
-                          future: _futureImages,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return Wrap(
-                                spacing: 16,
-                                runSpacing: 16,
-                                children: snapshot.data!.map((imageData) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => PhotoViewPage(
-                                            images: snapshot.data!,
-                                            initialIndex: snapshot.data!.indexOf(imageData),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      width: 150, // aumenta la larghezza del container
-                                      height: 170, // aumenta l'altezza del container
-                                      decoration: BoxDecoration(
-                                        border: Border.all(width: 1), // aggiungi bordo al container
-                                      ),
-                                      child: Image.memory(
-                                        imageData,
-                                        fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Text('Nessuna foto presente nel database!');
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          },
-                        ),
-                      ),
-                    )
+                    //SizedBox(width: 10,),
+
                   ],
                 ),
                 SizedBox(height: 20),

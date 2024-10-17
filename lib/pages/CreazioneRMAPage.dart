@@ -36,8 +36,11 @@ class _CreazioneRMAPageState
   List<TipologiaInterventoModel> allTipologie = [];
   DateTime _dataOdierna = DateTime.now();
   DateTime? selectedDate = null;
+  DateTime? selectedDateRicon = null;
+  DateTime? selectedDateRitiro = null;
   String _descrizione = '';
   String _difetto = '';
+  String _prodotto = '';
   ClienteModel? selectedCliente;
   FornitoreModel? selectedFornitore;
   UtenteModel? selectedUtenteRiconsegna;
@@ -51,13 +54,21 @@ class _CreazioneRMAPageState
   List<CategoriaInterventoSpecificoModel> allCategorieByTipologia = [];
   TextEditingController _descrizioneController = TextEditingController();
   TextEditingController _difettoController = TextEditingController();
+  TextEditingController _prodottoController = TextEditingController();
   TipologiaInterventoModel? _selectedTipologia;
   List<UtenteModel> allUtenti = [];
   List<UtenteModel> allCapogruppi = [];
   UtenteModel? _selectedUtente;
   UtenteModel? responsabile;
+  UtenteModel? utenteRitiro;
   UtenteModel? _responsabileSelezionato;
   List<UtenteModel?>? _selectedUtenti = [];
+  bool _rimborso = false;
+  final TextEditingController _rimborsoController = TextEditingController();
+  bool _cambio = false;
+  final TextEditingController _cambioController = TextEditingController();
+  bool _concluso = false;
+  final TextEditingController _conclusoController = TextEditingController();
 
   List<UtenteModel?>? _finalSelectedUtenti = [];
   bool isSelected = false;
@@ -91,6 +102,36 @@ class _CreazioneRMAPageState
     if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
       setState(() {
         selectedDate = dataSelezionata;
+      });
+    }
+  }
+
+  Future<void> _selezionaDataRicon() async {
+    final DateTime? dataSelezionata = await showDatePicker(
+      locale: const Locale('it', 'IT'),
+      context: context,
+      initialDate: _dataOdierna,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
+      setState(() {
+        selectedDateRicon = dataSelezionata;
+      });
+    }
+  }
+
+  Future<void> _selezionaDataRientro() async {
+    final DateTime? dataSelezionata = await showDatePicker(
+      locale: const Locale('it', 'IT'),
+      context: context,
+      initialDate: _dataOdierna,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
+      setState(() {
+        selectedDateRitiro = dataSelezionata;
       });
     }
   }
@@ -202,70 +243,22 @@ class _CreazioneRMAPageState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        //const SizedBox(height: 20.0),
                         SizedBox(
-                          width: 200,
-                          child: ElevatedButton(
-                            onPressed: _selezionaData,
-                            style: ElevatedButton.styleFrom(primary: Colors.red),
-                            child: const Text('SELEZIONA DATA ACQUISTO', style: TextStyle(color: Colors.white)),
+                          width: 400,
+                          child: TextFormField(
+                            controller: _prodottoController,
+                            maxLines: null,
+                            decoration:  InputDecoration(labelText: 'Prodotto'.toUpperCase()),
+                            onChanged: (value) {
+                              setState(() {
+                                _prodotto = value;
+                              });
+                            },
                           ),
                         ),
-                        if(selectedDate != null)
-                          Text('${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
-                        const SizedBox(height: 20.0),
-                        /*Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Checkbox(
-                              value: _orarioDisponibile,
-                              onChanged: (value) {
-                                setState(() {
-                                  _orarioDisponibile = value ?? false;
-                                });
-                              },
-                            ),
-                            Text("è disponibile un orario per l'appuntamento".toUpperCase()),
-                          ],
-                        ),
-                        if (_orarioDisponibile)
-                          Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 12),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    _selectTime(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.red, // Colore di sfondo rosso
-                                    onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
-                                  ),
-                                  child: Text('Seleziona Orario'.toUpperCase()),
-                                ),
-                                SizedBox(height: 12),
-                                Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}'.toUpperCase())
-                              ],
-                            ),
-                          ),*/
-                        SizedBox(height: 15),
-                        DropdownButton<TipologiaInterventoModel>(
-                          value: _selectedTipologia,
-                          hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
-                          onChanged: (TipologiaInterventoModel? newValue) {
-                            setState(() {
-                              _selectedTipologia = newValue;
-                            });
-                          },
-                          items: allTipologie
-                              .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                                (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                              value: value,
-                              child: Text(value.descrizione!),
-                            ),
-                          ).toList(),
-                        ),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 30.0),
+
                         SizedBox(
                           width: 600,
                           child: TextFormField(
@@ -279,12 +272,30 @@ class _CreazioneRMAPageState
                             },
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: _selezionaData,
+                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            child: const Text('DATA ACQUISTO', style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        if(selectedDate != null)
+                          Text('${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}', style: TextStyle(fontSize: 17),),
+                        const SizedBox(height: 18.0),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 200,
+                              child: Container(padding: EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.grey[300]!),
+                                ),
+                              width: 245,
                               child: GestureDetector(
                                 onTap: () {
                                   _showFornitoriDialog();
@@ -295,8 +306,8 @@ class _CreazioneRMAPageState
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        (selectedFornitore?.denominazione != null && selectedFornitore!.denominazione!.length > 15)
-                                            ? '${selectedFornitore!.denominazione?.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                        (selectedFornitore?.denominazione != null && selectedFornitore!.denominazione!.length > 18)
+                                            ? '${selectedFornitore!.denominazione?.substring(0, 18)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
                                             : (selectedFornitore?.denominazione ?? 'Seleziona Fornitore').toUpperCase(),  // Testo di fallback
                                         style: const TextStyle(fontSize: 16),
                                       ),
@@ -305,89 +316,11 @@ class _CreazioneRMAPageState
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 20),
-                            /*SizedBox(
-                              width: 200,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          CreazioneClientePage(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                  onPrimary: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                                ),
-                                child: Text('Crea nuovo cliente'.toUpperCase()),
                               ),
-                            ),*/
+                            ),
+
                           ],
                         ),
-
-
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 240,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _showDestinazioniDialog();
-                                },
-                                child: SizedBox(
-                                  height: 50,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        (selectedDestinazione?.denominazione != null && selectedDestinazione!.denominazione!.length > 15)
-                                            ? '${selectedDestinazione!.denominazione!.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                                            : (selectedDestinazione?.denominazione ?? 'Seleziona Destinazione').toUpperCase(),  // Testo di fallback
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                      const Icon(Icons.arrow_drop_down),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 20),
-
-                            SizedBox(
-                              //width: 210,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if(selectedUtenteRiconsegna != null){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            NuovaDestinazionePage(cliente: selectedCliente!),
-                                      ),
-                                    );
-                                  } else {
-                                    return _showNoClienteDialog();
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                  onPrimary: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                                ),
-                                child: Text('Crea nuova destinazione'.toUpperCase()),
-                              ),
-                            ),
-                          ],
-                        ),
-
 
                         const SizedBox(height: 20),
 
@@ -411,43 +344,147 @@ class _CreazioneRMAPageState
                                 ),
                               ),
                               child: Text(
-                                'Seleziona utente riconsegna'.toUpperCase(),
+                                'utente riconsegna'.toUpperCase(),
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                            SizedBox(height: 15),
+
                             //Text("OPPURE"),
-                            SizedBox(height: 15),
-                            /*ElevatedButton(
+                            SizedBox(height: 4),
+                            DisplayResponsabileUtentiWidget(
+                              responsabile: responsabile,
+                              selectedUtenti: _selectedUtenti,
+                              onSelectedUtentiChanged: _handleSelectedUtentiChanged,
+                            ),
+
+                          ],
+                        ),
+                        //const SizedBox(height: 40),
+                        SizedBox(
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: _selezionaDataRicon,
+                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            child: const Text('DATA RICONSEGNA', style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        if(selectedDateRicon != null)
+
+                        Text('${selectedDateRicon?.day}/${selectedDateRicon?.month}/${selectedDateRicon?.year}', style: TextStyle(fontSize: 17),),
+                        const SizedBox(height: 18.0),
+                        SizedBox(
+                          width: 200,
+                          child: CheckboxListTile(
+                            title: Text('Rimborso'),
+                            value: _rimborso,
+                            onChanged: (value) {
+                              setState(() {
+                                _rimborso = value!;
+                                if (_rimborso) {
+                                  _rimborsoController.clear();
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 15,),
+                        SizedBox(
+                          width: 200,
+                          child: CheckboxListTile(
+                            title: Text('Cambio'),
+                            value: _cambio,
+                            onChanged: (value) {
+                              setState(() {
+                                _cambio = value!;
+                                if (_cambio) {
+                                  _cambioController.clear();
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 15,),
+
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
                               onPressed: () {
                                 setState(() {
                                   _selectedUtenti = [];
-                                  responsabile = null;
+                                  utenteRitiro = null;
                                   _finalSelectedUtenti = [];
-                                  _responsabileSelezionato = null;
+                                  selectedUtenteRitiro = null;
                                 });
-                                _showUtentiDialog();
+                                _showRitiroDialog();
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: Colors.red,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(20), // Bordo squadrato
                                 ),
                               ),
                               child: Text(
-                                'Componi Squadra'.toUpperCase(),
+                                'utente ritiro'.toUpperCase(),
                                 style: TextStyle(color: Colors.white),
                               ),
-                            ),*/
+                            ),
+
+                            //Text("OPPURE"),
+                            SizedBox(height: 4),
+                            //utenteRitiro != null ? Text(utenteRitiro!.nome!) : Container(),
+                            DisplayUtenteRitiroWidget(
+                              utenteRitiro: utenteRitiro,
+                              selectedUtenti: _selectedUtenti,
+                              onSelectedUtentiChanged: _handleSelectedUtentiChanged,
+                            ),
+
                           ],
                         ),
+                        //const SizedBox(height: 40),
+                        SizedBox(
+                          width: 220,
+                          child: ElevatedButton(
+                            onPressed: _selezionaDataRientro,
+                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            child: const Text('DATA RIENTRO UFFICIO', style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        SizedBox(height: 5.0),
+                        if(selectedDateRitiro != null)
+
+                          Text('${selectedDateRitiro?.day}/${selectedDateRitiro?.month}/${selectedDateRitiro?.year}', style: TextStyle(fontSize: 17),),
+                        const SizedBox(height: 18.0),
+                        SizedBox(
+                          width: 200,
+                          child: CheckboxListTile(
+                            title: Text('Concluso'),
+                            value: _concluso,
+                            onChanged: (value) {
+                              setState(() {
+                                _concluso = value!;
+                                if (_concluso) {
+                                  _conclusoController.clear();
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 15,),
+                        ElevatedButton(
+                          onPressed: takePicture,
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.red,
+                            onPrimary: Colors.white,
+                          ),
+                          child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                        ),
+                        SizedBox(height: 15,),
+                        _buildImagePreview(),
                         // Aggiungi questo sotto il pulsante per la selezione degli utenti
                         const SizedBox(height: 20),
-                        DisplayResponsabileUtentiWidget(
-                          responsabile: responsabile,
-                          selectedUtenti: _selectedUtenti,
-                          onSelectedUtentiChanged: _handleSelectedUtentiChanged,
-                        ),
+
                         if(_selectedTipologia?.descrizione == "Riparazione Merce")
                           Center(
                             child: Column(
@@ -515,15 +552,16 @@ class _CreazioneRMAPageState
                         Padding(
                           padding: const EdgeInsets.only(bottom: 20.0),
                           child: ElevatedButton(
-                            onPressed: (selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty && _selectedTipologia != null)
+                            onPressed: (_prodotto != '' && _difetto != '' && selectedDate != null && selectedFornitore != null)
                                 ? () {
-                              if (_selectedTipologia?.descrizione == "Riparazione Merce") {
+                              /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {
                                 savePics();
                               } else if ((responsabile == null)) {
                                 _alertDialog();
-                              } else {
-                                saveRelations();
-                              }
+                              } else {*/
+                                savePics();
+                                //saveRMA();//saveRelations();
+                              //}
                             }
                                 : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
                             style: ElevatedButton.styleFrom(primary: Colors.red),
@@ -588,7 +626,7 @@ class _CreazioneRMAPageState
   }
 
   Future<http.Response?> savePics() async{
-    final data = await saveInterventoPlusMerce();
+    final data = await saveRMA();//saveInterventoPlusMerce();
     try{
       if(data == null){
         throw Exception('Dati della merce RMA non disponibili.');
@@ -756,7 +794,7 @@ class _CreazioneRMAPageState
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
-            'articolo' : _articoloController.text,
+            'prodotto' : _prodottoController.text,
             'accessori': _accessoriController.text,
             'difetto_riscontrato': _difettoController.text,
             'password' : _passwordController.text,
@@ -766,10 +804,10 @@ class _CreazioneRMAPageState
             'utente' : responsabile?.toMap()
         }),
       );
-      print("Merce salvata! : ${response.body}");
+      print("Merce RMA salvata! : ${response.body}");
       return response;
     } catch(e){
-      print('Errore durante il salvataggio dell\'intervento: $e');
+      print('Errore durante il salvataggio della merce rma: $e');
     }
     return null;
   }
@@ -785,7 +823,19 @@ class _CreazioneRMAPageState
           Uri.parse('$ipaddress/api/restituzioneMerce'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
-            'data': selectedDate?.toIso8601String(),
+            'prodotto':_prodotto,
+            'data_acquisto':selectedDate?.toIso8601String(),
+            'difetto_riscontrato':_difetto,
+            'fornitore':selectedFornitore?.toMap(),
+            'data_riconsegna':selectedDateRicon?.toIso8601String(),
+            'utenteRiconsegna': selectedUtenteRiconsegna?.toMap(),
+            'rimborso':_rimborso,//_rimborsoController.text,
+            'cambio':_cambio,//_cambioController.text,
+            'data_rientro_ufficio':selectedDateRitiro?.toIso8601String(),
+            'utenteRitiro':selectedUtenteRitiro?.toMap(),
+            'concluso':_concluso//_conclusoController.text,
+
+            /*'data': selectedDate?.toIso8601String(),
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : orario.toIso8601String(),
             'posizione_gps' : null,
@@ -808,7 +858,7 @@ class _CreazioneRMAPageState
             'tipologia': _selectedTipologia?.toMap(),
             'categoria_intervento_specifico': selectedCategoria?.toMap(),
             'tipologia_pagamento': null,
-            'destinazione': selectedDestinazione?.toMap(),
+            'destinazione': selectedDestinazione?.toMap(),*/
           }),
         );
         print("FINE PRIMO METODO: ${response.body}");
@@ -904,6 +954,7 @@ class _CreazioneRMAPageState
                               title: Text(
                                   '${forn.denominazione}, ${forn.indirizzo}'),
                               onTap: () {
+                                _aggiornaFornSelezionato(forn);
                                 setState(() {
                                   selectedFornitore = forn;
                                   //getAllDestinazioniByCliente(forn.id!);
@@ -923,6 +974,12 @@ class _CreazioneRMAPageState
         );
       },
     );
+  }
+
+  void _aggiornaFornSelezionato(FornitoreModel cliente) {
+    setState(() {
+      selectedFornitore = cliente;
+    });
   }
 
   void _showSingleUtenteDialog() {
@@ -949,6 +1006,45 @@ class _CreazioneRMAPageState
                           setState(() {
                             responsabile = utente;
                           });
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRitiroDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Seleziona un Utente', textAlign: TextAlign.center),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Lista degli utenti recuperati tramite la chiamata API
+                  Column(
+                    children: allUtenti.map((utente) {
+                      return ListTile(
+                        title: Text('${utente.nome} ${utente.cognome}'),
+                        onTap: () {
+                          // Imposta l'utente selezionato come _selectedUtente
+                          setState(() {
+                            utenteRitiro = utente;
+                          });
+                          Navigator.of(context).pop();
                         },
                       );
                     }).toList(),
@@ -1250,38 +1346,53 @@ class _DisplayResponsabileUtentiWidgetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        /*Text(
           'Utente riconsegna:'.toUpperCase(),
           style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        ),*/
         Text(
-          '${widget.responsabile?.nome ?? ''} ${widget.responsabile?.cognome ?? ''}',
+          '${widget.responsabile?.nome ?? ''} ${widget.responsabile?.cognome ?? ''}', style: TextStyle(fontSize: 17),
         ),
         SizedBox(height: 30),
-        /*Text(
-          'Utenti selezionati:'.toUpperCase(),
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 80,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: widget.selectedUtenti!.length,
-            itemBuilder: (context, index) {
-              final UtenteModel? utente = widget.selectedUtenti![index];
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Chip(
-                  label: Text('${utente?.nome ?? ''} ${utente?.cognome ?? ''}'.toUpperCase()),
-                ),
-              );
-            },
-          ),
-        ),*/
+
       ],
     );
   }
 }
 
+class DisplayUtenteRitiroWidget extends StatefulWidget {
+  final UtenteModel? utenteRitiro;
+  final List<UtenteModel?>? selectedUtenti;
+  final Function(List<UtenteModel?>)? onSelectedUtentiChanged;
+
+  const DisplayUtenteRitiroWidget({
+    Key? key,
+    required this.utenteRitiro,
+    required this.selectedUtenti,
+    this.onSelectedUtentiChanged,
+  }) : super(key: key);
+
+  @override
+  _DisplayUtenteRitiroWidgetState createState() =>
+      _DisplayUtenteRitiroWidgetState();
+}
+
+class _DisplayUtenteRitiroWidgetState
+    extends State<DisplayUtenteRitiroWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        Text(
+          '${widget.utenteRitiro?.nome ?? ''} ${widget.utenteRitiro?.cognome ?? ''}', style: TextStyle(fontSize: 17),
+        ),
+        SizedBox(height: 30),
+
+      ],
+    );
+  }
+}
 
 
