@@ -233,16 +233,55 @@ class _CreazioneRMAPageState
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(17.0),
             child: Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(17.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+                          child: Container(width: 545, height: 55,
+                            decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+                                border: Border.all(color: Colors.grey, width: 1)),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 75,
+                                  width: 8,
+                                  color: Colors.grey,
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child:
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+
+                                          WidgetSpan(
+                                            child: Icon(Icons.info_outline, size: 18, color: Colors.black54,),
+                                          ),
+                                          TextSpan(
+                                            text: " Inserire nel campo PRODOTTO il nome e il seriale della merce RMA",
+                                            style: TextStyle(color: Colors.black54, fontSize: 16),
+
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    //Text('Almeno un documento tra carta d\'identità e passaporto è obbligatorio'),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
                         //const SizedBox(height: 20.0),
                         SizedBox(
                           width: 400,
@@ -638,7 +677,7 @@ class _CreazioneRMAPageState
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/${rma.id}')
+              Uri.parse('$ipaddress/api/immagine/restituzione/${rma.id}')
             );
             request.files.add(
               await http.MultipartFile.fromPath(
