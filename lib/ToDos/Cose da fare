@@ -18,4 +18,5 @@ MODIFICHE DA FARE
 SIMONE
 - Aggiunta APP nella numerazione di TableInterventiPage
 - Aggiunta la proprietà codice_danea su InterventoModel e inserito nella TableInterventiPage
-- Aggiunto il dial per scattare una foto relativa all'interveno
+- Aggiunto il dial per scattare una foto relativa all'intervento e la relativa pagina da DettaglioInterventoByTecnicoPage
+- Aggiunto codice danea modificabile da TableInterventi

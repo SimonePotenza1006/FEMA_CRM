@@ -321,10 +321,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                         } else if (snapshot.hasData) {
                           List<InterventoModel> interventi = snapshot.data!;
 
-// Filtra ulteriormente nel FutureBuilder per sicurezza
+                          // Filtra ulteriormente nel FutureBuilder per sicurezza
                           interventi = interventi.where((intervento) => intervento.merce == null).toList();
 
-                          interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
+                          // Modifica il filtro per includere interventi senza data o con data corrispondente a `selectedDate`
+                          interventi = interventi.where((intervento) {
+                            return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                          }).toList();
 
                           if (interventi.isEmpty) {
                             return Center(child: Text('Nessun intervento trovato'));
