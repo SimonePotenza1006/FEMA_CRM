@@ -145,6 +145,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
           'descrizione': intervento.descrizione,
           'importo_intervento': double.parse(importoController.text),
           'prezzo_ivato' : intervento.prezzo_ivato,
+          'iva' : intervento.iva,
           'assegnato': intervento.assegnato,
           'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,

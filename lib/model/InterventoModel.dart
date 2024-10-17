@@ -1,5 +1,4 @@
 import 'package:fema_crm/model/MerceInRiparazioneModel.dart';
-
 import 'CategoriaInterventoSpecificoModel.dart';
 import 'ClienteModel.dart';
 import 'DestinazioneModel.dart';
@@ -54,6 +53,7 @@ class InterventoModel {
       this.descrizione,
       this.importo_intervento,
       this.prezzo_ivato,
+      this.iva,
       this.acconto,
       this.assegnato,
       this.accettato_da_tecnico,
@@ -88,6 +88,7 @@ class InterventoModel {
       'descrizione': descrizione,
       'importo_intervento': importo_intervento,
       'prezzo_ivato' : prezzo_ivato,
+      'iva' : iva,
       'acconto' : acconto,
       'assegnato': assegnato,
       'accettato_da_tecnico' : accettato_da_tecnico,
@@ -125,6 +126,7 @@ class InterventoModel {
     descrizione = map['descrizione'];
     importo_intervento = map['importo_intervento'];
     prezzo_ivato = map['prezzo_ivato'];
+    iva = map['iva'];
     acconto = map['acconto'];
     assegnato = map['assegnato'];
     accettato_da_tecnico = map['accettato_da_tecnico'];
@@ -159,6 +161,7 @@ class InterventoModel {
     'descrizione': descrizione,
     'importo_intervento': importo_intervento,
     'prezzo_ivato' : prezzo_ivato,
+    'iva' : iva,
     'acconto' : acconto,
     'assegnato': assegnato,
     'accettato_da_tecnico' : accettato_da_tecnico,
@@ -194,6 +197,7 @@ class InterventoModel {
       json['descrizione']?.toString(),
       json['importo_intervento'] != null ? double.parse(json['importo_intervento'].toString()) : null,
       json['prezzo_ivato'],
+      json['iva'],
       json['acconto'] != null ? double.parse(json['acconto'].toString()) : null,
       json['assegnato'],
       json['accettato_da_tecnico'],

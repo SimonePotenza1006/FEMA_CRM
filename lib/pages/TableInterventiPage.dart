@@ -43,6 +43,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Map<String, double> _columnWidths = {
     'intervento' : 0,
     'id_intervento' : 150,
+    'codice_danea' : 200,
     'data_apertura_intervento': 200,
     'data': 150,
     'cliente': 200,
@@ -527,6 +528,31 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     width: _columnWidths['id_intervento']?? double.nan,
                     minimumWidth: 150,
+                  ),
+                  GridColumn(
+                    columnName: 'codice_danea',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: ColumnFilter(
+                        columnName: 'CODICE DANEA',
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('codice_danea', filtro);
+                          });
+                        },
+                      ),
+                    ),
+                    width: _columnWidths['codice_danea']?? double.nan,
+                    minimumWidth: 200,
                   ),
                   GridColumn(
                     columnName: 'data_apertura_intervento',
@@ -1016,6 +1042,7 @@ class InterventoDataSource extends DataGridSource {
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   BuildContext context;
   TextEditingController importoController = TextEditingController();
+  TextEditingController codiceDaneaController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   GruppoInterventiModel? _selectedGruppo;
   List<GruppoInterventiModel> filteredGruppi = [];
@@ -1094,7 +1121,11 @@ class InterventoDataSource extends DataGridSource {
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
           DataGridCell<String>(
             columnName: 'id_intervento',
-            value: "${intervento.id}/${intervento.data_apertura_intervento?.year != null ? intervento.data_apertura_intervento?.year : DateTime.now().year }",
+            value: "${intervento.id}/${intervento.data_apertura_intervento?.year != null ? intervento.data_apertura_intervento?.year : DateTime.now().year }APP",
+          ),
+          DataGridCell<String>(
+            columnName: 'codice_danea',
+            value: "${intervento.numerazione_danea != null ? intervento.numerazione_danea : '//'}",
           ),
           DataGridCell<String>(
             columnName: 'data_apertura_intervento',
@@ -1377,6 +1408,7 @@ class InterventoDataSource extends DataGridSource {
           'descrizione': intervento.descrizione,
           'importo_intervento': intervento.importo_intervento,
           'prezzo_ivato' : intervento.prezzo_ivato,
+          'iva' : intervento.iva,
           'assegnato': intervento.assegnato,
           'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
@@ -1422,6 +1454,7 @@ class InterventoDataSource extends DataGridSource {
           'descrizione': intervento.descrizione,
           'importo_intervento': double.parse(importoController.text),
           'prezzo_ivato' : prezzoIvato,
+          'iva' : intervento.iva,
           'assegnato': intervento.assegnato,
           'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
@@ -1516,8 +1549,58 @@ class InterventoDataSource extends DataGridSource {
                 ),
               ),
               child: Text(
-                utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO',
+                utenti.isNotEmpty ? utenti.map((utente) =>
+                    utente.nomeCompleto()).join(', ') : 'NESSUNO',
                 overflow: TextOverflow.ellipsis,
+              ),
+            );
+          } else if(dataGridCell.columnName == 'codice_danea'){
+            return GestureDetector(
+              onTap: (){
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return
+                      StatefulBuilder(
+                          builder: (context, setState){
+                            return AlertDialog(
+                              title: Text('Inserisci il nuovo codice o elimina il precedente'),
+                              actions: <Widget>[
+                                TextFormField(
+                                  controller: codiceDaneaController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Codice Danea',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+
+                                  },
+                                  child: Text('Salva codice'),
+                                ),
+                              ],
+                            );
+                          }
+                      );
+                  },
+                );
+              },
+              child: Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.grey[600]!,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Text(
+                  dataGridCell.value.toString(),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             );
           } else {

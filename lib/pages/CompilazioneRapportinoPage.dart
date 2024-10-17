@@ -429,6 +429,7 @@ class _CompilazioneRapportinoPageState
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': widget.intervento.importo_intervento,
           'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
           'acconto': _importoController.text.isNotEmpty
               ? double.parse(_importoController.text)
               : (widget.intervento.acconto ?? 0.0), // Usa 0.0 se acconto è null

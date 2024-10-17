@@ -287,6 +287,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'descrizione': descrizioneController.text.toUpperCase(),
           'importo_intervento': widget.intervento.importo_intervento,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
           'acconto' : widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
@@ -1339,6 +1340,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'descrizione': descrizione,  // Using potentially updated descrizione
           'importo_intervento': importo,  // Using potentially updated importo
           'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
           'acconto': widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
@@ -1402,6 +1404,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': widget.intervento.importo_intervento,
             'prezzo_ivato' : widget.intervento.prezzo_ivato,
+            'iva' : widget.intervento.iva,
             'acconto' : widget.intervento.acconto,
             'assegnato': true,
             'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
@@ -1474,6 +1477,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': widget.intervento.importo_intervento,
             'prezzo_ivato' : widget.intervento.prezzo_ivato,
+            'iva' : widget.intervento.iva,
             'acconto' : widget.intervento.acconto,
             'assegnato': widget.intervento.assegnato,
             'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,

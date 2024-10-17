@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import '../model/InterventoModel.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'AggiuntaFotoPage.dart';
 import 'AggiuntaManualeProdottiDDTPage.dart';
 import 'AggiuntaNotaByTecnicoPage.dart';
 import 'CompilazionePreventivoMerceInRiparazionePage.dart';
@@ -251,17 +252,17 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                     ),
                   ),
                 ),
-                // SpeedDialChild(
-                //   child: Icon(Icons.camera_alt_outlined, color: Colors.white),
-                //   backgroundColor: Colors.red,
-                //   label: 'Aggiungi foto'.toUpperCase(),
-                //   onTap: () => Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => AggiuntaFotoPage(intervento: widget.intervento),
-                //     ),
-                //   ),
-                // ),
+                SpeedDialChild(
+                  child: Icon(Icons.camera_alt_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Aggiungi foto'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AggiuntaFotoPage(intervento: widget.intervento, utente: widget.utente),
+                    ),
+                  ),
+                ),
                 SpeedDialChild(
                   child: Icon(Icons.lock_clock_outlined, color: Colors.white),
                   backgroundColor: Colors.red,

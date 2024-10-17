@@ -653,6 +653,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'descrizione': _descrizioneController.text,
           'importo_intervento': totaleVendita,
           'prezzo_ivato' : null,
+          'iva' : null,
           'assegnato': true,
           'accettato_da_tecnico' : false,
           'conclusione_parziale' : false,

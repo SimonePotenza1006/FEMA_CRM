@@ -695,6 +695,7 @@ class _CreazioneRMAPageState
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
             'prezzo_ivato' : null,
+            'iva' : null,
             'assegnato': assigned,
             'accettato_da_tecnico' : false,
             'conclusione_parziale' : false,

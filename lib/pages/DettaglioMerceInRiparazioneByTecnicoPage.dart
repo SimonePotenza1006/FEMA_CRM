@@ -1025,6 +1025,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': null,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
           'acconto' : widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
