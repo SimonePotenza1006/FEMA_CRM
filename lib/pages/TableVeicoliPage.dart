@@ -57,7 +57,10 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
         var jsonData = jsonDecode(response.body);
         List<VeicoloModel> veicoli = [];
         for (var item in jsonData) {
-          veicoli.add(VeicoloModel.fromJson(item));
+          VeicoloModel veicolo = VeicoloModel.fromJson(item);
+          if(veicolo.flotta == true){
+            veicoli.add(veicolo);
+          }
         }
         setState(() {
           allVeicoli = veicoli;

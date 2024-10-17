@@ -251,6 +251,17 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                     ),
                   ),
                 ),
+                // SpeedDialChild(
+                //   child: Icon(Icons.camera_alt_outlined, color: Colors.white),
+                //   backgroundColor: Colors.red,
+                //   label: 'Aggiungi foto'.toUpperCase(),
+                //   onTap: () => Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => AggiuntaFotoPage(intervento: widget.intervento),
+                //     ),
+                //   ),
+                // ),
                 SpeedDialChild(
                   child: Icon(Icons.lock_clock_outlined, color: Colors.white),
                   backgroundColor: Colors.red,
@@ -567,7 +578,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
     // Verifica se il valore supera i 25 caratteri
     bool isValueTooLong = value.length > 15;
-    String displayedValue = isValueTooLong ? value.substring(0, 15) + "..." : value;
+    String displayedValue = isValueTooLong ? value.substring(0, 10) + "..." : value;
     return SizedBox(
       width: 450,
       child: Padding(

@@ -21,6 +21,7 @@ class VeicoloModel {
   DateTime? data_sostituzione_gomme;
   int? chilometraggio_ultima_sostituzione;
   int? soglia_sostituzione;
+  bool? flotta;
 
   VeicoloModel(
       this.id,
@@ -42,7 +43,8 @@ class VeicoloModel {
       this.soglia_inversione,
       this.data_sostituzione_gomme,
       this.chilometraggio_ultima_sostituzione,
-      this.soglia_sostituzione
+      this.soglia_sostituzione,
+      this.flotta
   );
 
   Map<String, dynamic> toMap() {
@@ -66,7 +68,8 @@ class VeicoloModel {
       'soglia_inversione' : soglia_inversione,
       'data_sostituzione_gomme': data_sostituzione_gomme?.toIso8601String(),
       'chilometraggio_ultima_sostituzione' : chilometraggio_ultima_sostituzione,
-      'soglia_sostituzione' : soglia_sostituzione
+      'soglia_sostituzione' : soglia_sostituzione,
+      'flotta' : flotta
     };
     return map;
   }
@@ -93,6 +96,7 @@ class VeicoloModel {
         map['data_sostituzione_gomme'] != null ? DateTime.parse(map['data_sostituzione_gomme']) : null;
         chilometraggio_ultima_sostituzione = map['chilometraggio_ultima_sostituzione'];
         soglia_sostituzione = map['soglia_sostituzione'];
+        flotta = map['flotta'];
   }
 
   factory VeicoloModel.fromJson(Map<String, dynamic> json) {
@@ -116,7 +120,8 @@ class VeicoloModel {
         json['soglia_inversione'],
         json['data_sostituzione_gomme']!= null ? DateTime.parse(json['data_sostituzione_gomme']) : null,
         json['chilometraggio_ultima_sostituzione'],
-        json['soglia_sostituzione']
+        json['soglia_sostituzione'],
+        json['flotta'],
     );
   }
 
@@ -141,5 +146,6 @@ class VeicoloModel {
         'data_sostituzione_gomme': data_sostituzione_gomme?.toIso8601String(),
         'chilometraggio_ultima_sostituzione' : chilometraggio_ultima_sostituzione,
         'soglia_sostituzione': soglia_sostituzione,
+        'flotta' : flotta
   };
 }

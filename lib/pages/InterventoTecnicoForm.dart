@@ -38,6 +38,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   TextEditingController _notaController = TextEditingController();
   TextEditingController _relazioneController = TextEditingController();
   bool _interventoConcluso = false;
+  bool _interventoAutoassegnato = false;
   ClienteModel? selectedCliente;
   DestinazioneModel? selectedDestinazione;
   List<VeicoloModel> veicoliList = [];
@@ -183,6 +184,19 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
               ),
               SizedBox(height: 15),
               const SizedBox(height: 20.0),
+              Row(
+                children: [
+                  const Text('AUTO-ASSEGNAZIONE', style: TextStyle(color: Colors.black)),
+                  Checkbox(
+                    value: _interventoAutoassegnato,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _interventoAutoassegnato = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
               Row(
                 children: [
                   const Text('INTERVENTO CONCLUSO:', style: TextStyle(color: Colors.black)),
@@ -558,7 +572,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
-          'data': null,
+          'data': _dataOdierna,
           'orario_appuntamento' : null,
           'posizione_gps' : null,
           'orario_inizio': orarioInizioSalvato?.toIso8601String(),
@@ -624,7 +638,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           'importo_intervento': null,
           'prezzo_ivato' : null,
           'acconto' : null,
-          'assegnato': false,
+          'assegnato': _interventoAutoassegnato != false ? true : false,
           'conclusione_parziale' : false,
           'concluso' : false,
           'saldato' : false,
@@ -632,7 +646,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           'note' : _notaController.text,
           'relazione_tecnico' : null,
           'firma_cliente' : null,
-          'utente' : null,
+          'utente' : _interventoAutoassegnato != false ? widget.userData.toMap() : null,
           'cliente' : selectedCliente?.toMap(),
           'veicolo' : null,
           'merce' : null,
@@ -686,9 +700,9 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<VeicoloModel> allVeicoli = [];
-        for (var veicoloJson in responseData) {
-          VeicoloModel veicolo = VeicoloModel.fromJson(veicoloJson);
-          allVeicoli.add(veicolo);
+        for (var item in responseData) {
+          VeicoloModel veicolo = VeicoloModel.fromJson(item);
+            allVeicoli.add(veicolo);
         }
         setState(() {
           veicoliList = allVeicoli;

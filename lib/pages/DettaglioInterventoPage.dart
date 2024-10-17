@@ -32,7 +32,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   List<NotaTecnicoModel> allNote = [];
   List<UtenteModel> allUtenti = [];
   List<RelazioneDdtProdottoModel> prodottiDdt = [];
-  TimeOfDay _selectedTimeAppuntamento = TimeOfDay.now();
+  TimeOfDay? _selectedTimeAppuntamento = null;
   List<RelazioneProdottiInterventoModel> allProdotti = [];
   TimeOfDay _selectedTime = TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _selectedTime2 = TimeOfDay(hour: 0, minute: 0);
@@ -98,19 +98,20 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
-  Future<void> _selectTimeAppuntamento(BuildContext context) async{
+  Future<void> _selectTimeAppuntamento(BuildContext context) async {
+    // Convert DateTime.now() to TimeOfDay
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: _selectedTimeAppuntamento,
+      initialTime: TimeOfDay.now(), // Use TimeOfDay.now() instead of DateTime.now()
     );
+
     if (pickedTime != null) {
       setState(() {
-        final now = DateTime.now();
-        widget.intervento.orario_appuntamento = DateTime(widget.intervento.data!.year, widget.intervento.data!.month, widget.intervento.data!.day, pickedTime.hour, pickedTime.minute);
         _selectedTimeAppuntamento = pickedTime;
       });
     }
   }
+
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
@@ -1300,30 +1301,47 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   }
 
   Future<void> saveModifiche() async {
-    DateTime? orario = _selectedTimeAppuntamento != null ? convertTimeOfDayToDateTime(_selectedTimeAppuntamento) : widget.intervento.orario_appuntamento;
-    double? importo = importoController.text.isNotEmpty ? double.tryParse(importoController.text) : widget.intervento.importo_intervento;
-    String? descrizione = descrizioneController.text.isNotEmpty ? descrizioneController.text : widget.intervento.descrizione;
+    // If _selectedTimeAppuntamento is not null, convert TimeOfDay to DateTime, else use widget.intervento.orario_appuntamento
+    DateTime? orario;
+    if (_selectedTimeAppuntamento != null) {
+      final now = DateTime.now();
+      orario = DateTime(now.year, now.month, now.day, _selectedTimeAppuntamento!.hour, _selectedTimeAppuntamento!.minute);
+    } else {
+      orario = widget.intervento.orario_appuntamento;
+    }
+
+    // Parse importo from controller, or fallback to existing value
+    double? importo = importoController.text.isNotEmpty
+        ? double.tryParse(importoController.text)
+        : widget.intervento.importo_intervento;
+
+    // Parse descrizione from controller, or fallback to existing value
+    String? descrizione = descrizioneController.text.isNotEmpty
+        ? descrizioneController.text
+        : widget.intervento.descrizione;
+
     try {
+      // Making HTTP request to update the 'intervento'
       final response = await http.post(
         Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
-          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
-          'orario_appuntamento': orario?.toIso8601String(),
-          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_appuntamento': orario?.toIso8601String(),  // Ensured correct DateTime
+          'posizione_gps': widget.intervento.posizione_gps,
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
-          'descrizione': descrizione,
-          'importo_intervento': importo,
-          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'descrizione': descrizione,  // Using potentially updated descrizione
+          'importo_intervento': importo,  // Using potentially updated importo
+          'prezzo_ivato': widget.intervento.prezzo_ivato,
           'acconto': widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'conclusione_parziale': widget.intervento.conclusione_parziale,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
-          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'saldato_da_tecnico': widget.intervento.saldato_da_tecnico,
           'note': widget.intervento.note,
           'relazione_tecnico': widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
@@ -1339,19 +1357,23 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         }),
       );
 
+      // Handle response success/failure
       if (response.statusCode == 201) {
         print('Modifica effettuata');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Intervento modificato con successo!'),
-            duration: Duration(seconds: 3), // Durata dello Snackbar
+            duration: Duration(seconds: 3),
           ),
         );
+      } else {
+        print('Errore nella richiesta: ${response.statusCode}');
       }
     } catch (e) {
       print('Errore nell\'aggiornamento dell\'intervento: $e');
     }
   }
+
 
   DateTime convertTimeOfDayToDateTime(TimeOfDay timeOfDay) {
     final now = DateTime.now();

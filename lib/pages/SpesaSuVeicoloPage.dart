@@ -517,7 +517,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
             'soglia_inversione' : selectedVeicolo?.soglia_inversione,
             'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
             'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
-            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione,
+            'flotta' : selectedVeicolo?.flotta
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -556,7 +557,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
             'soglia_inversione' : selectedVeicolo?.soglia_inversione,
             'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
             'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
-            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione,
+            'flotta' : selectedVeicolo?.flotta
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -595,7 +597,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
             'soglia_inversione' : selectedVeicolo?.soglia_inversione,
             'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
             'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
-            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione,
+            'flotta' : selectedVeicolo?.flotta
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -634,7 +637,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
             'soglia_inversione' : selectedVeicolo?.soglia_inversione,
             'data_sostituzione_gomme' : DateTime.now().toIso8601String(),
             'chilometraggio_ultima_sostituzione' : int.parse(_kmController.text.toString()),
-            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione,
+            'flotta' : selectedVeicolo?.flotta
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -673,7 +677,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
             'soglia_inversione' : selectedVeicolo?.soglia_inversione,
             'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
             'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
-            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione,
+            'flotta' : selectedVeicolo?.flotta
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -712,7 +717,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
             'soglia_inversione' : selectedVeicolo?.soglia_inversione,
             'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
             'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
-            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione,
+            'flotta' : selectedVeicolo?.flotta
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -751,7 +757,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
             'soglia_inversione' : selectedVeicolo?.soglia_inversione,
             'data_sostituzione_gomme' : selectedVeicolo?.data_sostituzione_gomme?.toIso8601String(),
             'chilometraggio_ultima_sostituzione' : selectedVeicolo?.chilometraggio_ultima_sostituzione,
-            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione
+            'soglia_sostituzione' : selectedVeicolo?.soglia_sostituzione,
+            'flotta' : selectedVeicolo?.flotta
           }),
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -913,7 +920,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         var jsonData = jsonDecode(response.body);
         List<VeicoloModel> veicoli = [];
         for (var item in jsonData) {
-          veicoli.add(VeicoloModel.fromJson(item));
+          VeicoloModel veicolo = VeicoloModel.fromJson(item);
+          if(veicolo.flotta == true){
+            veicoli.add(veicolo);
+          }
         }
         setState(() {
           allVeicoli = veicoli;

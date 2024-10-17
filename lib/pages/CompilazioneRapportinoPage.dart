@@ -353,7 +353,6 @@ class _CompilazioneRapportinoPageState
                         } else {
                           saveIntervento(); // Salva solo l'intervento
                         }
-
                         // Torna alla pagina precedente
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -542,9 +541,9 @@ class _CompilazioneRapportinoPageState
     var responseData = json.decode(response.body.toString());
     if (response.statusCode == 200) {
       List<VeicoloModel> veicoli = [];
-      for (var veicoloJson in responseData) {
-        VeicoloModel veicolo = VeicoloModel.fromJson(veicoloJson);
-        veicoli.add(veicolo);
+      for (var item in responseData) {
+        VeicoloModel veicolo = VeicoloModel.fromJson(item);
+          veicoli.add(veicolo);
       }
       setState(() {
         allVeicoli = veicoli;
