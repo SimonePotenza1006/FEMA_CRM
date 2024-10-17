@@ -19,6 +19,7 @@ import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
+import 'CalendarioPage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
 import 'MenuSopralluoghiTecnicoPage.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -214,7 +215,9 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
               color: Colors.white,
             ),
             onPressed: () {
-              setState(() {});
+              setState(() {
+
+              });
             },
           ),
           IconButton(
@@ -367,7 +370,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                             ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                             : 'Nessun orario di appuntamento',
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 10,
                                           color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                         ),
                                       ),
@@ -528,13 +531,375 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                 ),
               );
             } else {
-              return Scaffold();
+              return Scaffold(
+                body: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize:
+                    MainAxisSize.min, // Imposta grandezza minima per la colonna
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(35.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Center(
+                              child: Text(
+                                "CIAO ${widget.userData!.nome!.toUpperCase().toString()}!",
+                                textAlign: TextAlign.center, // Centra il testo
+                                style: TextStyle(
+                                  fontSize: 24, // Imposta la dimensione del testo
+                                  fontWeight: FontWeight.bold, // Imposta il grassetto
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            buildMenuButton(
+                              icon: Icons.lock_clock,
+                              text: 'TIMBRATURA',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => TimbraturaPage(utente: widget.userData!)),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            buildMenuButton(
+                              icon: Icons.calendar_month_outlined,
+                              text: 'CALENDARIO',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => CalendarioUtentePage(utente: widget.userData)),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            buildMenuButton(
+                              icon: Icons.car_rental_outlined,
+                              text: 'SPESA SU VEICOLO',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData!)),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            buildMenuButton(
+                              icon: Icons.snippet_folder_outlined,
+                              text: 'ORDINI AL FORNITORE',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => FormOrdineFornitorePage(utente: widget.userData!)),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            buildMenuButton(
+                              icon: Icons.remove_red_eye_outlined,
+                              text: 'SOPRALLUOGHI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MenuSopralluoghiTecnicoPage(utente: widget.userData!)),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'INTERVENTI',
+                              style: TextStyle(
+                                  fontSize: 30.0, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(width: 15),
+                            IconButton(
+                              icon: Icon(Icons.calendar_today),
+                              onPressed: () async {
+                                final DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: selectedDate,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2100),
+                                );
+                                if (pickedDate != null && pickedDate != selectedDate) {
+                                  setState(() {
+                                    selectedDate = pickedDate;
+                                  });
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10.0),
+                      FutureBuilder<List<InterventoModel>>(
+                        future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<InterventoModel> interventi = snapshot.data!;
+                            interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: interventi.length,
+                              itemBuilder: (context, index) {
+                                InterventoModel intervento = interventi[index];
+                                Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
+                                TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                                return Card(
+                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // aggiungi padding orizzontale
+                                  elevation: 4, // aggiungi ombreggiatura
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  // aggiungi bordi arrotondati
+                                  child: ListTile(
+                                    title: Text(
+                                      '${intervento.descrizione}',
+                                      style: textStyle,
+                                    ),
+                                    subtitle: Text(
+                                      intervento.cliente?.denominazione.toString()?? '',
+                                      style: textStyle,
+                                    ),
+                                    trailing: Column(
+                                      children: [
+                                        Text(
+                                          // Formatta la data secondo il tuo formato desiderato
+                                          intervento.data!= null
+                                              ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                              : 'Data non disponibile',
+                                          style: TextStyle(
+                                            fontSize: 16, // Stile opzionale per la data
+                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          intervento.orario_appuntamento!= null
+                                              ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                              : 'Nessun orario di appuntamento',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioInterventoByTecnicoPage(
+                                                utente: widget.userData!,
+                                                intervento: intervento,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    tileColor: backgroundColor,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
+                        },
+                      ),
+                      FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                        future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
+                            relazioni = relazioni.where((relazione) => relazione.intervento!.data!.isSameDay(selectedDate)).toList();
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: relazioni.length,
+                              itemBuilder: (context, index) {
+                                RelazioneUtentiInterventiModel relazione = relazioni[index];
+                                Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
+                                TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                                return ListTile(
+                                  title: Text(
+                                    '${relazione.intervento?.descrizione}',
+                                    style: textStyle,
+                                  ),
+                                  subtitle: Text(
+                                    relazione.intervento?.cliente?.denominazione.toString()?? '',
+                                    style: textStyle,
+                                  ),
+                                  trailing: Column(
+                                    children: [
+                                      Text(
+                                        // Formatta la data secondo il tuo formato desiderato
+                                        relazione.intervento?.data!= null
+                                            ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
+                                            : 'Data non disponibile',
+                                        style: TextStyle(
+                                          fontSize: 16, // Stile opzionale per la data
+                                          color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        relazione.intervento?.orario_appuntamento!= null
+                                            ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                            : 'Nessun orario di appuntamento',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DettaglioInterventoByTecnicoPage(
+                                              utente: widget.userData!,
+                                              intervento: relazione.intervento!,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  tileColor: backgroundColor,
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 50.0),
+                      const Text(
+                        'AGENDA COMMISSIONI',
+                        style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20.0),
+                      FutureBuilder<List<CommissioneModel>>(
+                        future: getAllCommissioniByUtente(widget.userData!.id.toString()),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<CommissioneModel> commissioni = snapshot.data!;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: commissioni.length,
+                              itemBuilder: (context, index) {
+                                CommissioneModel commissione = commissioni[index];
+                                return ListTile(
+                                  title: Text('${commissione.descrizione.toString()}'),
+                                  subtitle: Text(commissione.note ?? ''),
+                                  trailing: Text(
+                                    // Formatta la data secondo il tuo formato desiderato
+                                    commissione.data != null
+                                        ? '${commissione.data!.day}/${commissione.data!.month}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
+                                        : 'Data non disponibile',
+                                    style: TextStyle(
+                                        fontSize: 16), // Stile opzionale per la data
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DettaglioCommissioneTecnicoPage(
+                                                commissione: commissione),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: Text('Nessuna commissione trovata'));
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
           }
         ),
       ),
     );
   }
+
+  Widget buildMenuButton(
+      {required IconData icon, required String text, required VoidCallback onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red.shade400, Colors.red.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: Colors.white,
+                size: 20,
+              ),
+              SizedBox(width: 10),
+              Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }
 
 class MenuPainter extends CustomPainter {
@@ -605,7 +970,6 @@ class MenuPainter extends CustomPainter {
       );
       path.close();
       canvas.drawPath(path, paint);
-
       final iconX = center.dx +
           (outerRadius * scaleFactor + (isHovered ? innerRadius * scaleFactor * 1.2 : innerRadius * scaleFactor)) /
               2 *

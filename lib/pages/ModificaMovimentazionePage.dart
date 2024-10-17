@@ -52,146 +52,170 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            GestureDetector(
-              onTap: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: _selectedDate ?? DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                ).then((date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                });
-              },
-              child: AbsorbPointer(
+        child: Center(
+          child: Column(
+            children: [
+              SizedBox(
+                width: 350,
+                child: GestureDetector(
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    ).then((date) {
+                      setState(() {
+                        _selectedDate = date;
+                      });
+                    });
+                  },
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Data della movimentazione',
+                      ),
+                      controller: TextEditingController(text: _selectedDate != null? DateFormat('dd/MM/yyyy').format(_selectedDate!) : ''),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 350,
                 child: TextFormField(
+                  controller: _descrizioneController,
                   decoration: InputDecoration(
-                    labelText: 'Data della movimentazione',
+                    labelText: 'Descrizione',
                   ),
-                  controller: TextEditingController(text: _selectedDate != null? DateFormat('dd/MM/yyyy').format(_selectedDate!) : ''),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Inserisci una descrizione';
+                    }
+                    return null;
+                  },
                 ),
               ),
-            ),
-            TextFormField(
-              controller: _descrizioneController,
-              decoration: InputDecoration(
-                labelText: 'Descrizione',
+              SizedBox(
+                width: 350,
+                child: TextFormField(
+                  controller: _importoController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                  ],
+                  decoration: InputDecoration(
+                    labelText: 'Importo',
+                  ),
+                  validator: (value) {
+                    if (value == null || double.tryParse(value) == null) {
+                      return 'Inserisci un importo valido';
+                    }
+                    return null;
+                  },
+                ),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Inserisci una descrizione';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _importoController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
-              ],
-              decoration: InputDecoration(
-                labelText: 'Importo',
+              SizedBox(
+                width: 350,
+                child: DropdownButtonFormField<TipoMovimentazione>(
+                  value: _selectedTipoMovimentazione,
+                  onChanged: (TipoMovimentazione? newValue) {
+                    setState(() {
+                      _selectedTipoMovimentazione = newValue;
+                      selectedTipologia = newValue!; // Initialize selectedTipologia here
+                    });
+                  },
+                  items: TipoMovimentazione.values.map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
+                    String label;
+                    if (value == TipoMovimentazione.Entrata) {
+                      label = 'Entrata';
+                    } else if (value == TipoMovimentazione.Uscita) {
+                      label = 'Uscita';
+                    } else if(value == TipoMovimentazione.Acconto){
+                      label = 'Acconto';
+                    } else if(value == TipoMovimentazione.Pagamento) {
+                      label = 'Pagamento';
+                    } else if(value == TipoMovimentazione.Prelievo){
+                      label = 'Prelievo';
+                    } else {
+                      label = 'Versamento';
+                    }
+                    return DropdownMenuItem<TipoMovimentazione>(
+                      value: value,
+                      child: Text(label),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Tipo Movimentazione',
+                  ),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Seleziona il tipo di movimentazione';
+                    }
+                    return null;
+                  },
+                ),
               ),
-              validator: (value) {
-                if (value == null || double.tryParse(value) == null) {
-                  return 'Inserisci un importo valido';
-                }
-                return null;
-              },
-            ),
-            DropdownButtonFormField<TipoMovimentazione>(
-              value: _selectedTipoMovimentazione,
-              onChanged: (TipoMovimentazione? newValue) {
-                setState(() {
-                  _selectedTipoMovimentazione = newValue;
-                  selectedTipologia = newValue!; // Initialize selectedTipologia here
-                });
-              },
-              items: TipoMovimentazione.values.map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
-                String label;
-                if (value == TipoMovimentazione.Entrata) {
-                  label = 'Entrata';
-                } else if (value == TipoMovimentazione.Uscita) {
-                  label = 'Uscita';
-                } else if(value == TipoMovimentazione.Acconto){
-                  label = 'Acconto';
-                } else {
-                  label = 'Pagamento';
-                }
-                return DropdownMenuItem<TipoMovimentazione>(
-                  value: value,
-                  child: Text(label),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: 'Tipo Movimentazione',
+              SizedBox(
+                  width: 350,
+                  child: DropdownButtonFormField<UtenteModel>(
+                    value: allUtenti.contains(_selectedUtente) ? _selectedUtente : null,
+                    onChanged: (UtenteModel? newValue) {
+                      setState(() {
+                        _selectedUtente = newValue;
+                      });
+                    },
+                    items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel value) {
+                      return DropdownMenuItem<UtenteModel>(
+                        value: value,
+                        child: Text(value.cognome!),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'Utente',
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Seleziona l\'utente';
+                      }
+                      return null;
+                    },
+                  ),
               ),
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleziona il tipo di movimentazione';
-                }
-                return null;
-              },
-            ),
-            DropdownButtonFormField<UtenteModel>(
-              value: allUtenti.contains(_selectedUtente) ? _selectedUtente : null,
-              onChanged: (UtenteModel? newValue) {
-                setState(() {
-                  _selectedUtente = newValue;
-                });
-              },
-              items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel value) {
-                return DropdownMenuItem<UtenteModel>(
-                  value: value,
-                  child: Text(value.cognome!),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: 'Utente',
-              ),
-              validator: (value) {
-                if (value == null) {
-                  return 'Seleziona l\'utente';
-                }
-                return null;
-              },
-            ),
-            GestureDetector(
-                onTap: () {
-                  _showClientiDialog();
-                },
-                child: SizedBox(
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
-                      const Icon(Icons.arrow_drop_down),
-                    ],
+              SizedBox(
+                width: 350,
+                child: GestureDetector(
+                  onTap: () {
+                    _showClientiDialog();
+                  },
+                  child: SizedBox(
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                        const Icon(Icons.arrow_drop_down),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            SizedBox(height: 34),
-            Center(
-              child:ElevatedButton(
-                onPressed: () {
-                  updateMovimento();
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-                ),
-                child: Text(
-                  'Conferma modifiche',
-                  style: TextStyle(color: Colors.white),
+              SizedBox(height: 34),
+              Center(
+                child:ElevatedButton(
+                  onPressed: () {
+                    updateMovimento();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                  ),
+                  child: Text(
+                    'Conferma modifiche',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -331,7 +355,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
       if(response.statusCode == 201){
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Movimentazione aggionrata correttamente, ricarica la pagina per i nuovi dati'),
+            content: Text('Movimentazione aggiornata correttamente, ricarica la pagina per i nuovi dati'),
             duration: Duration(seconds: 3), // Durata dello Snackbar
           ),
         );

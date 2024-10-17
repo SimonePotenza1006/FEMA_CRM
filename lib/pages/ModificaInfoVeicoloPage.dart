@@ -446,6 +446,7 @@ class _ModificaInfoVeicoloPageState extends State<ModificaInfoVeicoloPage>{
           'chilometraggio_ultima_sostituzione' : int.parse(_chilometraggioSostituzioneController.text),
           'soglia_sostituzione' : int.parse(_sogliaSostituzioneController.text),
           'scadenza_gps' : _scadenzaGps?.toIso8601String(),
+          'flotta' : widget.veicolo.flotta
         }),
       );
       if(response.statusCode == 201){

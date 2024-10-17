@@ -36,6 +36,7 @@ class _CreazioneInterventoByAmministrazionePageState
   DateTime _dataOdierna = DateTime.now();
   DateTime? selectedDate = null;
   String _descrizione = '';
+  String _nota = '';
   ClienteModel? selectedCliente;
   DestinazioneModel? selectedDestinazione;
   List<ClienteModel> clientiList = [];
@@ -43,6 +44,7 @@ class _CreazioneInterventoByAmministrazionePageState
   List<DestinazioneModel> allDestinazioniByCliente = [];
   List<CategoriaInterventoSpecificoModel> allCategorieByTipologia = [];
   TextEditingController _descrizioneController = TextEditingController();
+  TextEditingController _notaController = TextEditingController();
   TipologiaInterventoModel? _selectedTipologia;
   List<UtenteModel> allUtenti = [];
   List<UtenteModel> allCapogruppi = [];
@@ -265,6 +267,20 @@ class _CreazioneInterventoByAmministrazionePageState
                             onChanged: (value) {
                               setState(() {
                                 _descrizione = value;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: 600,
+                          child: TextFormField(
+                            controller: _notaController,
+                            maxLines: null,
+                            decoration:  InputDecoration(labelText: 'Nota'.toUpperCase()),
+                            onChanged: (value) {
+                              setState(() {
+                                _nota = value;
                               });
                             },
                           ),
@@ -651,7 +667,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'concluso': false,
             'saldato': false,
             'saldato_da_tecnico' : false,
-            'note': null,
+            'note': _notaController.text.isNotEmpty ? _notaController.text : null,
             'relazione_tecnico' : null,
             'firma_cliente': null,
             'utente': responsabile?.toMap(),
@@ -767,15 +783,15 @@ class _CreazioneInterventoByAmministrazionePageState
   Future<http.Response?> saveIntervento() async {
     late http.Response response;
     var orario_appuntamento = _orarioDisponibile ? _selectedTime : null;
-    final orario = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, _selectedTime.hour, _selectedTime.minute);
     bool assigned = responsabile != null ? true : false;
     if(_orarioDisponibile == true){
       try {
+        final orario = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, _selectedTime.hour, _selectedTime.minute);
         response = await http.post(
           Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
-            'data': selectedDate?.toIso8601String(),
+            'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : orario.toIso8601String(),
             'posizione_gps' : null,
@@ -815,7 +831,7 @@ class _CreazioneInterventoByAmministrazionePageState
           Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
-            'data': selectedDate?.toIso8601String(),
+            'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,
             'posizione_gps' : null,
