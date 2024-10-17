@@ -280,6 +280,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': widget.intervento.importo_intervento,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_Tecnico' : widget.intervento.accettato_da_tecnico,
           'concluso': widget.intervento.concluso,

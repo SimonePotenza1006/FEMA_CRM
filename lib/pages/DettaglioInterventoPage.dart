@@ -287,6 +287,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'descrizione': descrizioneController.text.toUpperCase(),
           'importo_intervento': widget.intervento.importo_intervento,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
           'acconto' : widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
@@ -373,7 +374,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   width: 500,
                                   child: buildInfoRow(
                                       title: 'Descrizione',
-                                      value: descrizioneInterventoSub,
+                                      value: widget.intervento.descrizione!,
                                       context: context
                                   ),
                                 ),
@@ -1214,8 +1215,9 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     // Verifica se il valore supera i 25 caratteri
     bool isValueTooLong = value.length > 25;
     String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+
     return SizedBox(
-      width:280,
+      width: 280,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(
@@ -1263,7 +1265,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: Text("${title.toUpperCase()}"),
-                                  content: Text(value),
+                                  content: Text(value), // Mostra il valore completo qui
                                   actions: [
                                     TextButton(
                                       child: Text("Chiudi"),
@@ -1292,8 +1294,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       ),
     );
   }
-
-
 
   String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
     final now = DateTime.now();
@@ -1339,6 +1339,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'descrizione': descrizione,  // Using potentially updated descrizione
           'importo_intervento': importo,  // Using potentially updated importo
           'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
           'acconto': widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
@@ -1402,6 +1403,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': widget.intervento.importo_intervento,
             'prezzo_ivato' : widget.intervento.prezzo_ivato,
+            'iva' : widget.intervento.iva,
             'acconto' : widget.intervento.acconto,
             'assegnato': true,
             'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
@@ -1474,6 +1476,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': widget.intervento.importo_intervento,
             'prezzo_ivato' : widget.intervento.prezzo_ivato,
+            'iva' : widget.intervento.iva,
             'acconto' : widget.intervento.acconto,
             'assegnato': widget.intervento.assegnato,
             'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,

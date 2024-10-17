@@ -43,6 +43,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Map<String, double> _columnWidths = {
     'intervento' : 0,
     'id_intervento' : 150,
+    'codice_danea' : 200,
     'data_apertura_intervento': 200,
     'data': 150,
     'cliente': 200,
@@ -527,6 +528,31 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     width: _columnWidths['id_intervento']?? double.nan,
                     minimumWidth: 150,
+                  ),
+                  GridColumn(
+                    columnName: 'codice_danea',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: ColumnFilter(
+                        columnName: 'CODICE DANEA',
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('codice_danea', filtro);
+                          });
+                        },
+                      ),
+                    ),
+                    width: _columnWidths['codice_danea']?? double.nan,
+                    minimumWidth: 200,
                   ),
                   GridColumn(
                     columnName: 'data_apertura_intervento',
@@ -1016,6 +1042,7 @@ class InterventoDataSource extends DataGridSource {
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   BuildContext context;
   TextEditingController importoController = TextEditingController();
+  TextEditingController codiceDaneaController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   GruppoInterventiModel? _selectedGruppo;
   List<GruppoInterventiModel> filteredGruppi = [];
@@ -1094,7 +1121,50 @@ class InterventoDataSource extends DataGridSource {
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
           DataGridCell<String>(
             columnName: 'id_intervento',
-            value: "${intervento.id}/${intervento.data_apertura_intervento?.year != null ? intervento.data_apertura_intervento?.year : DateTime.now().year }",
+            value: "${intervento.id}/${intervento.data_apertura_intervento?.year != null ? intervento.data_apertura_intervento?.year : DateTime.now().year }APP",
+          ),
+          DataGridCell<Widget>(
+            columnName: 'codice_danea',
+            value: GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return
+                      StatefulBuilder(
+                          builder: (context, setState){
+                            return AlertDialog(
+                              title: Text('Inserisci un codice'.toUpperCase()),
+                              actions: <Widget>[
+                                TextFormField(
+                                  controller: codiceDaneaController,
+                                  decoration: InputDecoration(
+                                    labelText: 'CODICE DANEA',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    saveCodice(intervento).then((_) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                                      );
+                                    });
+                                  },
+                                  child: Text('Salva codice'.toUpperCase()),
+                                ),
+                              ],
+                            );
+                          }
+                      );
+                  },
+                );
+              },
+               child: Text(
+                   '${intervento.numerazione_danea != null ? intervento.numerazione_danea : 'N/A'}'
+               ),
+            ),
           ),
           DataGridCell<String>(
             columnName: 'data_apertura_intervento',
@@ -1360,6 +1430,8 @@ class InterventoDataSource extends DataGridSource {
     notifyListeners();
   }
 
+
+
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
@@ -1377,6 +1449,7 @@ class InterventoDataSource extends DataGridSource {
           'descrizione': intervento.descrizione,
           'importo_intervento': intervento.importo_intervento,
           'prezzo_ivato' : intervento.prezzo_ivato,
+          'iva' : intervento.iva,
           'assegnato': intervento.assegnato,
           'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
@@ -1422,6 +1495,7 @@ class InterventoDataSource extends DataGridSource {
           'descrizione': intervento.descrizione,
           'importo_intervento': double.parse(importoController.text),
           'prezzo_ivato' : prezzoIvato,
+          'iva' : intervento.iva,
           'assegnato': intervento.assegnato,
           'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
@@ -1447,6 +1521,54 @@ class InterventoDataSource extends DataGridSource {
         Navigator.of(context).pop();
         prezzoIvato = false;
 
+      }
+    } catch (e) {
+      print('Errore durante il salvataggio del intervento: $e');
+    }
+  }
+
+  Future<void> saveCodice(InterventoModel intervento) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ipaddress}/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.id,
+          'numerazione_danea' : codiceDaneaController.text.isNotEmpty ? codiceDaneaController.text : "N/A",
+          'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),
+          'data': intervento.data?.toIso8601String(),
+          'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : intervento.posizione_gps,
+          'orario_inizio': intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': intervento.orario_fine?.toIso8601String(),
+          'descrizione': intervento.descrizione,
+          'importo_intervento': intervento.importo_intervento,
+          'prezzo_ivato' : prezzoIvato,
+          'iva' : intervento.iva,
+          'assegnato': intervento.assegnato,
+          'accettato_da_tecnico' : intervento.accettato_da_tecnico,
+          'conclusione_parziale': intervento.conclusione_parziale,
+          'concluso': intervento.concluso,
+          'saldato': intervento.saldato,
+          'saldato_da_tecnico' : intervento.saldato_da_tecnico,
+          'note': intervento.note,
+          'relazione_tecnico' : intervento.relazione_tecnico,
+          'firma_cliente': intervento.firma_cliente,
+          'utente': intervento.utente?.toMap(),
+          'cliente': intervento.cliente?.toMap(),
+          'veicolo': intervento.veicolo?.toMap(),
+          'merce': intervento.merce?.toMap(),
+          'tipologia': intervento.tipologia?.toMap(),
+          'categoria': intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': intervento.tipologia_pagamento?.toMap(),
+          'destinazione': intervento.destinazione?.toMap(),
+          'gruppo' : intervento.gruppo?.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        codiceDaneaController.clear();
+        print('EVVAIIIIIIII');
+        Navigator.of(context).pop();
       }
     } catch (e) {
       print('Errore durante il salvataggio del intervento: $e');
@@ -1516,11 +1638,12 @@ class InterventoDataSource extends DataGridSource {
                 ),
               ),
               child: Text(
-                utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO',
+                utenti.isNotEmpty ? utenti.map((utente) =>
+                    utente.nomeCompleto()).join(', ') : 'NESSUNO',
                 overflow: TextOverflow.ellipsis,
               ),
             );
-          } else {
+          }  else {
             return GestureDetector(
               onTap: () {
                 Navigator.push(

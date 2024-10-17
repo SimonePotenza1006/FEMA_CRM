@@ -551,8 +551,17 @@ class _HomeFormAmministrazioneNewPageState
 
   void combineAppointments() {
     appointments = [];
+    // Aggiungi gli interventi
     appointments.addAll(allInterventi.map((intervento) {
-      DateTime startTime = intervento.orario_appuntamento!= null? intervento.orario_appuntamento! : intervento.data!;
+      DateTime? startTime;
+      if (intervento.orario_appuntamento != null) {
+        startTime = intervento.orario_appuntamento!;
+      } else if (intervento.data != null) {
+        startTime = intervento.data!;
+      } else {
+        // Gestione se entrambi i campi sono null, qui puoi loggare l'errore o impostare un valore predefinito
+        startTime = DateTime.now(); // oppure ritorna null per ignorare l'intervento
+      }
       DateTime endTime = startTime.add(Duration(hours: 1));
       String? subject = "${intervento.descrizione}";
       Color color = _getColorForTipologia(int.parse(intervento.tipologia!.id.toString()));
@@ -565,6 +574,7 @@ class _HomeFormAmministrazioneNewPageState
         concluso: intervento.concluso,
       );
     }).toList());
+    // Aggiungi le commissioni
     appointments.addAll(allCommissioni.map((commissione) {
       DateTime startTime = commissione.data!;
       DateTime endTime = startTime.add(Duration(hours: 2));
@@ -581,6 +591,7 @@ class _HomeFormAmministrazioneNewPageState
       _appointmentDataSource.updateAppointments(appointments);
     });
   }
+
 
   Color _getColorForTipologia(int tipologiaId) {
     switch (tipologiaId) {

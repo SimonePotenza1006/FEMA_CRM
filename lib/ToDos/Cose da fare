@@ -5,7 +5,7 @@ MODIFICHE DA FARE
 - Eliminare orario appuntamento intervento dal dettaglio intervento
 - Inserire nella tabella interventi una colonna con l'importo comprendente iva, e trattare quello esistente come importo netto
 - Poter modificare data creazione + numerazione intervento
-- Aggiungere "APP" in numerazione (/2024APP)
+- Aggiungere "APP" in numerazione (/2024APP) ✔
 - Eliminare dicitura "Mezzo null" sul pdf generato da intervento
 - Inserire i due punnti (:) anche dopo l'acconto
 - Dobbiamo poter modificare il cliente
@@ -15,3 +15,8 @@ MODIFICHE DA FARE
 
 
 17/10/2024
+SIMONE
+- Aggiunta APP nella numerazione di TableInterventiPage
+- Aggiunta la proprietà codice_danea su InterventoModel e inserito nella TableInterventiPage
+- Aggiunto il dial per scattare una foto relativa all'intervento e la relativa pagina da DettaglioInterventoByTecnicoPage
+- Aggiunto codice danea modificabile da TableInterventi
