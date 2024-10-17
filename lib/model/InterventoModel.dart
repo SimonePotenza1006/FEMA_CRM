@@ -21,6 +21,7 @@ class InterventoModel {
   String? descrizione;
   double? importo_intervento;
   bool? prezzo_ivato;
+  int? iva;
   double? acconto;
   bool? assegnato;
   bool? accettato_da_tecnico;
