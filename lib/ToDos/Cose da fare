@@ -1,0 +1,17 @@
+
+MODIFICHE DA FARE
+
+
+- Eliminare orario appuntamento intervento dal dettaglio intervento
+- Inserire nella tabella interventi una colonna con l'importo comprendente iva, e trattare quello esistente come importo netto
+- Poter modificare data creazione + numerazione intervento
+- Aggiungere "APP" in numerazione (/2024APP)
+- Eliminare dicitura "Mezzo null" sul pdf generato da intervento
+- Inserire i due punnti (:) anche dopo l'acconto
+- Dobbiamo poter modificare il cliente: lu potivi gia' fare
+- Aggiungere destinatario + destinazione
+- Possibilità di togliere la data accordata
+- Iva da inserire (campo a scelta tra 22%, 10%, 4%)
+
+
+17/10/2024

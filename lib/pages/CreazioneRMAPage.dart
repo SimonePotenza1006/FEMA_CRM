@@ -724,6 +724,7 @@ class _CreazioneRMAPageState
           Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'numerazione_danea' : null,
             'data': _dataOdierna.toIso8601String(),
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,
@@ -734,6 +735,7 @@ class _CreazioneRMAPageState
             'importo_intervento': null,
             'prezzo_ivato' : null,
             'assegnato': assigned,
+            'accettato_da_tecnico' : false,
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
