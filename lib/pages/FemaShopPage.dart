@@ -643,6 +643,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
         Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
+          'numerazione_danea' : null,
           'data': DateTime.now().toIso8601String(),
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'orario_appuntamento' : null,
@@ -653,6 +654,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'importo_intervento': totaleVendita,
           'prezzo_ivato' : null,
           'assegnato': true,
+          'accettato_da_tecnico' : false,
           'conclusione_parziale' : false,
           'concluso': true,
           'saldato': true,

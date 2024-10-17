@@ -11,6 +11,7 @@ import 'VeicoloModel.dart';
 
 class InterventoModel {
   String? id;
+  String? numerazione_danea;
   DateTime? data_apertura_intervento;
   DateTime? data;
   DateTime? orario_appuntamento;
@@ -22,6 +23,7 @@ class InterventoModel {
   bool? prezzo_ivato;
   double? acconto;
   bool? assegnato;
+  bool? accettato_da_tecnico;
   bool? conclusione_parziale;
   bool? concluso;
   bool? saldato;
@@ -41,6 +43,7 @@ class InterventoModel {
 
   InterventoModel(
       this.id,
+      this.numerazione_danea,
       this.data_apertura_intervento,
       this.data,
       this.orario_appuntamento,
@@ -52,6 +55,7 @@ class InterventoModel {
       this.prezzo_ivato,
       this.acconto,
       this.assegnato,
+      this.accettato_da_tecnico,
       this.conclusione_parziale,
       this.concluso,
       this.saldato,
@@ -73,6 +77,7 @@ class InterventoModel {
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
+      'numerazione_danea' : numerazione_danea,
       'data_apertura_intervento': data_apertura_intervento?.toIso8601String(),
       'data': data?.toIso8601String(),
       'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
@@ -84,6 +89,7 @@ class InterventoModel {
       'prezzo_ivato' : prezzo_ivato,
       'acconto' : acconto,
       'assegnato': assegnato,
+      'accettato_da_tecnico' : accettato_da_tecnico,
       'conclusione_parziale' : conclusione_parziale,
       'concluso': concluso,
       'saldato': saldato,
@@ -108,6 +114,7 @@ class InterventoModel {
 
   InterventoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
+    numerazione_danea = map['numerazione_danea'];
     map['data_apertura_intervento'] != null ? DateTime.parse(map['data_apertura_intervento']) : null;
     map['data'] != null ? DateTime.parse(map['data']) : null;
     map['orario_appuntamento'] != null ? DateTime.parse(map['orario_appuntamento']) : null;
@@ -119,6 +126,7 @@ class InterventoModel {
     prezzo_ivato = map['prezzo_ivato'];
     acconto = map['acconto'];
     assegnato = map['assegnato'];
+    accettato_da_tecnico = map['accettato_da_tecnico'];
     conclusione_parziale = map['conclusione_parziale'];
     concluso = map['concluso'];
     saldato = map['saldato'];
@@ -140,6 +148,7 @@ class InterventoModel {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'numerazione_danea' : numerazione_danea,
     'data_apertura_intervento' : data_apertura_intervento?.toIso8601String(),
     'data': data?.toIso8601String(),
     'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
@@ -151,6 +160,7 @@ class InterventoModel {
     'prezzo_ivato' : prezzo_ivato,
     'acconto' : acconto,
     'assegnato': assegnato,
+    'accettato_da_tecnico' : accettato_da_tecnico,
     'conclusione_parziale' : conclusione_parziale,
     'concluso': concluso,
     'saldato': saldato,
@@ -173,6 +183,7 @@ class InterventoModel {
   factory InterventoModel.fromJson(Map<String, dynamic> json) {
     return InterventoModel(
       json['id']?.toString(),
+      json['numerazione_danea']?.toString(),
       json['data_apertura_intervento'] != null ? DateTime.parse(json['data_apertura_intervento']) : null,
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['orario_appuntamento'] != null ? DateTime.parse(json['orario_appuntamento']) : null,
@@ -184,6 +195,7 @@ class InterventoModel {
       json['prezzo_ivato'],
       json['acconto'] != null ? double.parse(json['acconto'].toString()) : null,
       json['assegnato'],
+      json['accettato_da_tecnico'],
       json['conclusione_parziale'],
       json['concluso'],
       json['saldato'],

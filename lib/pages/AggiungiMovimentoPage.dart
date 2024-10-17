@@ -718,6 +718,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
+          'numerazione_danea' : selectedIntervento?.numerazione_danea,
           'data_apertura_intervento' : selectedIntervento?.data_apertura_intervento?.toIso8601String(),
           'data': selectedIntervento?.data?.toIso8601String(),
           'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
@@ -729,6 +730,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           'prezzo_ivato' : selectedIntervento?.prezzo_ivato,
           'acconto' : double.parse(_importoController.text),
           'assegnato': selectedIntervento?.assegnato,
+          'accettato_da_tecnico' : selectedIntervento?.accettato_da_tecnico,
           'conclusione_parziale' : selectedIntervento?.conclusione_parziale,
           'concluso': selectedIntervento?.concluso,
           'saldato': false,
@@ -767,6 +769,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
+          'numerazione_danea' : selectedIntervento?.numerazione_danea,
           'data_apertura_intervento' : selectedIntervento?.data_apertura_intervento?.toIso8601String(),
           'data': selectedIntervento?.data?.toIso8601String(),
           'orario_appuntamento' : selectedIntervento?.orario_appuntamento?.toIso8601String(),
@@ -778,6 +781,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           'prezzo_ivato' : selectedIntervento?.prezzo_ivato,
           'acconto' : double.parse(_importoController.text.toString()),
           'assegnato': selectedIntervento?.assegnato,
+          'accettato_da_tecnico' : selectedIntervento?.accettato_da_tecnico,
           'conclusione_parziale' : selectedIntervento?.conclusione_parziale,
           'concluso': selectedIntervento?.concluso,
           'saldato': true,

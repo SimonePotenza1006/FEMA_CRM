@@ -571,6 +571,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         Uri.parse('${ipaddress}/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
+          'numerazione_danea' : null,
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'data': _dataOdierna,
           'orario_appuntamento' : null,
@@ -581,6 +582,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           'importo_intervento': null,
           'prezzo_ivato' : null,
           'assegnato': assegnatoValue,
+          'accettato_da_tecnico' : false,
           'conclusione_parziale': conclusioneParzialeValue,
           'concluso': conclusoValue,
           'saldato': false,
@@ -628,6 +630,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
+          'numerazione_danea' : null,
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'data' : _dataOdierna.toIso8601String(),
           'orario_appuntamento' : null,
@@ -639,6 +642,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           'prezzo_ivato' : null,
           'acconto' : null,
           'assegnato': _interventoAutoassegnato != false ? true : false,
+          'accettato_da_tecnico' : false,
           'conclusione_parziale' : false,
           'concluso' : false,
           'saldato' : false,

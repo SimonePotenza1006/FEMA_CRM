@@ -1367,6 +1367,7 @@ class InterventoDataSource extends DataGridSource {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
+          'numerazione_danea' : intervento.numerazione_danea,
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
@@ -1377,6 +1378,7 @@ class InterventoDataSource extends DataGridSource {
           'importo_intervento': intervento.importo_intervento,
           'prezzo_ivato' : intervento.prezzo_ivato,
           'assegnato': intervento.assegnato,
+          'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
           'saldato': intervento.saldato,
@@ -1410,6 +1412,7 @@ class InterventoDataSource extends DataGridSource {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
+          'numerazione_danea' : intervento.numerazione_danea,
           'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
@@ -1420,6 +1423,7 @@ class InterventoDataSource extends DataGridSource {
           'importo_intervento': double.parse(importoController.text),
           'prezzo_ivato' : prezzoIvato,
           'assegnato': intervento.assegnato,
+          'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
           'saldato': intervento.saldato,

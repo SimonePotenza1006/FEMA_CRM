@@ -1015,6 +1015,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
@@ -1026,6 +1027,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
           'acconto' : widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
           'conclusione_parziale' : false,
           'concluso': true,
           'saldato': widget.intervento.saldato,

@@ -1500,6 +1500,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
+          'numerazione_danea' : intervento.numerazione_danea,
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
@@ -1510,6 +1511,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
           'importo_intervento': intervento.importo_intervento,
           'prezzo_ivato' : intervento.prezzo_ivato,
           'assegnato': intervento.assegnato,
+          'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
           'saldato': intervento.saldato,
@@ -1545,6 +1547,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
+          'numerazione_danea' : intervento.numerazione_danea,
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
           'posizione_gps' : intervento.posizione_gps,
@@ -1554,6 +1557,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
           'importo_intervento': double.parse(importoController.text),
           'prezzo_ivato' : intervento.prezzo_ivato,
           'assegnato': intervento.assegnato,
+          'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
           'concluso': intervento.concluso,
           'saldato': intervento.saldato,

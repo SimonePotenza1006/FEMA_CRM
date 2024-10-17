@@ -653,6 +653,7 @@ class _CreazioneInterventoByAmministrazionePageState
           Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'numerazione_danea' : null,
             'data': _dataOdierna.toIso8601String(),
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,
@@ -663,6 +664,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'importo_intervento': null,
             'prezzo_ivato' : null,
             'assegnato': assigned,
+            'accettato_da_tecnico' : false,
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
@@ -791,6 +793,7 @@ class _CreazioneInterventoByAmministrazionePageState
           Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'numerazione_danea' : null,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : orario.toIso8601String(),
@@ -801,6 +804,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'importo_intervento': null,
             'prezzo_ivato' : null,
             'assegnato': assigned,
+            'accettato_da_tecnico' : false,
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
@@ -831,6 +835,7 @@ class _CreazioneInterventoByAmministrazionePageState
           Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'numerazione_danea' : null,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,
@@ -841,6 +846,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'importo_intervento': null,
             'prezzo_ivato': null,
             'assegnato': true,
+            'accettato_da_tecnico' : false,
             'conclusione_parziale' : false,
             'concluso': false,
             'saldato': false,
