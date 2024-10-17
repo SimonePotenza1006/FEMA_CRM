@@ -31,7 +31,8 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   List<UtenteModel> allUtenti = [];
   InterventoModel? interventoAssociato;
   DateTime _dataOdierna = DateTime.now();
-  UtenteModel? selectedUtente;
+  UtenteModel? selectedUtenteRicon;
+  UtenteModel? selectedUtenteRitiro;
   Future<List<Uint8List>>? _futureImages;
   final _formKeyConclusione = GlobalKey<FormState>();
   TextEditingController importoFinaleController = TextEditingController();
@@ -42,6 +43,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   bool modificaDifettoVisible = false;
   DateTime? selectedDateRicon = null;
   DateTime? selectedDateRientro = null;
+  bool _rimborso = false;
 
   /*Future<http.Response?> getIntervento() async {
     try {
@@ -115,10 +117,60 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   @override
   void initState() {
     super.initState();
+    getAllUtentiAttivi();
     difettoController.text = widget.merce.difetto_riscontrato!;
     selectedDateRicon = widget.merce.data_riconsegna;
+    selectedDateRientro = widget.merce.data_rientro_ufficio;
+    selectedUtenteRicon = widget.merce.utenteRiconsegna;
+    selectedUtenteRitiro = widget.merce.utenteRitiro;
     _futureImages = fetchImages();
     importoPreventivatoController = TextEditingController(text: '');//widget.merce.importo_preventivato.toString());
+  }
+
+  Future<void> getAllUtentiAttivi() async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for (var item in jsonData) {
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata Api: $e');
+      _showErrorDialog();
+    }
+  }
+
+  void _showErrorDialog() {
+    if(mounted) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Errore di connessione'),
+            content: const Text(
+              'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.',
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
@@ -187,6 +239,97 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                             );
                           },
                         ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildRimborsoRow({required String title, required bool value, BuildContext? context}) {
+    //bool isValueTooLong = value.length > 20;
+    //String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
+    return SizedBox(
+      width: 500,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Switch(
+                        value: _rimborso,
+                        onChanged: (value) {
+                          setState(() {
+                            _rimborso = value ?? false;
+                          });
+                          modificaRimborso();
+                        },
+                      ),
+                      /*Text(
+                        displayedValue.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),*/
+                      /*if (isValueTooLong && context != null)
+                        IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("${title.toUpperCase()}"),
+                                  content: Text(value),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),*/
                     ],
                   ),
                 ),
@@ -327,6 +470,147 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
     }
   }
 
+  void _showRiconDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Seleziona un Utente', textAlign: TextAlign.center),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Lista degli utenti recuperati tramite la chiamata API
+                  Column(
+                    children: allUtenti.map((utente) {
+                      return ListTile(
+                        title: Text('${utente.nome} ${utente.cognome}'),
+                        onTap: () async {
+                          // Imposta l'utente selezionato come _selectedUtente
+                          setState(() {
+                            selectedUtenteRicon = utente;
+                          });
+                          try{
+                            final response = await http.post(
+                              Uri.parse('${ipaddress}/api/restituzioneMerce'),
+                              headers: {'Content-Type': 'application/json'},
+                              body: jsonEncode({
+                                'id': widget.merce.id.toString(),
+                                'prodotto' : widget.merce.prodotto.toString(),
+                                'data_acquisto': widget.merce.data_acquisto?.toIso8601String(),
+                                'difetto_riscontrato' : widget.merce.difetto_riscontrato.toString(),//difettoController.text.toUpperCase(),
+                                'fornitore' : widget.merce.fornitore?.toMap(),
+                                'data_riconsegna': widget.merce.data_riconsegna?.toIso8601String(),
+                                'utenteRiconsegna': selectedUtenteRicon,//widget.merce.utenteRiconsegna?.toMap(),
+                                'rimborso': widget.merce.rimborso,
+                                'cambio': widget.merce.cambio,
+                                'data_rientro_ufficio' : widget.merce.data_rientro_ufficio?.toIso8601String(),
+                                'utenteRitiro': widget.merce.utenteRitiro?.toMap(),
+                                'concluso': widget.merce.concluso
+                              }),
+                            );
+                            if(response.statusCode == 201){
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Utente addetto alla riconsegna salvato con successo!'),
+                                ),
+                              );
+                              setState(() {
+                                //widget.merce.difetto_riscontrato = difettoController.text;
+                              });
+                            }
+                          } catch(e){
+                            print('Qualcosa non va: $e');
+                          }
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRitiroDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Seleziona un Utente', textAlign: TextAlign.center),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Lista degli utenti recuperati tramite la chiamata API
+                  Column(
+                    children: allUtenti.map((utente) {
+                      return ListTile(
+                        title: Text('${utente.nome} ${utente.cognome}'),
+                        onTap: () async {
+                          // Imposta l'utente selezionato come _selectedUtente
+                          setState(() {
+                            selectedUtenteRitiro = utente;
+                          });
+                          try{
+                            final response = await http.post(
+                              Uri.parse('${ipaddress}/api/restituzioneMerce'),
+                              headers: {'Content-Type': 'application/json'},
+                              body: jsonEncode({
+                                'id': widget.merce.id.toString(),
+                                'prodotto' : widget.merce.prodotto.toString(),
+                                'data_acquisto': widget.merce.data_acquisto?.toIso8601String(),
+                                'difetto_riscontrato' : widget.merce.difetto_riscontrato.toString(),//difettoController.text.toUpperCase(),
+                                'fornitore' : widget.merce.fornitore?.toMap(),
+                                'data_riconsegna': widget.merce.data_riconsegna?.toIso8601String(),
+                                'utenteRiconsegna': widget.merce.utenteRiconsegna?.toMap(),
+                                'rimborso': widget.merce.rimborso,
+                                'cambio': widget.merce.cambio,
+                                'data_rientro_ufficio' : widget.merce.data_rientro_ufficio?.toIso8601String(),
+                                'utenteRitiro': selectedUtenteRitiro,//widget.merce.utenteRitiro?.toMap(),
+                                'concluso': widget.merce.concluso
+                              }),
+                            );
+                            if(response.statusCode == 201){
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Utente addetto alla riconsegna salvato con successo!'),
+                                ),
+                              );
+                              setState(() {
+                                //widget.merce.difetto_riscontrato = difettoController.text;
+                              });
+                            }
+                          } catch(e){
+                            print('Qualcosa non va: $e');
+                          }
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   void modificaDataRientro() async{
     try{
       final response = await http.post(
@@ -351,6 +635,41 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Data di rientro in ufficio salvata con successo!'),
+          ),
+        );
+        setState(() {
+          //widget.merce.difetto_riscontrato = difettoController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaRimborso() async{
+    try{
+      final response = await http.post(
+        Uri.parse('${ipaddress}/api/restituzioneMerce'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.merce.id.toString(),
+          'prodotto' : widget.merce.prodotto.toString(),
+          'data_acquisto': widget.merce.data_acquisto?.toIso8601String(),
+          'difetto_riscontrato' : widget.merce.difetto_riscontrato.toString(),//difettoController.text.toUpperCase(),
+          'fornitore' : widget.merce.fornitore?.toMap(),
+          'data_riconsegna': widget.merce.data_riconsegna?.toIso8601String(),
+          'utenteRiconsegna': widget.merce.utenteRiconsegna?.toMap(),
+          'rimborso': _rimborso,//widget.merce.rimborso,
+          'cambio': widget.merce.cambio,
+          'data_rientro_ufficio' : widget.merce.data_rientro_ufficio?.toIso8601String(),
+          'utenteRitiro': widget.merce.utenteRitiro?.toMap(),
+          'concluso': widget.merce.concluso
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Modifica rimborso salvata con successo!'),
           ),
         );
         setState(() {
@@ -588,70 +907,39 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                               ],
                             ),
                             SizedBox(height: 10),
-                            /*if(modificaDifettoVisible)
-                              SizedBox(
+
+                            Row(
+                              children: [
+                                SizedBox(
                                   width: 500,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: 300,
-                                        child: TextFormField(
-                                          maxLines: null,
-                                          controller: difettoController,
-                                          decoration: InputDecoration(
-                                            labelText: 'Difetto riscontrato',
-                                            hintText: 'Aggiungi difetto',
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 170,
-                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                                        decoration: BoxDecoration(
-                                          // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                                        ),
-                                        child: FloatingActionButton(
-                                          heroTag: "Tag2",
-                                          onPressed: () {
-                                            if(difettoController.text.isNotEmpty){
-                                              modificaDescrizione();
-                                            } else {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                SnackBar(
-                                                  content: Text('Non è possibile salvare un difetto nullo!'),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          backgroundColor: Colors.red,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                                child: Text(
-                                                  'Modifica Difetto'.toUpperCase(),
-                                                  style: TextStyle(color: Colors.white, fontSize: 12),
-                                                  textAlign: TextAlign.center, // Centra il testo
-                                                  softWrap: true, // Permette al testo di andare a capo
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                              ),*/
-                            //buildInfoRow(title: "data riconsegna", value: (widget.merce.data_riconsegna != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_riconsegna!) : "N/A"), context: context),
-                            //SizedBox(height: 10.0),
-                            buildInfoRow(title: "utente Riconsegna", value: widget.merce.utenteRiconsegna != null ? widget.merce.utenteRiconsegna!.nome!+' '+widget.merce.utenteRiconsegna!.cognome! : 'N/A', context: context),
+                                  child:
+                                  buildInfoRow(
+                                      title: "utente riconsegna",
+                                      value: selectedUtenteRicon != null ? selectedUtenteRicon!.nome!+' '+selectedUtenteRicon!.cognome! : 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    _showRiconDialog();
+                                    /*setState(() {
+                                      modificaDifettoVisible = !modificaDifettoVisible;
+                                    });*/
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ],
+                            ),
+                            //buildInfoRow(title: "utente Riconsegna", value: widget.merce.utenteRiconsegna != null ? widget.merce.utenteRiconsegna!.nome!+' '+widget.merce.utenteRiconsegna!.cognome! : 'N/A', context: context),
                             SizedBox(height: 10.0),
-                            buildInfoRow(title: "rimborso", value: widget.merce.rimborso != null ? (widget.merce.rimborso != true ? "NO" : "SI"): "N/A", context: context),
+                            buildRimborsoRow(title: "rimborso", value: widget.merce.rimborso!, context: context),
+                            //buildInfoRow(title: "rimborso", value: widget.merce.rimborso != null ? (widget.merce.rimborso != true ? "NO" : "SI"): "N/A", context: context),
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "cambio", value: widget.merce.cambio != null ? (widget.merce.cambio != true ? "NO" : "SI"): "N/A", context: context),
                             SizedBox(height: 10.0),
@@ -683,9 +971,37 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                                 )
                               ],
                             ),
-                            buildInfoRow(title: "data rientro ufficio", value: (widget.merce.data_rientro_ufficio != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_rientro_ufficio!) : "N/A"), context: context),
+                            //buildInfoRow(title: "data rientro ufficio", value: (widget.merce.data_rientro_ufficio != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_rientro_ufficio!) : "N/A"), context: context),
                             SizedBox(height: 10.0),
-                            buildInfoRow(title: "utente Ritiro", value: widget.merce.utenteRitiro != null ? widget.merce.utenteRitiro!.nome!+' '+widget.merce.utenteRitiro!.cognome! : 'N/A', context: context),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child:
+                                  buildInfoRow(
+                                      title: "utente ritiro",
+                                      value: selectedUtenteRitiro != null ? selectedUtenteRitiro!.nome!+' '+selectedUtenteRitiro!.cognome! : 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    _showRitiroDialog();
+                                    /*setState(() {
+                                      modificaDifettoVisible = !modificaDifettoVisible;
+                                    });*/
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ],
+                            ),
+                            //buildInfoRow(title: "utente Ritiro", value: widget.merce.utenteRitiro != null ? widget.merce.utenteRitiro!.nome!+' '+widget.merce.utenteRitiro!.cognome! : 'N/A', context: context),
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "concluso", value: widget.merce.concluso != null ? (widget.merce.concluso != true ? "NO" : "SI"): "N/A", context: context),
                             Container(

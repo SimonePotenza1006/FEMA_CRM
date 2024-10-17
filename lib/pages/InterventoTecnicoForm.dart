@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:fema_crm/model/InterventoModel.dart';
 import 'package:fema_crm/pages/VerificaMaterialeNewPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import '../model/CategoriaInterventoSpecificoModel.dart';
 import '../model/ClienteModel.dart';
@@ -52,6 +54,14 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   GlobalKey<SfSignaturePadState> _signaturePadKey =
   GlobalKey<SfSignaturePadState>();
   Uint8List? signatureBytes;
+  final _formKey = GlobalKey<FormState>();
+  final _articoloController = TextEditingController();
+  final _accessoriController = TextEditingController();
+  final _difettoController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _datiController = TextEditingController();
+  bool _preventivoRichiesto = false;
+  List<XFile> pickedImages =  [];
 
   @override
   void initState() {
@@ -382,12 +392,76 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                   ),
                 ),
               ),
+              if(_selectedTipologia?.descrizione == "Riparazione Merce")
+                Center(
+                  child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: 15,),
+                                  _buildTextFormField(
+                                      _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
+                                  SizedBox(height: 15,),
+                                  _buildTextFormField(
+                                      _accessoriController, "Accessori", "Inserisci gli accessori se presenti"),
+                                  SizedBox(height: 15,),
+                                  _buildTextFormField(
+                                      _difettoController, "Difetto", "Inserisci il difetto riscontrato"),
+                                  SizedBox(height: 15,),
+                                  _buildTextFormField(
+                                      _passwordController, "Password", "Inserisci le password, se presenti"),
+                                  SizedBox(height: 15,),
+                                  _buildTextFormField(
+                                      _datiController, "Dati", "Inserisci i dati da salvaguardare"),
+                                  SizedBox(height: 15,),
+                                  Center(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Checkbox(
+                                          value: _preventivoRichiesto,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _preventivoRichiesto = value!;
+                                            });
+                                          },
+                                        ),
+                                        Text("è richiesto un preventivo".toUpperCase()),
+                                      ],
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 20),
+                                  SizedBox(height: 15,),
+                                  ElevatedButton(
+                                    onPressed: takePicture,
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.red,
+                                      onPrimary: Colors.white,
+                                    ),
+                                    child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                  ),
+                                  SizedBox(height: 15,),
+                                  _buildImagePreview(),
+                                ]
+                            ),
+                          ),
+                        )
+                      ]
+                  ),
+                ),
               const SizedBox(height: 20.0),
               Container(
                 alignment: Alignment.bottomCenter,
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: ElevatedButton(
                   onPressed: () {
+
                     if(_interventoConcluso == true){
                       saveAndRedirect();
                     } else {
@@ -405,6 +479,72 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     );
   }
 
+  Future<void> takePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      setState(() {
+        pickedImages.add(pickedFile);
+      });
+    }
+  }
+
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    setState(() {
+                      pickedImages.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText) {
+    return SizedBox(
+      width: 300,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hintText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.grey,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+              color: Colors.red,
+            ),
+          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        ),
+      ),
+    );
+  }
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {

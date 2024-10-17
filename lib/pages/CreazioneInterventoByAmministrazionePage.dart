@@ -522,10 +522,12 @@ class _CreazioneInterventoByAmministrazionePageState
                           padding: const EdgeInsets.only(bottom: 20.0),
                           child: ElevatedButton(
                             onPressed: (selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty && _selectedTipologia != null)
-                                ? () {
-                              if (_selectedTipologia?.descrizione == "Riparazione Merce") {
+                                ? ()
+                            {
+                              /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {
                                 savePics();
-                              } else if ((responsabile == null)) {
+                              } else */
+                              if ((responsabile == null && _selectedUtenti!.isEmpty)) {
                                 _alertDialog();
                               } else {
                                 saveRelations();
@@ -559,8 +561,11 @@ class _CreazioneInterventoByAmministrazionePageState
             actions: <Widget>[
               TextButton(
                   onPressed: (){
+
+
                     if(_selectedTipologia?.id == 6){
-                      saveInterventoPlusMerce();
+                      savePics();
+                      //saveInterventoPlusMerce();
                     } else{
                       saveIntervento().then((value) => Navigator.pop(context));
                       Navigator.pop(context);
@@ -695,7 +700,7 @@ class _CreazioneInterventoByAmministrazionePageState
   }
 
   Future<void> saveRelations() async {
-    final data = await saveIntervento();
+    final data = _selectedTipologia?.id == 6 ? await saveIntervento() : await saveInterventoPlusMerce();
     if (_selectedUtenti == null || _selectedUtenti!.isEmpty) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -736,6 +741,38 @@ class _CreazioneInterventoByAmministrazionePageState
             print('Errore durante il salvataggio della relazione: $e');
             _showErrorDialog();
           }
+        }
+        //salvataggio pics
+        if (_selectedTipologia?.id == 6) try{
+          for(var image in pickedImages){
+            if(image.path != null && image.path.isNotEmpty){
+              print('Percorso del file: ${image.path}');
+              var request = http.MultipartRequest(
+                  'POST',
+                  Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+              );
+              request.files.add(
+                await http.MultipartFile.fromPath(
+                  'intervento',
+                  image.path,
+                  contentType: MediaType('image', 'jpeg'),
+                ),
+              );
+              var response = await request.send();
+              if(response.statusCode == 200){
+                print('File inviato con successo');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Foto salvata'),
+                  ),
+                );
+              }
+            }
+          }
+          pickedImages.clear();
+          Navigator.pop(context);
+        } catch(e){
+          print('Errore durante l\'invio del file: $e');
         }
         // Mostra un messaggio di successo all'utente se tutto è andato a buon fine
         if (mounted) {
