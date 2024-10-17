@@ -41,6 +41,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   final TextEditingController difettoController = TextEditingController();
   bool modificaDifettoVisible = false;
   DateTime? selectedDateRicon = null;
+  DateTime? selectedDateRientro = null;
 
   /*Future<http.Response?> getIntervento() async {
     try {
@@ -115,6 +116,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void initState() {
     super.initState();
     difettoController.text = widget.merce.difetto_riscontrato!;
+    selectedDateRicon = widget.merce.data_riconsegna;
     _futureImages = fetchImages();
     importoPreventivatoController = TextEditingController(text: '');//widget.merce.importo_preventivato.toString());
   }
@@ -277,11 +279,82 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       if(response.statusCode == 201){
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Difetto cambiato con successo!'),
+            content: Text('Difetto salvato con successo!'),
           ),
         );
         setState(() {
           widget.merce.difetto_riscontrato = difettoController.text;
+          modificaDifettoVisible = !modificaDifettoVisible;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDataRicon() async{
+    try{
+      final response = await http.post(
+        Uri.parse('${ipaddress}/api/restituzioneMerce'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.merce.id.toString(),
+          'prodotto' : widget.merce.prodotto.toString(),
+          'data_acquisto': widget.merce.data_acquisto?.toIso8601String(),
+          'difetto_riscontrato' : widget.merce.difetto_riscontrato.toString(),//difettoController.text.toUpperCase(),
+          'fornitore' : widget.merce.fornitore?.toMap(),
+          'data_riconsegna': selectedDateRicon?.toIso8601String(),//widget.merce.data_riconsegna?.toIso8601String(),
+          'utenteRiconsegna': widget.merce.utenteRiconsegna?.toMap(),
+          'rimborso': widget.merce.rimborso,
+          'cambio': widget.merce.cambio,
+          'data_rientro_ufficio' : widget.merce.data_rientro_ufficio?.toIso8601String(),
+          'utenteRitiro': widget.merce.utenteRitiro?.toMap(),
+          'concluso': widget.merce.concluso
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Data di riconsegna salvata con successo!'),
+          ),
+        );
+        setState(() {
+          //widget.merce.difetto_riscontrato = difettoController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDataRientro() async{
+    try{
+      final response = await http.post(
+        Uri.parse('${ipaddress}/api/restituzioneMerce'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.merce.id.toString(),
+          'prodotto' : widget.merce.prodotto.toString(),
+          'data_acquisto': widget.merce.data_acquisto?.toIso8601String(),
+          'difetto_riscontrato' : widget.merce.difetto_riscontrato.toString(),//difettoController.text.toUpperCase(),
+          'fornitore' : widget.merce.fornitore?.toMap(),
+          'data_riconsegna': widget.merce.data_riconsegna?.toIso8601String(),
+          'utenteRiconsegna': widget.merce.utenteRiconsegna?.toMap(),
+          'rimborso': widget.merce.rimborso,
+          'cambio': widget.merce.cambio,
+          'data_rientro_ufficio' : selectedDateRientro?.toIso8601String(),//widget.merce.data_rientro_ufficio?.toIso8601String(),
+          'utenteRitiro': widget.merce.utenteRitiro?.toMap(),
+          'concluso': widget.merce.concluso
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Data di rientro in ufficio salvata con successo!'),
+          ),
+        );
+        setState(() {
+          //widget.merce.difetto_riscontrato = difettoController.text;
         });
       }
     } catch(e){
@@ -301,6 +374,23 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       setState(() {
         selectedDateRicon = dataSelezionata;
       });
+      if (dataSelezionata != widget.merce.data_riconsegna) modificaDataRicon();
+    }
+  }
+
+  Future<void> _selezionaDataRientro() async {
+    final DateTime? dataSelezionata = await showDatePicker(
+      locale: const Locale('it', 'IT'),
+      context: context,
+      initialDate: widget.merce.data_rientro_ufficio == null ? _dataOdierna : widget.merce.data_rientro_ufficio,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
+      setState(() {
+        selectedDateRientro = dataSelezionata;
+      });
+      if (dataSelezionata != widget.merce.data_rientro_ufficio) modificaDataRientro();
     }
   }
 
@@ -497,7 +587,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                                 )
                               ],
                             ),
-                            SizedBox(height: 15),
+                            SizedBox(height: 10),
                             /*if(modificaDifettoVisible)
                               SizedBox(
                                   width: 500,
@@ -557,14 +647,42 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                                     ],
                                   )
                               ),*/
-                            buildInfoRow(title: "data riconsegna", value: (widget.merce.data_riconsegna != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_riconsegna!) : "N/A"), context: context),
-                            SizedBox(height: 10.0),
+                            //buildInfoRow(title: "data riconsegna", value: (widget.merce.data_riconsegna != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_riconsegna!) : "N/A"), context: context),
+                            //SizedBox(height: 10.0),
                             buildInfoRow(title: "utente Riconsegna", value: widget.merce.utenteRiconsegna != null ? widget.merce.utenteRiconsegna!.nome!+' '+widget.merce.utenteRiconsegna!.cognome! : 'N/A', context: context),
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "rimborso", value: widget.merce.rimborso != null ? (widget.merce.rimborso != true ? "NO" : "SI"): "N/A", context: context),
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "cambio", value: widget.merce.cambio != null ? (widget.merce.cambio != true ? "NO" : "SI"): "N/A", context: context),
                             SizedBox(height: 10.0),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child:
+                                  buildInfoRow(
+                                      title: "data rientro in ufficio",
+                                      value: selectedDateRientro != null ? DateFormat('dd/MM/yyyy').format(selectedDateRientro!) : 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    _selezionaDataRientro();
+                                    /*setState(() {
+                                      modificaDifettoVisible = !modificaDifettoVisible;
+                                    });*/
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ],
+                            ),
                             buildInfoRow(title: "data rientro ufficio", value: (widget.merce.data_rientro_ufficio != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_rientro_ufficio!) : "N/A"), context: context),
                             SizedBox(height: 10.0),
                             buildInfoRow(title: "utente Ritiro", value: widget.merce.utenteRitiro != null ? widget.merce.utenteRitiro!.nome!+' '+widget.merce.utenteRitiro!.cognome! : 'N/A', context: context),

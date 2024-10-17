@@ -955,6 +955,7 @@ class _CreazioneInterventoByAmministrazionePageState
                           setState(() {
                             responsabile = utente;
                           });
+                          Navigator.of(context).pop();
                         },
                       );
                     }).toList(),
