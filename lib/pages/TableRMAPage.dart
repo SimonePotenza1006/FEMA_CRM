@@ -545,7 +545,7 @@ class MerceDataSource extends DataGridSource{
             ),
             DataGridCell<String>(
                 columnName: 'utenteRiconsegna',
-                value: merce.utenteRiconsegna!.nome!+' '+merce.utenteRiconsegna!.cognome!,
+                value: merce.utenteRiconsegna != null ? merce.utenteRiconsegna!.nome!+' '+merce.utenteRiconsegna!.cognome! : 'N/A',
             ),
             DataGridCell<String>(
                 columnName: 'rimborso',
@@ -563,7 +563,7 @@ class MerceDataSource extends DataGridSource{
             ),
             DataGridCell<String>(
                 columnName: 'utenteRitiro',
-                value: merce.utenteRitiro!.nome!+' '+merce.utenteRitiro!.cognome!
+                value: merce.utenteRitiro != null ? merce.utenteRitiro!.nome!+' '+merce.utenteRitiro!.cognome! : 'N/A'
             ),
             DataGridCell<String>(
                 columnName: 'concluso',

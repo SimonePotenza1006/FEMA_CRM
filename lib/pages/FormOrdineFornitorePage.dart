@@ -157,8 +157,10 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
                               title: Text(
                                   '${cliente.denominazione}, ${cliente.indirizzo}'),
                               onTap: () {
+                                _aggiornaClienteSelezionato(cliente);
                                 setState(() {
                                   selectedCliente = cliente;
+                                  //print('Cliente selezionato: ${selectedCliente?.denominazione}');
                                 });
                                 Navigator.of(context).pop();
                               },
@@ -175,6 +177,12 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
         );
       },
     );
+  }
+
+  void _aggiornaClienteSelezionato(ClienteModel cliente) {
+    setState(() {
+      selectedCliente = cliente;
+    });
   }
 
   @override
@@ -223,25 +231,30 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               SizedBox(
-                width: 300,
-                child: Container(
+                width: 220,
+                /*child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.grey[300]!),
-                  ),
+                  ),*/
                   child: GestureDetector(
                     onTap: () {
                       _showClientiDialog();
                     },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: SizedBox(//Padding(
+                      height: 50,
+                      //padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                            (selectedCliente?.denominazione != null && selectedCliente!.denominazione!.length > 18)
+                                ? '${selectedCliente!.denominazione?.substring(0, 18)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                : (selectedCliente?.denominazione ?? 'Seleziona Cliente').toUpperCase(),
+
+                            //selectedCliente?.denominazione ?? 'Seleziona Cliente',
                             style: TextStyle(fontSize: 16),
                           ),
                           Icon(Icons.arrow_drop_down),
@@ -249,7 +262,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
                       ),
                     ),
                   ),
-                ),
+                //),
               ),
               SizedBox(height: 12),
               SizedBox(

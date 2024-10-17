@@ -46,13 +46,16 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   final _isEdited = <bool>[];
   bool _isLoading = false;
 
-  Future<String> getAddressFromCoordinates(
-      double latitude, double longitude) async {
+  Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
     try {
-      List<Placemark> placemarks =
-      await placemarkFromCoordinates(latitude, longitude);
-      Placemark place = placemarks[0];
-      return '${place.street},${place.subThoroughfare} ${place.locality}, ${place.administrativeArea} ${place.postalCode}';//, ${place.country}';
+      //List<Placemark> placemarks =
+      return placemarkFromCoordinates(latitude, longitude).then((value) {
+
+        return value.isNotEmpty ? '${value[0].street}, ${value[0].subThoroughfare} ${value[0].locality}, ${value[0].administrativeArea} ${value[0].postalCode}'
+        : '';
+      });
+      //Placemark place = placemarks[0];
+      //return '${place.street},${place.subThoroughfare} ${place.locality}, ${place.administrativeArea} ${place.postalCode}';//, ${place.country}';
     } catch (e) {
       print("Errore durante la conversione delle coordinate in indirizzo: $e");
       return "Indirizzo non disponibile";
@@ -61,14 +64,19 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   Future<void> _getCurrentLocation() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      String indirizzo =
-      await getAddressFromCoordinates(position.latitude, position.longitude);
+      await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((value) =>
+        getAddressFromCoordinates(value.latitude, value.longitude).then((value2) {
+          setState(() {
+            //_gps = "${position.latitude}, ${position.longitude}";
+            _indirizzo = value2.toString();
+          });
+        })
+      );
+      /*String indirizzo = await getAddressFromCoordinates(position.latitude, position.longitude);
       setState(() {
         _gps = "${position.latitude}, ${position.longitude}";
         _indirizzo = indirizzo.toString();
-      });
+      });*/
     } catch (e) {
       print("Errore durante l'ottenimento della posizione: $e");
     }
@@ -328,7 +336,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(15),
           child: Form(
             key: _formKey,
             child: Column(
@@ -351,12 +359,17 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
                   '${tipoTimbratura}',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 1),
+                Text(
+                  '${_indirizzo}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 7),
                 Text(
                   '${dataOdierna}',
                   style: TextStyle(fontSize: 20),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 25),
                 tipoTimbratura != 'TIMBRATURE ODIERNE TERMINATE' ? SizedBox(
                   width: 650,
                   height: 250,
@@ -633,7 +646,9 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
               content: Text('Timbratura di $tipoMessaggio registrata con successo!'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('OK'),
+                  child: Text('OK', style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.bold)),
                   onPressed: () {
                     Navigator.of(context).pop(); // Chiude l'AlertDialog
                     Navigator.pop(context); // Torna alla pagina precedente
