@@ -6,12 +6,14 @@ import 'package:fema_crm/model/InterventoModel.dart';
 import 'package:fema_crm/pages/VerificaMaterialeNewPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import '../model/CategoriaInterventoSpecificoModel.dart';
 import '../model/ClienteModel.dart';
 import '../model/DDTModel.dart';
 import '../model/DestinazioneModel.dart';
+import '../model/MerceInRiparazioneModel.dart';
 import '../model/RelazioneDdtProdottiModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
@@ -460,14 +462,34 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                 alignment: Alignment.bottomCenter,
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: (selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty && _selectedTipologia != null)
+                      ? () {
 
-                    if(_interventoConcluso == true){
+                    if(_selectedTipologia?.id == '6'){
+                      savePics().then((value) => Navigator.pop(context));
+                      //Navigator.pop(context);
+                      //saveInterventoPlusMerce();
+                    } else{
+                      if(_interventoConcluso == true){
+                        saveAndRedirect().then((value) => Navigator.pop(context));
+                      } else {
+                        saveIntervento().then((value) => Navigator.pop(context));
+                      }
+                      //saveIntervento().then((value) => Navigator.pop(context));
+                      //Navigator.pop(context);
+                    }
+
+                          /*if ((_interventoAutoassegnato == false)) { //no tecnico
+                             _alertDialog();
+                          } else {
+                              saveRelations();*/
+                    /*if(_interventoConcluso == true){
                       saveAndRedirect();
                     } else {
                       saveIntervento();
-                    }
-                  },
+                    }*/
+                          
+                  } : null,
                   style: ElevatedButton.styleFrom(primary: Colors.red),
                   child: const Text('SALVA INTERVENTO', style: TextStyle(color: Colors.white)),
                 ),
@@ -477,6 +499,281 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         ),
       ),
     );
+  }
+
+  Future<http.Response?> saveMerce() async{
+    bool? magazzino = _interventoAutoassegnato == true ? true : false;
+    late http.Response response;
+    try{
+      response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data' : DateTime.now().toIso8601String(),
+          'articolo' : _articoloController.text,
+          'accessori': _accessoriController.text,
+          'difetto_riscontrato': _difettoController.text,
+          'password' : _passwordController.text,
+          'dati' : _datiController.text,
+          'presenza_magazzino' : _interventoAutoassegnato,
+          'preventivo' : _preventivoRichiesto,
+          'utente' : _interventoAutoassegnato == true ? widget.userData.toMap() : null,
+        }),
+      );
+      print("Merce salvata! : ${response.body}");
+      return response;
+    } catch(e){
+      print('Errore durante il salvataggio dell\'intervento: $e');
+    }
+    return null;
+  }
+
+
+  Future<http.Response?> saveInterventoPlusMerce() async{
+    final data = await saveMerce();
+    try{
+      if (data == null) {
+        // Gestisci il caso in cui il salvataggio dell'intervento non restituisca dati validi
+        throw Exception('Dati dell\'intervento non disponibili.');
+      }
+      final merce = MerceInRiparazioneModel.fromJson(jsonDecode(data.body));
+      //bool assigned = _interventoAutoassegnato == null ? true : false;
+      try{
+        if(_interventoConcluso == true){
+          saveAndRedirect().then((value) => Navigator.pop(context));
+          //final response = await
+          try {
+            // Inizializziamo le variabili per i valori da inviare
+            DateTime? orarioInizioSalvato;
+            DateTime? orarioFineSalvato;
+            bool conclusioneParzialeValue = false;
+            bool assegnatoValue = false;
+            bool conclusoValue = false;
+            Map<String, dynamic>? veicolo;
+            Map<String, dynamic>? utente;
+
+            // Verifichiamo lo stato della checkbox
+            if (_interventoConcluso) {
+              final now = DateTime.now();
+              // Se l'intervento è concluso, convertiamo i valori TimeOfDay in DateTime
+              orarioInizioSalvato = DateTime(
+                now.year,
+                now.month,
+                now.day,
+                _orarioInizio.hour,
+                _orarioInizio.minute,
+              );
+              orarioFineSalvato = DateTime(
+                now.year,
+                now.month,
+                now.day,
+                _orarioFine.hour,
+                _orarioFine.minute,
+              );
+              conclusioneParzialeValue = true;
+              assegnatoValue = true;
+              conclusoValue = true;
+              veicolo = selectedVeicolo?.toMap();
+              utente = widget.userData.toMap();
+            }
+
+            // Effettuiamo la richiesta HTTP con i dati appropriati in base allo stato della checkbox
+            final response = await http.post(
+              Uri.parse('${ipaddress}/api/intervento'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'numerazione_danea' : null,
+                'data_apertura_intervento' : DateTime.now().toIso8601String(),
+                'data': _dataOdierna.toIso8601String(),
+                'orario_appuntamento' : null,
+                'posizione_gps' : null,
+                'orario_inizio': orarioInizioSalvato?.toIso8601String(),
+                'orario_fine': orarioFineSalvato?.toIso8601String(),
+                'descrizione': _descrizione,
+                'importo_intervento': null,
+                'prezzo_ivato' : null,
+                'iva' : null,
+                'assegnato': assegnatoValue,
+                'accettato_da_tecnico' : false,
+                'conclusione_parziale': conclusioneParzialeValue,
+                'concluso': conclusoValue,
+                'saldato': false,
+                'saldato_da_tecnico' : false,
+                'note': _nota,
+                'relazione_tecnico': _relazione,
+                'firma_cliente': signatureBytes,
+                'utente': utente,
+                'cliente': selectedCliente?.toMap(),
+                'veicolo': veicolo,
+                'merce' : null,
+                'tipologia': _selectedTipologia?.toMap(),
+                'categoria_intervento_specifico': null,
+                'tipologia_pagamento': null,
+                'destinazione': selectedDestinazione?.toMap(),
+                'gruppo' : null,
+              }),
+            );
+
+            // Restituiamo la risposta HTTP
+            //return response;
+            final intervento = InterventoModel.fromJson(jsonDecode(response.body));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => VerificaMaterialeNewPage(intervento: intervento, utente: widget.userData)),
+            );
+          } catch (e) {
+            print('Errore durante il salvataggio dell\'intervento: $e');
+            _showErrorDialog();
+            return null; // Restituiamo null in caso di errore
+          };
+          /*if (response != null) {
+            final intervento = InterventoModel.fromJson(jsonDecode(response.body));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => VerificaMaterialeNewPage(intervento: intervento, utente: widget.userData)),
+            );
+          } else {
+            print('Errore durante il recupero del ddt');
+          }*/
+        } else {
+          //saveIntervento().then((value) => Navigator.pop(context));
+          try {
+            final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+                headers: {'Content-Type' : 'application/json'},
+                body: jsonEncode({
+                  'numerazione_danea' : null,
+                  'data_apertura_intervento' : DateTime.now().toIso8601String(),
+                  'data' : _dataOdierna.toIso8601String(),
+                  'orario_appuntamento' : null,
+                  'posizione_gps' : null,
+                  'orario_inizio': null,
+                  'orario_fine': null,
+                  'descrizione' : _descrizioneController.text,
+                  'importo_intervento': null,
+                  'prezzo_ivato' : null,
+                  'iva' : null,
+                  'acconto' : null,
+                  'assegnato': _interventoAutoassegnato != false ? true : false,
+                  'accettato_da_tecnico' : false,
+                  'conclusione_parziale' : false,
+                  'concluso' : false,
+                  'saldato' : false,
+                  'saldato_da_tecnico' : false,
+                  'note' : _notaController.text,
+                  'relazione_tecnico' : null,
+                  'firma_cliente' : null,
+                  'utente' : _interventoAutoassegnato != false ? widget.userData.toMap() : null,
+                  'cliente' : selectedCliente?.toMap(),
+                  'veicolo' : null,
+                  'merce' : merce.toMap(),//null,
+                  'tipologia' : _selectedTipologia?.toMap(),
+                  'categoria' : null,
+                  'tipologia_pagamento' : null,
+                  'destinazione' : selectedDestinazione?.toMap(),
+                  'gruppo' : null,
+                })
+            );
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Intervento registrato con successo!'),
+              ),
+            );
+
+          } catch(e){
+            print('Errore durante il salvataggio dell\'intervento: $e');
+            _showErrorDialog();
+          }
+        }
+        /*final response = await http.post(
+          Uri.parse('$ipaddress/api/intervento'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'numerazione_danea' : null,
+            'data': _dataOdierna.toIso8601String(),//selectedDate != null ? selectedDate?.toIso8601String() : null,//_dataOdierna.toIso8601String(),
+            'data_apertura_intervento' : DateTime.now().toIso8601String(),
+            'orario_appuntamento' : null,
+            'posizione_gps' : null,
+            'orario_inizio': null,
+            'orario_fine': null,
+            'descrizione': _descrizioneController.text,
+            'importo_intervento': null,
+            'prezzo_ivato' : null,
+            'iva' : null,
+            'assegnato': _interventoAutoassegnato,//assigned,
+            'accettato_da_tecnico' : false,
+            'conclusione_parziale' : false,
+            'concluso': false,
+            'saldato': false,
+            'saldato_da_tecnico' : false,
+            'note': _notaController.text.isNotEmpty ? _notaController.text : null,
+            'relazione_tecnico' : null,
+            'firma_cliente': null,
+            'utente': _interventoAutoassegnato == true ? widget.userData.toMap() : null,
+            'cliente': selectedCliente?.toMap(),
+            'veicolo': null,
+            'merce' : merce.toMap(),
+            'tipologia': _selectedTipologia?.toMap(),
+            'categoria_intervento_specifico': selectedCategoria?.toMap(),
+            'tipologia_pagamento': null,
+            'destinazione': selectedDestinazione?.toMap(),
+          }),
+        );
+        return response;*/
+      } catch(e){
+        print('Errore durante il salvataggio dell\'intervento con merce: $e');
+        return null;
+      }
+    }
+    catch(e){
+      print('ERRORE: $e');
+      return null;
+    }
+  }
+
+  Future<http.Response?> savePics() async{
+    final data = await saveInterventoPlusMerce();
+    try{
+      if(data == null){
+        throw Exception('Dati dell\'intervento non disponibili.');
+      }
+      final intervento = InterventoModel.fromJson(jsonDecode(data.body));
+      try{
+        for(var image in pickedImages){
+          if(image.path != null && image.path.isNotEmpty){
+            print('Percorso del file: ${image.path}');
+            var request = http.MultipartRequest(
+                'POST',
+                Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+            );
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'intervento',
+                image.path,
+                contentType: MediaType('image', 'jpeg'),
+              ),
+            );
+            var response = await request.send();
+            if(response.statusCode == 200){
+              print('File inviato con successo');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Foto salvata'),
+                ),
+              );
+            }
+          }
+        }
+        pickedImages.clear();
+        print('fine salv');
+        Navigator.pop(context);
+      } catch(e){
+        print('Errore durante l\'invio del file: $e');
+      }
+    } catch(e){
+      print('Errore durante l\'invio del file: $e');
+    }
+    return null;
   }
 
   Future<void> takePicture() async {
@@ -713,7 +1010,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         body: jsonEncode({
           'numerazione_danea' : null,
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
-          'data': _dataOdierna,
+          'data': _dataOdierna.toIso8601String(),
           'orario_appuntamento' : null,
           'posizione_gps' : null,
           'orario_inizio': orarioInizioSalvato?.toIso8601String(),
