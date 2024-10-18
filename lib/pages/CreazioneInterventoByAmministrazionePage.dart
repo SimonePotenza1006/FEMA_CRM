@@ -342,7 +342,7 @@ class _CreazioneInterventoByAmministrazionePageState
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 240,
+                              width: 250,
                               child: GestureDetector(
                                 onTap: () {
                                   _showDestinazioniDialog();
@@ -527,9 +527,15 @@ class _CreazioneInterventoByAmministrazionePageState
                               /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {
                                 savePics();
                               } else */
-                              if ((responsabile == null && _selectedUtenti!.isEmpty)) {
+                              if ((responsabile == null && _selectedUtenti!.isEmpty)) { //no tecnico e no squadra
                                 _alertDialog();
-                              } else {
+
+                              } /*else if (responsabile != null && _selectedUtenti!.isEmpty) { //solo resp
+
+                              }*/
+
+                              else {
+                               // print('no ');
                                 saveRelations();
                               }
                             }
@@ -554,7 +560,7 @@ class _CreazioneInterventoByAmministrazionePageState
   void _alertDialog(){
     showDialog(
         context: context,
-        builder: (BuildContext context){
+        builder: (BuildContext dialogContext){
           return AlertDialog(
             title: Text('ATTENZIONE'),
             content: Text('L\'intervento non è stato assegnato ad alcun tecnico, procedere con la creazione?'.toUpperCase()),
@@ -564,10 +570,11 @@ class _CreazioneInterventoByAmministrazionePageState
 
 
                     if(_selectedTipologia?.id == '6'){
-                      savePics();
+                      savePics().then((value) => Navigator.pop(dialogContext));
+                      Navigator.pop(context);
                       //saveInterventoPlusMerce();
                     } else{
-                      saveIntervento().then((value) => Navigator.pop(context));
+                      saveIntervento().then((value) => Navigator.pop(dialogContext));
                       Navigator.pop(context);
                     }
                   },
@@ -632,6 +639,7 @@ class _CreazioneInterventoByAmministrazionePageState
           }
         }
         pickedImages.clear();
+        print('fine salv');
         Navigator.pop(context);
       } catch(e){
         print('Errore durante l\'invio del file: $e');
@@ -659,7 +667,7 @@ class _CreazioneInterventoByAmministrazionePageState
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'numerazione_danea' : null,
-            'data': _dataOdierna.toIso8601String(),
+            'data': selectedDate != null ? selectedDate?.toIso8601String() : null,//_dataOdierna.toIso8601String(),
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,
             'posizione_gps' : null,
@@ -701,7 +709,7 @@ class _CreazioneInterventoByAmministrazionePageState
   }
 
   Future<void> saveRelations() async {
-    final data = _selectedTipologia?.id == 6 ? await saveIntervento() : await saveInterventoPlusMerce();
+    final data = _selectedTipologia?.id == '6' ? await saveInterventoPlusMerce() : await saveIntervento();
     if (_selectedUtenti == null || _selectedUtenti!.isEmpty) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -744,7 +752,7 @@ class _CreazioneInterventoByAmministrazionePageState
           }
         }
         //salvataggio pics
-        if (_selectedTipologia?.id == 6) try{
+        if (_selectedTipologia?.id == '6') try{
           for(var image in pickedImages){
             if(image.path != null && image.path.isNotEmpty){
               print('Percorso del file: ${image.path}');
