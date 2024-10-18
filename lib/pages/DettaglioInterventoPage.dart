@@ -107,7 +107,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
     if (pickedTime != null) {
       setState(() {
-        
+          print('');
         _selectedTimeAppuntamento = pickedTime;
       });
     }
