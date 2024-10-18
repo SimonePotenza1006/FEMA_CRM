@@ -97,7 +97,6 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   }
 
   void _showInterventiDialog() {
-    var importo = selectedIntervento?.importo_intervento?.toStringAsFixed(2) ?? 'N/A';
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -113,9 +112,16 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: interventi.map((intervento) {
+                        // Calcola l'importo ivato, se i campi sono presenti
+                        double? importoIvato = (intervento.importo_intervento != null && intervento.iva != null)
+                            ? intervento.importo_intervento! * (1 + (intervento.iva! / 100))
+                            : null;
+
                         return ListTile(
                           leading: const Icon(Icons.settings),
-                          title: Text('${intervento.descrizione!}, importo: ${intervento.importo_intervento != null ? intervento.importo_intervento!.toStringAsFixed(2)+"€" : "Importo non inserito" }'),
+                          title: Text(
+                            '${intervento.descrizione!}, importo: ${importoIvato != null ? importoIvato.toStringAsFixed(2) + "€" : "Importo non inserito"}',
+                          ),
                           subtitle: Text(intervento.saldato! ? 'Saldato' : 'Non saldato'),
                           onTap: () {
                             setState(() {
@@ -135,6 +141,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       },
     );
   }
+
 
   void _showClientiDialog() {
     TextEditingController searchController = TextEditingController(); // Aggiungi un controller

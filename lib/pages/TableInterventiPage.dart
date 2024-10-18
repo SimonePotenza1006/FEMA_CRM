@@ -52,6 +52,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'responsabile' : 230,
     'importo_intervento': 150,
     'prezzo_ivato' : 130,
+    'importo_ivato' : 150,
     'acconto': 150,
     'inserimento_importo' : 150,
     'importo_restante' : 150,
@@ -718,7 +719,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                         ),
                       ),
                       child: ColumnFilter(
-                        columnName: 'importo'.toUpperCase(),
+                        columnName: 'importo \n netto'.toUpperCase(),
                         onFilterApplied: (filtro) {
                           setState(() {
                             _dataSource.filtraColonna('importo_intervento', filtro);
@@ -750,8 +751,29 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     width: _columnWidths['inserimento_importo']?? double.nan,
                     minimumWidth: 150,
                   ),
+                  // GridColumn(
+                  //   columnName: 'prezzo_ivato'.toUpperCase(),
+                  //   label: Container(
+                  //     padding: EdgeInsets.all(8.0),
+                  //     alignment: Alignment.center,
+                  //     decoration: BoxDecoration(
+                  //       border: Border(
+                  //         right: BorderSide(
+                  //           color: Colors.grey[300]!,
+                  //           width: 1,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     child: Text(
+                  //       'Prezzo Ivato'.toUpperCase(),
+                  //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  //     ),
+                  //   ),
+                  //   width: _columnWidths['prezzo_ivato']?? double.nan,
+                  //   minimumWidth: 130, // Imposta la larghezza minima
+                  // ),
                   GridColumn(
-                    columnName: 'prezzo_ivato'.toUpperCase(),
+                    columnName: 'importo_ivato',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
                       alignment: Alignment.center,
@@ -763,13 +785,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           ),
                         ),
                       ),
-                      child: Text(
-                        'Prezzo Ivato'.toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      child: ColumnFilter(
+                        columnName: 'importo \n ivato'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('importo_ivato', filtro);
+                          });
+                        },
                       ),
                     ),
-                    width: _columnWidths['prezzo_ivato']?? double.nan,
-                    minimumWidth: 130, // Imposta la larghezza minima
+                    width: _columnWidths['importo_ivato']?? double.nan,
+                    minimumWidth: 150, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'acconto'.toUpperCase(),
@@ -1050,6 +1076,10 @@ class InterventoDataSource extends DataGridSource {
   List<GruppoInterventiModel> allGruppiNonConclusi = [];
   InterventoModel? _selectedIntervento;
   bool prezzoIvato = false;
+  bool ventidue = false;
+  bool dieci = false;
+  bool quattro = false;
+  int selectedIva = 0;
 
 
   InterventoDataSource(
@@ -1211,49 +1241,109 @@ class InterventoDataSource extends DataGridSource {
                   builder: (BuildContext context) {
                     return
                       StatefulBuilder(
-                          builder: (context, setState){
-                            return AlertDialog(
-                              title: Text('Inserisci un importo'),
-                              actions: <Widget>[
-                                TextFormField(
-                                  controller: importoController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Importo',
-                                    border: OutlineInputBorder(),
+                        builder: (context, setState) {
+                           // Variabile per memorizzare l'aliquota IVA selezionata
+                          return AlertDialog(
+                            title: Text('Inserisci un importo'),
+                            actions: <Widget>[
+                              TextFormField(
+                                controller: importoController,
+                                decoration: InputDecoration(
+                                  labelText: 'Importo',
+                                  border: OutlineInputBorder(),
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                                ],
+                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                              ),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: intervento.prezzo_ivato,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        intervento.prezzo_ivato = value;
+                                        prezzoIvato = value!;
+                                      });
+                                    },
                                   ),
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
-                                  ],
-                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  Text('IVA INCLUSA'),
+                                ],
+                              ),
+                              if (prezzoIvato == true)
+                                Container(
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Checkbox(
+                                            value: ventidue,
+                                            onChanged: (bool? value) {
+                                              setState(() {
+                                                ventidue = value!;
+                                                dieci = false;
+                                                quattro = false;
+                                                selectedIva = 22; // Setta l'IVA a 22%
+                                                print('IVA selezionata: $selectedIva');
+                                              });
+                                            },
+                                          ),
+                                          Text(' 22%'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Checkbox(
+                                            value: dieci,
+                                            onChanged: (bool? value) {
+                                              setState(() {
+                                                dieci = value!;
+                                                ventidue = false;
+                                                quattro = false;
+                                                selectedIva = 10; // Setta l'IVA a 10%
+                                                print('IVA selezionata: $selectedIva');
+                                              });
+                                            },
+                                          ),
+                                          Text(' 10%'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Checkbox(
+                                            value: quattro,
+                                            onChanged: (bool? value) {
+                                              setState(() {
+                                                quattro = value!;
+                                                ventidue = false;
+                                                dieci = false;
+                                                selectedIva = 4; // Setta l'IVA a 4%
+                                                print('IVA selezionata: $selectedIva');
+                                              });
+                                            },
+                                          ),
+                                          Text(' 4%'),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                Row(
-                                  children: [
-                                    Checkbox(
-                                      value: intervento.prezzo_ivato,
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          intervento.prezzo_ivato = value;
-                                          prezzoIvato = value!;
-                                        });
-                                      },
-                                    ),
-                                    Text('IVA INCLUSA'),
-                                  ],
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    saveImporto(intervento, prezzoIvato).then((_) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => TableInterventiPage()),
-                                      );
-                                    });
-                                  },
-                                  child: Text('Salva importo'),
-                                ),
-                              ],
-                            );
-                          }
+                              TextButton(
+                                onPressed: () {
+                                  print('IVA passata: $selectedIva'); // Stampa l'IVA prima di chiamare saveImporto
+                                  saveImporto(intervento, prezzoIvato, selectedIva).then((_) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                                    );
+                                  });
+                                },
+                                child: Text('Salva importo'),
+                              ),
+                            ],
+                          );
+                        },
                       );
                   },
                 );
@@ -1261,11 +1351,18 @@ class InterventoDataSource extends DataGridSource {
               icon: Icon(Icons.create, color: Colors.grey),
             ),
           ),
+          // DataGridCell<String>(
+          //   columnName: 'prezzo_ivato',
+          //   value: intervento.prezzo_ivato != null
+          //       ? (intervento.prezzo_ivato! ? 'SI' : 'NO')
+          //       : 'NON INSERITO',
+          // ),
           DataGridCell<String>(
-            columnName: 'prezzo_ivato',
-            value: intervento.prezzo_ivato != null
-                ? (intervento.prezzo_ivato! ? 'SI' : 'NO')
-                : 'NON INSERITO',
+            columnName: 'importo_ivato',
+            value: (intervento.importo_intervento != null && intervento.iva != null)
+                ? ((intervento.importo_intervento! * (1 + (intervento.iva! / 100)))
+                .toStringAsFixed(2) + "€ (${intervento.iva}%)")
+                : '',
           ),
           DataGridCell<String>(
             columnName: 'acconto',
@@ -1275,7 +1372,11 @@ class InterventoDataSource extends DataGridSource {
           ),
           DataGridCell<String>(
             columnName: 'importo_restante',
-            value: restante_da_pagare.toStringAsFixed(2) + "€"
+            value: (intervento.importo_intervento != null && intervento.iva != null)
+                ? ((intervento.importo_intervento! * (1 + (intervento.iva! / 100)) -
+                (intervento.acconto ?? 0)) // Trattiamo acconto come 0 se è null
+                .toStringAsFixed(2) + "€")
+                : '',
           ),
           DataGridCell<Widget>(
               columnName: 'assegna_gruppo',
@@ -1478,8 +1579,9 @@ class InterventoDataSource extends DataGridSource {
     }
   }
 
-  Future<void> saveImporto(InterventoModel intervento, bool prezzoIvato) async {
+  Future<void> saveImporto(InterventoModel intervento, bool prezzoIvato, int iva) async {
     try {
+      print(' IVA : ${iva}');
       final response = await http.post(
         Uri.parse('${ipaddress}/api/intervento'),
         headers: {'Content-Type': 'application/json'},
@@ -1495,7 +1597,7 @@ class InterventoDataSource extends DataGridSource {
           'descrizione': intervento.descrizione,
           'importo_intervento': double.parse(importoController.text),
           'prezzo_ivato' : prezzoIvato,
-          'iva' : intervento.iva,
+          'iva' : iva, // Passa l'IVA selezionata come numero intero
           'assegnato': intervento.assegnato,
           'accettato_da_tecnico' : intervento.accettato_da_tecnico,
           'conclusione_parziale': intervento.conclusione_parziale,
@@ -1517,10 +1619,10 @@ class InterventoDataSource extends DataGridSource {
         }),
       );
       if (response.statusCode == 201) {
+        print(response.body.toString());
         print('EVVAIIIIIIII');
         Navigator.of(context).pop();
         prezzoIvato = false;
-
       }
     } catch (e) {
       print('Errore durante il salvataggio del intervento: $e');

@@ -91,12 +91,7 @@ class _HomeFormAmministrazioneNewPageState
       };
     }
     getAllVeicoli().then((_) {
-       getNote();//.whenComplete(() =>
-      //   checkScadenzeVeicoli().then((_) {
-      //
-      //     checkVeicoloScadenze(allVeicoli);
-      //   })
-      // );
+       getNote();
     });
     getAllOrdini();
     _scheduleGetAllOrdini();
@@ -1264,7 +1259,19 @@ class _HomeFormAmministrazioneNewPageState
                           return Center(child: Text('Errore: ${snapshot.error}'));
                         } else if (snapshot.hasData) {
                           List<InterventoModel> interventi = snapshot.data!;
-                          interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
+
+                          // Filtra ulteriormente nel FutureBuilder per sicurezza
+                          interventi = interventi.where((intervento) => intervento.merce == null).toList();
+
+                          // Modifica il filtro per includere interventi senza data o con data corrispondente a `selectedDate`
+                          interventi = interventi.where((intervento) {
+                            return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                          }).toList();
+
+                          if (interventi.isEmpty) {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
+
                           return ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
@@ -1272,7 +1279,9 @@ class _HomeFormAmministrazioneNewPageState
                             itemBuilder: (context, index) {
                               InterventoModel intervento = interventi[index];
                               Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
-                              TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                              TextStyle textStyle = intervento.concluso ?? false
+                                  ? TextStyle(color: Colors.white, fontSize: 15)
+                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                               return Card(
                                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1284,13 +1293,13 @@ class _HomeFormAmministrazioneNewPageState
                                     style: textStyle,
                                   ),
                                   subtitle: Text(
-                                    intervento.cliente?.denominazione.toString()?? '',
+                                    intervento.cliente?.denominazione.toString() ?? '',
                                     style: textStyle,
                                   ),
                                   trailing: Column(
                                     children: [
                                       Text(
-                                        intervento.data!= null
+                                        intervento.data != null
                                             ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                             : 'Data non disponibile',
                                         style: TextStyle(
@@ -1299,11 +1308,11 @@ class _HomeFormAmministrazioneNewPageState
                                         ),
                                       ),
                                       Text(
-                                        intervento.orario_appuntamento!= null
+                                        intervento.orario_appuntamento != null
                                             ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                             : 'Nessun orario di appuntamento',
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 10,
                                           color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                         ),
                                       ),
@@ -1313,11 +1322,10 @@ class _HomeFormAmministrazioneNewPageState
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData,
-                                              intervento: intervento,
-                                            ),
+                                        builder: (context) => DettaglioInterventoByTecnicoPage(
+                                          utente: widget.userData!,
+                                          intervento: intervento,
+                                        ),
                                       ),
                                     );
                                   },
@@ -1336,7 +1344,7 @@ class _HomeFormAmministrazioneNewPageState
                       },
                     ),
                     FutureBuilder<List<RelazioneUtentiInterventiModel>>(
-                      future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
+                      future: getAllRelazioniByUtente(widget.userData.id.toString(), selectedDate),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
@@ -1783,7 +1791,19 @@ class _HomeFormAmministrazioneNewPageState
                           return Center(child: Text('Errore: ${snapshot.error}'));
                         } else if (snapshot.hasData) {
                           List<InterventoModel> interventi = snapshot.data!;
-                          interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
+
+                          // Filtra ulteriormente nel FutureBuilder per sicurezza
+                          interventi = interventi.where((intervento) => intervento.merce == null).toList();
+
+                          // Modifica il filtro per includere interventi senza data o con data corrispondente a `selectedDate`
+                          interventi = interventi.where((intervento) {
+                            return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                          }).toList();
+
+                          if (interventi.isEmpty) {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
+
                           return ListView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
@@ -1791,40 +1811,40 @@ class _HomeFormAmministrazioneNewPageState
                             itemBuilder: (context, index) {
                               InterventoModel intervento = interventi[index];
                               Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
-                              TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                              TextStyle textStyle = intervento.concluso ?? false
+                                  ? TextStyle(color: Colors.white, fontSize: 15)
+                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                               return Card(
-                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // aggiungi padding orizzontale
-                                elevation: 4, // aggiungi ombreggiatura
+                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                elevation: 4,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                // aggiungi bordi arrotondati
                                 child: ListTile(
                                   title: Text(
                                     '${intervento.descrizione}',
                                     style: textStyle,
                                   ),
                                   subtitle: Text(
-                                    intervento.cliente?.denominazione.toString()?? '',
+                                    intervento.cliente?.denominazione.toString() ?? '',
                                     style: textStyle,
                                   ),
                                   trailing: Column(
                                     children: [
                                       Text(
-                                        // Formatta la data secondo il tuo formato desiderato
-                                        intervento.data!= null
+                                        intervento.data != null
                                             ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                             : 'Data non disponibile',
                                         style: TextStyle(
-                                          fontSize: 16, // Stile opzionale per la data
+                                          fontSize: 16,
                                           color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                         ),
                                       ),
                                       Text(
-                                        intervento.orario_appuntamento!= null
+                                        intervento.orario_appuntamento != null
                                             ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                             : 'Nessun orario di appuntamento',
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 10,
                                           color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                         ),
                                       ),
@@ -1834,11 +1854,10 @@ class _HomeFormAmministrazioneNewPageState
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData,
-                                              intervento: intervento,
-                                            ),
+                                        builder: (context) => DettaglioInterventoByTecnicoPage(
+                                          utente: widget.userData!,
+                                          intervento: intervento,
+                                        ),
                                       ),
                                     );
                                   },
@@ -1856,8 +1875,6 @@ class _HomeFormAmministrazioneNewPageState
                         }
                       },
                     ),
-
-
                     FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                       future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                       builder: (context, snapshot) {
