@@ -107,7 +107,9 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
     if (pickedTime != null) {
       setState(() {
-          print('mostrare orario appena modificato');
+
+        widget.intervento.orario_appuntamento =
+              DateTime(widget.intervento.data!.year, widget.intervento.data!.month, widget.intervento.data!.day, pickedTime.hour, pickedTime.minute);
         _selectedTimeAppuntamento = pickedTime;
       });
     }
@@ -494,7 +496,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               children: [
                                 Container(
                                   width: 170,
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding
+                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
                                   child: FloatingActionButton(
                                     onPressed: () {
                                       _selectDate(context);
@@ -517,10 +519,42 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 20),
+                                Container(
+                                  width: 70,
+                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                                  child: FloatingActionButton(
+                                    onPressed: () {
+                                      //_selectDate(context);
+
+                                        setState(() {
+                                          widget.intervento.data = null;
+
+                                        });
+
+                                    },
+                                    heroTag: "TagDel",
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.delete, color: Colors.white),
+                                    /*Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible( // Permette al testo di adattarsi alla dimensione
+                                          child: Text(
+                                            'Modifica data intervento'.toUpperCase(),
+                                            style: TextStyle(color: Colors.white, fontSize: 12),
+                                            textAlign: TextAlign.center, // Centra il testo
+                                            softWrap: true, // Permette al testo di andare a capo
+                                          ),
+                                        ),
+                                      ],
+                                    ),*/
+                                  ),
+                                ),
+                                SizedBox(width: 30),
                                 Container(
                                   width: 170,
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
                                   decoration: BoxDecoration(
                                     // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
                                   ),
@@ -544,6 +578,35 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                         ),
                                       ],
                                     ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 70,
+                                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                                  child: FloatingActionButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        widget.intervento.orario_appuntamento = null;
+                                        _selectedTimeAppuntamento = null;
+                                      });
+                                    },
+                                    heroTag: "TagDel2",
+                                    backgroundColor: Colors.red,
+                                    child: Icon(Icons.delete, color: Colors.white),
+                                    /*Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible( // Permette al testo di adattarsi alla dimensione
+                                          child: Text(
+                                            'Modifica data intervento'.toUpperCase(),
+                                            style: TextStyle(color: Colors.white, fontSize: 12),
+                                            textAlign: TextAlign.center, // Centra il testo
+                                            softWrap: true, // Permette al testo di andare a capo
+                                          ),
+                                        ),
+                                      ],
+                                    ),*/
                                   ),
                                 ),
                               ],

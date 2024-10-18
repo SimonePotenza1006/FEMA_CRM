@@ -923,6 +923,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                       )
                   ),
                   GridColumn(
+                    allowSorting: true,
                     columnName: 'tipologia'.toUpperCase(),
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -1586,9 +1587,9 @@ class InterventoDataSource extends DataGridSource {
                 icon: Icon(Icons.folder, color:Colors.grey),
               )
           ),
-          DataGridCell<int>(
+          DataGridCell<String>(
             columnName: 'tipologia',
-            value: int.parse(intervento.tipologia!.id.toString()),
+            value: intervento.tipologia?.descrizione,//int.parse(intervento.tipologia!.id.toString()),
           ),
         ],
       ));
