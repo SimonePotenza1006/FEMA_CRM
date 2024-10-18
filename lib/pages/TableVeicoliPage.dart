@@ -102,13 +102,39 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TableSpeseVeicoliPage(),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.folder_copy_outlined,
+                  color: Colors.white,
+                ),
+                SizedBox(
+                  width: 2,
+                ),
+                Text(
+                  'REPORT SPESE',
+                  style: TextStyle(color: Colors.white),
+                )
+              ],
+            ),
+          ),
+          SizedBox(width : 20),
           IconButton(
             icon: Icon(
               Icons.add,
               color: Colors.white,
             ),
             onPressed: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => CreazioneNuovoVeicoloPage()),
               );
@@ -116,33 +142,33 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
           ),
         ],
       ),
-      floatingActionButton: Stack(
-        children: [
-          Positioned(
-              bottom: 16,
-              right: 16,
-              child: SpeedDial(
-                heroTag: '1',
-                animatedIcon: AnimatedIcons.menu_close,
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                children: [
-                  SpeedDialChild(
-                    child: Icon(Icons.list, color: Colors.white),
-                    backgroundColor: Colors.red,
-                    label: 'Report spese'.toUpperCase(),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TableSpeseVeicoliPage(),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-          )
-        ],
-      ),
+      // floatingActionButton: Stack(
+      //   children: [
+      //     Positioned(
+      //         bottom: 16,
+      //         right: 16,
+      //         child: SpeedDial(
+      //           heroTag: '1',
+      //           animatedIcon: AnimatedIcons.menu_close,
+      //           backgroundColor: Colors.red,
+      //           foregroundColor: Colors.white,
+      //           children: [
+      //             SpeedDialChild(
+      //               child: Icon(Icons.list, color: Colors.white),
+      //               backgroundColor: Colors.red,
+      //               label: 'Report spese'.toUpperCase(),
+      //               onTap: () => Navigator.push(
+      //                 context,
+      //                 MaterialPageRoute(
+      //                   builder: (context) => TableSpeseVeicoliPage(),
+      //                 ),
+      //               ),
+      //             ),
+      //           ],
+      //         )
+      //     )
+      //   ],
+      // ),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: Column(

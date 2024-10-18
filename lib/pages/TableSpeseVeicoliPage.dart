@@ -249,6 +249,49 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
+          GestureDetector(
+            child: Row(
+              children: [
+                Icon(
+                    Icons.filter_alt_outlined, color: Colors.white
+                ),
+                SizedBox(width: 5),
+                Text(
+                  'FILTRA',
+                  style: TextStyle(color: Colors.white),
+                ),
+                SizedBox(width: 20,)
+              ],
+            ),
+            onTap: () => mostraRicercaInterventiDialog(
+                context: context,
+                spese: allSpese,
+                veicoli: allVeicoli,
+                tipologie: allTipologie,
+                dataSource: _dataSource,
+                onFiltrati: (speseFiltrate){
+                  _dataSource.updateData(speseFiltrate);
+                }
+            ),
+          ),
+          SizedBox(width: 13),
+          GestureDetector(
+            child: Row(
+              children: [
+                Icon(
+                    Icons.table_rows_outlined, color: Colors.white
+                ),
+                SizedBox(width: 5),
+                Text(
+                  'SCARICA EXCEL',
+                  style: TextStyle(color: Colors.white),
+                ),
+                SizedBox(width: 20,)
+              ],
+            ),
+            onTap: _showVehicleSelectionDialog,
+          ),
+          SizedBox(width: 13),
           Row(
             children: [
               IconButton(
@@ -525,46 +568,6 @@ class _TableSpeseVeicoliPageState extends State<TableSpeseVeicoliPage>{
           ],
         ),
       ),
-      floatingActionButton:Stack(
-        children: [
-          Positioned(
-              bottom: 16,
-              right: 16,
-              child: Column(
-                children: [
-                  FloatingActionButton(
-                    backgroundColor: Colors.red,
-                    onPressed: _showVehicleSelectionDialog,
-                    child: Icon(
-                      Icons.download,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  FloatingActionButton(
-                    backgroundColor: Colors.red,
-                    onPressed: () {
-                      mostraRicercaInterventiDialog(
-                          context: context,
-                          spese: allSpese,
-                          veicoli: allVeicoli,
-                          tipologie: allTipologie,
-                          dataSource: _dataSource,
-                          onFiltrati: (speseFiltrate){
-                            _dataSource.updateData(speseFiltrate);
-                          }
-                      );
-                    },
-                    child: Icon(
-                      Icons.filter_alt_outlined,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              )
-          )
-        ],
-      )
     );
   }
 
