@@ -58,6 +58,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'inserimento_importo' : 100,
     'importo_restante' : 150,
     'assegna_gruppo' : 130,
+    'tipologia' : 180
   };
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
 
@@ -443,6 +444,72 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ),
                             SizedBox(width: 3),
                             Text('VENDITA FRONT OFFICE'),
+
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          'Priorità:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ NULLA'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.lightGreen,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ BASSA'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.yellow,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ MEDIA'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.orange,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ ALTA'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.red,
+                            ),
+                            SizedBox(width: 3),
+                            Text('URGENTE'),
                           ],
                         ),
                       ],
@@ -475,7 +542,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             Expanded(
               child: SfDataGrid(
                 allowPullToRefresh: true,
-                allowMultiColumnSorting: true,
                 allowSorting: true,
                 source: _dataSource,
                 columnWidthMode: ColumnWidthMode.auto,
@@ -855,7 +921,28 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       )
-                  )
+                  ),
+                  GridColumn(
+                    columnName: 'tipologia'.toUpperCase(),
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'SETTORE'.toUpperCase(),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['tipologia']?? double.nan,
+                    minimumWidth: 180, // Imposta la larghezza minima
+                  ),
                 ],
                 onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
                   setState(() {
@@ -1078,7 +1165,6 @@ class InterventoDataSource extends DataGridSource {
   bool dieci = false;
   bool quattro = false;
   int selectedIva = 0;
-
 
   InterventoDataSource(
       this.context,
@@ -1499,7 +1585,11 @@ class InterventoDataSource extends DataGridSource {
                 },
                 icon: Icon(Icons.folder, color:Colors.grey),
               )
-          )
+          ),
+          DataGridCell<int>(
+            columnName: 'tipologia',
+            value: int.parse(intervento.tipologia!.id.toString()),
+          ),
         ],
       ));
     }

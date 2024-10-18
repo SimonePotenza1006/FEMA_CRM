@@ -3,19 +3,17 @@ MODIFICHE DA FARE
 
 
 - Eliminare orario appuntamento intervento dal dettaglio intervento
-- Inserire nella tabella interventi una colonna con l'importo comprendente iva, e trattare quello esistente come importo netto ✔
 - Poter modificare data creazione + numerazione intervento
-- Aggiungere "APP" in numerazione (/2024APP) ✔
 - Eliminare dicitura "Mezzo null" sul pdf generato da intervento
 - Inserire i due punnti (:) anche dopo l'acconto
 - Dobbiamo poter modificare il cliente
 - Aggiungere destinatario + destinazione
 - Possibilità di togliere la data accordata
-- Iva da inserire (campo a scelta tra 22%, 10%, 4%) ✔
-- Stampare rapportino lato tecnico
 - Usare calendario solo per la visualizzazioned egli interventi
 - Creare un Button sul menu tecnico per reindirizzarlo su una tabella
 popolata dagli interventi della sua categoria di interventi,
+- Gestire anche il caricamento dei PDF oltre alle immagini (Riferite ad un intervento almeno per ora)
+- Capire perchè il sorting tramite le tipologie di intervento non funzionano
 
 
 17/10/2024
@@ -24,9 +22,17 @@ SIMONE
 - Aggiunta la proprietà codice_danea su InterventoModel e inserito nella TableInterventiPage
 - Aggiunto il dial per scattare una foto relativa all'intervento e la relativa pagina da DettaglioInterventoByTecnicoPage
 - Aggiunto codice danea modificabile da TableInterventi
+- Iva da inserire (campo a scelta tra 22%, 10%, 4%) ✔
+- Aggiungere "APP" in numerazione (/2024APP) ✔
 
 
 18/10/2024
+SIMONE
 - Finalizzato il discorso IVA su TableInterventi e AggiuntaMovimentoPage
 - Sistemata la posizione di alcuni FAB sulle pagine TableVeicoliPage e TableSpeseVeicoliPage
 - Inizializzata la priorità dell'intervento e inserito nella TableInterventiPage
+- Stampare rapportino lato tecnico ✔
+- Eliminata la possibilità di modificare l' che effettua la movimentazione
+- Inserire nella tabella interventi una colonna con l'importo comprendente iva, e trattare quello esistente come importo netto ✔
+- Risolto il bug di stampa del PDF preventivo servizi
+- Inserita la colonna TipologiaIntervento nella TableInterventiPage

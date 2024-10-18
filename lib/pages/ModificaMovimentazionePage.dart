@@ -35,7 +35,6 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
   @override
   void initState(){
     super.initState();
-    getUtenti();
     getAllClienti();
     _importoController = TextEditingController(text: widget.movimento.importo.toString());
     _descrizioneController = TextEditingController(text: widget.movimento.descrizione);
@@ -154,32 +153,6 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
                     return null;
                   },
                 ),
-              ),
-              SizedBox(
-                  width: 350,
-                  child: DropdownButtonFormField<UtenteModel>(
-                    value: allUtenti.contains(_selectedUtente) ? _selectedUtente : null,
-                    onChanged: (UtenteModel? newValue) {
-                      setState(() {
-                        _selectedUtente = newValue;
-                      });
-                    },
-                    items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel value) {
-                      return DropdownMenuItem<UtenteModel>(
-                        value: value,
-                        child: Text(value.cognome!),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                      labelText: 'Utente',
-                    ),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Seleziona l\'utente';
-                      }
-                      return null;
-                    },
-                  ),
               ),
               SizedBox(
                 width: 350,
@@ -319,23 +292,6 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
     }
   }
 
-  Future<void> getUtenti() async {
-    try{
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
-      var responseData = json.decode(response.body);
-      if(response.statusCode == 200){
-        List<UtenteModel> utenti = [];
-        for(var item in responseData){
-          utenti.add(UtenteModel.fromJson(item));
-        }
-        setState(() {
-          allUtenti = utenti;
-        });
-      }
-    } catch(e){
-      throw Exception('Errore durante il recupero degli utenti : $e');
-    }
-  }
 
   Future<void> updateMovimento() async{
     try{
@@ -346,7 +302,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
           'id' : widget.movimento.id,
           'data' : _selectedDate?.toIso8601String(),
           'utente' : _selectedUtente?.toMap(),
-          'cliente' : selectedCliente?.toMap(),
+          'cliente' : widget.movimento.utente?.toMap(),
           'tipo_movimentazione': selectedTipologia.toString().split('.').last,
           'descrizione' : _descrizioneController.text,
           'importo' : double.parse(_importoController.text.toString())

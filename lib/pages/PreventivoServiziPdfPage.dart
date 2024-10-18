@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'dart:io' as io;
 import 'package:pdf/widgets.dart' as pdfw;
+import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../databaseHandler/DbHelper.dart';
 import '../model/AziendaModel.dart';
@@ -414,8 +415,11 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
                       icon: Icon(Icons.print, color: Colors.white),
                       label: Text("Stampa", style: TextStyle(color: Colors.white)),
                       onPressed: () async {
-                        // await Printing.layoutPdf(
-                        //     onLayout: (PdfPageFormat format) async => unita!);
+                        if (fileAss != null) {
+                        await _printPdf(fileAss!.path); // Stampa il PDF quando si preme il bottone
+                        } else {
+                        print('Il file PDF non è ancora stato generato');
+                        }
                       }),
                 ]) //: Container(),
               ])),
@@ -457,6 +461,23 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
         },
       ),
     );
+  }
+
+  Future<void> _printPdf(String path) async {
+    try {
+      print('Percorso del file: $path'); // Stampa il percorso
+      final pdfFile = io.File(path);
+      if (await pdfFile.exists()) {
+        final bytes = await pdfFile.readAsBytes();
+        await Printing.layoutPdf(
+          onLayout: (PdfPageFormat format) async => bytes,
+        );
+      } else {
+        print('File PDF non trovato.');
+      }
+    } catch (e) {
+      print('Errore durante la stampa: $e');
+    }
   }
 }
 
