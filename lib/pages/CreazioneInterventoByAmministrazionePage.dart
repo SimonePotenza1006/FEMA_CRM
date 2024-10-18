@@ -521,7 +521,11 @@ class _CreazioneInterventoByAmministrazionePageState
                         Padding(
                           padding: const EdgeInsets.only(bottom: 20.0),
                           child: ElevatedButton(
-                            onPressed: (selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty && _selectedTipologia != null)
+                            onPressed: ((selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty &&
+                                _selectedTipologia != null && _selectedTipologia?.id != '6') ||
+                                (_selectedTipologia?.id == '6' && _articoloController.text.isNotEmpty && _accessoriController.text.isNotEmpty &&
+                                _difettoController.text.isNotEmpty && _passwordController.text.isNotEmpty && _datiController.text.isNotEmpty &&
+                                    pickedImages.length>0))
                                 ? ()
                             {
                               /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {

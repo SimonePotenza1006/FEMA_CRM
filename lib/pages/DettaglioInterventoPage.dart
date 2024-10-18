@@ -107,6 +107,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
     if (pickedTime != null) {
       setState(() {
+        
         _selectedTimeAppuntamento = pickedTime;
       });
     }
@@ -1370,6 +1371,10 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             content: Text('Intervento modificato con successo!'),
             duration: Duration(seconds: 3),
           ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DettaglioInterventoPage(intervento: InterventoModel.fromJson(jsonDecode(response.body)))),
         );
       } else {
         print('Errore nella richiesta: ${response.statusCode}');
