@@ -462,7 +462,12 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                 alignment: Alignment.bottomCenter,
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: ElevatedButton(
-                  onPressed: (selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty && _selectedTipologia != null)
+                  onPressed: //(selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty && _selectedTipologia != null)
+                  ((selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty &&
+                      _selectedTipologia != null && _selectedTipologia?.id != '6') ||
+                      (_selectedTipologia?.id == '6' && _articoloController.text.isNotEmpty && _accessoriController.text.isNotEmpty &&
+                          _difettoController.text.isNotEmpty && _passwordController.text.isNotEmpty && _datiController.text.isNotEmpty &&
+                          pickedImages.length>0))
                       ? () {
 
                     if(_selectedTipologia?.id == '6'){
@@ -515,7 +520,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           'difetto_riscontrato': _difettoController.text,
           'password' : _passwordController.text,
           'dati' : _datiController.text,
-          'presenza_magazzino' : _interventoAutoassegnato,
+          'presenza_magazzino' : !_interventoAutoassegnato,
           'preventivo' : _preventivoRichiesto,
           'utente' : _interventoAutoassegnato == true ? widget.userData.toMap() : null,
         }),
