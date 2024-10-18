@@ -469,11 +469,26 @@ class _CompilazioneRapportinoPageState
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        pickedImages.add(pickedFile);
-      });
+
+    // Verifica se sei su Android
+    if (Platform.isAndroid) {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+      if (pickedFile != null) {
+        setState(() {
+          pickedImages.add(pickedFile);
+        });
+      }
+    }
+    // Verifica se sei su Windows
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
     }
   }
 
@@ -498,11 +513,6 @@ class _CompilazioneRapportinoPageState
           var response = await request.send();
           if (response.statusCode == 200) {
             print('File inviato con successo');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Rapportino registrato!'),
-              ),
-            );
           } else {
             print('Errore durante l\'invio del file: ${response.statusCode}');
           }

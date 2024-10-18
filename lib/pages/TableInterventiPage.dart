@@ -44,6 +44,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'intervento' : 0,
     'id_intervento' : 150,
     'codice_danea' : 200,
+    'priorita' : 45,
     'data_apertura_intervento': 200,
     'data': 150,
     'cliente': 200,
@@ -54,7 +55,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'prezzo_ivato' : 130,
     'importo_ivato' : 150,
     'acconto': 150,
-    'inserimento_importo' : 150,
+    'inserimento_importo' : 100,
     'importo_restante' : 150,
     'assegna_gruppo' : 130,
   };
@@ -531,6 +532,24 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 150,
                   ),
                   GridColumn(
+                    columnName: 'priorita',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text('PR'),
+                    ),
+                    width: _columnWidths['priorita']?? double.nan,
+                    minimumWidth: 45,
+                  ),
+                  GridColumn(
                     columnName: 'codice_danea',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -554,6 +573,31 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     width: _columnWidths['codice_danea']?? double.nan,
                     minimumWidth: 200,
+                  ),
+                  GridColumn(
+                    columnName: 'cliente',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: ColumnFilter(
+                        columnName: 'Cliente'.toUpperCase(),
+                        onFilterApplied: (filtro) {
+                          setState(() {
+                            _dataSource.filtraColonna('cliente', filtro);
+                          });
+                        },
+                      ),
+                    ),
+                    width: _columnWidths['cliente']?? double.nan,
+                    minimumWidth: 200, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'data_apertura_intervento',
@@ -604,31 +648,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     ),
                     width: _columnWidths['data']?? double.nan,
                     minimumWidth: 150,
-                  ),
-                  GridColumn(
-                    columnName: 'cliente',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'Cliente'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('cliente', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['cliente']?? double.nan,
-                    minimumWidth: 200, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'orario_appuntamento',
@@ -706,6 +725,27 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     minimumWidth: 230,
                   ),
                   GridColumn(
+                    columnName: 'inserimento_importo',
+                    label : Container(
+                        padding: EdgeInsets.all(8),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            border: Border(
+                                right : BorderSide(
+                                  color: Colors.grey,
+                                  width: 1,
+                                )
+                            )
+                        ),
+                        child: Text(
+                          ''.toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                        )
+                    ),
+                    width: _columnWidths['inserimento_importo']?? double.nan,
+                    minimumWidth: 100,
+                  ),
+                  GridColumn(
                     columnName: 'importo_intervento',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -730,48 +770,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     width: _columnWidths['importo_intervento']?? double.nan,
                     minimumWidth: 150, // Imposta la larghezza minima
                   ),
-                  GridColumn(
-                    columnName: 'inserimento_importo',
-                    label : Container(
-                        padding: EdgeInsets.all(8),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                right : BorderSide(
-                                  color: Colors.grey,
-                                  width: 1,
-                                )
-                            )
-                        ),
-                        child: Text(
-                          'Inserimento Importo'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        )
-                    ),
-                    width: _columnWidths['inserimento_importo']?? double.nan,
-                    minimumWidth: 150,
-                  ),
-                  // GridColumn(
-                  //   columnName: 'prezzo_ivato'.toUpperCase(),
-                  //   label: Container(
-                  //     padding: EdgeInsets.all(8.0),
-                  //     alignment: Alignment.center,
-                  //     decoration: BoxDecoration(
-                  //       border: Border(
-                  //         right: BorderSide(
-                  //           color: Colors.grey[300]!,
-                  //           width: 1,
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     child: Text(
-                  //       'Prezzo Ivato'.toUpperCase(),
-                  //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  //     ),
-                  //   ),
-                  //   width: _columnWidths['prezzo_ivato']?? double.nan,
-                  //   minimumWidth: 130, // Imposta la larghezza minima
-                  // ),
                   GridColumn(
                     columnName: 'importo_ivato',
                     label: Container(
@@ -1132,6 +1130,24 @@ class InterventoDataSource extends DataGridSource {
           backgroundColor = Colors.blueGrey[200];
       }
 
+      Color? prioritaColor;
+      switch (intervento.priorita) {
+        case Priorita.BASSA :
+          prioritaColor = Colors.lightGreen;
+          break;
+        case Priorita.MEDIA :
+          prioritaColor = Colors.yellow; // grigio chiaro
+          break;
+        case Priorita.ALTA:
+          prioritaColor = Colors.orange; // giallo chiaro
+          break;
+        case Priorita.URGENTE:
+          backgroundColor = Colors.red; // azzurro chiaro
+          break;
+        default:
+          backgroundColor = Colors.blueGrey[200];
+      }
+
       double? importo = intervento.importo_intervento != null ? intervento.importo_intervento : 0;
       double? acconto = intervento.acconto != null ? intervento.acconto : 0;
       double? restante_da_pagare = importo! - acconto!;
@@ -1145,13 +1161,16 @@ class InterventoDataSource extends DataGridSource {
       } else {
         utentiNomi = 'NESSUNO'; // or any other default value
       }
-
       rows.add(DataGridRow(
         cells: [
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
           DataGridCell<String>(
             columnName: 'id_intervento',
             value: "${intervento.id}/${intervento.data_apertura_intervento?.year != null ? intervento.data_apertura_intervento?.year : DateTime.now().year }APP",
+          ),
+          DataGridCell<Priorita>(
+            columnName: 'priorita',
+            value : intervento.priorita,
           ),
           DataGridCell<Widget>(
             columnName: 'codice_danea',
@@ -1197,6 +1216,10 @@ class InterventoDataSource extends DataGridSource {
             ),
           ),
           DataGridCell<String>(
+            columnName: 'cliente',
+            value: intervento.cliente?.denominazione ?? '',
+          ),
+          DataGridCell<String>(
             columnName: 'data_apertura_intervento',
             value: intervento.data_apertura_intervento != null
                 ? DateFormat('dd/MM/yyyy').format(intervento.data_apertura_intervento!)
@@ -1207,10 +1230,6 @@ class InterventoDataSource extends DataGridSource {
             value: intervento.data != null
                 ? DateFormat('dd/MM/yyyy').format(intervento.data!)
                 : '',
-          ),
-          DataGridCell<String>(
-            columnName: 'cliente',
-            value: intervento.cliente?.denominazione ?? '',
           ),
           DataGridCell<String>(
             columnName: 'orario_appuntamento',
@@ -1226,12 +1245,6 @@ class InterventoDataSource extends DataGridSource {
             columnName: 'responsabile',
             value: intervento.utente?.nomeCompleto() ?? 'NON ASSEGNATO',
           ),
-          DataGridCell<String>(
-            columnName: 'importo_intervento',
-            value: intervento.importo_intervento != null
-                ? intervento.importo_intervento!.toStringAsFixed(2) + "€"
-                : '',
-          ),
           DataGridCell<Widget>(
             columnName: 'inserimento_importo',
             value: IconButton(
@@ -1242,7 +1255,7 @@ class InterventoDataSource extends DataGridSource {
                     return
                       StatefulBuilder(
                         builder: (context, setState) {
-                           // Variabile per memorizzare l'aliquota IVA selezionata
+                          // Variabile per memorizzare l'aliquota IVA selezionata
                           return AlertDialog(
                             title: Text('Inserisci un importo'),
                             actions: <Widget>[
@@ -1351,12 +1364,12 @@ class InterventoDataSource extends DataGridSource {
               icon: Icon(Icons.create, color: Colors.grey),
             ),
           ),
-          // DataGridCell<String>(
-          //   columnName: 'prezzo_ivato',
-          //   value: intervento.prezzo_ivato != null
-          //       ? (intervento.prezzo_ivato! ? 'SI' : 'NO')
-          //       : 'NON INSERITO',
-          // ),
+          DataGridCell<String>(
+            columnName: 'importo_intervento',
+            value: intervento.importo_intervento != null
+                ? intervento.importo_intervento!.toStringAsFixed(2) + "€"
+                : '',
+          ),
           DataGridCell<String>(
             columnName: 'importo_ivato',
             value: (intervento.importo_intervento != null && intervento.iva != null)
@@ -1531,8 +1544,6 @@ class InterventoDataSource extends DataGridSource {
     notifyListeners();
   }
 
-
-
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
@@ -1705,12 +1716,35 @@ class InterventoDataSource extends DataGridSource {
       default:
         backgroundColor = Colors.white;
     }
+
+    Color? prioritaColor;
+    switch (intervento.priorita) {
+      case Priorita.BASSA :
+        prioritaColor = Colors.lightGreen;
+        break;
+      case Priorita.MEDIA :
+        prioritaColor = Colors.yellow; // grigio chiaro
+        break;
+      case Priorita.ALTA:
+        prioritaColor = Colors.orange; // giallo chiaro
+        break;
+      case Priorita.URGENTE:
+        prioritaColor = Colors.red; // azzurro chiaro
+        break;
+      default:
+        prioritaColor = Colors.blueGrey[200];
+    }
     return DataGridRowAdapter(
       color: backgroundColor,
       cells: row.getCells().map<Widget>((dataGridCell) {
         if (dataGridCell.columnName == 'intervento') {
           // Cella invisibile per l'oggetto InterventoModel
           return SizedBox.shrink(); // La cella sarà invisibile ma presente
+        }
+        if( dataGridCell.columnName == 'priorita'){
+          return Container(
+              color: prioritaColor,
+            );
         }
         if (dataGridCell.value is Widget) {
           return Container(
@@ -1745,7 +1779,7 @@ class InterventoDataSource extends DataGridSource {
                 overflow: TextOverflow.ellipsis,
               ),
             );
-          }  else {
+          } else {
             return GestureDetector(
               onTap: () {
                 Navigator.push(

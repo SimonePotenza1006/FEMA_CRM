@@ -11,6 +11,7 @@ import 'VeicoloModel.dart';
 class InterventoModel {
   String? id;
   String? numerazione_danea;
+  Priorita? priorita;
   DateTime? data_apertura_intervento;
   DateTime? data;
   DateTime? orario_appuntamento;
@@ -44,6 +45,7 @@ class InterventoModel {
   InterventoModel(
       this.id,
       this.numerazione_danea,
+      this.priorita,
       this.data_apertura_intervento,
       this.data,
       this.orario_appuntamento,
@@ -79,6 +81,7 @@ class InterventoModel {
     var map = <String, dynamic>{
       'id': id,
       'numerazione_danea' : numerazione_danea,
+      'priorita' : priorita.toString(),
       'data_apertura_intervento': data_apertura_intervento?.toIso8601String(),
       'data': data?.toIso8601String(),
       'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
@@ -117,6 +120,8 @@ class InterventoModel {
   InterventoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     numerazione_danea = map['numerazione_danea'];
+    priorita = Priorita.values.firstWhere(
+            (type) => type.toString() == 'priorita.${map['priorita']}');
     map['data_apertura_intervento'] != null ? DateTime.parse(map['data_apertura_intervento']) : null;
     map['data'] != null ? DateTime.parse(map['data']) : null;
     map['orario_appuntamento'] != null ? DateTime.parse(map['orario_appuntamento']) : null;
@@ -152,6 +157,7 @@ class InterventoModel {
   Map<String, dynamic> toJson() => {
     'id': id,
     'numerazione_danea' : numerazione_danea,
+    'priorita' : priorita.toString().split('.').last,
     'data_apertura_intervento' : data_apertura_intervento?.toIso8601String(),
     'data': data?.toIso8601String(),
     'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
@@ -188,6 +194,7 @@ class InterventoModel {
     return InterventoModel(
       json['id']?.toString(),
       json['numerazione_danea']?.toString(),
+      _getPrioritaFromString(json['priorita']),
       json['data_apertura_intervento'] != null ? DateTime.parse(json['data_apertura_intervento']) : null,
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['orario_appuntamento'] != null ? DateTime.parse(json['orario_appuntamento']) : null,
@@ -218,6 +225,22 @@ class InterventoModel {
       json['destinazione'] != null ? DestinazioneModel.fromJson(json['destinazione']) : null,
       json['gruppo'] != null ? GruppoInterventiModel.fromJson(json['gruppo']) : null,
     );
+  }
+
+  static Priorita _getPrioritaFromString(String? priorita){
+    if(priorita == "BASSA"){
+      return Priorita.BASSA;
+    } else if(priorita == "MEDIA"){
+      return Priorita.MEDIA;
+    } else if(priorita == "ALTA"){
+      return Priorita.ALTA;
+    } else if(priorita == "URGENTE") {
+      return Priorita.URGENTE;
+    } else if(priorita == "NULLA"){
+      return Priorita.NULLA;
+    } else {
+      throw Exception('Valore non valido per Priorita: $priorita');
+    }
   }
 
   List<InterventoModel> filtraPerUtente(List<InterventoModel> interventi, UtenteModel utente) {
@@ -282,4 +305,15 @@ class InterventoModel {
           intervento.data!.isBefore(endDate);
     }).toList();
   }
+}
+
+
+
+
+enum Priorita{
+  NULLA,
+  BASSA,
+  MEDIA,
+  ALTA,
+  URGENTE,
 }

@@ -22,6 +22,7 @@ import 'AggiuntaNotaByTecnicoPage.dart';
 import 'CompilazionePreventivoMerceInRiparazionePage.dart';
 import 'InizioInterventoPage.dart';
 import 'ModificaRelazioneRapportinoPage.dart';
+import 'PDFInterventoPage.dart';
 import 'ScannerBarCodePage.dart';
 import 'ScannerQrCodePage.dart';
 import 'CompilazioneRapportinoPage.dart'; // Importa il pacchetto per il formato delle date
@@ -569,6 +570,23 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
                   ],
                 ),
               SizedBox(height: 40),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PDFInterventoPage(
+                        intervento: widget.intervento,
+                      ),
+                    ),
+                  );
+                },
+                icon: Icon(Icons.picture_as_pdf, color: Colors.white),
+                label: Text('Genera PDF', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
+                ),
+              ),
             ],
           ),
         ),
