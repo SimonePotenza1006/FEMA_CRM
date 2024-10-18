@@ -107,7 +107,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
     if (pickedTime != null) {
       setState(() {
-        
+          print('mostrare orario appena modificato');
         _selectedTimeAppuntamento = pickedTime;
       });
     }
