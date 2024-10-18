@@ -563,7 +563,7 @@ class _CreazioneInterventoByAmministrazionePageState
                   onPressed: (){
 
 
-                    if(_selectedTipologia?.id == 6){
+                    if(_selectedTipologia?.id == '6'){
                       savePics();
                       //saveInterventoPlusMerce();
                     } else{
