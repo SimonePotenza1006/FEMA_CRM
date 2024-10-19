@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:excel/excel.dart';
+import 'package:fema_crm/pages/PDFPrelievoCassaPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'dart:io';
 import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
@@ -44,6 +47,8 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   final TextEditingController _prelievoController = TextEditingController();
   final TextEditingController  _descrizioneUscitaController = TextEditingController();
   final TextEditingController _causaleVersamentoController = TextEditingController();
+  GlobalKey<SfSignaturePadState> _signaturePadKey =
+  GlobalKey<SfSignaturePadState>();
 
 
 
@@ -358,6 +363,19 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   void _generateExcel() async {
     var excel = Excel.createExcel();
     Sheet sheetObject = excel['Sheet1'];
+
+    // Definisci gli stili per le righe alternate
+    CellStyle whiteBackground = CellStyle(
+      backgroundColorHex: '#FFFFFF', // Bianco
+      fontFamily: getFontFamily(FontFamily.Arial),
+    );
+
+    CellStyle greenBackground = CellStyle(
+      backgroundColorHex: '#CCFFCC', // Verde chiaro
+      fontFamily: getFontFamily(FontFamily.Arial),
+    );
+
+    // Aggiungi l'intestazione
     sheetObject.appendRow([
       'Data',
       'Tipo di movimentazione',
@@ -365,22 +383,38 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       'Descrizione',
       'Utente',
     ]);
+
+    // Applica lo stile di sfondo bianco per l'intestazione
+    for (var i = 0; i < sheetObject.maxCols; i++) {
+      sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0))
+          .cellStyle = whiteBackground;
+    }
+
     double total = 0;
     for (var spesa in movimentiList2) {
-      if (spesa.importo!= null) {
-        if (spesa.tipo_movimentazione == TipoMovimentazione.Uscita || spesa.tipo_movimentazione == TipoMovimentazione.Prelievo) {
+      if (spesa.importo != null) {
+        if (spesa.tipo_movimentazione == TipoMovimentazione.Uscita ||
+            spesa.tipo_movimentazione == TipoMovimentazione.Prelievo) {
           total -= spesa.importo!;
-        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto || spesa.tipo_movimentazione == TipoMovimentazione.Pagamento || spesa.tipo_movimentazione == TipoMovimentazione.Entrata || spesa.tipo_movimentazione == TipoMovimentazione.Versamento) {
+        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto ||
+            spesa.tipo_movimentazione == TipoMovimentazione.Pagamento ||
+            spesa.tipo_movimentazione == TipoMovimentazione.Entrata ||
+            spesa.tipo_movimentazione == TipoMovimentazione.Versamento) {
           total += spesa.importo!;
         }
       }
     }
+
+    int rowIndex = 1; // Inizia dalla seconda riga (indice 1)
     for (var spesa in movimentiList2) {
       String importoFormatted;
-      if (spesa.importo!= null) {
-        if (spesa.tipo_movimentazione == TipoMovimentazione.Uscita || spesa.tipo_movimentazione == TipoMovimentazione.Prelievo) {
+      if (spesa.importo != null) {
+        if (spesa.tipo_movimentazione == TipoMovimentazione.Uscita ||
+            spesa.tipo_movimentazione == TipoMovimentazione.Prelievo) {
           importoFormatted = '-${spesa.importo!.toStringAsFixed(2)}';
-        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto || spesa.tipo_movimentazione == TipoMovimentazione.Pagamento || spesa.tipo_movimentazione == TipoMovimentazione.Entrata) {
+        } else if (spesa.tipo_movimentazione == TipoMovimentazione.Acconto ||
+            spesa.tipo_movimentazione == TipoMovimentazione.Pagamento ||
+            spesa.tipo_movimentazione == TipoMovimentazione.Entrata) {
           importoFormatted = '+${spesa.importo!.toStringAsFixed(2)}';
         } else {
           importoFormatted = spesa.importo!.toStringAsFixed(2);
@@ -388,14 +422,27 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       } else {
         importoFormatted = 'N/A';
       }
+
+      // Aggiungi la riga
       sheetObject.appendRow([
-        spesa.data!= null? DateFormat('yyyy-MM-dd').format(spesa.data!) : 'N/A',
-        spesa.tipo_movimentazione.toString()?? 'N/A',
+        spesa.data != null ? DateFormat('yyyy-MM-dd').format(spesa.data!) : 'N/A',
+        spesa.tipo_movimentazione.toString().split('.').last ?? 'N/A',
         importoFormatted,
-        spesa.descrizione?? 'N/A',
-        spesa.utente?.cognome?? 'N/A'
+        spesa.descrizione ?? 'N/A',
+        spesa.utente?.cognome ?? 'N/A'
       ]);
+
+      // Alterna il colore di sfondo tra bianco e verde chiaro
+      var backgroundColor = rowIndex % 2 == 0 ? whiteBackground : greenBackground;
+      for (var i = 0; i < sheetObject.maxCols; i++) {
+        sheetObject
+            .cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: rowIndex))
+            .cellStyle = backgroundColor;
+      }
+      rowIndex++;
     }
+
+    // Aggiungi la riga totale
     sheetObject.appendRow([
       'Totale',
       '',
@@ -403,6 +450,13 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       '',
       ''
     ]);
+
+    // Applica lo stile alla riga totale (bianco)
+    for (var i = 0; i < sheetObject.maxCols; i++) {
+      sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: rowIndex))
+          .cellStyle = whiteBackground;
+    }
+
     try {
       late String filePath;
       if (Platform.isWindows) {
@@ -425,11 +479,9 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Excel salvato in $filePath')));
       } else {
-        // Gestisci il caso in cui excel.encode() restituisce null
         print('Errore durante la codifica del file Excel');
       }
     } catch (error) {
-      // Gestisci eventuali errori durante il salvataggio del file
       print('Errore durante il salvataggio del file Excel: $error');
     }
   }
@@ -670,18 +722,62 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     return null;
                   },
                 ),
+                SizedBox(height: 5),
+                Container(
+                  width: 700,
+                  height: 250,
+                  child: SfSignaturePad(
+                    key: _signaturePadKey,
+                    backgroundColor: Colors.white,
+                    strokeColor: Colors.black,
+                    minimumStrokeWidth: 2.0,
+                    maximumStrokeWidth: 4.0,
+                  ),
+                ),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKeyPrelievo.currentState!.validate()) { // Convalida il form
                   // Puliamo l'input prima di inviarlo alla funzione
                   String cleanedInput = _prelievoController.text.trim();
-                  addPrelievo(cleanedInput); // Aggiunge il prelievo con l'importo pulito
+
+                  // Ottieni la firma dal SignaturePad
+                  final signaturePadState = _signaturePadKey.currentState;
+                  if (signaturePadState != null) {
+                    final image = await signaturePadState.toImage(); // Ottieni l'immagine come dart:ui Image
+                    final byteData = await image.toByteData(format: ImageByteFormat.png); // Convertilo in PNG
+                    final Uint8List? firmaIncaricato = byteData?.buffer.asUint8List(); // Ottieni i byte come Uint8List
+
+                    if (firmaIncaricato != null) {
+                      // Passa la firma e i dati alla pagina PDFPrelievoCassaPage
+                      addPrelievo(cleanedInput).whenComplete(() =>
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PDFPrelievoCassaPage(
+                                descrizione: 'Prelievo del ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
+                                data: DateTime.now(),
+                                utente: widget.userData,
+                                tipoMovimentazione: TipoMovimentazione.Prelievo,
+                                importo: _prelievoController.text,
+                                firmaIncaricato: firmaIncaricato, // Passa la firma come Uint8List
+                              ),
+                            ),
+                          ),
+                      );
+                    } else {
+                      // Gestisci il caso in cui la firma non è stata raccolta
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Firma non valida, riprova.')),
+                      );
+                    }
+                  }
                 }
               },
+
               child: Text('Conferma prelievo'.toUpperCase()),
             ),
           ],
