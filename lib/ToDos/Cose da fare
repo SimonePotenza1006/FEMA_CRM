@@ -2,10 +2,10 @@
 MODIFICHE DA FARE
 
 
-- Eliminare orario appuntamento intervento dal dettaglio intervento
+
 - Poter modificare data creazione + numerazione intervento
 - Eliminare dicitura "Mezzo null" sul pdf generato da intervento
-- Inserire i due punnti (:) anche dopo l'acconto
+- Inserire i due punti (:) anche dopo l'acconto
 - Dobbiamo poter modificare il cliente
 - Aggiungere destinatario + destinazione
 - Possibilità di togliere la data accordata
@@ -14,6 +14,7 @@ MODIFICHE DA FARE
 popolata dagli interventi della sua categoria di interventi,
 - Gestire anche il caricamento dei PDF oltre alle immagini (Riferite ad un intervento almeno per ora)
 - Capire perchè il sorting tramite le tipologie di intervento non funzionano
+- Sistemare il totale dei prezzi fornitore da DettaglioInterventoPage per comprendere il prodotto tra quantità e prezzo
 
 
 17/10/2024
@@ -36,3 +37,13 @@ SIMONE
 - Inserire nella tabella interventi una colonna con l'importo comprendente iva, e trattare quello esistente come importo netto ✔
 - Risolto il bug di stampa del PDF preventivo servizi
 - Inserita la colonna TipologiaIntervento nella TableInterventiPage
+
+19/10/2024
+SIMONE
+- Corretto il bug della ricerca cliente da InterventoTecnicoForm
+- Eliminare orario appuntamento intervento dal dettaglio intervento
+- Inserita dicitura /'AnnoApertura+APP' nella dicitura ID del DettaglioInterventoAmministrazione
+- Inserita la firma nella movimentazione di prelievo
+- Inserito un doppio colore nell'excel delle movimentazioni
+
+

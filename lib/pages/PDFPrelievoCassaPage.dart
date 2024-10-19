@@ -19,21 +19,17 @@ import 'PDFInterventoPage.dart';
 class PDFPrelievoCassaPage extends StatefulWidget {
   final String? descrizione;
   final UtenteModel? utente;
-  final UtenteModel? incaricato;
   final DateTime? data;
   final String? importo;
   final TipoMovimentazione tipoMovimentazione;
-  final Uint8List? firmaCassa;
   final Uint8List? firmaIncaricato;
 
   PDFPrelievoCassaPage({
     required this.descrizione,
     required this.utente,
-    required this.incaricato,
     required this.data,
     required this.importo,
     required this.tipoMovimentazione,
-    required this.firmaCassa,
     required this.firmaIncaricato,
   });
 
@@ -200,7 +196,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
       final String recipient = 'info@femasistemi.it';
 
       final String subject =
-          '(MOVIMENTOCASSA) ${widget.tipoMovimentazione.toString().substring(19)} in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, utente: ${widget.utente?.nome} ${widget.utente?.cognome}, incaricato ${widget.incaricato?.nome} ${widget.incaricato?.cognome}';
+          '(MOVIMENTOCASSA) ${widget.tipoMovimentazione.toString().substring(19)} in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, utente: ${widget.utente?.nome} ${widget.utente?.cognome}.';
       final String body =
           'In allegato il PDF riepilogativo della movimentazione in ${widget.tipoMovimentazione.toString().substring(19)}  dalla cassa pari a ${widget.importo}, con descrizione ${widget.descrizione}';
 
@@ -250,25 +246,12 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
                   ),
                   pw.SizedBox(height: 20),
                   pw.Text(
-                    "Si attesta che, in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, l'utente ${widget.incaricato?.cognome} ${widget.incaricato?.nome} ha effettuato un movimento di ${widget.tipoMovimentazione.toString().substring(19)} dal fondocassa aziendale un importo pari a ${widget.importo}. Tale movimentazione è dovuta a: \' ${widget.descrizione} \' ",
+                    "Si attesta che, in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, l'utente ${widget.utente?.cognome} ${widget.utente?.nome} ha effettuato un movimento di ${widget.tipoMovimentazione.toString().substring(19)} dal fondocassa aziendale un importo pari a ${widget.importo}. Tale movimentazione è dovuta a: \' ${widget.descrizione} \' ",
                   ),
                   pw.SizedBox(height: 60),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                     children: [
-                      pw.Column(
-                        children: [
-                          pw.Text("Firma responsabile cassa"),
-                          pw.SizedBox(height: 20),
-                          pw.SizedBox(
-                            height: 100,
-                            width: 130,
-                            child: pw.Image(
-                              pw.MemoryImage(widget.firmaCassa!),
-                            ),
-                          ),
-                        ],
-                      ),
                       pw.Column(
                         children: [
                           pw.Text("Firma incaricato a ritiro"),
