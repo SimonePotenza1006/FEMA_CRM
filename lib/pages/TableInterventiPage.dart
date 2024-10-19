@@ -61,6 +61,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'tipologia' : 180
   };
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
+  bool isLoading = true;
 
   Future<void> getAllUtenti() async{
     try{
@@ -155,6 +156,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   }
 
   Future<void> getAllInterventi() async {
+    setState(() {
+      isLoading = true; // Inizio del caricamento
+    });
     try {
       var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
       var response = await http.get(apiUrl);
@@ -182,6 +186,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error during API call: $e')),
       );
+    } finally {
+      setState(() {
+        isLoading = false; // Fine del caricamento
+      });
     }
   }
 
@@ -529,7 +537,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
               color: Colors.white,
             ),
             onPressed: () {
-              getAllInterventi();
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => TableInterventiPage()));
+              //getAllInterventi();
             },
           ),
         ],
@@ -540,7 +551,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           children: [
             SizedBox(height: 10),
             Expanded(
-              child: SfDataGrid(
+              child: isLoading // Controlla lo stato di caricamento
+                  ? Center(child: CircularProgressIndicator()) // Mostra l'indicatore di caricamento
+                  : SfDataGrid(
                 allowPullToRefresh: true,
                 allowSorting: true,
                 source: _dataSource,

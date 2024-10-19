@@ -328,8 +328,29 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+
+    Color? prioritaColor;
+    switch (widget.intervento.priorita) {
+      case Priorita.BASSA :
+        prioritaColor = Colors.lightGreen;
+        break;
+      case Priorita.MEDIA :
+        prioritaColor = Colors.yellow; // grigio chiaro
+        break;
+      case Priorita.ALTA:
+        prioritaColor = Colors.orange; // giallo chiaro
+        break;
+      case Priorita.URGENTE:
+        prioritaColor = Colors.red; // azzurro chiaro
+        break;
+      default:
+        prioritaColor = Colors.blueGrey[200];
+    }
+
     String descrizioneInterventoSub = widget.intervento.descrizione!.length < 30
         ? widget.intervento.descrizione!
         : widget.intervento.descrizione!.substring(0, 30);
@@ -463,9 +484,34 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               children: [
                                 buildInfoRow(
                                     title: 'ID intervento',
-                                    value: widget.intervento.id!,
+                                    value: widget.intervento.id!+'/${widget.intervento.data_apertura_intervento?.year != null ? widget.intervento.data_apertura_intervento?.year : DateTime.now().year }APP',
                                     context: context
                                 ),
+                                SizedBox(width: 20),
+                                buildInfoRow(
+                                    title: 'Codice DANEA',
+                                    value: widget.intervento.numerazione_danea ?? 'N/A',
+                                    context: context
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                buildInfoPrioritaRow(
+                                    title: 'Priorità',
+                                    value: widget.intervento.priorita!,
+                                    context: context
+                                ),
+                                /*Container(
+                                  color: prioritaColor,
+                                ),*/
+                                /*buildInfoRow(
+                                    title: 'Priorità',
+                                    value: widget.intervento.priorita!,
+                                    context: context
+                                ),*/
                                 SizedBox(width: 20),
                                 buildInfoRow(
                                     title: 'Data creazione',
@@ -1275,6 +1321,8 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     );
   }
 
+
+
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
     // Verifica se il valore supera i 25 caratteri
     bool isValueTooLong = value.length > 25;
@@ -1359,6 +1407,131 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     );
   }
 
+  void updatePriorita(Priorita newPriorita) {
+    setState(() {
+      widget.intervento.priorita = newPriorita;
+    });
+  }
+
+  Widget buildInfoPrioritaRow({required String title, required Priorita value, BuildContext? context}) {
+    Color? prioritaColor;
+    switch (value) {
+      case Priorita.BASSA :
+        prioritaColor = Colors.lightGreen;
+        break;
+      case Priorita.MEDIA :
+        prioritaColor = Colors.yellow; // grigio chiaro
+        break;
+      case Priorita.ALTA:
+        prioritaColor = Colors.orange; // giallo chiaro
+        break;
+      case Priorita.URGENTE:
+        prioritaColor = Colors.red; // azzurro chiaro
+        break;
+      default:
+        prioritaColor = Colors.blueGrey[200];
+    }
+    // Verifica se il valore supera i 25 caratteri
+    //bool isValueTooLong = value.length > 25;
+    //String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+
+    return SizedBox(
+      width: 280,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                      onTap: () {
+                  // Funzione per aprire il dialog
+                  showDialog(
+                  context: context!,
+                  builder: (BuildContext context) {
+                    return
+                      AlertDialog(
+                        title: Text("Seleziona Priorità"),
+                        content: DropdownButton<Priorita>(
+                          value: value,
+                          onChanged: (Priorita? newValue) {
+                            if (newValue != null) {
+                              updatePriorita(newValue); // Aggiorna la priorità nel widget genitore
+                              Navigator.of(context).pop(); // Chiudi il dialog
+                            }
+                            setState(() {
+                              value = newValue!;
+                              widget.intervento.priorita = value; // Aggiorna l'oggetto
+                            });
+                          },
+                          items: Priorita.values.map((Priorita priorita) {
+                            return DropdownMenuItem<Priorita>(
+                              value: priorita,
+                              child: Text(priorita.toString().split('.').last.toUpperCase()),
+                            );
+                          }).toList(),
+                        ),
+                        actions: [
+                          TextButton(
+                            child: Text("Chiudi"),
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Chiudi il dialog
+                            },
+                          ),
+                        ],
+                      );
+
+                  },
+                );
+      },
+        child:
+        Container(
+
+                        height: 25,
+                        width: 25,
+                        color: prioritaColor,
+                      )),
+
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String timeOfDayToIso8601String(TimeOfDay timeOfDay) {
     final now = DateTime.now();
     final dateTime = DateTime(
@@ -1387,13 +1560,14 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         : widget.intervento.descrizione;
 
     try {
-      // Making HTTP request to update the 'intervento'
+      // Making HTTP request to update the 'intervento
       final response = await http.post(
         Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
           'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento': orario?.toIso8601String(),  // Ensured correct DateTime

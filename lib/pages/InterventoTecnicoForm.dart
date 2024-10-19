@@ -64,6 +64,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   final _datiController = TextEditingController();
   bool _preventivoRichiesto = false;
   List<XFile> pickedImages =  [];
+  bool isLoadingClienti = false;
 
   @override
   void initState() {
@@ -867,7 +868,40 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     }
   }
 
-  void _showClientiDialog() {
+  void _showClientiDialog() async {
+    // Mostra il dialogo con un indicatore di caricamento
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'SELEZIONA CLIENTE',
+            textAlign: TextAlign.center,
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Caricamento clienti...'), // Messaggio di caricamento
+              SizedBox(height: 16),
+              Center(child: CircularProgressIndicator()), // Indicatore di caricamento
+            ],
+          ),
+        );
+      },
+    );
+
+    // Carica i clienti in background
+    await getAllClienti();
+
+    // Chiudi il dialogo e mostra i clienti
+    Navigator.of(context).pop(); // Chiudi il dialogo
+
+    // Mostra il dialogo con la lista dei clienti
+    _showClientiListDialog();
+  }
+
+  void _showClientiListDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -887,8 +921,8 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                     setState(() {
                       filteredClientiList = clientiList
                           .where((cliente) => cliente.denominazione!
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
                           .toList();
                     });
                   },
@@ -924,6 +958,77 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       },
     );
   }
+
+  /*void _showClientiDialog() async {
+    setState(() {
+      isLoadingClienti = true; // Inizio del caricamento
+    });
+
+    await getAllClienti(); // Carica i clienti prima di aprire il dialogo
+
+    setState(() {
+      isLoadingClienti = false; // Fine del caricamento
+    });
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'SELEZIONA CLIENTE',
+            textAlign: TextAlign.center,
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      filteredClientiList = clientiList
+                          .where((cliente) => cliente.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                          .toList();
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'CERCA CLIENTE',
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                ),
+                SizedBox(height: 16),
+                if (isLoadingClienti)
+                  Center(child: CircularProgressIndicator())
+                else
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: filteredClientiList.map((cliente) {
+                        return ListTile(
+                          leading: Icon(Icons.contact_page_outlined),
+                          title: Text(cliente.denominazione!),
+                          onTap: () {
+                            setState(() {
+                              selectedCliente = cliente;
+                              getAllDestinazioniByCliente(cliente.id!);
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }*/
 
   void _showDestinazioniDialog() {
     showDialog(
@@ -1118,6 +1223,9 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   }
 
   Future<void> getAllClienti() async {
+    setState(() {
+      isLoadingClienti = true; // Inizio del caricamento
+    });
     try {
       var apiUrl = Uri.parse('${ipaddress}/api/cliente');
       var response = await http.get(apiUrl);
@@ -1138,6 +1246,10 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     } catch (e) {
       print('Errore durante la chiamata all\'API: $e');
       _showErrorDialog();
+    } finally {
+      setState(() {
+        isLoadingClienti = false; // Fine del caricamento
+      });
     }
   }
 
