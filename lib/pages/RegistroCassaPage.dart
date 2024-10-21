@@ -932,7 +932,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
-          'descrizione': _causaleVersamentoController.text,
+          'descrizione': _causaleVersamentoController.text.toUpperCase(),
           'tipo_movimentazione': "Versamento",
           'importo': double.parse(_versamentoController.text.toString()),
           'utente': widget.userData.toMap()

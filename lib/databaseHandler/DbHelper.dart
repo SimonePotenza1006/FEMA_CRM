@@ -22,6 +22,7 @@ import 'package:flutter/cupertino.dart';
 
 
 import '../model/AziendaModel.dart';
+import '../model/DestinazioneModel.dart';
 import '../model/DeviceModel.dart';
 import '../model/LicenzaModel.dart';
 import '../model/OrdinePerInterventoModel.dart';
@@ -293,6 +294,25 @@ class DbHelper{
       return [];
     } catch(e){
       print("Errore fetching clienti:$e");
+      return [];
+    }
+  }
+
+  Future<List<DestinazioneModel>> getDestinazioneByCliente(ClienteModel cliente) async{
+    int clienteId = int.parse(cliente.id!);
+    try{
+      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/${clienteId}'));
+      if(response.statusCode == 200){
+         final jsonData = jsonDecode(response.body);
+         List<DestinazioneModel> destinazioni = [];
+         for(var item in jsonData){
+           destinazioni.add(DestinazioneModel.fromJson(item));
+        }
+         return destinazioni;
+      }
+      return [];
+    } catch(e){
+      print('Errore fetching Destinazione By Cliente : $e');
       return [];
     }
   }

@@ -706,7 +706,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
         body: jsonEncode({
           'data': now,
           'utente': widget.userData.toMap(),
-          'nota': "Ricevuto un acconto di ${_importoController.text} ",
+          'nota': "Ricevuto un acconto di ${_importoController.text}".toUpperCase(),
           'cliente' : selectedCliente?.toMap(),
           'intervento' : selectedIntervento?.toMap()
         }),
@@ -831,7 +831,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
     Map<String, dynamic> body = {
       'id': null,
       'data': selectedDate.toIso8601String(),
-      'descrizione': _descrizioneController.text,
+      'descrizione': _descrizioneController.text.toUpperCase(),
       'tipo_movimentazione': tipoMovimentazioneString,
       'importo': double.parse(_importoController.text.toString()),
       'utente': widget.userData.toMap(),

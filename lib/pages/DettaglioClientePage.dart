@@ -61,36 +61,39 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-                    _buildInfoText(title:'Indirizzo', value: widget.cliente.indirizzo != null ? widget.cliente.indirizzo! : "Non inserito"),
-                    _buildInfoText(title:'Partita Iva', value:widget.cliente.partita_iva != null ? widget.cliente.partita_iva! : "Non inserito"),
-                    _buildInfoText(title:'Cap', value:widget.cliente.cap != null ? widget.cliente.cap!: "Non inserito"),
-                    _buildInfoText(title:'Città', value:widget.cliente.citta != null ? widget.cliente.citta!: "Non inserito"),
-                    _buildInfoText(title:'Provincia', value:widget.cliente.provincia != null ? widget.cliente.provincia!: "Non inserito"),
-                    _buildInfoText(title:'Nazione', value:widget.cliente.nazione != null ? widget.cliente.nazione!: "Non inserito"),
-                    _buildInfoText(title:'Recapito fatturazione elettronica', value:widget.cliente.recapito_fatturazione_elettronica != null ? widget.cliente.recapito_fatturazione_elettronica!: "Non inserito"),
-                    _buildInfoText(title:'Riferimento amministrativo', value:widget.cliente.riferimento_amministrativo != null ? widget.cliente.riferimento_amministrativo!: "Non inserito"),
-                    _buildInfoText(title:'Referente', value:widget.cliente.referente != null ? widget.cliente.referente!: "Non inserito"),
-                    _buildInfoText(title:'Fax', value:widget.cliente.fax != null ? widget.cliente.fax!: "Non inserito"),
-                    _buildInfoText(title:'Telefono', value:widget.cliente.telefono != null ? widget.cliente.telefono!: "Non inserito"),
-                    _buildInfoText(title:'Cellulare', value:widget.cliente.cellulare != null ? widget.cliente.cellulare!: "Non inserito"),
-                    _buildInfoText(title:'Email', value:widget.cliente.email != null ? widget.cliente.email!: "Non inserito"),
-                    _buildInfoText(title:'PEC', value:widget.cliente.pec != null ? widget.cliente.pec!: "Non inserito"),
-                    _buildInfoText(title:'Note', value: widget.cliente.note != null ? widget.cliente.note!: "Non inserito"),
-                    if(allPosizioni.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 12),
-                          Text('Ultime posizioni salvate dai tecnici:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          for(var posizione in allPosizioni)
-                            Text('${posizione.dataCreazione?.day}/${posizione.dataCreazione?.month}/${posizione.dataCreazione?.day} ${posizione.indirizzo}')
-                        ],
-                      )
-                  ],
-          ),
+
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoText(title:'Indirizzo', value: widget.cliente.indirizzo != null ? widget.cliente.indirizzo! : "Non inserito"),
+                _buildInfoText(title:'Partita Iva', value:widget.cliente.partita_iva != null ? widget.cliente.partita_iva! : "Non inserito"),
+                _buildInfoText(title:'Cap', value:widget.cliente.cap != null ? widget.cliente.cap!: "Non inserito"),
+                _buildInfoText(title:'Città', value:widget.cliente.citta != null ? widget.cliente.citta!: "Non inserito"),
+                _buildInfoText(title:'Provincia', value:widget.cliente.provincia != null ? widget.cliente.provincia!: "Non inserito"),
+                _buildInfoText(title:'Nazione', value:widget.cliente.nazione != null ? widget.cliente.nazione!: "Non inserito"),
+                _buildInfoText(title:'Recapito fatturazione elettronica', value:widget.cliente.recapito_fatturazione_elettronica != null ? widget.cliente.recapito_fatturazione_elettronica!: "Non inserito"),
+                _buildInfoText(title:'Riferimento amministrativo', value:widget.cliente.riferimento_amministrativo != null ? widget.cliente.riferimento_amministrativo!: "Non inserito"),
+                _buildInfoText(title:'Referente', value:widget.cliente.referente != null ? widget.cliente.referente!: "Non inserito"),
+                _buildInfoText(title:'Fax', value:widget.cliente.fax != null ? widget.cliente.fax!: "Non inserito"),
+                _buildInfoText(title:'Telefono', value:widget.cliente.telefono != null ? widget.cliente.telefono!: "Non inserito"),
+                _buildInfoText(title:'Cellulare', value:widget.cliente.cellulare != null ? widget.cliente.cellulare!: "Non inserito"),
+                _buildInfoText(title:'Email', value:widget.cliente.email != null ? widget.cliente.email!: "Non inserito"),
+                _buildInfoText(title:'PEC', value:widget.cliente.pec != null ? widget.cliente.pec!: "Non inserito"),
+                _buildInfoText(title:'Note', value: widget.cliente.note != null ? widget.cliente.note!: "Non inserito"),
+                if(allPosizioni.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 12),
+                      Text('Ultime posizioni salvate dai tecnici:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      for(var posizione in allPosizioni)
+                        Text('${posizione.dataCreazione?.day}/${posizione.dataCreazione?.month}/${posizione.dataCreazione?.day} ${posizione.indirizzo}')
+                    ],
+                  )
+              ],
+            ),
+          )
         ),
       ),
       bottomNavigationBar: Padding(
@@ -139,10 +142,11 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
     // Verifica se il valore supera i 25 caratteri
     bool isValueTooLong = value.length > 25;
     String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+
     return SizedBox(
-      width:600,
+      width: 500,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, ),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(
           children: [
             Row(
@@ -188,7 +192,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: Text("${title.toUpperCase()}"),
-                                  content: Text(value),
+                                  content: Text(value), // Mostra il valore completo qui
                                   actions: [
                                     TextButton(
                                       child: Text("Chiudi"),
@@ -212,7 +216,6 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
               color: Colors.grey[400],
               thickness: 1,
             ),
-            SizedBox(width: 50)
           ],
         ),
       ),

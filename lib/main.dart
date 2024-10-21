@@ -183,7 +183,6 @@ class _LoginFormState extends State<LoginForm> {
       print('Running on '
           '${androidInfo.model.toString()} ${androidInfo.serialNumber
           .toString()} '
-
       );
     }
     /*if (dispositivi.contains(idd)) {

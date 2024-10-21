@@ -794,7 +794,6 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
   void _showClientiDialog() {
     TextEditingController searchController = TextEditingController(); // Aggiungi un controller
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
