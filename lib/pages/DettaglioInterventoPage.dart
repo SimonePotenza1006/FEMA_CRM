@@ -49,7 +49,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   UtenteModel? _responsabileSelezionato;
   List<UtenteModel?> _selectedUtenti = [];
   List<UtenteModel?> _finalSelectedUtenti = [];
-  final TextEditingController rapportinoController = TextEditingController();
+   TextEditingController rapportinoController = TextEditingController();
   bool modificaDescrizioneVisible = false;
   bool modificaImportoVisibile = false;
   bool modificaNotaVisibile = false;
@@ -1611,6 +1611,9 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
               SizedBox(
                 width: 480,
                 child: TextFormField(
+                  minLines: 3,
+                  maxLines: 3,
+                  style: TextStyle(fontSize: 13),
                   controller: rapportinoController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(

@@ -27,7 +27,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
   Map<String, double> _columnWidths = {
     'merce' : 0,
     'prodotto' : 200,
-    'data_acquisto' : 120,
+    'data_acquisto' : 130,
     'difetto_riscontrato' : 200,
     'fornitore' : 200,
     'data_riconsegna' : 200,
@@ -147,7 +147,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                           ],
                         ),
                         SizedBox(height: 8),
-                        Row(
+                        /*Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Container(
@@ -184,7 +184,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                             SizedBox(width: 8),
                             Text('Riparazione conclusa'),
                           ],
-                        ),
+                        ),*/
                       ],
                     ),
                   );
@@ -249,7 +249,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                               ],
                             ),
                             SizedBox(height: 8),
-                            Row(
+                            /*Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Container(
@@ -286,7 +286,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                                 SizedBox(width: 8),
                                 Text('Riparazione conclusa'),
                               ],
-                            ),
+                            ),*/
                           ],
                         ),
                       );
@@ -382,7 +382,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                         ),
                       ),
                       width: _columnWidths['data_acquisto']?? double.nan,
-                      minimumWidth: 120,
+                      minimumWidth: 130,
                     ),
                     GridColumn(
                       columnName: 'difetto_riscontrato',
@@ -524,7 +524,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                           ),
                         ),
                         child: Text(
-                          'data rientro ufficio'.toUpperCase(),
+                          'data rientro'.toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       ),

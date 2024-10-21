@@ -149,7 +149,6 @@ class _CreazioneRMAPageState
     if (pickedFile != null) {
       setState(() {
         pickedImages.add(pickedFile);
-        print('');
       });
     }
   }
@@ -196,7 +195,7 @@ class _CreazioneRMAPageState
   }
 
   Widget _buildGroupContainer({required String title, required List<Widget> children}) {
-    return Container(
+    return Container(width: MediaQuery.of(context).size.width * 0.9,
       margin: const EdgeInsets.only(top: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

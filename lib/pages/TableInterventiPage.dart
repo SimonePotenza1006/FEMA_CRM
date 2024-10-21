@@ -46,7 +46,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     'id_intervento' : 150,
     'codice_danea' : 200,
     'priorita' : 45,
-    'data_apertura_intervento': 200,
+    'data_apertura_intervento': 210,
     'data': 150,
     'cliente': 200,
     'orario_appuntamento': 260,
@@ -875,7 +875,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                       ),
                     ),
                     width: _columnWidths['data_apertura_intervento']?? double.nan,
-                    minimumWidth: 200, // Imposta la larghezza minima
+                    minimumWidth: 210, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'data',
@@ -925,7 +925,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                       ),
                     ),
                     width: _columnWidths['orario_appuntamento']?? double.nan,
-                    minimumWidth: 100, // Imposta la larghezza minima
+                    minimumWidth: 120, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'descrizione',

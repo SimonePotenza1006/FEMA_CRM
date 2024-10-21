@@ -135,6 +135,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
         final jsonData = jsonDecode(response.body);
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
+          if (UtenteModel.fromJson(item).nome != 'Segreteria')
           utenti.add(UtenteModel.fromJson(item));
         }
         setState(() {
