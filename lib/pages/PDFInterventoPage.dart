@@ -214,6 +214,7 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
     print('Data creazione: ${formattedDataCreazione}');
     print('Ora inizio: ${formattedOrarioInizio}');
     print('Ora fine : ${formattedOrarioFine}');
+    var veicolo = widget.intervento.veicolo != null ? widget.intervento.veicolo?.descrizione : "";
 
     try {
       print('Dentro al try');
@@ -299,7 +300,7 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                         ),
                         pw.SizedBox(height: 15),
                         pw.Text(
-                          'MEZZO: ${widget.intervento.veicolo?.descrizione}',
+                          'MEZZO: ${veicolo}',
                           style: pw.TextStyle(
                             fontSize: 12,
                           ),
@@ -873,7 +874,7 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                               pw.Padding(
                                 padding: pw.EdgeInsets.symmetric(horizontal: 8),
                                 child: pw.Text(
-                                  'Acconto',
+                                  'Acconto: ',
                                   style: pw.TextStyle(
                                     fontWeight: pw.FontWeight.bold,
                                   ),

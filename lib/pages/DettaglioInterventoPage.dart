@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:fema_crm/databaseHandler/DbHelper.dart';
 import 'package:fema_crm/model/DDTModel.dart';
+import 'package:fema_crm/model/DestinazioneModel.dart';
 import 'package:fema_crm/model/NotaTecnicoModel.dart';
 import 'package:fema_crm/model/RelazioneDdtProdottiModel.dart';
 import 'package:fema_crm/model/RelazioneProdottiInterventoModel.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import '../model/ClienteModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/UtenteModel.dart';
 import 'AggiuntaManualeProdottiDDTPage.dart';
@@ -31,6 +34,12 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
   List<NotaTecnicoModel> allNote = [];
   List<UtenteModel> allUtenti = [];
+  late Future<List<ClienteModel>> allClienti;
+  List<ClienteModel> clientiList =[];
+  List<ClienteModel> filteredClientiList = [];
+  List<DestinazioneModel> allDestinazioniByCliente = [];
+  ClienteModel? selectedCliente;
+  DestinazioneModel? selectedDestinazione;
   List<RelazioneDdtProdottoModel> prodottiDdt = [];
   TimeOfDay? _selectedTimeAppuntamento = null;
   List<RelazioneProdottiInterventoModel> allProdotti = [];
@@ -47,10 +56,19 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   final TextEditingController importoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   Future<List<Uint8List>>? _futureImages;
+  DbHelper? dbHelper;
 
   @override
   void initState() {
     super.initState();
+    dbHelper = DbHelper();
+    allClienti = dbHelper!.getAllClienti();
+    allClienti.then((clienti) {
+      setState(() {
+        clientiList = clienti;
+        filteredClientiList = List.from(clientiList);
+      });
+    });
     getProdottiByIntervento();
     getRelazioni();
     getNoteByIntervento();
@@ -59,6 +77,149 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     _futureImages = fetchImages();
     rapportinoController.text = (widget.intervento.relazione_tecnico != null ? widget.intervento.relazione_tecnico : '//')!;
   }
+
+  void _showClientiDialog() {
+    TextEditingController searchController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Seleziona Cliente', textAlign: TextAlign.center),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          filteredClientiList = clientiList
+                              .where((cliente) => cliente.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Cerca Cliente',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: filteredClientiList.map((cliente) {
+                            return ListTile(
+                              leading: const Icon(Icons.contact_page_outlined),
+                              title: Text('${cliente.denominazione}, ${cliente.indirizzo}'),
+                              onTap: () {
+                                setState(() {
+                                  selectedCliente = cliente;
+                                });
+                                Navigator.of(context).pop(); // Chiude il dialog dei clienti
+                                _getAndShowDestinazioni(cliente); // Chiama la funzione per aprire il dialog delle destinazioni
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _getAndShowDestinazioni(ClienteModel cliente) async {
+    // Mostra un indicatore di caricamento
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Previene la chiusura del dialog toccando al di fuori
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    // Ottieni le destinazioni
+    List<DestinazioneModel> destinazioni = await dbHelper!.getDestinazioneByCliente(cliente);
+
+    // Chiudi l'indicatore di caricamento
+    Navigator.of(context).pop();
+
+    if (destinazioni.isNotEmpty) {
+      // Mostra il dialog delle destinazioni
+      _showDestinazioniDialog(destinazioni);
+    } else {
+      // Se non ci sono destinazioni, mostra un messaggio di errore o di avviso
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Nessuna destinazione trovata'),
+            content: const Text('Non ci sono destinazioni disponibili per questo cliente.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _showDestinazioniDialog(List<DestinazioneModel> destinazioni) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('SELEZIONA DESTINAZIONE', textAlign: TextAlign.center),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: destinazioni.map((destinazione) {
+                        return ListTile(
+                          leading: const Icon(Icons.home_work_outlined),
+                          title: Text(destinazione.denominazione!),
+                          onTap: () {
+                            setState(() {
+                              selectedDestinazione = destinazione;
+                            });
+                            Navigator.of(context).pop(); // Chiude il dialog delle destinazioni
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 
   Future<List<Uint8List>> fetchImages() async {
     final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
@@ -725,12 +886,40 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 ],
                               ),
                             ),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: 'Cliente',
-                                  value: widget.intervento.cliente?.denominazione ?? 'N/A', context: context),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Cliente',
+                                      value: widget.intervento.cliente?.denominazione ?? 'N/A', context: context),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {
+                                    _showClientiDialog();
+                                  },
+                                )
+                              ],
                             ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //   children: [
+                            //     SizedBox(
+                            //       width: 500,
+                            //       child: buildInfoRow(
+                            //           title: 'Destinazione',
+                            //           value: widget.intervento.destinazione?.denominazione ?? 'N/A', context: context),
+                            //     ),
+                            //     IconButton(
+                            //       icon: Icon(Icons.edit),
+                            //       onPressed: () {
+                            //         _showClientiDialog();
+                            //       },
+                            //     )
+                            //   ],
+                            // ),
                             SizedBox(
                               width: 500,
                               child: buildInfoRow(
@@ -1559,6 +1748,9 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         ? descrizioneController.text
         : widget.intervento.descrizione;
 
+    ClienteModel? cliente = selectedCliente != null ? selectedCliente : widget.intervento.cliente;
+    DestinazioneModel? destinazione = selectedDestinazione != null ? selectedDestinazione : widget.intervento.destinazione;
+
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
@@ -1586,16 +1778,16 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'saldato': widget.intervento.saldato,
           'saldato_da_tecnico': widget.intervento.saldato_da_tecnico,
           'note': widget.intervento.note,
-          'relazione_tecnico': widget.intervento.relazione_tecnico,
+          'relazione_tecnico': rapportinoController.text,
           'firma_cliente': widget.intervento.firma_cliente,
           'utente': widget.intervento.utente?.toMap(),
-          'cliente': widget.intervento.cliente?.toMap(),
+          'cliente': cliente?.toMap(),
           'veicolo': widget.intervento.veicolo?.toMap(),
           'merce': widget.intervento.merce?.toMap(),
           'tipologia': widget.intervento.tipologia?.toMap(),
           'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
           'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-          'destinazione': widget.intervento.destinazione?.toMap(),
+          'destinazione': destinazione?.toMap(),
           'gruppo': widget.intervento.gruppo?.toMap(),
         }),
       );

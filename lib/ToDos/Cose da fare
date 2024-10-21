@@ -4,9 +4,6 @@ MODIFICHE DA FARE
 
 
 - Poter modificare data creazione + numerazione intervento
-- Eliminare dicitura "Mezzo null" sul pdf generato da intervento
-- Inserire i due punti (:) anche dopo l'acconto
-- Dobbiamo poter modificare il cliente
 - Aggiungere destinatario + destinazione
 - Possibilità di togliere la data accordata
 - Usare calendario solo per la visualizzazioned egli interventi
@@ -15,6 +12,17 @@ popolata dagli interventi della sua categoria di interventi,
 - Gestire anche il caricamento dei PDF oltre alle immagini (Riferite ad un intervento almeno per ora)
 - Capire perchè il sorting tramite le tipologie di intervento non funzionano
 - Sistemare il totale dei prezzi fornitore da DettaglioInterventoPage per comprendere il prodotto tra quantità e prezzo
+- Quando filtro x tecnico o per categoria mi deve fare un totale agli interventi… sotto la tabella in modo da sapere i ricavi mensili x tecnico e categoria
+Il tutto stampabile anche la lista degli interventi
+- Gestire la compilazione dei dati della riparazione merce in caso di intervento autoassegnato e concluso
+
+
+ALESSANDRO
+Se riapro un intervento non posso + vedere i dettagli, invece sarebbe utile (anche semplicemente visualizzarne un’ estrazione pdf + la consultazione degli allegati inseriti) grazie eccheccazz
+Nel rapportino versione desktop allegare anche pdf e non solo formati foto
+Nella redazione dell’ intervento non sarebbe meglio  che il cliente sia “in alto” sul form, prima dei dettagli sull’ intervento, e non “in basso”?
+Cambiare sulla versione desktop la dicitura “scatta foto” con “allega documento”  eccheccazz
+
 
 
 17/10/2024
@@ -45,5 +53,13 @@ SIMONE
 - Inserita dicitura /'AnnoApertura+APP' nella dicitura ID del DettaglioInterventoAmministrazione
 - Inserita la firma nella movimentazione di prelievo
 - Inserito un doppio colore nell'excel delle movimentazioni
+
+21/10/2024
+Simone
+- Resi UpperCase tutte le proprietà "descrizione" delle post in RegistroCassaPage e AggiungiMovimentoPage;
+- Eliminata dicitura "Mezzo null" sul pdf generato da intervento
+- Inseriti i due punti (:) anche dopo l'acconto
+- Risolto un bug del salvataggio rapportino in DettaglioInterventoPage;
+- Ora si può cambiare cliente e destinazione da DettaglioIntervetnoPage;
 
 

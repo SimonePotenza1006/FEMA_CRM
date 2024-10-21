@@ -460,6 +460,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           'Priorità:',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
+                        SizedBox(height: 3),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -472,6 +473,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             Text('PRIORITÁ NULLA'),
                           ],
                         ),
+                        SizedBox(height: 3),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -484,6 +486,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             Text('PRIORITÁ BASSA'),
                           ],
                         ),
+                        SizedBox(height: 3),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -496,6 +499,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             Text('PRIORITÁ MEDIA'),
                           ],
                         ),
+                        SizedBox(height: 3),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -508,6 +512,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             Text('PRIORITÁ ALTA'),
                           ],
                         ),
+                        SizedBox(height: 3),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [

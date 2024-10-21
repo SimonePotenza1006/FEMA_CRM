@@ -55,26 +55,27 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
   void filterClienti(String query) {
     setState(() {
       filteredClienti = allClienti.where((cliente) {
-        final denominazione = cliente.denominazione?.toLowerCase();
-        final codice_fiscale = cliente.codice_fiscale?.toLowerCase();
-        final partita_iva = cliente.partita_iva?.toLowerCase();
-        final telefono = cliente.telefono?.toLowerCase();
-        final cellulare = cliente.cellulare?.toLowerCase();
-        final citta = cliente.citta?.toLowerCase();
-        final email = cliente.email?.toLowerCase();
-        final cap = cliente.cap?.toLowerCase();
+        final denominazione = cliente.denominazione?.toLowerCase() ?? '';
+        final codice_fiscale = cliente.codice_fiscale?.toLowerCase() ?? '';
+        final partita_iva = cliente.partita_iva?.toLowerCase() ?? '';
+        final telefono = cliente.telefono?.toLowerCase() ?? '';
+        final cellulare = cliente.cellulare?.toLowerCase() ?? '';
+        final citta = cliente.citta?.toLowerCase() ?? '';
+        final email = cliente.email?.toLowerCase() ?? '';
+        final cap = cliente.cap?.toLowerCase() ?? '';
 
-        return denominazione!.contains(query.toLowerCase()) ||
-            codice_fiscale!.contains(query.toLowerCase()) ||
-            partita_iva!.contains(query.toLowerCase()) ||
-            telefono!.contains(query.toLowerCase()) ||
-            cellulare!.contains(query.toLowerCase()) ||
-            citta!.contains(query.toLowerCase()) ||
-            email!.contains(query.toLowerCase()) ||
-            cap!.contains(query.toLowerCase());
+        return denominazione.contains(query.toLowerCase()) ||
+            codice_fiscale.contains(query.toLowerCase()) ||
+            partita_iva.contains(query.toLowerCase()) ||
+            telefono.contains(query.toLowerCase()) ||
+            cellulare.contains(query.toLowerCase()) ||
+            citta.contains(query.toLowerCase()) ||
+            email.contains(query.toLowerCase()) ||
+            cap.contains(query.toLowerCase());
       }).toList();
     });
   }
+
 
   void startSearch() {
     setState(() {
