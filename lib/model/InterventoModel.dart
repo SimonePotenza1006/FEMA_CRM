@@ -81,7 +81,7 @@ class InterventoModel {
     var map = <String, dynamic>{
       'id': id,
       'numerazione_danea' : numerazione_danea,
-      'priorita' : priorita.toString(),
+      'priorita' : priorita.toString().split('.').last,
       'data_apertura_intervento': data_apertura_intervento?.toIso8601String(),
       'data': data?.toIso8601String(),
       'orario_appuntamento' : orario_appuntamento?.toIso8601String(),

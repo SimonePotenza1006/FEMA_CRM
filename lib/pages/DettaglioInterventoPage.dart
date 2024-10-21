@@ -444,6 +444,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
@@ -695,14 +696,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     value: widget.intervento.priorita!,
                                     context: context
                                 ),
-                                /*Container(
-                                  color: prioritaColor,
-                                ),*/
-                                /*buildInfoRow(
-                                    title: 'Priorità',
-                                    value: widget.intervento.priorita!,
-                                    context: context
-                                ),*/
                                 SizedBox(width: 20),
                                 buildInfoRow(
                                     title: 'Data creazione',
@@ -1084,13 +1077,23 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                 backgroundColor: Colors.red,
                               ),
                             SizedBox(height: 12),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: 'Utente incaricato',
-                                  value: '${widget.intervento.utente?.nomeCompleto() ?? 'Non assegnato'}',
-                                  context: context
-                              ),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Utente incaricato',
+                                      value: '${widget.intervento.utente?.nomeCompleto() ?? 'Non assegnato'}',
+                                      context: context
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: (){
+                                    _showUtentiDialog();
+                                  },
+                                )
+                              ],
                             ),
                             if (otherUtenti.isNotEmpty)
                               SizedBox(
@@ -1417,8 +1420,8 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   return Wrap(
-                                    spacing: 16, // aumenta la spaziatura orizzontale tra le foto
-                                    runSpacing: 16, // aumenta la spaziatura verticale tra le foto
+                                    spacing: 16,
+                                    runSpacing: 16,
                                     children: snapshot.data!.asMap().entries.map((entry) {
                                       int index = entry.key;
                                       Uint8List imageData = entry.value;
@@ -1952,6 +1955,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           body: jsonEncode({
             'id': widget.intervento.id,
             'numerazione_danea' : widget.intervento.numerazione_danea,
+            'priorita' : widget.intervento.priorita.toString().split('.').last,
             'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
             'data': widget.intervento.data?.toIso8601String(),
             'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
@@ -1987,7 +1991,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         if(_selectedUtenti.isNotEmpty){
           for(var utente in _selectedUtenti){
             try{
-              print('sono qui');
+              print('sono quiiiiii');
               final response = await http.post(
                 Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
@@ -1996,13 +2000,13 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                   'intervento' : widget.intervento.toMap(),
                 }),
               );
-              print(response.body);
+              print(response.body.toString());
+              print(response.statusCode);
             } catch(e) {
               print('Errore durante il salvataggio della relazione: $e');
             }
           }
         }
-        Navigator.pop(context);
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

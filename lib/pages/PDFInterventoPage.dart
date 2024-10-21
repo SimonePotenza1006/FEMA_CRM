@@ -944,79 +944,11 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                     child: pw.Row(
                                       children: [
                                         pw.SizedBox(height: 30),
-                                        pw.Text('SALDATO:'),
-                                        pw.Padding(
-                                          padding:
-                                          const pw.EdgeInsets.only(left: 8.0),
-                                          child: pw.Container(
-                                            decoration: pw.BoxDecoration(
-                                              border: pw.Border.all(
-                                                  color: PdfColors.black,
-                                                  width: 1.0),
-                                            ),
-                                            padding: const pw.EdgeInsets.all(
-                                                4.0),
-                                            child: pw.Row(
-                                              children: [
-                                                pw.Checkbox(
-                                                  value: widget
-                                                      .intervento.saldato ==
-                                                      true,
-                                                  // Imposta il valore della checkbox "SI" in base a widget.intervento.saldato
-                                                  name: '',
-                                                ),
-                                                // Checkbox "SI" se widget.intervento.saldato è true, altrimenti "NO"
-                                                pw.Container(
-                                                  padding: const pw
-                                                      .EdgeInsets.symmetric(
-                                                      horizontal: 4.0),
-                                                  child: pw.FittedBox(
-                                                    fit: pw.BoxFit.scaleDown,
-                                                    alignment:
-                                                    pw.Alignment.center,
-                                                    child: pw.Text('SI'),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        pw.Padding(
-                                          padding:
-                                          const pw.EdgeInsets.only(left: 8.0),
-                                          child: pw.Container(
-                                            decoration: pw.BoxDecoration(
-                                              border: pw.Border.all(
-                                                  color: PdfColors.black,
-                                                  width: 1.0),
-                                            ),
-                                            padding: const pw.EdgeInsets.all(
-                                                4.0),
-                                            child: pw.Row(
-                                              children: [
-                                                pw.Checkbox(
-                                                  value: widget
-                                                      .intervento.saldato ==
-                                                      false,
-                                                  // Imposta il valore della checkbox "NO" in base a widget.intervento.saldato
-                                                  name: '',
-                                                ),
-                                                // Checkbox "NO" se widget.intervento.saldato è true, altrimenti "SI"
-                                                pw.Container(
-                                                  padding: const pw
-                                                      .EdgeInsets.symmetric(
-                                                      horizontal: 2.0),
-                                                  child: pw.FittedBox(
-                                                    fit: pw.BoxFit.scaleDown,
-                                                    alignment:
-                                                    pw.Alignment.center,
-                                                    child: pw.Text('NO'),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                        pw.Text('SALDATO: '),
+                                        if(widget.intervento.saldato = true)
+                                          pw.Text(' SI'),
+                                        if(widget.intervento.saldato = false)
+                                          pw.Text(' NO')
                                       ],
                                     ),
                                   ),

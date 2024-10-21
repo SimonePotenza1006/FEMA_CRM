@@ -62,6 +62,7 @@ SIMONE
 - Risolto un bug del salvataggio rapportino in DettaglioInterventoPage;
 - Ora si può cambiare cliente e destinazione da DettaglioIntervetnoPage;
 - Risolto bug del filtraggio clienti da ListaClientiPage;
-- Si puo cambiare la nota e il concluso da DettaglioInterventoPage;
+- Si puo cambiare la nota, concluso e saldato da DettaglioInterventoPage;
+- Si possono cambiare gli utenti assegnati DettaglioInterventoPage;
 
 
