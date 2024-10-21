@@ -880,6 +880,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         final jsonData = jsonDecode(response.body);
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
+          if (UtenteModel.fromJson(item).cognome != 'Mazzei' && UtenteModel.fromJson(item).cognome != 'Chiriatti' && UtenteModel.fromJson(item).nome != 'Segreteria')
           utenti.add(UtenteModel.fromJson(item));
         }
         return utenti;

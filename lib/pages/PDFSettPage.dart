@@ -89,7 +89,7 @@ class _PDFSettPageState extends State<PDFSettPage> {
 
       // Calcolo il mese dell'anno
       int mese = marcaTempo.data!.month;
-      String nomeMese = nomiMesi[marcaTempo.data!.month - 1];
+      String nomeMese = nomiMesi[marcaTempo.data!.month - 1]+' '+marcaTempo.data!.year.toString();
 
       // Controllo se il mese è presente nella mappa dell'utente
       if (!oreLavoroMese[marcaTempo.utente!.nome! +' '+marcaTempo.utente!.cognome!]!.containsKey(nomeMese)) {

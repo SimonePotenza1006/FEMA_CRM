@@ -792,64 +792,92 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     }
   }
 
-  void _showClientiDialog() {
-    TextEditingController searchController = TextEditingController(); // Aggiungi un controller
-
+  void _showClientiDialog() async {
+    // Mostra il dialogo con un indicatore di caricamento
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) { // Usa StatefulBuilder per aggiornare lo stato del dialogo
-            return AlertDialog(
-              title: const Text('Seleziona Cliente', textAlign: TextAlign.center),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              content: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: searchController, // Aggiungi il controller
-                      onChanged: (value) {
-                        setState(() {
-                          filteredClientiList = clientiList
-                              .where((cliente) => cliente.denominazione!
-                              .toLowerCase()
-                              .contains(value.toLowerCase()))
-                              .toList();
-                        });
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Cerca Cliente',
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: filteredClientiList.map((cliente) {
-                            return ListTile(
-                              leading: const Icon(Icons.contact_page_outlined),
-                              title: Text(
-                                  '${cliente.denominazione}, ${cliente.indirizzo}'),
-                              onTap: () {
-                                setState(() {
-                                  selectedCliente = cliente;
-                                  getAllDestinazioniByCliente(cliente.id!);
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
+        return AlertDialog(
+          title: Text(
+            'SELEZIONA CLIENTE',
+            textAlign: TextAlign.center,
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Attendi, caricamento clienti in corso...'), // Messaggio di caricamento
+              SizedBox(height: 16),
+              Center(child: CircularProgressIndicator()), // Indicatore di caricamento
+            ],
+          ),
+        );
+      },
+    );
+
+    // Carica i clienti in background
+    await getAllClienti();
+
+    // Chiudi il dialogo e mostra i clienti
+    Navigator.of(context).pop(); // Chiudi il dialogo
+
+    // Mostra il dialogo con la lista dei clienti
+    _showClientiListDialog();
+  }
+
+  void _showClientiListDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'SELEZIONA CLIENTE',
+            textAlign: TextAlign.center,
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      filteredClientiList = clientiList
+                          .where((cliente) => cliente.denominazione!
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
+                          .toList();
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'CERCA CLIENTE',
+                    prefixIcon: Icon(Icons.search),
+                  ),
                 ),
-              ),
-            );
-          },
+                SizedBox(height: 16),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: filteredClientiList.map((cliente) {
+                        return ListTile(
+                          leading: Icon(Icons.contact_page_outlined),
+                          title: Text(cliente.denominazione!),
+                          onTap: () {
+                            setState(() {
+                              selectedCliente = cliente;
+                              getAllDestinazioniByCliente(cliente.id!);
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );

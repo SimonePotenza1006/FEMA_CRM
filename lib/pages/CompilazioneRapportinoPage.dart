@@ -328,7 +328,7 @@ class _CompilazioneRapportinoPageState
                     primary: Colors.red,
                     onPrimary: Colors.white,
                   ),
-                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                  child: Text(Platform.isWindows ? 'Allega Foto' : 'Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                 ),
               ),
 

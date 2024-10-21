@@ -147,6 +147,7 @@ class _PDFOggiPageState extends State<PDFOggiPage> {
                       pw.Text(
                         user.nome! + ' ' + user.cognome!,
                         style: pw.TextStyle(
+                          fontSize: 13,
                           fontWeight: pw.FontWeight.bold,
                           color: PdfColors.black,
                         ),
