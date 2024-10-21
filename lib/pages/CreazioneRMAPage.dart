@@ -149,6 +149,7 @@ class _CreazioneRMAPageState
     if (pickedFile != null) {
       setState(() {
         pickedImages.add(pickedFile);
+        print('');
       });
     }
   }
