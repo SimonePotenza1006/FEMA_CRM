@@ -52,8 +52,10 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   final TextEditingController rapportinoController = TextEditingController();
   bool modificaDescrizioneVisible = false;
   bool modificaImportoVisibile = false;
+  bool modificaNotaVisibile = false;
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   Future<List<Uint8List>>? _futureImages;
   DbHelper? dbHelper;
@@ -489,11 +491,8 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     Color? prioritaColor;
     switch (widget.intervento.priorita) {
       case Priorita.BASSA :
@@ -522,6 +521,37 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'Dettaglio Intervento',
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          Tooltip(
+            message: 'Salva modifiche',  // The text that will appear in the tooltip
+            preferBelow: true,       // This makes the tooltip appear below the icon
+            child: IconButton(
+              icon: Icon(Icons.save, color: Colors.white, size: 30),
+              onPressed: () {
+                saveModifiche();
+              },
+            ),
+          ),
+          SizedBox(width: 10),
+          Tooltip(
+            message: 'Genera PDF',  // The text that will appear in the tooltip
+            preferBelow: true,       // This makes the tooltip appear below the icon
+            child: IconButton(
+              icon: Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 30),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PDFInterventoPage(
+                      intervento: widget.intervento,
+                      //descrizione: widget.intervento.relazione_tecnico.toString(),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -1082,20 +1112,100 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                               ),
                             SizedBox(height: 15),
                             buildRelazioneForm(title: 'Relazione tecnico'),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: 'Concluso',
-                                  value: booleanToString(widget.intervento.concluso ?? false),
-                                  context: context
-                              ),
-                            ),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                title: 'Saldato',
-                                value: booleanToString(widget.intervento.saldato ?? false),
-                              ),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                  children:[
+                                    SizedBox(
+                                      width: 500,
+                                      child: buildInfoRow(
+                                          title: 'Concluso',
+                                          value: booleanToString(widget.intervento.concluso ?? false),
+                                          context: context
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.edit),
+                                      onPressed: () {
+                                        // Mostra il dialogo quando l'utente tocca l'icona
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            bool isConcluso = widget.intervento.concluso ?? false;
+
+                                            return AlertDialog(
+                                              title: Text(isConcluso
+                                                  ? 'L\'intervento non è concluso?'
+                                                  : 'L\'intervento è concluso?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      widget.intervento.concluso = !isConcluso;
+                                                    });
+                                                    Navigator.of(context).pop(); // Chiude il dialogo
+                                                  },
+                                                  child: Text(isConcluso ? 'Non concluso' : 'Concluso'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop(); // Chiude il dialogo senza fare nulla
+                                                  },
+                                                  child: Text('Annulla'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ]
+                                ),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children:[
+                                  SizedBox(
+                                    width: 500,
+                                    child: buildInfoRow(
+                                        title: 'Saldato',
+                                        value: booleanToString(widget.intervento.saldato ?? false),
+                                        context: context
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          bool isSaldato = widget.intervento.saldato ?? false;
+
+                                          return AlertDialog(
+                                            title: Text(isSaldato
+                                                ? 'L\'intervento non è stato saldato?'
+                                                : 'L\'intervento è stato saldato?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    widget.intervento.saldato = !isSaldato;
+                                                  });
+                                                  Navigator.of(context).pop(); // Chiude il dialogo
+                                                },
+                                                child: Text(isSaldato ? 'Non saldato' : 'Saldato'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(); // Chiude il dialogo senza fare nulla
+                                                },
+                                                child: Text('Annulla'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ]
                             ),
                             SizedBox(
                               width: 500,
@@ -1105,14 +1215,82 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                   value : widget.intervento.posizione_gps ?? "N/A"
                               ),
                             ),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: 'Note',
-                                  value: widget.intervento.note ?? 'N/A',
-                                  context: context
-                              ),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Note',
+                                      value: widget.intervento.note ?? 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      modificaNotaVisibile = !modificaNotaVisibile;
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ],
                             ),
+                            if(modificaNotaVisibile)
+                              SizedBox(
+                                  width: 500,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 300,
+                                        child: TextFormField(
+                                          maxLines: null,
+                                          controller: noteController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Nota',
+                                            hintText: 'Aggiungi una nota',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 170,
+                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                        decoration: BoxDecoration(
+                                          // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                        ),
+                                        child: FloatingActionButton(
+                                          heroTag: "Tag12",
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.intervento.note = noteController.text;
+                                            });
+                                          },
+                                          backgroundColor: Colors.red,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                                child: Text(
+                                                  'Modifica Nota'.toUpperCase(),
+                                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                                  textAlign: TextAlign.center, // Centra il testo
+                                                  softWrap: true, // Permette al testo di andare a capo
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),
                             SizedBox(
                               width: 500,
                               child: buildInfoRow(
@@ -1406,60 +1584,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                     ],
                   ),
                 SizedBox(height: 20),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 20,),
-                      SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: () {
-                          saveModifiche();
-                        },
-                        child: Text(
-                          'Salva modifiche',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PDFInterventoPage(
-                                    intervento: widget.intervento,
-                                    //descrizione: widget.intervento.relazione_tecnico.toString(),
-                                ),
-                              ),
-                            );
-                        },
-                        icon: Icon(Icons.picture_as_pdf, color: Colors.white),
-                        label: Text('Genera PDF', style: TextStyle(color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      ElevatedButton(
-                        onPressed: () {
-                          saldato();
-                        },
-                        child: Text(
-                          'Intervento saldato',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ],
@@ -1894,58 +2018,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
-  Future<void> saldato() async {
-    try {
-      final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'id': widget.intervento.id,
-            'numerazione_danea' : widget.intervento.numerazione_danea,
-            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
-            'data': widget.intervento.data?.toIso8601String(),
-            'orario_appuntamento' : widget.intervento.orario_appuntamento,
-            'posizione_gps' : widget.intervento.posizione_gps,
-            'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
-            'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
-            'descrizione': widget.intervento.descrizione,
-            'importo_intervento': widget.intervento.importo_intervento,
-            'prezzo_ivato' : widget.intervento.prezzo_ivato,
-            'iva' : widget.intervento.iva,
-            'acconto' : widget.intervento.acconto,
-            'assegnato': widget.intervento.assegnato,
-            'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
-            'conclusione_parziale' : widget.intervento.conclusione_parziale,
-            'concluso': widget.intervento.concluso,
-            'saldato': true,
-            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
-            'note': widget.intervento.note,
-            'relazione_tecnico' : widget.intervento.relazione_tecnico,
-            'firma_cliente': widget.intervento.firma_cliente,
-            'utente': widget.intervento.utente?.toMap(),
-            'cliente': widget.intervento.cliente?.toMap(),
-            'veicolo': widget.intervento.veicolo?.toMap(),
-            'merce' : widget.intervento.merce?.toMap(),
-            'tipologia': widget.intervento.tipologia?.toMap(),
-            'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
-            'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-            'destinazione': widget.intervento.destinazione?.toMap(),
-            'gruppo': widget.intervento.gruppo?.toMap()
-          }));
-      if (response.statusCode == 201) {
-        print('EVVAIIIIIIII');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Intervento saldato!'),
-            duration: Duration(seconds: 3), // Durata dello Snackbar
-          ),
-        );
-        Navigator.pop(context);
-        Navigator.pop(context);
-      } else {}
-    } catch (e) {
-      print('Errore : $e');
-    }
-  }
 
   void _showUtentiDialog() {
     showDialog(

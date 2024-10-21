@@ -55,11 +55,13 @@ SIMONE
 - Inserito un doppio colore nell'excel delle movimentazioni
 
 21/10/2024
-Simone
+SIMONE
 - Resi UpperCase tutte le proprietà "descrizione" delle post in RegistroCassaPage e AggiungiMovimentoPage;
 - Eliminata dicitura "Mezzo null" sul pdf generato da intervento
 - Inseriti i due punti (:) anche dopo l'acconto
 - Risolto un bug del salvataggio rapportino in DettaglioInterventoPage;
 - Ora si può cambiare cliente e destinazione da DettaglioIntervetnoPage;
+- Risolto bug del filtraggio clienti da ListaClientiPage;
+- Si puo cambiare la nota e il concluso da DettaglioInterventoPage;
 
 
