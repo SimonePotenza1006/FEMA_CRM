@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:fema_crm/model/TipologiaInterventoModel.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -533,7 +534,175 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             },
             child: IconButton(
               icon: Icon(Icons.info),
-              color: Colors.white, onPressed: () {  },
+              color: Colors.white, onPressed: () {
+                if(Platform.isAndroid)
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Legenda colori:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.grey[200],
+                            ),
+                            SizedBox(width: 3),
+                            Text('INFORMATICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.yellow[200],
+                            ),
+                            SizedBox(width: 3),
+                            Text('ELETTRICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.lightBlue[200],
+                            ),
+                            SizedBox(width: 3),
+                            Text('IDRICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.pink[50],
+                            ),
+                            SizedBox(width: 3),
+                            Text('ELETTRONICO'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.green[100],
+                            ),
+                            SizedBox(width: 3),
+                            Text('RIPARAZIONE MERCE'),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 3),
+                            Text('VENDITA FRONT OFFICE'),
+
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Text(
+                          'Priorità:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ NULLA'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.lightGreen,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ BASSA'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.yellow,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ MEDIA'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.orange,
+                            ),
+                            SizedBox(width: 3),
+                            Text('PRIORITÁ ALTA'),
+                          ],
+                        ),
+                        SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              color: Colors.red,
+                            ),
+                            SizedBox(width: 3),
+                            Text('URGENTE'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+                },
             ),
           ),
           IconButton(

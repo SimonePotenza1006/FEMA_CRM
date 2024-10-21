@@ -194,6 +194,27 @@ class _CreazioneRMAPageState
     }
   }
 
+  Widget _buildGroupContainer({required String title, required List<Widget> children}) {
+    return Container(
+      margin: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          /*Text(
+            title,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),*/
+          //SizedBox(height: 10),
+          ...children,
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -238,11 +259,13 @@ class _CreazioneRMAPageState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+
                   Padding(
                     padding: const EdgeInsets.all(17.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        _buildGroupContainer( children: [
                         ClipRRect(
                           borderRadius: const BorderRadius.all(Radius.circular(12.0)),
                           child: Container(width: 545, height: 55,
@@ -334,7 +357,7 @@ class _CreazioneRMAPageState
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(color: Colors.grey[300]!),
                                 ),
-                              width: 245,
+                              width: 260,
                               child: GestureDetector(
                                 onTap: () {
                                   _showFornitoriDialog();
@@ -361,8 +384,20 @@ class _CreazioneRMAPageState
                           ],
                         ),
 
-                        const SizedBox(height: 20),
-
+                          SizedBox(height: 15,),
+                          ElevatedButton(
+                            onPressed: takePicture,
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.red,
+                              onPrimary: Colors.white,
+                            ),
+                            child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                          ),
+                          SizedBox(height: 15,),
+                          _buildImagePreview(),
+], title: ''),
+                        //const SizedBox(height: 20),
+                        _buildGroupContainer( children: [
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -412,6 +447,8 @@ class _CreazioneRMAPageState
 
                         Text('${selectedDateRicon?.day}/${selectedDateRicon?.month}/${selectedDateRicon?.year}', style: TextStyle(fontSize: 17),),
                         const SizedBox(height: 18.0),
+                      ], title: ''),
+                      _buildGroupContainer( children: [
                         SizedBox(
                           width: 200,
                           child: CheckboxListTile(
@@ -510,20 +547,10 @@ class _CreazioneRMAPageState
                             },
                           ),
                         ),
-                        SizedBox(height: 15,),
-                        ElevatedButton(
-                          onPressed: takePicture,
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.red,
-                            onPrimary: Colors.white,
-                          ),
-                          child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                        ),
-                        SizedBox(height: 15,),
-                        _buildImagePreview(),
+
                         // Aggiungi questo sotto il pulsante per la selezione degli utenti
                         const SizedBox(height: 20),
-
+                      ], title: ''),
                         if(_selectedTipologia?.descrizione == "Riparazione Merce")
                           Center(
                             child: Column(
@@ -603,8 +630,10 @@ class _CreazioneRMAPageState
                               //}
                             }
                                 : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
-                            style: ElevatedButton.styleFrom(primary: Colors.red),
-                            child:  Text('Salva Merce RMA'.toUpperCase(), style: TextStyle(color: Colors.white)),
+                            style: ElevatedButton.styleFrom(
+                                minimumSize: Size(220, 70),
+                                primary: Colors.red),
+                            child:  Text('Salva Merce RMA'.toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18)),
                           ),
                         ),
 
@@ -1238,7 +1267,8 @@ class _CreazioneRMAPageState
         final jsonData = jsonDecode(response.body);
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
-          utenti.add(UtenteModel.fromJson(item));
+          if (UtenteModel.fromJson(item).nome != 'Segreteria')
+            utenti.add(UtenteModel.fromJson(item));
         }
         setState(() {
           allUtenti = utenti;

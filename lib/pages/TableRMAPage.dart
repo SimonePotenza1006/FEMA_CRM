@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 //import 'package:fema_crm/model/MerceInRiparazioneModel.dart';
 import 'package:fema_crm/model/RestituzioneMerceModel.dart';
 import 'package:fema_crm/model/TipologiaInterventoModel.dart';
@@ -116,7 +117,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                               color: Colors.white,
                             ),
                             SizedBox(width: 8),
-                            Text('Presenza in magazzino'),
+                            Text('RMA Registrata'),
                           ],
                         ),
                         SizedBox(height: 8),
@@ -129,7 +130,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                               color: Colors.grey[300],
                             ),
                             SizedBox(width: 8),
-                            Text('Presa in carico'),
+                            Text('Riconsegnata al fornitore'),
                           ],
                         ),
                         SizedBox(height: 8),
@@ -139,10 +140,10 @@ class _TableRMAPageState extends State<TableRMAPage>{
                             Container(
                               width: 20,
                               height: 20,
-                              color: Colors.orange[300],
+                              color: Colors.blue[300],
                             ),
                             SizedBox(width: 8),
-                            Text('Preventivo comunicato, in attesa di accettazione'),
+                            Text('Rientrata in ufficio'),
                           ],
                         ),
                         SizedBox(height: 8),
@@ -165,7 +166,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
                             Container(
                               width: 20,
                               height: 20,
-                              color: Colors.blue[300],
+                              color: Colors.orange[300],
                             ),
                             SizedBox(width: 8),
                             Text('Preventivo accettato, riparazione in corso'),
@@ -193,7 +194,105 @@ class _TableRMAPageState extends State<TableRMAPage>{
             child: IconButton(
               icon: Icon(Icons.info),
               color: Colors.white,
-              onPressed: () {},
+              onPressed: () {
+                if(Platform.isAndroid)
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Container(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Legenda colori:',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(width: 8),
+                                Text('RMA Registrata'),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  color: Colors.grey[300],
+                                ),
+                                SizedBox(width: 8),
+                                Text('Riconsegnata al fornitore'),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  color: Colors.blue[300],
+                                ),
+                                SizedBox(width: 8),
+                                Text('Rientrata in ufficio'),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  color: Colors.red[300],
+                                ),
+                                SizedBox(width: 8),
+                                Text('Preventivo rifiutato'),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  color: Colors.orange[300],
+                                ),
+                                SizedBox(width: 8),
+                                Text('Preventivo accettato, riparazione in corso'),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  color: Colors.green[300],
+                                ),
+                                SizedBox(width: 8),
+                                Text('Riparazione conclusa'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+              },
             ),
           ),
           IconButton(
@@ -584,21 +683,19 @@ class MerceDataSource extends DataGridSource{
 
     Color backgroundColor = Colors.white;
 
-    /*if (merce.presenza_magazzino == true) {
-      backgroundColor = Colors.white; // Bianco
-    } else if (merce.data_presa_in_carico != null) {
+    if (merce.data_riconsegna != null && merce.data_rientro_ufficio == null) {
       backgroundColor = Colors.grey[300]!; // Grigio chiaro
-    } else if (merce.preventivo == true && merce.data_comunica_preventivo != null && merce.preventivo_accettato == null) {
-      backgroundColor = Colors.orange[300]!; // Arancione
-    } else if (merce.preventivo == true && merce.preventivo_accettato == false) {
+    } else if (merce.data_rientro_ufficio != null) {
+      backgroundColor = Colors.blue[300]!; // Arancione
+    /*} else if (merce.preventivo == true && merce.preventivo_accettato == false) {
       backgroundColor = Colors.red[300]!; // Rosso
     } else if (merce.preventivo == true && merce.preventivo_accettato == true && merce.data_conclusione == null) {
-      backgroundColor = Colors.blue[300]!; // Blu
+      backgroundColor = Colors.orange[300]!; // Blu
     } else if (merce.data_conclusione != null) {
-      backgroundColor = Colors.green[300]!; // Verde
+      backgroundColor = Colors.green[300]!; // Verde*/
     } else {
       backgroundColor = Colors.white; // Default to white if none of the conditions are met
-    }*/
+    }
 
     return DataGridRowAdapter(
       color: backgroundColor,
