@@ -2,10 +2,9 @@
 MODIFICHE DA FARE
 
 
-
+- Aggiungere un alert per errore dei contachilometri nella registrazione di una nuova spesa
 - Poter modificare data creazione + numerazione intervento
 - Aggiungere destinatario + destinazione
-- Possibilità di togliere la data accordata
 - Usare calendario solo per la visualizzazioned egli interventi
 - Creare un Button sul menu tecnico per reindirizzarlo su una tabella
 popolata dagli interventi della sua categoria di interventi,
@@ -64,5 +63,6 @@ SIMONE
 - Risolto bug del filtraggio clienti da ListaClientiPage;
 - Si puo cambiare la nota, concluso e saldato da DettaglioInterventoPage;
 - Si possono cambiare gli utenti assegnati DettaglioInterventoPage;
+- Possibilità di togliere la data accordata
 
 
