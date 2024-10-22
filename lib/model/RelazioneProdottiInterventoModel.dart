@@ -59,7 +59,7 @@ class RelazioneProdottiInterventoModel{
       json['prodotto'] != null ? ProdottoModel.fromJson(json['prodotto']) : null,
       json['ddt'] != null ? DDTModel.fromJson(json['ddt']) : null,
       json['intervento'] != null ? InterventoModel.fromJson(json['intervento']) : null,
-      json['quanita'],
+      json['quantita'] is double ? json['quantita'] : (json['quantita'] != null ? double.tryParse(json['quantita'].toString()) : null),
       json['presenza_storico_utente'],
       json['seriale']
     );

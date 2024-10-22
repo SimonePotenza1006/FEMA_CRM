@@ -945,9 +945,9 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                                       children: [
                                         pw.SizedBox(height: 30),
                                         pw.Text('SALDATO: '),
-                                        if(widget.intervento.saldato = true)
+                                        if(widget.intervento.saldato == true)
                                           pw.Text(' SI'),
-                                        if(widget.intervento.saldato = false)
+                                        if(widget.intervento.saldato == false)
                                           pw.Text(' NO')
                                       ],
                                     ),

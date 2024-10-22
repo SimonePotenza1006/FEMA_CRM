@@ -237,390 +237,56 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       body: Padding(
         padding: EdgeInsets.only(top: 40, bottom: 40),
         child: LayoutBuilder(
-          builder: (context, constraints){
-            print('pix '+constraints.maxWidth.toString());
-            if (constraints.maxWidth <= 800) {
-              // Tablet/Mobile layout
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Column(
-                      children: [
-                        GestureDetector(
-                          onTapUp: (details) {
-                            if (_hoveredIndex != -1) {
-                              _navigateToPage(_hoveredIndex);
-                            }
-                          },
-                          onPanUpdate: (details) {
-                            RenderBox box = context.findRenderObject() as RenderBox;
-                            Offset localOffset = box.globalToLocal(details.globalPosition);
-                            setState(() {
-                              _hoveredIndex = _calculateHoveredIndex(localOffset);
-                            });
-                          },
-                          child: CustomPaint(
-                            size: Size(300, 300),
-                            painter: MenuPainter(
-                                  (index) {
-                                setState(() {
-                                  _hoveredIndex = index;
-                                });
-                              },
-                                  () {
-                                setState(() {
-                                  _hoveredIndex = -1;
-                                });
-                              },
-                              context,
-                              size: Size(300, 300),
-                              hoveredIndex: _hoveredIndex,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 25),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+            builder: (context, constraints){
+              if (constraints.maxWidth < 800) {
+                // Tablet/Mobile layout
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Column(
                         children: [
-                          Text(
-                            'Interventi',
-                            style: TextStyle(
-                                fontSize: 30.0, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(width: 15),
-                          IconButton(
-                            icon: Icon(Icons.calendar_today),
-                            onPressed: () async {
-                              final DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: selectedDate,
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime(2100),
-                              );
-                              if (pickedDate != null && pickedDate != selectedDate) {
-                                setState(() {
-                                  selectedDate = pickedDate;
-                                });
+                          GestureDetector(
+                            onTapUp: (details) {
+                              if (_hoveredIndex != -1) {
+                                _navigateToPage(_hoveredIndex);
                               }
                             },
+                            onPanUpdate: (details) {
+                              RenderBox box = context.findRenderObject() as RenderBox;
+                              Offset localOffset = box.globalToLocal(details.globalPosition);
+                              setState(() {
+                                _hoveredIndex = _calculateHoveredIndex(localOffset);
+                              });
+                            },
+                            child: CustomPaint(
+                              size: Size(300, 300),
+                              painter: MenuPainter(
+                                    (index) {
+                                  setState(() {
+                                    _hoveredIndex = index;
+                                  });
+                                },
+                                    () {
+                                  setState(() {
+                                    _hoveredIndex = -1;
+                                  });
+                                },
+                                context,
+                                size: Size(300, 300),
+                                hoveredIndex: _hoveredIndex,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 10.0),
-                    FutureBuilder<List<InterventoModel>>(
-                      future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Errore: ${snapshot.error}'));
-                        } else if (snapshot.hasData) {
-                          List<InterventoModel> interventi = snapshot.data!;
-
-                          // Filtra ulteriormente nel FutureBuilder per sicurezza
-                          interventi = interventi.where((intervento) => intervento.merce == null).toList();
-
-                          // Modifica il filtro per includere interventi senza data o con data corrispondente a `selectedDate`
-                          interventi = interventi.where((intervento) {
-                            return intervento.data == null || intervento.data!.isSameDay(selectedDate);
-                          }).toList();
-
-                          if (interventi.isEmpty) {
-                            return Center(child: Text('Nessun intervento trovato'));
-                          }
-
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: interventi.length,
-                            itemBuilder: (context, index) {
-                              InterventoModel intervento = interventi[index];
-                              Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
-                              TextStyle textStyle = intervento.concluso ?? false
-                                  ? TextStyle(color: Colors.white, fontSize: 15)
-                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
-
-                              return Card(
-                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                child: ListTile(
-                                  title: Text(
-                                    '${intervento.descrizione}',
-                                    style: textStyle,
-                                  ),
-                                  subtitle: Text(
-                                    intervento.cliente?.denominazione.toString() ?? '',
-                                    style: textStyle,
-                                  ),
-                                  trailing: Column(
-                                    children: [
-                                      Text(
-                                        intervento.data != null
-                                            ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                            : 'Data non disponibile',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: intervento.concluso ?? false ? Colors.white : Colors.black,
-                                        ),
-                                      ),
-                                      Text(
-                                        intervento.orario_appuntamento != null
-                                            ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                            : 'Nessun orario di appuntamento',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: intervento.concluso ?? false ? Colors.white : Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => DettaglioInterventoByTecnicoPage(
-                                          utente: widget.userData!,
-                                          intervento: intervento,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  tileColor: backgroundColor,
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        } else {
-                          return Center(child: Text('Nessun intervento trovato'));
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 50.0),
-                    Center(
-                      child: Text(
-                        'Merce in riparazione',
-                        style: TextStyle(
-                            fontSize: 30.0, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 20.0),
-                    FutureBuilder<List<InterventoModel>>(
-                      future: getMerce(
-                        widget.userData!.id.toString()
-                      ),
-                      builder:(context, snapshot){
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Errore: ${snapshot.error}'));
-                        } else if (snapshot.hasData) {
-                          List<InterventoModel> merce = snapshot.data!;
-                          if(merce.isEmpty){
-                            return Center(child: Text('Nessuna merce in riparazione'));
-                          }
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: merce.length,
-                            itemBuilder:(context, index){
-                              InterventoModel singolaMerce = merce[index];
-                              return Card(
-                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
-                                child: ListTile(
-                                  title: Text(
-                                    '${singolaMerce.merce?.articolo}',
-                                  ),
-                                  subtitle: Text(
-                                    '${singolaMerce.merce?.difetto_riscontrato}',
-                                  ),
-                                  trailing: Column(
-                                    children: [
-                                      Text('Data arrivo merce:'),
-                                      SizedBox(height: 3),
-                                      Text('${singolaMerce.data_apertura_intervento != null ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
-                                    ],
-                                  ),
-                                  onTap: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
-                                            intervento: singolaMerce,
-                                            merce : singolaMerce.merce!,
-                                        ),
-                                      )
-                                    );
-                                  },
-                                  tileColor: Colors.white60,
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              );
-                            }
-                          );
-                        } else{
-                          return Center(child: Text('Nessuna merce trovata'));
-                        }
-                      }
-                    ),
-                    const SizedBox(height: 50.0),
-                    Center(
-                      child: Text(
-                        'Agenda commissioni',
-                        style: TextStyle(
-                            fontSize: 30.0, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 20.0),
-                    FutureBuilder<List<CommissioneModel>>(
-                      future: getAllCommissioniByUtente(
-                          widget.userData!.id.toString()),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Errore: ${snapshot.error}'));
-                        } else if (snapshot.hasData) {
-                          List<CommissioneModel> commissioni = snapshot.data!;
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: commissioni.length,
-                            itemBuilder: (context, index) {
-                              CommissioneModel commissione = commissioni[index];
-                              return ListTile(
-                                title: Text(
-                                    '${commissione.descrizione.toString()}'),
-                                subtitle: Text(commissione.note?? ''),
-                                trailing: Text(
-                                  commissione.data!= null
-                                      ? '${commissione.data!.day}/${commissione.data!.month}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
-                                      : 'Data non disponibile',
-                                  style: TextStyle(
-                                      fontSize: 16),
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          DettaglioCommissioneTecnicoPage(
-                                              commissione: commissione),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          return Center(child: Text('Nessun intervento trovato'));
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return Scaffold(
-                body: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize:
-                    MainAxisSize.min, // Imposta grandezza minima per la colonna
-                    children: [
+                      SizedBox(height: 25),
                       Padding(
-                        padding: const EdgeInsets.all(35.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Center(
-                              child: Text(
-                                "CIAO ${widget.userData!.nome!.toUpperCase().toString()}!",
-                                textAlign: TextAlign.center, // Centra il testo
-                                style: TextStyle(
-                                  fontSize: 24, // Imposta la dimensione del testo
-                                  fontWeight: FontWeight.bold, // Imposta il grassetto
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            buildMenuButton(
-                              icon: Icons.lock_clock,
-                              text: 'TIMBRATURA',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => TimbraturaPage(utente: widget.userData!)),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 20),
-                            buildMenuButton(
-                              icon: Icons.calendar_month_outlined,
-                              text: 'CALENDARIO',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => CalendarioUtentePage(utente: widget.userData)),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 20),
-                            buildMenuButton(
-                              icon: Icons.car_rental_outlined,
-                              text: 'SPESA SU VEICOLO',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData!)),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 20),
-                            buildMenuButton(
-                              icon: Icons.snippet_folder_outlined,
-                              text: 'ORDINI AL FORNITORE',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => FormOrdineFornitorePage(utente: widget.userData!)),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 20),
-                            buildMenuButton(
-                              icon: Icons.remove_red_eye_outlined,
-                              text: 'SOPRALLUOGHI',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => MenuSopralluoghiTecnicoPage(utente: widget.userData!)),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Center(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'INTERVENTI',
+                              'Interventi',
                               style: TextStyle(
                                   fontSize: 30.0, fontWeight: FontWeight.bold),
                             ),
@@ -738,85 +404,91 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           }
                         },
                       ),
-                      FutureBuilder<List<RelazioneUtentiInterventiModel>>(
-                        future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Errore: ${snapshot.error}'));
-                          } else if (snapshot.hasData) {
-                            List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
-                            relazioni = relazioni.where((relazione) => relazione.intervento!.data!.isSameDay(selectedDate)).toList();
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: relazioni.length,
-                              itemBuilder: (context, index) {
-                                RelazioneUtentiInterventiModel relazione = relazioni[index];
-                                Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
-                                TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
-                                return ListTile(
-                                  title: Text(
-                                    '${relazione.intervento?.descrizione}',
-                                    style: textStyle,
-                                  ),
-                                  subtitle: Text(
-                                    relazione.intervento?.cliente?.denominazione.toString()?? '',
-                                    style: textStyle,
-                                  ),
-                                  trailing: Column(
-                                    children: [
-                                      Text(
-                                        // Formatta la data secondo il tuo formato desiderato
-                                        relazione.intervento?.data!= null
-                                            ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
-                                            : 'Data non disponibile',
-                                        style: TextStyle(
-                                          fontSize: 16, // Stile opzionale per la data
-                                          color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                      const SizedBox(height: 50.0),
+                      Center(
+                        child: Text(
+                          'Merce in riparazione',
+                          style: TextStyle(
+                              fontSize: 30.0, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+                      FutureBuilder<List<InterventoModel>>(
+                          future: getMerce(
+                              widget.userData!.id.toString()
+                          ),
+                          builder:(context, snapshot){
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<InterventoModel> merce = snapshot.data!;
+                              if(merce.isEmpty){
+                                return Center(child: Text('Nessuna mece in riparazione'));
+                              }
+                              return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: merce.length,
+                                  itemBuilder:(context, index){
+                                    InterventoModel singolaMerce = merce[index];
+                                    return Card(
+                                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
+                                      child: ListTile(
+                                        title: Text(
+                                          '${singolaMerce.merce?.articolo}',
                                         ),
-                                      ),
-                                      Text(
-                                        relazione.intervento?.orario_appuntamento!= null
-                                            ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
-                                            : 'Nessun orario di appuntamento',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                        subtitle: Text(
+                                          '${singolaMerce.merce?.difetto_riscontrato}',
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData!,
-                                              intervento: relazione.intervento!,
-                                            ),
+                                        trailing: Column(
+                                          children: [
+                                            Text('Data arrivo merce:'),
+                                            SizedBox(height: 3),
+                                            Text('${singolaMerce.data_apertura_intervento != null ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
+                                          ],
+                                        ),
+                                        onTap: (){
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                                  intervento: singolaMerce,
+                                                  merce : singolaMerce.merce!,
+                                                  utente : widget.userData!
+                                                ),
+                                              )
+                                          );
+                                        },
+                                        tileColor: Colors.white60,
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
                                       ),
                                     );
-                                  },
-                                  tileColor: backgroundColor,
-                                );
-                              },
-                            );
-                          } else {
-                            return Center(child: Text('Nessun intervento trovato'));
+                                  }
+                              );
+                            } else{
+                              return Center(child: Text('Nessuna merce trovata'));
+                            }
                           }
-                        },
                       ),
                       const SizedBox(height: 50.0),
-                      const Text(
-                        'AGENDA COMMISSIONI',
-                        style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                      Center(
+                        child: Text(
+                          'Agenda commissioni',
+                          style: TextStyle(
+                              fontSize: 30.0, fontWeight: FontWeight.bold),
+                        ),
                       ),
                       const SizedBox(height: 20.0),
                       FutureBuilder<List<CommissioneModel>>(
-                        future: getAllCommissioniByUtente(widget.userData!.id.toString()),
+                        future: getAllCommissioniByUtente(
+                            widget.userData!.id.toString()),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
@@ -831,15 +503,15 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               itemBuilder: (context, index) {
                                 CommissioneModel commissione = commissioni[index];
                                 return ListTile(
-                                  title: Text('${commissione.descrizione.toString()}'),
-                                  subtitle: Text(commissione.note ?? ''),
+                                  title: Text(
+                                      '${commissione.descrizione.toString()}'),
+                                  subtitle: Text(commissione.note?? ''),
                                   trailing: Text(
-                                    // Formatta la data secondo il tuo formato desiderato
-                                    commissione.data != null
+                                    commissione.data!= null
                                         ? '${commissione.data!.day}/${commissione.data!.month}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
                                         : 'Data non disponibile',
                                     style: TextStyle(
-                                        fontSize: 16), // Stile opzionale per la data
+                                        fontSize: 16),
                                   ),
                                   onTap: () {
                                     Navigator.push(
@@ -855,16 +527,417 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               },
                             );
                           } else {
-                            return Center(child: Text('Nessuna commissione trovata'));
+                            return Center(child: Text('Nessun intervento trovato'));
                           }
                         },
                       ),
                     ],
                   ),
-                ),
-              );
+                );
+              } else {
+                return Scaffold(
+                  body: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize:
+                      MainAxisSize.min, // Imposta grandezza minima per la colonna
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(35.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Center(
+                                child: Text(
+                                  "CIAO ${widget.userData!.nome!.toUpperCase().toString()}!",
+                                  textAlign: TextAlign.center, // Centra il testo
+                                  style: TextStyle(
+                                    fontSize: 24, // Imposta la dimensione del testo
+                                    fontWeight: FontWeight.bold, // Imposta il grassetto
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              buildMenuButton(
+                                icon: Icons.lock_clock,
+                                text: 'TIMBRATURA',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => TimbraturaPage(utente: widget.userData!)),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              buildMenuButton(
+                                icon: Icons.calendar_month_outlined,
+                                text: 'CALENDARIO',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => CalendarioUtentePage(utente: widget.userData)),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              buildMenuButton(
+                                icon: Icons.car_rental_outlined,
+                                text: 'SPESA SU VEICOLO',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData!)),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              buildMenuButton(
+                                icon: Icons.snippet_folder_outlined,
+                                text: 'ORDINI AL FORNITORE',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => FormOrdineFornitorePage(utente: widget.userData!)),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              buildMenuButton(
+                                icon: Icons.remove_red_eye_outlined,
+                                text: 'SOPRALLUOGHI',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => MenuSopralluoghiTecnicoPage(utente: widget.userData!)),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'INTERVENTI',
+                                style: TextStyle(
+                                    fontSize: 30.0, fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 15),
+                              IconButton(
+                                icon: Icon(Icons.calendar_today),
+                                onPressed: () async {
+                                  final DateTime? pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: selectedDate,
+                                    firstDate: DateTime(2000),
+                                    lastDate: DateTime(2100),
+                                  );
+                                  if (pickedDate != null && pickedDate != selectedDate) {
+                                    setState(() {
+                                      selectedDate = pickedDate;
+                                    });
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10.0),
+                        FutureBuilder<List<InterventoModel>>(
+                          future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<InterventoModel> interventi = snapshot.data!;
+
+                              // Filtra ulteriormente nel FutureBuilder per sicurezza
+                              interventi = interventi.where((intervento) => intervento.merce == null).toList();
+
+                              // Modifica il filtro per includere interventi senza data o con data corrispondente a `selectedDate`
+                              interventi = interventi.where((intervento) {
+                                return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                              }).toList();
+
+                              if (interventi.isEmpty) {
+                                return Center(child: Text('Nessun intervento trovato'));
+                              }
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: interventi.length,
+                                itemBuilder: (context, index) {
+                                  InterventoModel intervento = interventi[index];
+                                  Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
+                                  TextStyle textStyle = intervento.concluso ?? false
+                                      ? TextStyle(color: Colors.white, fontSize: 15)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: ListTile(
+                                      title: Text(
+                                        '${intervento.descrizione}',
+                                        style: textStyle,
+                                      ),
+                                      subtitle: Text(
+                                        intervento.cliente?.denominazione.toString() ?? '',
+                                        style: textStyle,
+                                      ),
+                                      trailing: Column(
+                                        children: [
+                                          Text(
+                                            intervento.data != null
+                                                ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                                : 'Data non disponibile',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                            ),
+                                          ),
+                                          Text(
+                                            intervento.orario_appuntamento != null
+                                                ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                                : 'Nessun orario di appuntamento',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DettaglioInterventoByTecnicoPage(
+                                              utente: widget.userData!,
+                                              intervento: intervento,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      tileColor: backgroundColor,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text('Nessun intervento trovato'));
+                            }
+                          },
+                        ),
+                        FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                          future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
+                              relazioni = relazioni.where((relazione) => relazione.intervento!.data!.isSameDay(selectedDate)).toList();
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: relazioni.length,
+                                itemBuilder: (context, index) {
+                                  RelazioneUtentiInterventiModel relazione = relazioni[index];
+                                  Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
+                                  TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                                  return ListTile(
+                                    title: Text(
+                                      '${relazione.intervento?.descrizione}',
+                                      style: textStyle,
+                                    ),
+                                    subtitle: Text(
+                                      relazione.intervento?.cliente?.denominazione.toString()?? '',
+                                      style: textStyle,
+                                    ),
+                                    trailing: Column(
+                                      children: [
+                                        Text(
+                                          // Formatta la data secondo il tuo formato desiderato
+                                          relazione.intervento?.data!= null
+                                              ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
+                                              : 'Data non disponibile',
+                                          style: TextStyle(
+                                            fontSize: 16, // Stile opzionale per la data
+                                            color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          relazione.intervento?.orario_appuntamento!= null
+                                              ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                              : 'Nessun orario di appuntamento',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioInterventoByTecnicoPage(
+                                                utente: widget.userData!,
+                                                intervento: relazione.intervento!,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    tileColor: backgroundColor,
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text('Nessun intervento trovato'));
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 50.0),
+                        Center(
+                          child: Text(
+                            'MERCE IN RIPARAZIONE',
+                            style: TextStyle(
+                                fontSize: 30.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 20.0),
+                        FutureBuilder<List<InterventoModel>>(
+                            future: getMerce(
+                                widget.userData!.id.toString()
+                            ),
+                            builder:(context, snapshot){
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Errore: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                List<InterventoModel> merce = snapshot.data!;
+                                if(merce.isEmpty){
+                                  return Center(child: Text('Nessuna mece in riparazione'));
+                                }
+                                return ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: merce.length,
+                                    itemBuilder:(context, index){
+                                      InterventoModel singolaMerce = merce[index];
+                                      return Card(
+                                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        elevation: 4,
+                                        shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
+                                        child: ListTile(
+                                          title: Text(
+                                            '${singolaMerce.merce?.articolo}',
+                                          ),
+                                          subtitle: Text(
+                                            '${singolaMerce.merce?.difetto_riscontrato}',
+                                          ),
+                                          trailing: Column(
+                                            children: [
+                                              Text('Data arrivo merce:'),
+                                              SizedBox(height: 3),
+                                              Text('${singolaMerce.data_apertura_intervento != null ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
+                                            ],
+                                          ),
+                                          onTap: (){
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                                      intervento: singolaMerce,
+                                                      merce : singolaMerce.merce!,
+                                                      utente : widget.userData!
+                                                  ),
+                                                )
+                                            );
+                                          },
+                                          tileColor: Colors.white60,
+                                          shape: RoundedRectangleBorder(
+                                            side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                );
+                              } else{
+                                return Center(child: Text('Nessuna merce trovata'));
+                              }
+                            }
+                        ),
+                        const SizedBox(height: 50.0),
+                        const Text(
+                          'AGENDA COMMISSIONI',
+                          style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20.0),
+                        FutureBuilder<List<CommissioneModel>>(
+                          future: getAllCommissioniByUtente(widget.userData!.id.toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<CommissioneModel> commissioni = snapshot.data!;
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: commissioni.length,
+                                itemBuilder: (context, index) {
+                                  CommissioneModel commissione = commissioni[index];
+                                  return ListTile(
+                                    title: Text('${commissione.descrizione.toString()}'),
+                                    subtitle: Text(commissione.note ?? ''),
+                                    trailing: Text(
+                                      // Formatta la data secondo il tuo formato desiderato
+                                      commissione.data != null
+                                          ? '${commissione.data!.day}/${commissione.data!.month}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
+                                          : 'Data non disponibile',
+                                      style: TextStyle(
+                                          fontSize: 16), // Stile opzionale per la data
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioCommissioneTecnicoPage(
+                                                  commissione: commissione),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text('Nessuna commissione trovata'));
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
             }
-          }
         ),
       ),
     );
@@ -877,7 +950,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.red.shade400, Colors.red.shade700],
+            colors: [Colors.red, Colors.red],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -1061,4 +1134,3 @@ class MenuItem {
 
   MenuItem({required this.icon, required this.label});
 }
-

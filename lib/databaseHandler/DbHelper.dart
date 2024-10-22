@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fema_crm/model/InterventoModel.dart';
 import 'package:fema_crm/model/RestituzioneMerceModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ import 'package:flutter/cupertino.dart';
 import '../model/AziendaModel.dart';
 import '../model/DestinazioneModel.dart';
 import '../model/DeviceModel.dart';
+import '../model/FaseRiparazioneModel.dart';
 import '../model/LicenzaModel.dart';
 import '../model/OrdinePerInterventoModel.dart';
 import '../model/RuoloUtenteModel.dart';
@@ -35,9 +37,7 @@ import '../model/VeicoloModel.dart';
 class DbHelper{
 
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-  String ipaddress1 = 'http://localhost:8080';
-  String ipaddress3 ='http://79.10.122.110:8084';
-  String ipaddress4 = 'http://10.0.2.2.8080';
+
 
   List<OrdinePerInterventoModel> allOrdini = [];
   List<VeicoloModel> allVeicoli = [];
@@ -294,6 +294,25 @@ class DbHelper{
       return [];
     } catch(e){
       print("Errore fetching clienti:$e");
+      return [];
+    }
+  }
+
+  Future<List<FaseRiparazioneModel>> getFasiByMerce(InterventoModel intervento) async{
+    int merceId = int.parse(intervento.merce!.id!);
+    try{
+      final response = await http.get(Uri.parse('$ipaddress/api/fasi/merce/$merceId'));
+      if(response.statusCode == 200){
+        final jsonData = jsonDecode(response.body);
+        List<FaseRiparazioneModel> fasi = [];
+        for(var item in jsonData){
+          fasi.add(FaseRiparazioneModel.fromJson(item));
+        }
+        return fasi;
+      }
+      return [];
+    } catch(e){
+      print('Errore fetching FASI: $e');
       return [];
     }
   }
