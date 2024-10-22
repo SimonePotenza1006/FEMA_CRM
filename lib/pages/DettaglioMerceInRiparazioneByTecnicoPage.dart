@@ -8,14 +8,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../model/ProdottoModel.dart';
+import '../model/UtenteModel.dart';
 import 'CreazioneScadenzaPage.dart';
 import 'SalvataggioCredenzialiClientePage.dart';
 
 class DettaglioMerceInRiparazioneByTecnicoPage extends StatefulWidget {
   final InterventoModel intervento;
   final MerceInRiparazioneModel merce;
+  final UtenteModel utente;
 
-  DettaglioMerceInRiparazioneByTecnicoPage({Key? key, required this.intervento, required this.merce}) : super(key: key);
+  DettaglioMerceInRiparazioneByTecnicoPage({Key? key, required this.intervento, required this.merce, required this.utente}) : super(key: key);
 
   @override
   _DettaglioMerceInRiparazioneByTecnicoPageState createState() =>
@@ -123,337 +125,339 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: Wrap(
-          children:[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildDetailRow(title:'Data arrivo', value: widget.intervento.data != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.intervento.merce!.data!) : '', context: context),
-                      _buildDetailRow(title: 'Presa in carico', value: widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.merce.data_presa_in_carico!) : "NESSUNA DATA", context: context),
-                      _buildDetailRow(title:'Articolo', value: widget.intervento.merce?.articolo ?? '', context: context),
-                      _buildDetailRow(title:'Accessori', value: widget.intervento.merce?.accessori ?? '', context: context),
-                      _buildDetailRow(title:'Difetto Riscontrato', value: widget.intervento.merce?.difetto_riscontrato ?? '', context: context),
-                      //_buildDetailRotitle:w('Data Presa in Carico:', widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_presa_in_carico!) : ''),
-                      _buildDetailRow(title:'Password', value: widget.intervento.merce?.password ?? '', context: context),
-                      _buildDetailRow(title:'Dati', value: widget.intervento.merce?.dati ?? '', context: context),
-                      _buildDetailRow(title:'Preventivo', value: widget.intervento.merce?.preventivo != null ? (widget.intervento.merce!.preventivo! ? 'Richiesto' : 'non richiesto') : '', context: context),
-                      if (widget.merce.preventivo != null && widget.merce.preventivo == true)
-                        SizedBox(
-                          child: Column(
-                            children: [
-                              _buildDetailRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito", context: context),
-                              SizedBox(
-                                  width: 500,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: 210,
-                                        child: TextFormField(
-                                          controller: importoPreventivatoController,
-                                          keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(
-                                            labelText: 'Importo Preventivato'.toUpperCase(),
-                                            border: OutlineInputBorder(),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 10),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          if(importoPreventivatoController.text.isNotEmpty){
-                                            saveImportoPreventivo();
-                                          } else{
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text('Non puoi salvare un preventivo nullo!'),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          primary: Colors.red,
-                                          onPrimary: Colors.white,
-                                        ),
-                                        child: Text('Salva importo Preventivo'.toUpperCase()),
-                                      ),
-                                    ],
-                                  )
-                              ),
-                            ],
-                          ),
-                        ),
-                      SizedBox(height: 20),
-                      _buildDetailRow(title:'Diagnosi', value:widget.intervento.merce?.diagnosi ?? 'N/A', context: context),
-                      SizedBox(
-                        width: 500,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 250,
-                              child: TextFormField(
-                                controller: diagnosiController,
-                                decoration: InputDecoration(
-                                  labelText: 'Diagnosi'.toUpperCase(),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.grey),
-                                  ),
-                                ),
-                                maxLines: null,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            ElevatedButton(
-                              onPressed: () {
-                                if(diagnosiController.text.isNotEmpty){
-                                  saveDiagnosi();
-                                } else{
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non puoi salvare una diagnosi nulla!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                                onPrimary: Colors.white,
-                              ),
-                              child: Text('Salva diagnosi'.toUpperCase()),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 20,),
-                      _buildDetailRow(title: 'Risoluzione', value: widget.intervento.merce?.risoluzione ?? 'N/A', context: context),
-                      SizedBox(
-                        width: 500,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 250,
-                              child: TextFormField(
-                                controller: risoluzioneController,
-                                decoration: InputDecoration(
-                                  labelText: 'Risoluzione'.toUpperCase(),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.grey),
-                                  ),
-                                ),
-                                maxLines: null,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            ElevatedButton(
-                              onPressed: () {
-                                if(risoluzioneController.text.isNotEmpty){
-                                  saveRisoluzione();
-                                } else{
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non puoi salvare una risoluzione nulla!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                                onPrimary: Colors.white,
-                              ),
-                              child: Text('Salva risoluzione'.toUpperCase()),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20,),
-                      _buildDetailRow(title: 'Prodotti Installati', value: widget.intervento.merce?.prodotti_installati ?? 'N/A', context: context),
-                      SizedBox(
-                        width: 500,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 250,
-                              child: TextFormField(
-                                controller: prodottiInstallatiController,
-                                decoration: InputDecoration(
-                                  labelText: 'Prodotti installati'.toUpperCase(),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.grey),
-                                  ),
-                                ),
-                                maxLines: null,
-                              ),
-                            ),
-                            SizedBox(height: 12),
-                            ElevatedButton(
-                              onPressed: () {
-                                if(prodottiInstallatiController.text.isNotEmpty){
-                                  saveProdotti();
-                                } else{
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non puoi salvare dei prodotti nulli!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                                onPrimary: Colors.white,
-                              ),
-                              child: Text('Salva prodotti'.toUpperCase()),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      SizedBox(height: 12),
-                      Center(
-                        child: Text('SELEZIONARE I PRODOTTI INSTALLATI SE PRESENTI IN MAGAZZINO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                      ),
-                      SizedBox(height: 12),
-                      Container(
-                        width: 500,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _buildSearchField(),
-                              ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.search),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Container(
-                        width: 500,
-                        height: 400,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey[300]!),
-                          color: Colors.white
-                        ),
-                        child: FutureBuilder<List<ProdottoModel>>(
-                          future: Future.value(allProdotti),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<ProdottoModel> prodotti = filteredProdotti;
-                              return ListView.builder(
-                                itemCount: prodotti.length,
-                                itemBuilder: (context, index) {
-                                  ProdottoModel prodotto = prodotti[index];
-                                  final isSelected = selectedProdotti.contains(prodotto);
-
-                                  return CheckboxListTile(
-                                    title: Text(prodotto.descrizione!.toUpperCase()),
-                                    value: isSelected,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        if (value == true) {
-                                          // Aggiungi prodotto se selezionato
-                                          selectedProdotti.add(prodotto);
-                                        } else {
-                                          // Rimuovi prodotto se deselezionato
-                                          selectedProdotti.remove(prodotto);
-                                        }
-                                      });
-                                    },
-                                  );
-                                },
-                              );
-                            } else {
-                              return const Center(child: Text('Nessun prodotto nello storico'));
-                            }
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      if(selectedProdotti.isNotEmpty)
-                        SizedBox(
-                          width: 400,
-                          child: ListaPuntataProdotti(selectedProdotti: selectedProdotti),
-                        ),
-                      SizedBox(height: 20),
-                      Center(
-                        child: SizedBox(
-                          width: 200,
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                saveRelazioni().whenComplete(() =>
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Prodotti aggiunti correttamente alla riparazione'),
-                                    ),
-                                  )
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                                onPrimary: Colors.white,
-                                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Text('salva'.toUpperCase()),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(height: 50),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      consegna();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                      shape: RoundedRectangleBorder(
+        child: Center(
+          child: Wrap(
+              children:[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(10),
                       ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildDetailRow(title:'Data arrivo', value: widget.intervento.data != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.intervento.merce!.data!) : '', context: context),
+                          _buildDetailRow(title: 'Presa in carico', value: widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.merce.data_presa_in_carico!) : "NESSUNA DATA", context: context),
+                          _buildDetailRow(title:'Articolo', value: widget.intervento.merce?.articolo ?? '', context: context),
+                          _buildDetailRow(title:'Accessori', value: widget.intervento.merce?.accessori ?? '', context: context),
+                          _buildDetailRow(title:'Difetto Riscontrato', value: widget.intervento.merce?.difetto_riscontrato ?? '', context: context),
+                          //_buildDetailRotitle:w('Data Presa in Carico:', widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_presa_in_carico!) : ''),
+                          _buildDetailRow(title:'Password', value: widget.intervento.merce?.password ?? '', context: context),
+                          _buildDetailRow(title:'Dati', value: widget.intervento.merce?.dati ?? '', context: context),
+                          _buildDetailRow(title:'Preventivo', value: widget.intervento.merce?.preventivo != null ? (widget.intervento.merce!.preventivo! ? 'Richiesto' : 'non richiesto') : '', context: context),
+                          if (widget.merce.preventivo != null && widget.merce.preventivo == true)
+                            SizedBox(
+                              child: Column(
+                                children: [
+                                  _buildDetailRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito", context: context),
+                                  SizedBox(
+                                      width: 500,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                            width: 210,
+                                            child: TextFormField(
+                                              controller: importoPreventivatoController,
+                                              keyboardType: TextInputType.number,
+                                              decoration: InputDecoration(
+                                                labelText: 'Importo Preventivato'.toUpperCase(),
+                                                border: OutlineInputBorder(),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              if(importoPreventivatoController.text.isNotEmpty){
+                                                saveImportoPreventivo();
+                                              } else{
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Non puoi salvare un preventivo nullo!'),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              primary: Colors.red,
+                                              onPrimary: Colors.white,
+                                            ),
+                                            child: Text('Salva importo Preventivo'.toUpperCase()),
+                                          ),
+                                        ],
+                                      )
+                                  ),
+                                ],
+                              ),
+                            ),
+                          SizedBox(height: 20),
+                          _buildDetailRow(title:'Diagnosi', value:widget.intervento.merce?.diagnosi ?? 'N/A', context: context),
+                          SizedBox(
+                            width: 500,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 250,
+                                  child: TextFormField(
+                                    controller: diagnosiController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Diagnosi'.toUpperCase(),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(color: Colors.grey),
+                                      ),
+                                    ),
+                                    maxLines: null,
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if(diagnosiController.text.isNotEmpty){
+                                      saveDiagnosi();
+                                    } else{
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Non puoi salvare una diagnosi nulla!'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: Text('Salva diagnosi'.toUpperCase()),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: 20,),
+                          _buildDetailRow(title: 'Risoluzione', value: widget.intervento.merce?.risoluzione ?? 'N/A', context: context),
+                          SizedBox(
+                            width: 500,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 250,
+                                  child: TextFormField(
+                                    controller: risoluzioneController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Risoluzione'.toUpperCase(),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(color: Colors.grey),
+                                      ),
+                                    ),
+                                    maxLines: null,
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if(risoluzioneController.text.isNotEmpty){
+                                      saveRisoluzione();
+                                    } else{
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Non puoi salvare una risoluzione nulla!'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: Text('Salva risoluzione'.toUpperCase()),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 20,),
+                          _buildDetailRow(title: 'Prodotti Installati', value: widget.intervento.merce?.prodotti_installati ?? 'N/A', context: context),
+                          SizedBox(
+                            width: 500,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 250,
+                                  child: TextFormField(
+                                    controller: prodottiInstallatiController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Prodotti installati'.toUpperCase(),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(color: Colors.grey),
+                                      ),
+                                    ),
+                                    maxLines: null,
+                                  ),
+                                ),
+                                SizedBox(height: 12),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if(prodottiInstallatiController.text.isNotEmpty){
+                                      saveProdotti();
+                                    } else{
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Non puoi salvare dei prodotti nulli!'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: Text('Salva prodotti'.toUpperCase()),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          SizedBox(height: 12),
+                          Center(
+                            child: Text('SELEZIONARE I PRODOTTI INSTALLATI SE PRESENTI IN MAGAZZINO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                          ),
+                          SizedBox(height: 12),
+                          Container(
+                            width: 500,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey[300]!),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildSearchField(),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.search),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          Container(
+                            width: 500,
+                            height: 400,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey[300]!),
+                                color: Colors.white
+                            ),
+                            child: FutureBuilder<List<ProdottoModel>>(
+                              future: Future.value(allProdotti),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(child: Text('Errore: ${snapshot.error}'));
+                                } else if (snapshot.hasData) {
+                                  List<ProdottoModel> prodotti = filteredProdotti;
+                                  return ListView.builder(
+                                    itemCount: prodotti.length,
+                                    itemBuilder: (context, index) {
+                                      ProdottoModel prodotto = prodotti[index];
+                                      final isSelected = selectedProdotti.contains(prodotto);
+
+                                      return CheckboxListTile(
+                                        title: Text(prodotto.descrizione!.toUpperCase()),
+                                        value: isSelected,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (value == true) {
+                                              // Aggiungi prodotto se selezionato
+                                              selectedProdotti.add(prodotto);
+                                            } else {
+                                              // Rimuovi prodotto se deselezionato
+                                              selectedProdotti.remove(prodotto);
+                                            }
+                                          });
+                                        },
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  return const Center(child: Text('Nessun prodotto nello storico'));
+                                }
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          if(selectedProdotti.isNotEmpty)
+                            SizedBox(
+                              width: 400,
+                              child: ListaPuntataProdotti(selectedProdotti: selectedProdotti),
+                            ),
+                          SizedBox(height: 20),
+                          Center(
+                            child: SizedBox(
+                              width: 200,
+                              child: Center(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    saveRelazioni().whenComplete(() =>
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Prodotti aggiunti correttamente alla riparazione'),
+                                          ),
+                                        )
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    onPrimary: Colors.white,
+                                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text('salva'.toUpperCase()),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                    child: Text('merce consegnata'.toUpperCase()),
-                  ),
-                ),
-              ],
-            )
-          ]
-        ),
+                    SizedBox(height: 50),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          consegna();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          onPrimary: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text('merce consegnata'.toUpperCase()),
+                      ),
+                    ),
+                  ],
+                )
+              ]
+          ),
+        )
       ),
       floatingActionButton: Stack(
         children: [
@@ -465,6 +469,17 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
               children: [
+                SpeedDialChild(
+                  child: Icon(Icons.lock_clock_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Crea una nuova fase'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CreazioneFaseRiparazionePage(merce: widget.merce, utente: widget.utente),
+                    ),
+                  ),
+                ),
                 SpeedDialChild(
                   child: Icon(Icons.password, color: Colors.white),
                   backgroundColor: Colors.red,

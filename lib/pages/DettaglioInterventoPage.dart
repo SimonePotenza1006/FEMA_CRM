@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import '../model/ClienteModel.dart';
+import '../model/FaseRiparazioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/UtenteModel.dart';
 import 'AggiuntaManualeProdottiDDTPage.dart';
@@ -35,6 +36,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   List<NotaTecnicoModel> allNote = [];
   List<UtenteModel> allUtenti = [];
   late Future<List<ClienteModel>> allClienti;
+  late Future<List<FaseRiparazioneModel>> allFasi;
   List<ClienteModel> clientiList =[];
   List<ClienteModel> filteredClientiList = [];
   List<DestinazioneModel> allDestinazioniByCliente = [];
@@ -49,7 +51,9 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   UtenteModel? _responsabileSelezionato;
   List<UtenteModel?> _selectedUtenti = [];
   List<UtenteModel?> _finalSelectedUtenti = [];
-   TextEditingController rapportinoController = TextEditingController();
+  List<FaseRiparazioneModel> fasiRiparazione = [];
+  TextEditingController rapportinoController = TextEditingController();
+  TextEditingController _codiceDaneaController = TextEditingController();
   bool modificaDescrizioneVisible = false;
   bool modificaImportoVisibile = false;
   bool modificaNotaVisibile = false;
@@ -69,6 +73,12 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       setState(() {
         clientiList = clienti;
         filteredClientiList = List.from(clientiList);
+      });
+    });
+    allFasi = dbHelper!.getFasiByMerce(widget.intervento);
+    allFasi.then((fasi){
+      setState(() {
+       fasiRiparazione = fasi;
       });
     });
     getProdottiByIntervento();
@@ -278,6 +288,22 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     }
   }
 
+  Future<void> _selectDate2(BuildContext context) async {
+    DateTime selectedDate = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        widget.intervento.data_apertura_intervento = picked;
+        selectedDate = picked;
+      });
+    }
+  }
+
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
@@ -373,8 +399,15 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   }
 
   late double totalePrezzoFornitore = allProdotti.fold(0.0, (sum, relazione) {
-    return sum + (relazione.prodotto?.prezzo_fornitore ?? 0.0);
+    double prezzoFornitore = relazione.prodotto?.prezzo_fornitore ?? 0.0;
+    double quantita = relazione.quantita ?? 1.0;
+
+    print('Prezzo Fornitore: $prezzoFornitore, Quantità: ${quantita}'); // Controllo dei valori
+
+    return sum + (prezzoFornitore * quantita);
   });
+
+
 
   Future<void> getNoteByIntervento() async{
     try{
@@ -491,6 +524,40 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
       print('Qualcosa non va: $e');
     }
   }
+
+  void showCodiceDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Inserisci un codice'.toUpperCase()),
+              actions: <Widget>[
+                TextFormField(
+                  controller: _codiceDaneaController,
+                  decoration: InputDecoration(
+                    labelText: 'CODICE DANEA',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState((){
+                      widget.intervento.numerazione_danea = _codiceDaneaController.text;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text('Salva codice'.toUpperCase()),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -685,6 +752,12 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     value: widget.intervento.numerazione_danea ?? 'N/A',
                                     context: context
                                 ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: (){
+                                    showCodiceDialog(context);
+                                  }
+                                )
                               ],
                             ),
                             SizedBox(height: 10),
@@ -702,6 +775,12 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                     value: formatDate(widget.intervento.data_apertura_intervento),
                                     context: context
                                 ),
+                                IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed:(){
+                                      _selectDate2(context);
+                                    }
+                                )
                               ],
                             ),
                             Row(
@@ -1545,7 +1624,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore',
+                                'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore - Quantità: ${relazione.quantita?.toStringAsFixed(2)}',
                                 style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
                               ),
                               SizedBox(height: 6),

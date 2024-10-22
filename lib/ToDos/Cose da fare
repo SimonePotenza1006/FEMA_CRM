@@ -3,7 +3,7 @@ MODIFICHE DA FARE
 
 
 - Aggiungere un alert per errore dei contachilometri nella registrazione di una nuova spesa
-- Poter modificare data creazione + numerazione intervento
+
 - Aggiungere destinatario + destinazione
 - Usare calendario solo per la visualizzazioned egli interventi
 - Creare un Button sul menu tecnico per reindirizzarlo su una tabella
@@ -14,13 +14,13 @@ popolata dagli interventi della sua categoria di interventi,
 - Quando filtro x tecnico o per categoria mi deve fare un totale agli interventi… sotto la tabella in modo da sapere i ricavi mensili x tecnico e categoria
 Il tutto stampabile anche la lista degli interventi
 - Gestire la compilazione dei dati della riparazione merce in caso di intervento autoassegnato e concluso
-
+- Bug caricamento foto merce in riparazione
 
 ALESSANDRO
 Se riapro un intervento non posso + vedere i dettagli, invece sarebbe utile (anche semplicemente visualizzarne un’ estrazione pdf + la consultazione degli allegati inseriti) grazie eccheccazz
 Nel rapportino versione desktop allegare anche pdf e non solo formati foto
 Nella redazione dell’ intervento non sarebbe meglio  che il cliente sia “in alto” sul form, prima dei dettagli sull’ intervento, e non “in basso”?
-Cambiare sulla versione desktop la dicitura “scatta foto” con “allega documento”  eccheccazz
+
 
 
 
@@ -65,4 +65,7 @@ SIMONE
 - Si possono cambiare gli utenti assegnati DettaglioInterventoPage;
 - Possibilità di togliere la data accordata
 
+22/10/2024
+- Cambiare sulla versione desktop la dicitura “scatta foto” con “allega documento”  eccheccazz
+- Possibilità di cambiare Codice Danea e data creazione da DettaglioInterventoPage
 
