@@ -1488,6 +1488,32 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
                                         context: context
                                     ),
                                   ),
+                                  if (fasiRiparazione.isNotEmpty)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Fasi riparazione:',
+                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                        ),
+                                        ...fasiRiparazione.map((fase) => SizedBox(
+                                            width: 370,
+                                            child:ListTile(
+                                              title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)},${fase.utente?.nome} ${fase.utente?.cognome}'),
+                                              subtitle: Text('${fase.descrizione}'),
+                                            )
+                                          )
+                                            ),
+                                      ],
+                                    ),
+                                  if(fasiRiparazione.isEmpty)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height: 14,),
+                                        //Text('Nessuna nota relativa all\'intervento', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                                      ],
+                                    ),
                                 ],
                               ),
                             ),

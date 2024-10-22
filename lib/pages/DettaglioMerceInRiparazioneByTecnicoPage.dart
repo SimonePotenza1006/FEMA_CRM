@@ -9,6 +9,7 @@ import 'dart:convert';
 
 import '../model/ProdottoModel.dart';
 import '../model/UtenteModel.dart';
+import 'CreazioneFaseRiparazionePage.dart';
 import 'CreazioneScadenzaPage.dart';
 import 'SalvataggioCredenzialiClientePage.dart';
 
@@ -36,7 +37,6 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
   List<ProdottoModel> selectedProdotti = [];
   late TextEditingController searchController;
   bool isSearching = false;
-
 
   Widget _buildSearchField() {
     return TextField(
@@ -470,7 +470,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
               foregroundColor: Colors.white,
               children: [
                 SpeedDialChild(
-                  child: Icon(Icons.lock_clock_outlined, color: Colors.white),
+                  child: Icon(Icons.calendar_month_sharp, color: Colors.white),
                   backgroundColor: Colors.red,
                   label: 'Crea una nuova fase'.toUpperCase(),
                   onTap: () => Navigator.push(
