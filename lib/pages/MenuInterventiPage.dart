@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/pages/CreazioneInterventoByAmministrazionePage.dart';
 import 'package:fema_crm/pages/ListaInterventiFinalPage.dart';
@@ -18,6 +20,29 @@ class MenuInterventiPage extends StatefulWidget{
 
 class _MenuInterventiPageState extends State<MenuInterventiPage>{
   int _hoveredIndex = -1;
+  Map<int, int> _menuItemClickCount = {};
+  final List<MenuItem> _menuItems = [
+    MenuItem(icon: Icons.list_outlined, label: 'LISTA INTERVENTI'),
+    MenuItem(icon: Icons.playlist_add, label: 'CREA INTERVENTO'),
+    MenuItem(icon: Icons.groups, label: 'GRUPPI DI INTERVENTO')
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    if(Platform.isAndroid){
+      _menuItemClickCount.clear();
+      for (int i = 0; i < _menuItems.length; i++) {
+        _menuItemClickCount[i] = 0;
+      };
+    }
+    /*getAllVeicoli().then((_) {
+      getNote();
+    });
+    getAllOrdini();
+    _scheduleGetAllOrdini();
+    fetchData();*/
+  }
 
   @override
   Widget build(BuildContext context){
@@ -96,9 +121,25 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
     return hoveredIndex;
   }
 
-
+  int _lastClickedIndex = 0;
 
   void _navigateToPage(int index) {
+    if(Platform.isAndroid){
+      if (_lastClickedIndex != index) {
+        _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
+        _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
+      }
+    }
+
+    if(Platform.isAndroid){
+      if (_menuItemClickCount.containsKey(index)) {
+        _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
+      } else {
+        _menuItemClickCount[index] = 1;
+      }
+    }
+
+    if ((_menuItemClickCount[index] ?? 0) % 2 == 0 && _hoveredIndex != -1) {
     switch (index) {
       case 0:
         Navigator.push(
@@ -119,6 +160,7 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
               TableGruppiPage()),
         );
         break;
+      }
     }
   }
 }
