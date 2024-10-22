@@ -1776,7 +1776,7 @@ class InterventoDataSource extends DataGridSource {
           ),
           DataGridCell<String>(
             columnName: 'tipologia',
-            value: intervento.tipologia?.descrizione,//int.parse(intervento.tipologia!.id.toString()),
+            value: intervento.tipologia?.descrizione ?? '',//int.parse(intervento.tipologia!.id.toString()),
           ),
         ],
       ));

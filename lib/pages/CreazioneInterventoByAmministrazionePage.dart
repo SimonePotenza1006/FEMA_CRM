@@ -960,6 +960,7 @@ class _CreazioneInterventoByAmministrazionePageState
   }
 
   void _showClientiListDialog() {
+    TextEditingController searchController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -975,6 +976,7 @@ class _CreazioneInterventoByAmministrazionePageState
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
+                  controller: searchController,
                   onChanged: (value) {
                     setState(() {
                       filteredClientiList = clientiList

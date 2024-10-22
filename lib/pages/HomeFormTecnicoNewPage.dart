@@ -238,7 +238,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         padding: EdgeInsets.only(top: 40, bottom: 40),
         child: LayoutBuilder(
           builder: (context, constraints){
-            if (constraints.maxWidth < 800) {
+            print('pix '+constraints.maxWidth.toString());
+            if (constraints.maxWidth <= 800) {
               // Tablet/Mobile layout
               return SingleChildScrollView(
                 child: Column(
@@ -425,7 +426,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                         } else if (snapshot.hasData) {
                           List<InterventoModel> merce = snapshot.data!;
                           if(merce.isEmpty){
-                            return Center(child: Text('Nessuna mece in riparazione'));
+                            return Center(child: Text('Nessuna merce in riparazione'));
                           }
                           return ListView.builder(
                             shrinkWrap: true,

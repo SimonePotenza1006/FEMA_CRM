@@ -16,6 +16,7 @@ import '../model/InterventoModel.dart';
 import '../model/ImmagineModel.dart';
 import 'dart:ui' as ui;
 import 'HomeFormTecnico.dart';
+import 'package:path/path.dart' as basename;
 
 class CompilazioneRapportinoPage extends StatefulWidget {
   final InterventoModel intervento;
@@ -334,9 +335,9 @@ class _CompilazioneRapportinoPageState
               ),
 
               SizedBox(height: 10),
-              Center(
+              /*Center(
                 child: ElevatedButton(
-                  onPressed: takePdf(),
+                  onPressed: takePdf,
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
                     onPrimary: Colors.white,
@@ -344,8 +345,11 @@ class _CompilazioneRapportinoPageState
                   child: Text('Allega Pdf', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                 ),
               ),
-
-              if(pickedImages.isNotEmpty)
+              SizedBox(height: 10.0),
+              if (imageFile != null)  Center(child: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: Text(basename.basename(imageFile!.uri.path )))),*/
+              if (pickedImages.isNotEmpty)
                 _buildImagePreview(),
               SizedBox(height: 20),
               Container(
@@ -392,8 +396,8 @@ class _CompilazioneRapportinoPageState
   }
 
   File? imageFile;
-  File? _scannedDocumentFile;
-  takePdf() async {
+  //File? _scannedDocumentFile;
+  Future<void> takePdf() async {
 
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
@@ -408,7 +412,7 @@ class _CompilazioneRapportinoPageState
         imageFile = File(result.files.first.path!);
         print('mkjhplm '+imageFile.toString());
         //_scannedDocumentFile = null;
-        _scannedDocumentFile=imageFile;
+        //_scannedDocumentFile=imageFile;
       });
     }
 
