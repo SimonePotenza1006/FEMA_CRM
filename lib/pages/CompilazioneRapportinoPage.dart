@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:intl/intl.dart';
@@ -332,6 +333,18 @@ class _CompilazioneRapportinoPageState
                 ),
               ),
 
+              SizedBox(height: 10),
+              Center(
+                child: ElevatedButton(
+                  onPressed: takePdf(),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    onPrimary: Colors.white,
+                  ),
+                  child: Text('Allega Pdf', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                ),
+              ),
+
               if(pickedImages.isNotEmpty)
                 _buildImagePreview(),
               SizedBox(height: 20),
@@ -376,6 +389,38 @@ class _CompilazioneRapportinoPageState
         ),
       ),
     );
+  }
+
+  File? imageFile;
+  File? _scannedDocumentFile;
+  takePdf() async {
+
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+
+    );
+
+    if (result != null) {
+      setState(() {
+
+        imageFile = File(result.files.first.path!);
+        print('mkjhplm '+imageFile.toString());
+        //_scannedDocumentFile = null;
+        _scannedDocumentFile=imageFile;
+      });
+    }
+
+    print('vffder45');
+    try{
+      print('hghjfj6');
+      var doc = await imageFile;
+      print('yujjgfj d');
+
+    } catch(error) {
+      print("errffdrsss: $error");
+    }
   }
 
   bool _isSaveButtonEnabled() {
