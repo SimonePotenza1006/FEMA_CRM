@@ -15,7 +15,8 @@ class TableMagazzinoPage extends StatefulWidget{
 }
 
 class _TableMagazzinoPageState extends State<TableMagazzinoPage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<ProdottoModel> _allProdotti = [];
   List<ProdottoModel> _filteredProdotti = [];
   late ProdottoDataSource _dataSource;

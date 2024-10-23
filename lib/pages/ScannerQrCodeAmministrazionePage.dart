@@ -25,7 +25,8 @@ class _ScannerQrCodeAmministrazionePageState
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool qrRead = false;
   String qrData = "";
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -142,7 +143,7 @@ class _ScannerQrCodeAmministrazionePageState
     print(lottoSeriale);
     print(codiceDanea);
 
-    String apiUrl = '${ipaddress}/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
+    String apiUrl = '$ipaddress/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
     final response =
         await http.get(Uri.parse(apiUrl)).timeout(Duration(seconds: 10));
 

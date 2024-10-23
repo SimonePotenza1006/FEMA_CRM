@@ -22,7 +22,8 @@ class DettaglioListinoPage extends StatefulWidget {
 class _DettaglioListinoPageState extends State<DettaglioListinoPage> {
   DbHelper? dbHelper;
   List<CategoriaPrezzoListinoModel> allListiniForCategoria = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   bool isLoading = true;
 
   @override
@@ -80,7 +81,7 @@ class _DettaglioListinoPageState extends State<DettaglioListinoPage> {
   Future<void> getAllListiniForCategoria() async {
     try {
       final response = await http.get(Uri.parse(
-          '${ipaddress}/api/listino/categoria/${widget.categoria.id}'));
+          '$ipaddress/api/listino/categoria/${widget.categoria.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

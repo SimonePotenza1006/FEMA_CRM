@@ -20,6 +20,7 @@ class _MagazzinoPageState extends State<MagazzinoPage> {
   int currentPage = 0;
   int itemsPerPage = 50;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -29,7 +30,7 @@ class _MagazzinoPageState extends State<MagazzinoPage> {
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("${ipaddress}/api/prodotto");
+      var apiUrl = Uri.parse("$ipaddress/api/prodotto");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

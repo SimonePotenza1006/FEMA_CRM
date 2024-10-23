@@ -21,7 +21,8 @@ class _ReportPreventiviPerAgentePageState
     extends State<ReportPreventiviPerAgentePage> {
   List<AgenteModel> agentiList = [];
   Map<String, List<PreventivoModel>> preventiviPerAgenteMap = {};
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   DateTime? _selectedMonth; // Imposto il tipo come DateTime opzionale
 
   @override
@@ -406,7 +407,7 @@ class _ReportPreventiviPerAgentePageState
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -453,7 +454,7 @@ class _ReportPreventiviPerAgentePageState
 
   Future<void> getAllPreventiviForAgente(String agenteId) async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/preventivo/agente/$agenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/preventivo/agente/$agenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

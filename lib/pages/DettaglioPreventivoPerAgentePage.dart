@@ -19,7 +19,8 @@ class DettaglioPreventivoPerAgentePage extends StatefulWidget {
 class _DettaglioPreventivoPerAgentePageState
     extends State<DettaglioPreventivoPerAgentePage> {
   List<RelazionePreventivoProdottiModel> allProdotti = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   bool isLoading = true;
 
   @override
@@ -287,7 +288,7 @@ class _DettaglioPreventivoPerAgentePageState
     });
     try {
       var apiUrl = Uri.parse(
-          '${ipaddress}/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

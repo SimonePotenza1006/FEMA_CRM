@@ -19,7 +19,8 @@ class TableVeicoliPage extends StatefulWidget{
 }
 
 class _TableVeicoliPageState extends State<TableVeicoliPage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late VeicoloDataSource _dataSource;
   List<VeicoloModel> allVeicoli =[];
   Map<String, double> _columnWidths = {
@@ -561,7 +562,8 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
 class VeicoloDataSource extends DataGridSource {
   List<VeicoloModel> _vehicles = [];
   BuildContext context;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   VeicoloDataSource(this.context, List<VeicoloModel> vehicles) {
     _vehicles = vehicles;

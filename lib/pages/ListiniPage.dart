@@ -16,6 +16,7 @@ class _ListiniPageState extends State<ListiniPage> {
   List<TipologiaInterventoModel> allTipologie = [];
   bool isLoading = true;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {

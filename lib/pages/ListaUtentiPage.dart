@@ -14,7 +14,8 @@ class ListaUtentiPage extends StatefulWidget{
 
 class _ListaUtentiPageState extends State<ListaUtentiPage>{
   List<UtenteModel> allUtenti = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   bool isLoading = true;
 
   @override
@@ -53,7 +54,7 @@ class _ListaUtentiPageState extends State<ListaUtentiPage>{
   
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('${ipaddress}/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);

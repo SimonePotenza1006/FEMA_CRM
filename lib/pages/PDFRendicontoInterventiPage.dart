@@ -26,7 +26,8 @@ class _PDFRendicontoInterventiPageState
   Map<String, List<InterventoModel>> interventoPerTipologiaMap = {};
   List<InterventoModel> interventiList = [];
   List<TipologiaInterventoModel> tipologieList = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -37,7 +38,7 @@ class _PDFRendicontoInterventiPageState
 
   Future<void> getAllTipologieIntervento() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -89,7 +90,7 @@ class _PDFRendicontoInterventiPageState
   Future<void> getAllInterventiForTipologia(String tipologiaId) async {
     try {
       var apiUrl = Uri.parse(
-          '${ipaddress}/api/intervento/categoriaIntervento/$tipologiaId');
+          '$ipaddress/api/intervento/categoriaIntervento/$tipologiaId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

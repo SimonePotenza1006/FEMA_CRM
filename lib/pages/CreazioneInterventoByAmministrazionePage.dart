@@ -31,6 +31,7 @@ class _CreazioneInterventoByAmministrazionePageState
     extends State<CreazioneInterventoByAmministrazionePage> {
   List<XFile> pickedImages =  [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   CategoriaInterventoSpecificoModel? selectedCategoria;
   List<TipologiaInterventoModel> allTipologie = [];
   DateTime _dataOdierna = DateTime.now();

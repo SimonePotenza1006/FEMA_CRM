@@ -43,7 +43,8 @@ class _RegistrazionePreventivoAmministrazionePageState
   List<ClienteModel> filteredClientiList = [];
   List<DestinazioneModel> allDestinazioniByCliente = [];
   List<PreventivoModel> allPreventiviByCliente = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -343,7 +344,7 @@ class _RegistrazionePreventivoAmministrazionePageState
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -366,7 +367,7 @@ class _RegistrazionePreventivoAmministrazionePageState
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/azienda');
+      var apiUrl = Uri.parse('$ipaddress/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -389,7 +390,7 @@ class _RegistrazionePreventivoAmministrazionePageState
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -414,7 +415,7 @@ class _RegistrazionePreventivoAmministrazionePageState
   Future<http.Response?> savePrimePreventivo() async {
     late http.Response response;
     try {
-      response = await http.post(Uri.parse('${ipaddress}/api/preventivo'),
+      response = await http.post(Uri.parse('$ipaddress/api/preventivo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'azienda': selectedAzienda?.toMap(),
@@ -483,7 +484,7 @@ class _RegistrazionePreventivoAmministrazionePageState
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
       final response = await http
-          .get(Uri.parse('${ipaddress}/api/destinazione/cliente/$clientId'));
+          .get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

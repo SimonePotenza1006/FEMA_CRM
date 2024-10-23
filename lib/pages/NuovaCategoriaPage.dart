@@ -17,7 +17,8 @@ class NuovaCategoriaPage extends StatefulWidget {
 
 class _NuovaCategoriaPageState extends State<NuovaCategoriaPage> {
   final _descrizioneController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +67,7 @@ class _NuovaCategoriaPageState extends State<NuovaCategoriaPage> {
   Future<void> createNewCategoria() async {
     try {
       final response =
-          await http.post(Uri.parse('${ipaddress}/api/categorieIntervento'),
+          await http.post(Uri.parse('$ipaddress/api/categorieIntervento'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'descrizione': _descrizioneController.text,

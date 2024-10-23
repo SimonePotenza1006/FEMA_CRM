@@ -29,7 +29,8 @@ class RegistroCassaPage extends StatefulWidget {
 class _RegistroCassaPageState extends State<RegistroCassaPage> {
   List<MovimentiModel> movimentiList = [];
   List<MovimentiModel> movimentiList2 = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   double? fondoCassaSettimana1;
   double? fondoCassaSettimana2;
   double? fondoCassaSettimana3;
@@ -520,7 +521,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   Future<void> getAllMovimentazioniExcel() async{
     try{
-      var apiUrl = Uri.parse('${ipaddress}/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -545,7 +546,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   Future<void> getAllMovimentazioni() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/movimenti/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

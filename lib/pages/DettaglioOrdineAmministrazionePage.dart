@@ -22,7 +22,8 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   final DateFormat timeFormatter = DateFormat('HH:mm');
   List<FornitoreModel> allFornitori = [];
   List<FornitoreModel> filteredFornitori = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {

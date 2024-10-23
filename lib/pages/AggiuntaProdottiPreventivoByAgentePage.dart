@@ -26,7 +26,8 @@ class _AggiuntaProdottoPreventivoByAgentePageState
   List<ProdottoModel> prodottiList = [];
   List<ProdottoModel> filteredProdottiList = [];
   Set<ProdottoModel> selectedProducts = {};
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -219,7 +220,7 @@ class _AggiuntaProdottoPreventivoByAgentePageState
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("${ipaddress}/api/prodotto");
+      var apiUrl = Uri.parse("$ipaddress/api/prodotto");
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

@@ -19,7 +19,8 @@ class MenuOrdiniFornitorePage extends StatefulWidget {
 }
 
 class _MenuOrdiniFornitorePageState extends State<MenuOrdiniFornitorePage> {
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<OrdinePerInterventoModel> allOrdini = [];
   int _hoveredIndex = -1;
 

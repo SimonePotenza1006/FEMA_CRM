@@ -23,7 +23,8 @@ class PreventivoServiziPage extends StatefulWidget{
 }
 
 class _PreventivoServiziPageState extends State<PreventivoServiziPage> with WidgetsBindingObserver{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   final _formKey = GlobalKey<FormState>();
   List<AziendaModel> allAziende = [];
   AziendaModel? selectedAzienda;
@@ -811,7 +812,7 @@ class _PreventivoServiziPageState extends State<PreventivoServiziPage> with Widg
 
   Future<void> getAllAziende() async{
     try{
-      var apiUrl = Uri.parse('${ipaddress}/api/azienda');
+      var apiUrl = Uri.parse('$ipaddress/api/azienda');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         List<AziendaModel> aziende = [];

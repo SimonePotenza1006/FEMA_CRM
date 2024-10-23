@@ -27,7 +27,8 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
 
   bool _isSigned = false;
   final _formKey = GlobalKey<FormState>();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String dataOdierna = DateFormat('dd-MM-yyyy, HH:mm')
       .format(DateTime.now())
       .toString();
@@ -684,7 +685,7 @@ print('ssA '+settimanaA.toString());
 
   Future<void> getAllMarcatempo() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/marcatempo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/marcatempo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -740,7 +741,7 @@ print('ssA '+settimanaA.toString());
         if (true){//tipoTimbratura == "INGRESSO") {
           print(DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String()+' '+DateTime.now().toIso8601String());
           final response = await http.post(
-            Uri.parse('${ipaddress}/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : row.idmt,
@@ -761,7 +762,7 @@ print('ssA '+settimanaA.toString());
             }),
           ).then((value) async {
             if (row.idmt2 != null) { final response = await http.post(
-              Uri.parse('${ipaddress}/marcatempo'),
+              Uri.parse('$ipaddress/marcatempo'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'id' : row.idmt2,
@@ -782,7 +783,7 @@ print('ssA '+settimanaA.toString());
               }),
             );} else if (row.oraIngresso2 != null) {
               final response = await http.post(
-                Uri.parse('${ipaddress}/marcatempo'),
+                Uri.parse('$ipaddress/marcatempo'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'id' : '',
@@ -820,7 +821,7 @@ print('ssA '+settimanaA.toString());
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('${ipaddress}/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,

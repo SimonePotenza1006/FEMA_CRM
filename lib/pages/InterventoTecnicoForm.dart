@@ -53,6 +53,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   TextEditingController _descrizioneController = TextEditingController();
   TipologiaInterventoModel? _selectedTipologia;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   GlobalKey<SfSignaturePadState> _signaturePadKey =
   GlobalKey<SfSignaturePadState>();
   Uint8List? signatureBytes;
@@ -82,7 +83,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllTipologie() async {
     try {
       final response =
-          await http.get(Uri.parse('${ipaddress}/api/tipologiaIntervento'));
+          await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -105,7 +106,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     try {
       if (_selectedTipologia != null) {
         final response = await http.get(Uri.parse(
-            '${ipaddress}/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
+            '$ipaddress/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
         if (response.statusCode == 200) {
           var jsonData = jsonDecode(response.body);
           List<CategoriaInterventoSpecificoModel> categorie = [];
@@ -589,7 +590,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
             // Effettuiamo la richiesta HTTP con i dati appropriati in base allo stato della checkbox
             final response = await http.post(
-              Uri.parse('${ipaddress}/api/intervento'),
+              Uri.parse('$ipaddress/api/intervento'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'numerazione_danea' : null,
@@ -997,7 +998,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
       final response = await http
-          .get(Uri.parse('${ipaddress}/api/destinazione/cliente/$clientId'));
+          .get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -1156,7 +1157,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
       // Effettuiamo la richiesta HTTP con i dati appropriati in base allo stato della checkbox
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'numerazione_danea' : null,
@@ -1265,7 +1266,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -1290,7 +1291,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllVeicoli() async {
     try {
       http.Response response =
-          await http.get(Uri.parse('${ipaddress}/api/veicolo'));
+          await http.get(Uri.parse('$ipaddress/api/veicolo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<VeicoloModel> allVeicoli = [];

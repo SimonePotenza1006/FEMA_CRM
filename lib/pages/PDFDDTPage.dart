@@ -32,7 +32,8 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   late Future<Uint8List> _pdfFuture;
   List<RelazioneDdtProdottoModel> allProdotti = [];
   GlobalKey globalKey = GlobalKey();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -564,7 +565,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '${ipaddress}/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
+          '$ipaddress/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

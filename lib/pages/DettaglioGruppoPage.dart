@@ -16,7 +16,8 @@ class DettaglioGruppoPage extends StatefulWidget {
 }
 
 class _DettaglioGruppoPageState extends State<DettaglioGruppoPage> {
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<InterventoModel> interventi = [];
   bool modificaDescrizioneVisible = false;
   final TextEditingController descrizioneController = TextEditingController();

@@ -15,7 +15,8 @@ class ModificaRelazioneRapportinoPage extends StatefulWidget{
 }
 
 class _ModificaRelazioneRapportinoPageState extends State<ModificaRelazioneRapportinoPage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   TextEditingController _relazioneController = TextEditingController();
 
   @override

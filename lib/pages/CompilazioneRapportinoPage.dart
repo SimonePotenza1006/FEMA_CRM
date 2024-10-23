@@ -44,6 +44,7 @@ class _CompilazioneRapportinoPageState
   late TimeOfDay selectedStartTime;
   VeicoloModel? selectedVeicolo;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   CategoriaPrezzoListinoModel? selectedListino;
   List<DestinazioneModel> allDestinazioniByCliente = [];
   DestinazioneModel? selectedDestinazione;
@@ -464,7 +465,7 @@ class _CompilazioneRapportinoPageState
   Future<void> saveIntervento() async {
     try {
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -578,7 +579,7 @@ class _CompilazioneRapportinoPageState
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '${ipaddress}/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
+          '$ipaddress/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -599,7 +600,7 @@ class _CompilazioneRapportinoPageState
 
   Future<void> getAllVeicoli() async {
     http.Response response =
-        await http.get(Uri.parse('${ipaddress}/api/veicolo'));
+        await http.get(Uri.parse('$ipaddress/api/veicolo'));
     var responseData = json.decode(response.body.toString());
     if (response.statusCode == 200) {
       List<VeicoloModel> veicoli = [];

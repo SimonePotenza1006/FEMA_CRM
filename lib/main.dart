@@ -116,6 +116,7 @@ class _LoginFormState extends State<LoginForm> {
   final Future<SharedPreferences> _pref = SharedPreferences.getInstance();
   final GlobalKey<FormState> _formKeyLice = GlobalKey<FormState>();
   final _formKey = GlobalKey<FormState>();
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   final _conUserId = TextEditingController();
   final _conPassword = TextEditingController();

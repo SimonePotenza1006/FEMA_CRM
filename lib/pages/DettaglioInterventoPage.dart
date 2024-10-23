@@ -60,7 +60,8 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
   DbHelper? dbHelper;
 
@@ -431,7 +432,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('${ipaddress}/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -451,7 +452,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('${ipaddress}/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -472,7 +473,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -2062,7 +2063,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     print(_selectedUtenti.toString());
     print(_finalSelectedUtenti.toString());
     try {
-      final response = await http.post(Uri.parse('${ipaddress}/api/intervento'),
+      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,

@@ -24,7 +24,8 @@ class CertificazioniPage extends StatefulWidget{
 class _CertificazioniPageState extends State<CertificazioniPage>{
 
   List<FileSystemItem> fileStructure = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String currentPath = '';
 
   @override

@@ -30,7 +30,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   List<TipologiaSpesaVeicoloModel> allTipologie = [];
   List<VeicoloModel> allVeicoli = [];
   List<SpesaVeicoloModel> allSpese = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   final TextEditingController _importoController = TextEditingController();
   final TextEditingController _kmController = TextEditingController();
   final TextEditingController _dataPolizzaController = TextEditingController();

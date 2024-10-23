@@ -36,7 +36,8 @@ class _PDFSettPageState extends State<PDFSettPage> {
   late Future<Uint8List> _pdfFuture;
   List<RelazionePreventivoProdottiModel> allProdotti = [];
   GlobalKey globalKey = GlobalKey();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<MarcaTempoModel> marcasss = [];
   int totore=0;
   List<pw.Widget> tabelleM = [];

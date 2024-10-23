@@ -19,7 +19,8 @@ class CreazioneFaseRiparazionePage extends StatefulWidget{
 }
 
 class _CreazioneFaseRiparazionePageState extends State<CreazioneFaseRiparazionePage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   TextEditingController _descrizioneController = TextEditingController();
 
   @override

@@ -27,7 +27,8 @@ class DettaglioRMAAmministrazionePage extends StatefulWidget{
 }
 
 class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministrazionePage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<UtenteModel> allUtenti = [];
   InterventoModel? interventoAssociato;
   DateTime _dataOdierna = DateTime.now();
@@ -403,7 +404,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -439,7 +440,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaDataRicon() async{
     try{
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -497,7 +498,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('${ipaddress}/api/restituzioneMerce'),
+                              Uri.parse('$ipaddress/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -567,7 +568,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('${ipaddress}/api/restituzioneMerce'),
+                              Uri.parse('$ipaddress/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -615,7 +616,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaDataRientro() async{
     try{
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -650,7 +651,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaRimborso() async{
     try{
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -1256,7 +1257,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       double? importo = double.parse(importoPreventivatoController.text);
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1303,7 +1304,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1347,7 +1348,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1391,7 +1392,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1435,7 +1436,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1481,7 +1482,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       String? dataAccettazione = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,

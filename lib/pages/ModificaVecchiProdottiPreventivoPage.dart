@@ -29,6 +29,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
   List<TextEditingController> prezziControllers = [];
   Timer? _debounce;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -550,7 +551,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
     try {
       // Chiamata POST per aggiornare il preventivo
       response = await http.post(
-        Uri.parse('${ipaddress}/api/preventivo'),
+        Uri.parse('$ipaddress/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -590,7 +591,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
           final prezzo = double.tryParse(prezziControllers[i].text);
 
           response = await http.post(
-            Uri.parse('${ipaddress}/api/relazionePreventivoProdotto'),
+            Uri.parse('$ipaddress/api/relazionePreventivoProdotto'),
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json"
