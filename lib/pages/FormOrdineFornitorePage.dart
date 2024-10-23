@@ -47,7 +47,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllProdotti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/prodotto'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ProdottoModel> prodotti = [];
@@ -69,7 +69,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -489,7 +489,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveNota() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddressProva/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : widget.utente.toMap(),
@@ -506,7 +506,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveOrdineProdottoNonPresente() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ordine'),
+        Uri.parse('$ipaddressProva/api/ordine'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -542,7 +542,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       for(var prodotto in prodottiOrdinati){
         try{
           final response = await http.post(
-            Uri.parse('$ipaddress/api/ordine'),
+            Uri.parse('$ipaddressProva/api/ordine'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'descrizione' : _descrizioneController.text,
