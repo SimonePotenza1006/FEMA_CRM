@@ -616,7 +616,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               ),
                               SizedBox(height: 20),
                               buildMenuButton(
-                                icon: Icons.remove_red_eye_outlined,
+                                icon: Icons.build,
                                 text: 'CREA INTERVENTO',
                                 onPressed: () {
                                   Navigator.push(

@@ -136,7 +136,6 @@ class _LoginFormState extends State<LoginForm> {
         getUserData()
     );
     super.initState();
-
     _loadSavedCredentials();
   }
 
@@ -147,9 +146,7 @@ class _LoginFormState extends State<LoginForm> {
     } on PlatformException {
       udid = 'Failed to get UDID.';
     }
-
     if (!mounted) return;
-
     setState(() {
       idd = udid;//_udid = udid;
     });

@@ -13,6 +13,7 @@ popolata dagli interventi della sua categoria di interventi,
 - Il tutto stampabile anche la lista degli interventi
 - Gestire la compilazione dei dati della riparazione merce in caso di intervento autoassegnato e concluso
 - Bug caricamento foto merce in riparazione
+- DettaglioMerceInRiparazioneByTecnicoPage line 843
 
 ALESSANDRO
 Se riapro un intervento non posso + vedere i dettagli, invece sarebbe utile (anche semplicemente visualizzarne un’ estrazione pdf + la consultazione degli allegati inseriti) grazie eccheccazz
@@ -71,3 +72,4 @@ SIMONE
 - Sistemare il totale dei prezzi fornitore da DettaglioInterventoPage per comprendere il prodotto tra quantità e prezzo
 - Nella redazione dell’ intervento non sarebbe meglio  che il cliente sia “in alto” sul form, prima dei dettagli sull’ intervento, e non “in basso”?
 - Aggiunta numerazione Danea su pdf rapportino, iniseme al rapportino.toUpperCase e alcuni fallOff della data
+- Risolto bug caricamento foto da creazione intervento tecnico

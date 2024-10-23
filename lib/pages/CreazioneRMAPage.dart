@@ -145,12 +145,26 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
-    if (pickedFile != null) {
-      setState(() {
-        pickedImages.add(pickedFile);
-      });
+    // Verifica se sei su Android
+    if (Platform.isAndroid) {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+      if (pickedFile != null) {
+        setState(() {
+          pickedImages.add(pickedFile);
+        });
+      }
+    }
+    // Verifica se sei su Windows
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
     }
   }
 
