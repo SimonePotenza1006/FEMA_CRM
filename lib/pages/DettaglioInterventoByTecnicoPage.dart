@@ -48,7 +48,8 @@ class DettaglioInterventoByTecnicoPage extends StatefulWidget {
 class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoByTecnicoPage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy'); // Formato della data
   final DateFormat timeFormat = DateFormat('HH:mm');
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<NotaTecnicoModel> allNote = [];
   List<RelazioneDdtProdottoModel> prodotti = [];
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
@@ -138,7 +139,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('${ipaddress}/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];

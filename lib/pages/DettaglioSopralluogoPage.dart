@@ -25,7 +25,8 @@ class DettaglioSopralluogoPage extends StatefulWidget {
 
 class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
   XFile? pickedImage;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
   List<XFile> pickedImages =  [];
   List<TipologiaInterventoModel> tipologieList = [];
@@ -34,7 +35,7 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -64,7 +65,7 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

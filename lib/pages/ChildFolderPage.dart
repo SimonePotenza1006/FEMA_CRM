@@ -18,6 +18,7 @@ class ChildFolderPage extends StatefulWidget {
 
 class _ChildFolderPageState extends State<ChildFolderPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<CartellaModel> allCartelle = [];
   List<bool> _hoverStates = [];
   Future<List<Map<String, dynamic>>>? _futureImages;

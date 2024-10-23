@@ -23,6 +23,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   List<AziendaModel> aziendeList = [];
   AziendaModel? selectedAzienda;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   bool _areFieldsFilled = false;
 
@@ -50,7 +51,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   }
 
   Future<void> createAgente() async {
-    final url = Uri.parse('${ipaddress}/api/agente');
+    final url = Uri.parse('$ipaddress/api/agente');
     final body = jsonEncode({
       'nome': nomeController.text.toString(),
       'cognome': cognomeController.text.toString(),
@@ -86,7 +87,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/azienda');
+      var apiUrl = Uri.parse('$ipaddress/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

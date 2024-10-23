@@ -18,7 +18,8 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
   final _formKey = GlobalKey<FormState>();
   final _descrizioneController = TextEditingController();
   final _prezzoController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +85,7 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
 
   Future<void> createNewListino(String descrizione, double prezzo,
       CategoriaInterventoSpecificoModel categoria) async {
-    final url = Uri.parse('${ipaddress}/api/listino');
+    final url = Uri.parse('$ipaddress/api/listino');
     final body = jsonEncode({
       'descrizione': descrizione,
       'prezzo': prezzo,

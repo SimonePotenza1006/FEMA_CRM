@@ -29,7 +29,8 @@ class PDFInterventoPage extends StatefulWidget {
 
 class _PDFInterventoPageState extends State<PDFInterventoPage> {
   late Future<Uint8List> _pdfFuture;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -195,11 +196,13 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
         ? DateFormat('HH:mm').format(DateTime.parse(orarioFine.toString()))
         : '';
 
+    var codDanea = widget.intervento.numerazione_danea != null ? widget.intervento.numerazione_danea.toString() : '';
+
     var importo = widget.intervento.importo_intervento;
 
-    var formattedDataCreazione = data != null
-        ? DateFormat('dd/MM/yyyy').format(DateTime.parse(data.toString()))
-        : '';
+    var formattedDataCreazione = widget.intervento.orario_fine != null
+        ? DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.intervento.orario_fine.toString()))
+        : (widget.intervento.data != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.intervento.data.toString())) : "");
 
     var relazione = widget.intervento.relazione_tecnico;
 
@@ -338,11 +341,18 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                             fontSize: 12,
                           ),
                         ),
+                        pw.SizedBox(height: 5),
+                        pw.Text(
+                          'CODICE DANEA: ${codDanea}',
+                          style: pw.TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     )
                   ],
                 ),
-                pw.SizedBox(height: 10),
+                pw.SizedBox(height: 15),
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
@@ -824,9 +834,9 @@ class _PDFInterventoPageState extends State<PDFInterventoPage> {
                 ),
                 // Aggiungo la row richiesta
                 pw.SizedBox(height: 30),
-                pw.Text('${widget.intervento.relazione_tecnico ?? ''}',
+                pw.Text('${widget.intervento.relazione_tecnico?.toUpperCase() ?? ''}',
                     style: pw.TextStyle(fontSize: 10)),
-                pw.SizedBox(height: 120),
+                pw.SizedBox(height: 270),
                 if(widget.intervento.conclusione_parziale == false)
                   pw.Padding(
                     padding: pw.EdgeInsets.symmetric(horizontal: 8),

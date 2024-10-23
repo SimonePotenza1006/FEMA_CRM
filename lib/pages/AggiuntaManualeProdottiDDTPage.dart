@@ -29,6 +29,7 @@ class _AggiuntaManualeProdottiDDTPageState
   late TextEditingController searchController;
   List<ProdottoModel> filteredProdottiList = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   DDTModel? ddt;
 
 
@@ -52,7 +53,7 @@ class _AggiuntaManualeProdottiDDTPageState
       debugPrint('Body della richiesta: $body', wrapWidth: 1024);
 
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/ddt'),
+        Uri.parse('$ipaddress/api/ddt'),
         body: jsonEncode(body),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -236,7 +237,7 @@ class _AggiuntaManualeProdottiDDTPageState
 
   Future<http.Response?> checkExistingDDT() async{
     try{
-      var apiUrl = Uri.parse("${ipaddress}/api/ddt/intervento/${widget.intervento.id}");
+      var apiUrl = Uri.parse("$ipaddress/api/ddt/intervento/${widget.intervento.id}");
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -254,7 +255,7 @@ class _AggiuntaManualeProdottiDDTPageState
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("${ipaddress}/api/prodotto");
+      var apiUrl = Uri.parse("$ipaddress/api/prodotto");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

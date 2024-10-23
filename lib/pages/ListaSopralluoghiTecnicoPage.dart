@@ -19,6 +19,7 @@ class ListaSopralluoghiTecnicoPage extends StatefulWidget{
 
 class _ListaSopralluoghiTecnicoPageState extends State<ListaSopralluoghiTecnicoPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<SopralluogoModel> sopralluoghiList = [];
   List<SopralluogoModel> originalSopralluoghiList = [];
   TextEditingController _searchController = TextEditingController();
@@ -201,7 +202,7 @@ class _ListaSopralluoghiTecnicoPageState extends State<ListaSopralluoghiTecnicoP
 
   Future<void> getSopralluoghiByUtente() async {
     try {
-      http.Response response = await http.get(Uri.parse('${ipaddress}/api/sopralluogo/utente/${widget.utente.id}'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/sopralluogo/utente/${widget.utente.id}'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<SopralluogoModel> sopralluoghi = [];

@@ -14,7 +14,8 @@ class ReportCommissioniPage extends StatefulWidget {
 
 class _ReportCommissioniPageState extends State<ReportCommissioniPage> {
   List<CommissioneModel> allCommissioni = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -124,7 +125,7 @@ class _ReportCommissioniPageState extends State<ReportCommissioniPage> {
 
   Future<void> getAllCommissioni() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/commissione/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/commissione/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

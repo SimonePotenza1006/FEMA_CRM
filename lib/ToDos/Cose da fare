@@ -3,23 +3,21 @@ MODIFICHE DA FARE
 
 
 - Aggiungere un alert per errore dei contachilometri nella registrazione di una nuova spesa
-
 - Aggiungere destinatario + destinazione
 - Usare calendario solo per la visualizzazioned egli interventi
 - Creare un Button sul menu tecnico per reindirizzarlo su una tabella
 popolata dagli interventi della sua categoria di interventi,
 - Gestire anche il caricamento dei PDF oltre alle immagini (Riferite ad un intervento almeno per ora)
 - Capire perchè il sorting tramite le tipologie di intervento non funzionano
-- Sistemare il totale dei prezzi fornitore da DettaglioInterventoPage per comprendere il prodotto tra quantità e prezzo
 - Quando filtro x tecnico o per categoria mi deve fare un totale agli interventi… sotto la tabella in modo da sapere i ricavi mensili x tecnico e categoria
-Il tutto stampabile anche la lista degli interventi
+- Il tutto stampabile anche la lista degli interventi
 - Gestire la compilazione dei dati della riparazione merce in caso di intervento autoassegnato e concluso
 - Bug caricamento foto merce in riparazione
 
 ALESSANDRO
 Se riapro un intervento non posso + vedere i dettagli, invece sarebbe utile (anche semplicemente visualizzarne un’ estrazione pdf + la consultazione degli allegati inseriti) grazie eccheccazz
 Nel rapportino versione desktop allegare anche pdf e non solo formati foto
-Nella redazione dell’ intervento non sarebbe meglio  che il cliente sia “in alto” sul form, prima dei dettagli sull’ intervento, e non “in basso”?
+
 
 
 
@@ -69,3 +67,7 @@ SIMONE
 - Cambiare sulla versione desktop la dicitura “scatta foto” con “allega documento”  eccheccazz
 - Possibilità di cambiare Codice Danea e data creazione da DettaglioInterventoPage
 
+23/10/23
+- Sistemare il totale dei prezzi fornitore da DettaglioInterventoPage per comprendere il prodotto tra quantità e prezzo
+- Nella redazione dell’ intervento non sarebbe meglio  che il cliente sia “in alto” sul form, prima dei dettagli sull’ intervento, e non “in basso”?
+- Aggiunta numerazione Danea su pdf rapportino, iniseme al rapportino.toUpperCase e alcuni fallOff della data

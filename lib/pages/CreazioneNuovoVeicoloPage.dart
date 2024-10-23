@@ -42,7 +42,8 @@ class _CreazioneNuovoVeicoloPageState extends State<CreazioneNuovoVeicoloPage> {
   DateTime? _selectedSostituzioneDate;
   DateTime? _selectedGpsDate;
 
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller, DateTime? selectedDate, void Function(DateTime?) setSelectedDate) async {
     final DateTime? picked = await showDatePicker(
@@ -76,7 +77,7 @@ class _CreazioneNuovoVeicoloPageState extends State<CreazioneNuovoVeicoloPage> {
       }
 
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/veicolo'),
+        Uri.parse('$ipaddress/api/veicolo'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione': _descrizioneController.text,

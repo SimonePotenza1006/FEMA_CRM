@@ -18,7 +18,8 @@ class DettaglioSpesaVeicoloPage extends StatefulWidget{
 }
 
 class _DettaglioSpesaSivisPageState extends State<DettaglioSpesaVeicoloPage> {
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Uint8List? _image;
 
   @override

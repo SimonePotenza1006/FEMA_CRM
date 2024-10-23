@@ -36,7 +36,8 @@ class HomeFormTecnicoNewPage extends StatefulWidget{
 
 class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   DateTime selectedDate = DateTime.now();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
   // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -76,7 +77,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -100,7 +101,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -143,7 +144,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];

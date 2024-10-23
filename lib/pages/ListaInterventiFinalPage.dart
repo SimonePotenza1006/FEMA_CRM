@@ -29,7 +29,8 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
   TextEditingController _noteController = TextEditingController();
   TextEditingController _importoGruppoController = TextEditingController();
   bool isSearching = false;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<InterventoModel> filteredInterventi = [];
   List<InterventoModel> allInterventi = [];
   List<GruppoInterventiModel> allGruppiNonConclusi = [];
@@ -1496,7 +1497,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1544,7 +1545,7 @@ class _ListaInterventiFinalPageState extends State<ListaInterventiFinalPage>{
   Future<void> saveImporto(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1607,7 +1608,8 @@ class GruppiConcTableWidget extends StatelessWidget {
   });
 
   final TextEditingController _importoGruppoController = TextEditingController();
-  final String ipaddress = 'http://gestione.femasistemi.it:8090';
+  final String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Map<String, double> _calculateGroupImportoSum(List<InterventoModel> interventi, List<GruppoInterventiModel> gruppi) {
     Map<String, double> groupImportoSum = {};
@@ -1754,7 +1756,8 @@ class GruppiTableWidget extends StatelessWidget {
     required this.setState,});
 
   final TextEditingController _importoGruppoController = TextEditingController();
-  final String ipaddress = 'http://gestione.femasistemi.it:8090';
+  final String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Map<String, double> _calculateGroupImportoSum(List<InterventoModel> interventi, List<GruppoInterventiModel> gruppi) {
     Map<String, double> groupImportoSum = {};

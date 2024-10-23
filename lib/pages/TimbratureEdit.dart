@@ -32,6 +32,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
   bool _isSigned = false;
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String dataOdierna = DateFormat('dd-MM-yyyy, HH:mm')
       .format(DateTime.now())
       .toString();
@@ -424,7 +425,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempoDataUtente(DateTime data, String utenteid) async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/marcatempo');
+      var apiUrl = Uri.parse('$ipaddress/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -465,7 +466,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempoToday() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/marcatempo/pres/1/2');
+      var apiUrl = Uri.parse('$ipaddress/marcatempo/pres/1/2');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -511,7 +512,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempoMonth(int current) async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/marcatempo');
+      var apiUrl = Uri.parse('$ipaddress/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -556,7 +557,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempo() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/marcatempo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/marcatempo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -621,7 +622,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         print(DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String()+' '+DateTime.now().toIso8601String());
 
         final response1 = await http.post(
-          Uri.parse('${ipaddress}/marcatempo'),
+          Uri.parse('$ipaddress/marcatempo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : row.idmt,
@@ -646,7 +647,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         var response3;
         if (row.idmt2 != null) {
           response2 = await http.post(
-            Uri.parse('${ipaddress}/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : row.idmt2,
@@ -669,7 +670,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         } else if (row.oraIngresso2 != null && row.oraIngresso2 != '') {
           print('3');
           response3 = await http.post(
-            Uri.parse('${ipaddress}/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : '',
@@ -756,7 +757,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           var response2 = null;
           var response3 = null;
           final response = await http.post(
-            Uri.parse('${ipaddress}/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : '',
@@ -800,7 +801,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('${ipaddress}/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,

@@ -26,7 +26,8 @@ class _ListaPreventiviTecnicoPageState
   List<PreventivoModel> preventiviList = [];
   bool isLoading = true;
   double totalCommission = 0.0;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -274,7 +275,7 @@ class _ListaPreventiviTecnicoPageState
       await findAgente();
       String? agenteId = agente?.id;
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/preventivo/ordered'));
+          .get(Uri.parse('$ipaddress/api/preventivo/ordered'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<PreventivoModel> allPreventiviByAgente = [];
@@ -303,7 +304,7 @@ class _ListaPreventiviTecnicoPageState
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

@@ -20,7 +20,8 @@ class DettaglioGruppoInterventiPage extends StatefulWidget {
 }
 
 class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoInterventiPage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<InterventoModel> filteredInterventi = [];
   List<InterventoModel> allInterventi = [];
   bool isLoading = true;
@@ -131,7 +132,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
   Future<void> saveImporto(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

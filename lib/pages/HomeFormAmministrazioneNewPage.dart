@@ -70,6 +70,7 @@ class _HomeFormAmministrazioneNewPageState
   List<CommissioneModel> allCommissioni = [];
   final AppointmentDataSource _appointmentDataSource = AppointmentDataSource([]);
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<TipologiaInterventoModel> allTipologie = [];
   List<UtenteModel> allUtenti = [];
   Map<String, bool> _publishedNotes = {};
@@ -266,7 +267,7 @@ class _HomeFormAmministrazioneNewPageState
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -290,7 +291,7 @@ class _HomeFormAmministrazioneNewPageState
     try {
       String userId = widget.userData.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -314,7 +315,7 @@ class _HomeFormAmministrazioneNewPageState
     try {
       String userId = widget.userData.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -617,7 +618,7 @@ class _HomeFormAmministrazioneNewPageState
   Future<List<NotaTecnicoModel>> getNote() async {
     try {
       http.Response response = await http.get(
-          Uri.parse('${ipaddress}/api/noteTecnico/ordered'),
+          Uri.parse('$ipaddress/api/noteTecnico/ordered'),
       );
 
       if (response.statusCode == 200) {

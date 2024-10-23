@@ -20,7 +20,8 @@ class TableSopralluoghiPage extends StatefulWidget{
 }
 
 class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late SopralluogoDataSource _dataSource;
   List<SopralluogoModel> sopralluoghiList = [];
   List<UtenteModel> utentiList =[];
@@ -69,7 +70,7 @@ class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -120,7 +121,7 @@ class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
 
   Future<void> getAllSopralluoghi() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/sopralluogo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/sopralluogo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

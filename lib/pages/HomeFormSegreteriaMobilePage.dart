@@ -42,6 +42,7 @@ class HomeFormSegreteriaMobilePage extends StatefulWidget{
 class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobilePage>{
   DateTime selectedDate = DateTime.now();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String formattedDate = intl.DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
   int _lastClickedIndex = 0;
@@ -76,7 +77,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -100,7 +101,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/merceInRiparazione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/merceInRiparazione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<MerceInRiparazioneModel> allMerceByUtente = [];
@@ -124,7 +125,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -148,7 +149,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];

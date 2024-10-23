@@ -24,6 +24,7 @@ class _DettaglioTipologiePageState extends State<DettaglioTipologiePage> {
   List<CategoriaInterventoSpecificoModel> allCategorieForTipologia = [];
   bool isLoading = true;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -81,7 +82,7 @@ class _DettaglioTipologiePageState extends State<DettaglioTipologiePage> {
   Future<void> getAllCategorieForTipologia() async {
     try {
       final response = await http.get(Uri.parse(
-          '${ipaddress}/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
+          '$ipaddress/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

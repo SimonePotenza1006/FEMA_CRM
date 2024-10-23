@@ -20,7 +20,8 @@ class TableGruppiPage extends StatefulWidget{
 }
 
 class _TableGruppiPageState extends State<TableGruppiPage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late GruppoDataSource _dataSource;
   List<GruppoInterventiModel> allGruppi =[];
   Map<String, double> _columnWidths = {
@@ -244,7 +245,8 @@ class _TableGruppiPageState extends State<TableGruppiPage>{
 class GruppoDataSource extends DataGridSource{
   List<GruppoInterventiModel> _gruppi =[];
   BuildContext context;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   TextEditingController importoController = TextEditingController();
 
   GruppoDataSource(this.context, List<GruppoInterventiModel> gruppi){
@@ -342,7 +344,7 @@ class GruppoDataSource extends DataGridSource{
   Future<void> saveImporto(GruppoInterventiModel gruppo) async {
     try {
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/gruppi'),
+        Uri.parse('$ipaddress/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': gruppo.id,

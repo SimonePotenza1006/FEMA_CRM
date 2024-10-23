@@ -21,6 +21,7 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   final TextEditingController sitoController = TextEditingController();
   final TextEditingController telefonoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   bool _areFieldsFilled = false;
 
@@ -44,7 +45,7 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   }
 
   Future<void> createAzienda() async {
-    final url = Uri.parse('${ipaddress}/api/azienda');
+    final url = Uri.parse('$ipaddress/api/azienda');
     final body = jsonEncode({
       'nome': denominazioneController.text.toString(),
       'luogo_di_lavoro': luogoLavoroController.text.toString(),

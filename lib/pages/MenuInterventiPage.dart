@@ -175,7 +175,7 @@ class MenuPainter extends CustomPainter {
   MenuPainter(this.onHover, this.onHoverExit, this.context, {required this.size, required this.hoveredIndex});
 
   final List<MenuItem> _menuItems = [
-    MenuItem(icon: Icons.list_outlined, label: 'LISTA INTERVENTI'),
+    MenuItem(icon: Icons.list, label: 'LISTA INTERVENTI'),
     MenuItem(icon: Icons.playlist_add, label: 'CREA INTERVENTO'),
     MenuItem(icon: Icons.groups, label: 'GRUPPI DI INTERVENTO')
   ];

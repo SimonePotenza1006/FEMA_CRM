@@ -30,7 +30,8 @@ class _ModificaDettaglioProdottoPageState
   final TextEditingController _qtaGiacenzaController = TextEditingController();
   final TextEditingController _ultimoCostoAcquistoController =
       TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -61,7 +62,7 @@ class _ModificaDettaglioProdottoPageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('${ipaddress}/api/prodotto'),
+        Uri.parse('$ipaddress/api/prodotto'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"

@@ -26,7 +26,8 @@ class DettaglioMerceInRiparazioneAmministrazionePage extends StatefulWidget{
 }
 
 class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<DettaglioMerceInRiparazioneAmministrazionePage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<UtenteModel> allUtenti = [];
   InterventoModel? interventoAssociato;
   UtenteModel? selectedUtente;
@@ -580,7 +581,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       double? importo = double.parse(importoPreventivatoController.text);
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -627,7 +628,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -671,7 +672,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -715,7 +716,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -759,7 +760,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -805,7 +806,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       String? dataAccettazione = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,

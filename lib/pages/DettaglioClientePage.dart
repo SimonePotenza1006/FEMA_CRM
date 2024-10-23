@@ -22,7 +22,8 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   DbHelper? dbHelper;
   List<ClienteModel> allClienti = [];
   List<PosizioneGPSModel> allPosizioni = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -261,7 +262,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   Future<void> deleteCliente(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('${ipaddress}/api/cliente/$id'),
+        Uri.parse('$ipaddress/api/cliente/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

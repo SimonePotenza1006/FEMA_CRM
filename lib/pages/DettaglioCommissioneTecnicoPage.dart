@@ -20,7 +20,8 @@ class DettaglioCommissioneTecnicoPage extends StatefulWidget {
 
 class _DettaglioCommissioneTecnicoPageState
     extends State<DettaglioCommissioneTecnicoPage> {
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +93,7 @@ class _DettaglioCommissioneTecnicoPageState
   }
 
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('${ipaddress}/api/commissione');
+    final url = Uri.parse('$ipaddress/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),

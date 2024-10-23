@@ -30,6 +30,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
   final _datiController = TextEditingController();
   bool _preventivoRichiesto = false;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<XFile> pickedImages =  [];
   List<UtenteModel> allUtenti =[];
   List<ClienteModel> clientiList = [];
@@ -224,7 +225,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
   }
 
   Future<void> createMerce() async{
-    final url = Uri.parse('${ipaddress}/api/merceInRiparazione');
+    final url = Uri.parse('$ipaddress/api/merceInRiparazione');
     final body = jsonEncode({
       'data' : DateTime.now().toIso8601String(),
       'articolo' : _articoloController.text,

@@ -29,7 +29,8 @@ class PDFRendicontoMensilePreventiviPage extends StatefulWidget {
 
 class _PDFRendicontoMensilePreventiviPageState
     extends State<PDFRendicontoMensilePreventiviPage> {
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late Future<Uint8List> _pdfFuture;
   List<AgenteModel> allAgenti = [];
   Map<String, List<PreventivoModel>> preventiviPerAgenteMap = {};
@@ -246,7 +247,7 @@ class _PDFRendicontoMensilePreventiviPageState
   Future<void> getAllAgenti() async {
     try {
       print('Recupero agenti...');
-      var apiUrl = Uri.parse('${ipaddress}/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -301,7 +302,7 @@ class _PDFRendicontoMensilePreventiviPageState
   Future<void> getAllPreventiviForAgente(String agenteId) async {
     print('Inizio getAllPreventiviForAgente per agente $agenteId');
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/preventivo/agente/$agenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/preventivo/agente/$agenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

@@ -20,7 +20,8 @@ class _AssegnazioneCommissionePageState
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final TextEditingController _dataController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   // Selected user
   UtenteModel? selectedUser;
@@ -172,7 +173,7 @@ class _AssegnazioneCommissionePageState
         _dataController.text)); // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/commissione'),
+        Uri.parse('$ipaddress/api/commissione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': formattedDate, // Utilizza la data formattata
@@ -195,7 +196,7 @@ class _AssegnazioneCommissionePageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

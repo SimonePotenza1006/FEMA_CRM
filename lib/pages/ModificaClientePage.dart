@@ -34,7 +34,8 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
   late TextEditingController _emailController;
   late TextEditingController _pecController;
   late TextEditingController _noteController;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   io.File? selectedFile;
 
   @override
@@ -210,7 +211,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
     try {
       // Prima aggiorna il cliente esistente
       response = await http.put(
-        Uri.parse('${ipaddress}/api/cliente/${widget.cliente.id}'),
+        Uri.parse('$ipaddress/api/cliente/${widget.cliente.id}'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -262,7 +263,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
       // Crea una richiesta multipart per l'upload del file
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('${ipaddress}/pdfu/certificazioni/clienti'),
+        Uri.parse('$ipaddress/pdfu/certificazioni/clienti'),
       );
 
       // Aggiungi il nome del cliente come parametro

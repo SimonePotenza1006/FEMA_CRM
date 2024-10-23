@@ -18,7 +18,8 @@ class TableAccessiApplicazionePage extends StatefulWidget {
 
 class _TableAccessiApplicazionePageState
     extends State<TableAccessiApplicazionePage> {
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late IngressoDataSource _dataSource;
   List<IngressoModel> allIngressi = [];
   Map<String, double> _columnWidths = {

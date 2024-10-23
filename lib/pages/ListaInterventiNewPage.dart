@@ -30,7 +30,8 @@ class _ListaInterventiNewPageState extends State<ListaInterventiNewPage>{
   TextEditingController searchController = TextEditingController();
   TextEditingController importoController = TextEditingController();
   bool isSearching = false;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllGruppi() async {
     try{
@@ -881,7 +882,7 @@ class _ListaInterventiNewPageState extends State<ListaInterventiNewPage>{
   Future<void> saveImporto(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

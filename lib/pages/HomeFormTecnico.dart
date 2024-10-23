@@ -34,7 +34,8 @@ class HomeFormTecnico extends StatefulWidget {
 
 class _HomeFormTecnicoState extends State<HomeFormTecnico> {
   DateTime selectedDate = DateTime.now();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
 
 
@@ -69,7 +70,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -93,7 +94,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/merceInRiparazione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/merceInRiparazione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<MerceInRiparazioneModel> allMerceByUtente = [];
@@ -117,7 +118,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -141,7 +142,7 @@ class _HomeFormTecnicoState extends State<HomeFormTecnico> {
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('${ipaddress}/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];

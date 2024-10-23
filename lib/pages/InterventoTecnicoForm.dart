@@ -53,6 +53,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   TextEditingController _descrizioneController = TextEditingController();
   TipologiaInterventoModel? _selectedTipologia;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   GlobalKey<SfSignaturePadState> _signaturePadKey =
   GlobalKey<SfSignaturePadState>();
   Uint8List? signatureBytes;
@@ -82,7 +83,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllTipologie() async {
     try {
       final response =
-          await http.get(Uri.parse('${ipaddress}/api/tipologiaIntervento'));
+          await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -105,7 +106,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     try {
       if (_selectedTipologia != null) {
         final response = await http.get(Uri.parse(
-            '${ipaddress}/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
+            '$ipaddress/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
         if (response.statusCode == 200) {
           var jsonData = jsonDecode(response.body);
           List<CategoriaInterventoSpecificoModel> categorie = [];
@@ -179,12 +180,54 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('DATA: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
-              ElevatedButton(
-                onPressed: _selezionaData,
-                style: ElevatedButton.styleFrom(primary: Colors.red),
-                child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
+              GestureDetector(
+                onTap: () {
+                  _showClientiDialog();
+                },
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedCliente?.denominazione ?? 'SELEZIONA CLIENTE',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
               ),
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  _showDestinazioniDialog();
+                },
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedDestinazione?.denominazione ?? 'SELEZIONA DESTINAZIONE',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 30),
+              Text('DATA: ${_dataOdierna.day}/${_dataOdierna.month}/${_dataOdierna.year}'),
+              SizedBox(
+                width: 300,
+                child: ElevatedButton(
+                  onPressed: _selezionaData,
+                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _descrizioneController,
                 decoration: const InputDecoration(labelText: 'DESCRIZIONE'),
@@ -357,43 +400,6 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
                 },
               ),
               SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  _showClientiDialog();
-                },
-                child: SizedBox(
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        selectedCliente?.denominazione ?? 'SELEZIONA CLIENTE',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  _showDestinazioniDialog();
-                },
-                child: SizedBox(
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        selectedDestinazione?.denominazione ?? 'SELEZIONA DESTINAZIONE',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-              ),
               if(_selectedTipologia?.descrizione == "Riparazione Merce")
                 Center(
                   child: Column(
@@ -584,7 +590,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
             // Effettuiamo la richiesta HTTP con i dati appropriati in base allo stato della checkbox
             final response = await http.post(
-              Uri.parse('${ipaddress}/api/intervento'),
+              Uri.parse('$ipaddress/api/intervento'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'numerazione_danea' : null,
@@ -827,63 +833,111 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
   void _showClientiListDialog() {
     TextEditingController searchController = TextEditingController();
+    List<ClienteModel> filteredClientiList = clientiList; // Inizializzazione della lista filtrata
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'SELEZIONA CLIENTE',
-            textAlign: TextAlign.center,
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      filteredClientiList = clientiList
-                          .where((cliente) => cliente.denominazione!
-                          .toLowerCase()
-                          .contains(value.toLowerCase()))
-                          .toList();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'CERCA CLIENTE',
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: filteredClientiList.map((cliente) {
-                        return ListTile(
-                          leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione!),
-                          onTap: () {
-                            setState(() {
-                              selectedCliente = cliente;
-                              getAllDestinazioniByCliente(cliente.id!);
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }).toList(),
+        return StatefulBuilder(
+          builder: (context, setState) { // Usa StatefulBuilder per gestire lo stato nel dialog
+            return AlertDialog(
+              title: Text(
+                'SELEZIONA CLIENTE',
+                textAlign: TextAlign.center,
+              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        // Aggiorna lo stato del dialogo, non del widget genitore
+                        setState(() {
+                          filteredClientiList = clientiList.where((cliente) {
+                            final denominazione = cliente.denominazione?.toLowerCase() ?? '';
+                            final codice_fiscale = cliente.codice_fiscale?.toLowerCase() ?? '';
+                            final partita_iva = cliente.partita_iva?.toLowerCase() ?? '';
+                            final telefono = cliente.telefono?.toLowerCase() ?? '';
+                            final cellulare = cliente.cellulare?.toLowerCase() ?? '';
+                            final citta = cliente.citta?.toLowerCase() ?? '';
+                            final email = cliente.email?.toLowerCase() ?? '';
+                            final cap = cliente.cap?.toLowerCase() ?? '';
+
+                            return denominazione.contains(value.toLowerCase()) ||
+                                codice_fiscale.contains(value.toLowerCase()) ||
+                                partita_iva.contains(value.toLowerCase()) ||
+                                telefono.contains(value.toLowerCase()) ||
+                                cellulare.contains(value.toLowerCase()) ||
+                                citta.contains(value.toLowerCase()) ||
+                                email.contains(value.toLowerCase()) ||
+                                cap.contains(value.toLowerCase());
+                          }).toList();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'CERCA CLIENTE',
+                        prefixIcon: Icon(Icons.search),
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: filteredClientiList.map((cliente) {
+                            return ListTile(
+                              leading: Icon(Icons.contact_page_outlined),
+                              title: Text(cliente.denominazione!),
+                              onTap: () {
+                                setState(() {
+                                  selectedCliente = cliente;
+                                  getAllDestinazioniByCliente(cliente.id!);
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
+
+
+// Metodo di filtro (aggiorna filteredClientiList con i clienti filtrati)
+  void filterClienti(String query) {
+    setState(() {
+      filteredClientiList = clientiList.where((cliente) {
+        final denominazione = cliente.denominazione?.toLowerCase() ?? '';
+        final codice_fiscale = cliente.codice_fiscale?.toLowerCase() ?? '';
+        final partita_iva = cliente.partita_iva?.toLowerCase() ?? '';
+        final telefono = cliente.telefono?.toLowerCase() ?? '';
+        final cellulare = cliente.cellulare?.toLowerCase() ?? '';
+        final citta = cliente.citta?.toLowerCase() ?? '';
+        final email = cliente.email?.toLowerCase() ?? '';
+        final cap = cliente.cap?.toLowerCase() ?? '';
+
+        return denominazione.contains(query.toLowerCase()) ||
+            codice_fiscale.contains(query.toLowerCase()) ||
+            partita_iva.contains(query.toLowerCase()) ||
+            telefono.contains(query.toLowerCase()) ||
+            cellulare.contains(query.toLowerCase()) ||
+            citta.contains(query.toLowerCase()) ||
+            email.contains(query.toLowerCase()) ||
+            cap.contains(query.toLowerCase());
+      }).toList();
+    });
+  }
+
 
   Widget _buildImagePreview() {
     return SizedBox(
@@ -944,7 +998,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
       final response = await http
-          .get(Uri.parse('${ipaddress}/api/destinazione/cliente/$clientId'));
+          .get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -1103,7 +1157,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
       // Effettuiamo la richiesta HTTP con i dati appropriati in base allo stato della checkbox
       final response = await http.post(
-        Uri.parse('${ipaddress}/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'numerazione_danea' : null,
@@ -1212,7 +1266,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -1237,7 +1291,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllVeicoli() async {
     try {
       http.Response response =
-          await http.get(Uri.parse('${ipaddress}/api/veicolo'));
+          await http.get(Uri.parse('$ipaddress/api/veicolo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<VeicoloModel> allVeicoli = [];

@@ -31,6 +31,7 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
   late List<TextEditingController> quantityControllers;
   late Timer _debounce;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<RelazionePreventivoProdottiModel> allProdotti = [];
 
   @override
@@ -345,7 +346,7 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '${ipaddress}/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -393,7 +394,7 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
     try {
       // Chiamata POST per aggiornare il preventivo
       response = await http.post(
-        Uri.parse('${ipaddress}/api/preventivo'),
+        Uri.parse('$ipaddress/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -430,7 +431,7 @@ class _ModificaSelezioneProdottiPreventivoByAgentePageState
           final quantita = quantitaProdotti[i];
 
           response = await http.post(
-            Uri.parse('${ipaddress}/api/relazionePreventivoProdotto'),
+            Uri.parse('$ipaddress/api/relazionePreventivoProdotto'),
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json"

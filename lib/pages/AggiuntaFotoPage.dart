@@ -20,6 +20,7 @@ class AggiuntaFotoPage extends StatefulWidget {
 class _AggiuntaFotoPageState extends State<AggiuntaFotoPage> {
   List<XFile> pickedImages = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();

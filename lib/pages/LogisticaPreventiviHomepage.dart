@@ -28,7 +28,8 @@ class LogisticaPreventiviHomepage extends StatefulWidget {
 class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepage> {
 
   int _hoveredIndex = -1;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<PreventivoModel> preventiviList = [];
   ScrollController _verticalScrollController = ScrollController();
   ScrollController _horizontalScrollController = ScrollController();
@@ -49,7 +50,7 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
 
   Future<void> getAllPreventivi() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/preventivo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/preventivo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

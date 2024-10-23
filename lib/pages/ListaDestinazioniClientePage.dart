@@ -24,7 +24,8 @@ class _ListaDestinazioniClientePageState
   DbHelper? dbHelper;
   List<DestinazioneModel> allDestinazioniByCliente = [];
   bool isLoading = true;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -87,7 +88,7 @@ class _ListaDestinazioniClientePageState
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '${ipaddress}/api/destinazione/cliente/${widget.cliente.id}'));
+          '$ipaddress/api/destinazione/cliente/${widget.cliente.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

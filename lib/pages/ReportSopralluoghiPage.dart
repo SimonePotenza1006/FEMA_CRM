@@ -21,7 +21,8 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
   bool _isSearchActive = false;
   String? _filterValue;
   bool _isFilterButtonPressed = false;
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -199,7 +200,7 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
 
   Future<void> getAllSopralluoghi() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/sopralluogo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/sopralluogo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

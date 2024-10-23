@@ -16,7 +16,8 @@ class TableMerceInRiparazionePage extends StatefulWidget{
 }
 
 class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<MerceInRiparazioneModel> _allMerce = [];
   late MerceDataSource _dataSource;
   Map<String, double> _columnWidths = {

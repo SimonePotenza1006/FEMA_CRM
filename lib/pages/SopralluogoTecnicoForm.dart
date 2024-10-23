@@ -32,7 +32,8 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
   TipologiaInterventoModel? selectedTipologia;
   final TextEditingController indirizzoController = TextEditingController(); // Aggiunto controller per il campo indirizzo
   final TextEditingController descrizioneController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
@@ -358,7 +359,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
     late http.Response response;
     try {
       response =
-      await http.post(Uri.parse('${ipaddress}/api/sopralluogo'),
+      await http.post(Uri.parse('$ipaddress/api/sopralluogo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data': DateTime.now().toIso8601String(),
@@ -384,7 +385,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -416,7 +417,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('${ipaddress}/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

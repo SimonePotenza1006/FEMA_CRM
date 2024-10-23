@@ -37,6 +37,7 @@ import '../model/VeicoloModel.dart';
 class DbHelper{
 
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
 
   List<OrdinePerInterventoModel> allOrdini = [];
@@ -483,55 +484,6 @@ class DbHelper{
     }
   }
 
-
-  // Future<List<ClienteModel>> getAllClienti() async{
-  //   try{
-  //     http.Response response = await http.get(Uri.parse('$ipaddress/api/cliente'));
-  //     var responseData = json.decode(response.body.toString());
-  //     if (response.statusCode == 200) {
-  //       List<ClienteModel> clienti = [];
-  //       for(var singoloCliente in responseData){
-  //         List<TipologiaInterventoModel>? tipologieIntervento;
-  //         if (singoloCliente['tipologie_interventi'] != null) {
-  //           tipologieIntervento = (singoloCliente['tipologie_interventi'] as List<dynamic>)
-  //               .map((data) => TipologiaInterventoModel.fromJson(data))
-  //               .toList();
-  //         }
-  //         ClienteModel cliente = ClienteModel(
-  //           singoloCliente['id'],
-  //           singoloCliente['codice_fiscale'].toString(),
-  //           singoloCliente['partita_iva'].toString(),
-  //           singoloCliente['denominazione'].toString(),
-  //           singoloCliente['indirizzo'].toString(),
-  //           singoloCliente['cap'].toString(),
-  //           singoloCliente['citta'].toString(),
-  //           singoloCliente['provincia'].toString(),
-  //           singoloCliente['nazione'].toString(),
-  //           singoloCliente['recapito_fatturazione_elettronica'].toString(),
-  //           singoloCliente['riferimento_amministrativo'].toString(),
-  //           singoloCliente['referente'].toString(),
-  //           singoloCliente['fax'].toString(),
-  //           singoloCliente['telefono'].toString(),
-  //           singoloCliente['cellulare'].toString(),
-  //           singoloCliente['email'].toString(),
-  //           singoloCliente['pec'].toString(),
-  //           singoloCliente['note'].toString(),
-  //           singoloCliente['note_tecnico'].toString(),
-  //           tipologieIntervento,
-  //         );
-  //         clienti.add(cliente);
-  //       }
-  //       return clienti;
-  //     }
-  //     else{
-  //       throw Exception('Failed to load clienti!');
-  //     }
-  //   }
-  //   catch(e){
-  //     print('Errore in get all clientiç $e');
-  //     throw Exception(e);
-  //   }
-  // }
 
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
