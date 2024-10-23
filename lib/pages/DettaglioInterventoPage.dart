@@ -1963,6 +1963,10 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     return dateTime.toIso8601String();
   }
 
+  Future<void> saveModificheMerce() async{
+    
+  }
+
   Future<void> saveModifiche() async {
     // If _selectedTimeAppuntamento is not null, convert TimeOfDay to DateTime, else use widget.intervento.orario_appuntamento
     DateTime? orario;

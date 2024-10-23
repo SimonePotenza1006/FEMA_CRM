@@ -961,59 +961,80 @@ class _CreazioneInterventoByAmministrazionePageState
 
   void _showClientiListDialog() {
     TextEditingController searchController = TextEditingController();
+    List<ClienteModel> filteredClientiList = clientiList; // Inizializzazione della lista filtrata
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'SELEZIONA CLIENTE',
-            textAlign: TextAlign.center,
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      filteredClientiList = clientiList
-                          .where((cliente) => cliente.denominazione!
-                          .toLowerCase()
-                          .contains(value.toLowerCase()))
-                          .toList();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'CERCA CLIENTE',
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: filteredClientiList.map((cliente) {
-                        return ListTile(
-                          leading: Icon(Icons.contact_page_outlined),
-                          title: Text(cliente.denominazione!),
-                          onTap: () {
-                            setState(() {
-                              selectedCliente = cliente;
-                              getAllDestinazioniByCliente(cliente.id!);
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }).toList(),
+        return StatefulBuilder(
+          builder: (context, setState) { // Usa StatefulBuilder per gestire lo stato nel dialog
+            return AlertDialog(
+              title: Text(
+                'SELEZIONA CLIENTE',
+                textAlign: TextAlign.center,
+              ),
+              contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        // Aggiorna lo stato del dialogo, non del widget genitore
+                        setState(() {
+                          filteredClientiList = clientiList.where((cliente) {
+                            final denominazione = cliente.denominazione?.toLowerCase() ?? '';
+                            final codice_fiscale = cliente.codice_fiscale?.toLowerCase() ?? '';
+                            final partita_iva = cliente.partita_iva?.toLowerCase() ?? '';
+                            final telefono = cliente.telefono?.toLowerCase() ?? '';
+                            final cellulare = cliente.cellulare?.toLowerCase() ?? '';
+                            final citta = cliente.citta?.toLowerCase() ?? '';
+                            final email = cliente.email?.toLowerCase() ?? '';
+                            final cap = cliente.cap?.toLowerCase() ?? '';
+
+                            return denominazione.contains(value.toLowerCase()) ||
+                                codice_fiscale.contains(value.toLowerCase()) ||
+                                partita_iva.contains(value.toLowerCase()) ||
+                                telefono.contains(value.toLowerCase()) ||
+                                cellulare.contains(value.toLowerCase()) ||
+                                citta.contains(value.toLowerCase()) ||
+                                email.contains(value.toLowerCase()) ||
+                                cap.contains(value.toLowerCase());
+                          }).toList();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'CERCA CLIENTE',
+                        prefixIcon: Icon(Icons.search),
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: filteredClientiList.map((cliente) {
+                            return ListTile(
+                              leading: Icon(Icons.contact_page_outlined),
+                              title: Text(cliente.denominazione!),
+                              onTap: () {
+                                setState(() {
+                                  selectedCliente = cliente;
+                                  getAllDestinazioniByCliente(cliente.id!);
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
