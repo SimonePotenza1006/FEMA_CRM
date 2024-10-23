@@ -21,6 +21,7 @@ import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
 import 'CalendarioPage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
+import 'InterventoTecnicoForm.dart';
 import 'MenuSopralluoghiTecnicoPage.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 
@@ -609,6 +610,17 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) => MenuSopralluoghiTecnicoPage(utente: widget.userData!)),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              buildMenuButton(
+                                icon: Icons.remove_red_eye_outlined,
+                                text: 'CREA INTERVENTO',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => InterventoTecnicoForm(userData: widget.userData!)),
                                   );
                                 },
                               ),

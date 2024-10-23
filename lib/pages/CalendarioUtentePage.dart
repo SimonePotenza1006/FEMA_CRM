@@ -42,7 +42,7 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
 
   Future<void> fetchData() async {
     print('fetchData chiamato');
-    await getAllInterventiByUtente();
+    await getAllInterventiBySettore();//getAllInterventiByUtente();
     await getAllCommissioniByUtente();
     combineAppointments();
   }
@@ -188,20 +188,34 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
                           Appointment appointment = details.appointments.elementAt(index)!;
                           return GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    if (appointment.recurrenceId is InterventoModel) {
-                                      InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                      return DettaglioInterventoByTecnicoPage(utente: widget.utente!, intervento: intervento);
-                                    } else {
-                                      CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
-                                      return DettaglioCommissioneTecnicoPage(commissione: commissione);
-                                    }
-                                  },
-                                ),
-                              );
+                              if (appointment.recurrenceId is InterventoModel) {
+                                if ((appointment.recurrenceId as InterventoModel).utente!.id == widget.utente!.id)
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+
+                                          InterventoModel intervento = appointment.recurrenceId as InterventoModel;
+                                          return DettaglioInterventoByTecnicoPage(
+                                              utente: widget.utente!, intervento: intervento);
+
+                                        }
+
+                                    ),
+                                  );
+                              else null;
+                            } else
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+
+                                    CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
+                                    return DettaglioCommissioneTecnicoPage(commissione: commissione);
+
+                                },
+                              ),
+                            );
                             },
                             child: Container(
                               margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
@@ -300,9 +314,36 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
     }
   }
 
+  Future<void> getAllInterventiBySettore() async {
+    try {
+      print('getAllInterventiBySettore chiamato');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.utente!.tipologia_intervento!.id.toString());
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        print('getAllInterventiByUtente: successo, status code: ${response.statusCode}');
+        var jsonData = jsonDecode(response.body);
+        List<InterventoModel> interventi = [];
+        for (var item in jsonData) {
+          if (InterventoModel.fromJson(item).data != null && InterventoModel.fromJson(item).utente != null) //solo gli interventi con data e utente
+          interventi.add(InterventoModel.fromJson(item));
+        }
+        setState(() {
+          allInterventiByUtente = interventi;
+        });
+      } else {
+        print('getAllInterventiBySettore: fallita con status code ${response.statusCode}');
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API getAllInterventi: $e');
+    }
+  }
+
+
   void combineAppointments() {
     appointments = [];
     appointments.addAll(allInterventiByUtente.map((intervento) {
+      print('ut: '+intervento.utente!.toString()+' '+widget.utente.toString());
       DateTime startTime = intervento.data!;
       DateTime endTime = startTime.add(Duration(hours: 1));
       String? utente = intervento.utente != null ? intervento.utente?.nomeCompleto() : 'NON ASSEGNATO';
@@ -312,7 +353,7 @@ class _CalendarioUtentePageState extends State<CalendarioUtentePage> {
         endTime: endTime,
         subject: "${intervento.descrizione}",
         recurrenceId: intervento,
-        color: Colors.red,
+        color: intervento.utente!.id == widget.utente!.id ? Colors.red : Colors.grey,
         concluso: intervento.concluso, // Aggiunto per tracciare lo stato 'concluso'
       );
     }).toList());
