@@ -27,12 +27,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     'difetto' : 300,
     'richiesta_preventivo' : 80,
     'importo_preventivato' : 120,
-    'data_presa_in_carico' : 120,
-    'data_comunica_preventivo' : 120,
     'preventivo_accettato' : 80,
-    'data_accettazione_preventivo' : 120,
     'data_conclusione' : 120,
-    'prodotti_installati' : 300,
     'data_consegna' : 120
   };
 
@@ -76,111 +72,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
-          MouseRegion(
-            onEnter: (event) {
-              showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Legenda colori:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 8),
-                            Text('Presenza in magazzino'),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.grey[300],
-                            ),
-                            SizedBox(width: 8),
-                            Text('Presa in carico'),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.orange[300],
-                            ),
-                            SizedBox(width: 8),
-                            Text('Preventivo comunicato, in attesa di accettazione'),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.red[300],
-                            ),
-                            SizedBox(width: 8),
-                            Text('Preventivo rifiutato'),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.blue[300],
-                            ),
-                            SizedBox(width: 8),
-                            Text('Preventivo accettato, riparazione in corso'),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.green[300],
-                            ),
-                            SizedBox(width: 8),
-                            Text('Riparazione conclusa'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-            child: IconButton(
-              icon: Icon(Icons.info),
-              color: Colors.white,
-              onPressed: () {},
-            ),
-          ),
           IconButton(
             icon: Icon(
               Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -334,48 +225,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       minimumWidth: 80,
                     ),
                     GridColumn(
-                      columnName: 'data_presa_in_carico',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'data incarico'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['data_presa_in_carico']?? double.nan,
-                      minimumWidth: 120,
-                    ),
-                    GridColumn(
-                      columnName: 'data_comunica_preventivo',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'data comunicazione preventivo'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['data_comunica_preventivo']?? double.nan,
-                      minimumWidth: 120,
-                    ),
-                    GridColumn(
                       columnName: 'preventivo_accettato',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -397,27 +246,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       minimumWidth: 80,
                     ),
                     GridColumn(
-                      columnName: 'data_accettazione_preventivo',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'data accettazione preventivo'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['data_accettazione_preventivo']?? double.nan,
-                      minimumWidth: 120,
-                    ),
-                    GridColumn(
                       columnName: 'data_conclusione',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -437,27 +265,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       ),
                       width: _columnWidths['data_conclusione']?? double.nan,
                       minimumWidth: 120,
-                    ),
-                    GridColumn(
-                      columnName: 'prodotti_installati',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'prodotti installati'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['prodotti_installati']?? double.nan,
-                      minimumWidth: 200,
                     ),
                     GridColumn(
                       columnName: 'data_consegna',
@@ -544,36 +351,14 @@ class MerceDataSource extends DataGridSource{
                 value: importo,
             ),
             DataGridCell<String>(
-                columnName: 'data_presa_in_carico',
-                value: merce.data_presa_in_carico != null
-                    ? DateFormat('dd/MM/yyyy').format(merce.data_presa_in_carico!)
-                    : 'N/A',
-            ),
-            DataGridCell<String>(
-                columnName: 'data_comunica_preventivo',
-                value: merce.data_comunica_preventivo != null
-                    ? DateFormat('dd/MM/yyyy').format(merce.data_comunica_preventivo!)
-                    : 'N/A',
-            ),
-            DataGridCell<String>(
                 columnName: 'preventivo_accettato',
                 value: preventivoAccettato
-            ),
-            DataGridCell<String>(
-                columnName: 'data_accettazione_preventivo',
-                value: merce.data_accettazione_preventivo != null
-                    ? DateFormat('dd/MM/yyyy').format(merce.data_accettazione_preventivo!)
-                    : 'N/A'
             ),
             DataGridCell<String>(
                 columnName: 'data_conclusione',
                 value: merce.data_conclusione != null
                     ? DateFormat('dd/MM/yyyy').format(merce.data_conclusione!)
                     : 'N/A'
-            ),
-            DataGridCell<String>(
-                columnName: 'prodotti_installati',
-                value: merce.prodotti_installati ?? 'N/A'
             ),
             DataGridCell<String>(
                 columnName: 'data_consegna',
@@ -597,11 +382,7 @@ class MerceDataSource extends DataGridSource{
 
     if (merce.presenza_magazzino == true) {
       backgroundColor = Colors.white; // Bianco
-    } else if (merce.data_presa_in_carico != null) {
-      backgroundColor = Colors.grey[300]!; // Grigio chiaro
-    } else if (merce.preventivo == true && merce.data_comunica_preventivo != null && merce.preventivo_accettato == null) {
-      backgroundColor = Colors.orange[300]!; // Arancione
-    } else if (merce.preventivo == true && merce.preventivo_accettato == false) {
+    }  else if (merce.preventivo == true && merce.preventivo_accettato == false) {
       backgroundColor = Colors.red[300]!; // Rosso
     } else if (merce.preventivo == true && merce.preventivo_accettato == true && merce.data_conclusione == null) {
       backgroundColor = Colors.blue[300]!; // Blu

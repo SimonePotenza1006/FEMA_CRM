@@ -366,8 +366,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                             if(widget.merce.data_conclusione != null)
                               buildInfoRow(title: 'Risoluzione', value: widget.merce.risoluzione ?? "N?A", context: context),
-                            if(widget.merce.data_conclusione != null)
-                              buildInfoRow(title: 'prodotti installati', value: widget.merce.prodotti_installati ?? 'N/A', context: context)
                           ],
                         )
                     ),
@@ -383,19 +381,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         children: [
                           buildInfoRow(title: "data arrivo", value: widget.merce.data != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data!) : "N/A"),
                           SizedBox(height: 10.0),
-                          buildInfoRow(title: "data presa in carico", value:(widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_presa_in_carico!) : 'N/A' )),
-                          SizedBox(height: 10.0),
-                          if(widget.merce.preventivo == true)
-                            SizedBox(
-                              child: Column(
-                                children: [
-                                  buildInfoRow(title: "data comunica preventivo", value: (widget.merce.data_comunica_preventivo != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_comunica_preventivo!) : 'N/A' )),
-                                  SizedBox(height: 10.0),
-                                  buildInfoRow(title: "data accettazione preventivo", value:(widget.merce.data_accettazione_preventivo != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_accettazione_preventivo !) : 'N/A' )),
-                                  SizedBox(height: 10),
-                                ],
-                              ),
-                            ),
                           buildInfoRow(title: 'data conclusione', value: (widget.merce.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_conclusione!) : 'N/A')),
                           SizedBox(height: 10),
                           buildInfoRow(title: 'data consegna', value: (widget.merce.data_consegna != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_consegna!) : "N/A")),
@@ -468,27 +453,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
                 children: [
-                  if(widget.merce.preventivo == true && widget.merce.data_comunica_preventivo == null)
-                    SpeedDialChild(
-                      child: Icon(Icons.contact_phone_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: "Preventivo comunicato".toUpperCase(),
-                      onTap: () => comunicazionePreventivo(),
-                    ),
-                  if(widget.merce.data_comunica_preventivo != null && widget.merce.data_accettazione_preventivo == null)
-                    SpeedDialChild(
-                      child: Icon(Icons.check_circle_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: "Preventivo accettato".toUpperCase(),
-                      onTap: () => accettazionePreventivo(),
-                    ),
-                  if(widget.merce.data_comunica_preventivo != null && widget.merce.data_accettazione_preventivo == null)
-                    SpeedDialChild(
-                      child: Icon(Icons.dangerous_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: "Preventivo rifiutato".toUpperCase(),
-                      onTap: () => accettazionePreventivo(),
-                    ),
                   SpeedDialChild(
                     child: Icon(Icons.fact_check_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
@@ -567,15 +531,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
-
-
-
   Future<void> saveImportoPreventivo() async {
     try {
       // Ottieni la data attuale come stringa ISO 8601
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
@@ -589,19 +547,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'articolo': widget.merce.articolo,
           'accessori': widget.merce.accessori,
           'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
           'password': widget.merce.password,
           'dati': widget.merce.dati,
           'presenza_magazzino' : widget.merce.presenza_magazzino,
           'preventivo': widget.merce.preventivo,
           'importo_preventivato': importo,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
           'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazionePreventivo,
           'diagnosi': widget.merce.diagnosi,
           'risoluzione': widget.merce.risoluzione,
           'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
           'data_consegna': dataConsegna,
         }),
       );
@@ -618,146 +572,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
-  Future<void> comunicazionePreventivo() async {
-    try {
-      // Ottieni la data attuale come stringa ISO 8601
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : DateTime.now().toIso8601String(),
-          'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazionePreventivo,
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Data comunicazione preventivo salvata con successo!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_comunica_preventivo = DateTime.now();
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
-  Future<void> accettazionePreventivo() async {
-    try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
-          'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : DateTime.now().toIso8601String(),
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Il preventivo è stato accettato!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_accettazione_preventivo= DateTime.now();
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
-  Future<void> rifiutoPreventivo() async {
-    try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
-          'preventivo_accettato' : false,
-          'data_accettazione_preventivo' : null,
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Il preventivo è stato accettato!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_accettazione_preventivo= DateTime.now();
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
   Future<void> conclusioneRiparazione() async {
     try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/merceInRiparazione'),
@@ -768,15 +584,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'articolo': widget.merce.articolo,
           'accessori': widget.merce.accessori,
           'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
           'password': widget.merce.password,
           'dati': widget.merce.dati,
           'presenza_magazzino' : widget.merce.presenza_magazzino,
           'preventivo': widget.merce.preventivo,
           'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
           'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazionePreventivo,
           'diagnosi': widget.merce.diagnosi,
           'risoluzione': _risoluzioneController.text,
           'data_conclusione': DateTime.now().toIso8601String(),
@@ -792,7 +605,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       setState(() {
         widget.merce.data_conclusione= DateTime.now();
         widget.merce.risoluzione = _risoluzioneController.text;
-        widget.merce.prodotti_installati = _prodottiController.text;
       });
     } catch (e) {
       print('Errore durante il salvataggio dell\'importo preventivato: $e');
@@ -801,9 +613,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> consegna() async {
     try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataAccettazione = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/merceInRiparazione'),
@@ -814,19 +623,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'articolo': widget.merce.articolo,
           'accessori': widget.merce.accessori,
           'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
           'password': widget.merce.password,
           'dati': widget.merce.dati,
           'presenza_magazzino' : widget.merce.presenza_magazzino,
           'preventivo': widget.merce.preventivo,
           'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
           'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazione,
           'diagnosi': widget.merce.diagnosi,
           'risoluzione': widget.merce.risoluzione,
           'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
           'data_consegna': DateTime.now().toIso8601String(),
         }),
       );

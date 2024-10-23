@@ -526,7 +526,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'difetto_riscontrato': _difettoController.text,
           'password' : _passwordController.text,
           'dati' : _datiController.text,
-          'presenza_magazzino' : !_interventoAutoassegnato,
+          'presenza_magazzino' : true,
           'preventivo' : _preventivoRichiesto,
           'utente' : _interventoAutoassegnato == true ? widget.userData.toMap() : null,
         }),
@@ -538,7 +538,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
     return null;
   }
-
 
   Future<http.Response?> saveInterventoPlusMerce() async{
     final data = await saveMerce();
@@ -594,6 +593,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'numerazione_danea' : null,
+                'priorita' : 'NULLA',
                 'data_apertura_intervento' : DateTime.now().toIso8601String(),
                 'data': _dataOdierna.toIso8601String(),
                 'orario_appuntamento' : null,
@@ -647,12 +647,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print('Errore durante il recupero del ddt');
           }*/
         } else {
-          //saveIntervento().then((value) => Navigator.pop(context));
           try {
             final response = await http.post(Uri.parse('$ipaddressProva/api/intervento'),
                 headers: {'Content-Type' : 'application/json'},
                 body: jsonEncode({
                   'numerazione_danea' : null,
+                  'priorita' : 'NULLA',
                   'data_apertura_intervento' : DateTime.now().toIso8601String(),
                   'data' : _dataOdierna.toIso8601String(),
                   'orario_appuntamento' : null,
@@ -684,53 +684,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   'gruppo' : null,
                 })
             );
-            Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Intervento registrato con successo!'),
               ),
             );
-
+            return response;
           } catch(e){
             print('Errore durante il salvataggio dell\'intervento: $e');
             _showErrorDialog();
           }
         }
-        /*final response = await http.post(
-          Uri.parse('$ipaddressProva/api/intervento'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'numerazione_danea' : null,
-            'data': _dataOdierna.toIso8601String(),//selectedDate != null ? selectedDate?.toIso8601String() : null,//_dataOdierna.toIso8601String(),
-            'data_apertura_intervento' : DateTime.now().toIso8601String(),
-            'orario_appuntamento' : null,
-            'posizione_gps' : null,
-            'orario_inizio': null,
-            'orario_fine': null,
-            'descrizione': _descrizioneController.text,
-            'importo_intervento': null,
-            'prezzo_ivato' : null,
-            'iva' : null,
-            'assegnato': _interventoAutoassegnato,//assigned,
-            'accettato_da_tecnico' : false,
-            'conclusione_parziale' : false,
-            'concluso': false,
-            'saldato': false,
-            'saldato_da_tecnico' : false,
-            'note': _notaController.text.isNotEmpty ? _notaController.text : null,
-            'relazione_tecnico' : null,
-            'firma_cliente': null,
-            'utente': _interventoAutoassegnato == true ? widget.userData.toMap() : null,
-            'cliente': selectedCliente?.toMap(),
-            'veicolo': null,
-            'merce' : merce.toMap(),
-            'tipologia': _selectedTipologia?.toMap(),
-            'categoria_intervento_specifico': selectedCategoria?.toMap(),
-            'tipologia_pagamento': null,
-            'destinazione': selectedDestinazione?.toMap(),
-          }),
-        );
-        return response;*/
       } catch(e){
         print('Errore durante il salvataggio dell\'intervento con merce: $e');
         return null;
@@ -789,12 +753,26 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
-    if (pickedFile != null) {
-      setState(() {
-        pickedImages.add(pickedFile);
-      });
+    // Verifica se sei su Android
+    if (Platform.isAndroid) {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+      if (pickedFile != null) {
+        setState(() {
+          pickedImages.add(pickedFile);
+        });
+      }
+    }
+    // Verifica se sei su Windows
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
     }
   }
 
@@ -1013,64 +991,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       print('Errore durante la richiesta HTTP: $e');
     }
   }
-
-  // void _showClientiDialog() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text(
-  //           'SELEZIONA CLIENTE',
-  //           textAlign: TextAlign.center,
-  //         ),
-  //         contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-  //         content: SizedBox(
-  //           width: MediaQuery.of(context).size.width * 0.8,
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               TextField(
-  //                 onChanged: (value) {
-  //                   setState(() {
-  //                     filteredClientiList = clientiList
-  //                         .where((cliente) => cliente.denominazione!
-  //                             .toLowerCase()
-  //                             .contains(value.toLowerCase()))
-  //                         .toList();
-  //                   });
-  //                 },
-  //                 decoration: InputDecoration(
-  //                   labelText: 'CERCA CLIENTE',
-  //                   prefixIcon: Icon(Icons.search),
-  //                 ),
-  //               ),
-  //               SizedBox(height: 16),
-  //               Expanded(
-  //                 child: SingleChildScrollView(
-  //                   child: Column(
-  //                     children: filteredClientiList.map((cliente) {
-  //                       return ListTile(
-  //                         leading: Icon(Icons.contact_page_outlined),
-  //                         title: Text(cliente.denominazione!),
-  //                         onTap: () {
-  //                           setState(() {
-  //                             selectedCliente = cliente;
-  //                             getAllDestinazioniByCliente(cliente.id!);
-  //                           });
-  //                           Navigator.of(context).pop();
-  //                         },
-  //                       );
-  //                     }).toList(),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   void _showDestinazioniDialog() {
     showDialog(

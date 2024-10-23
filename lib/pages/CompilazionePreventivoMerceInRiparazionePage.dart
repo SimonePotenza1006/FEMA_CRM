@@ -103,7 +103,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'articolo': widget.merce.articolo,
           'accessori': widget.merce.accessori,
           'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': widget.merce.data_presa_in_carico?.toIso8601String(),
           'password': widget.merce.password,
           'dati': widget.merce.dati,
           'presenza_magazzino' : widget.merce.presenza_magazzino,
@@ -112,7 +111,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'diagnosi': _diagnosiController.text,
           'risoluzione': widget.merce.risoluzione,
           'data_conclusione': widget.merce.data_conclusione?.toIso8601String(),
-          'prodotti_installati': widget.merce.prodotti_installati,
           'data_consegna': widget.merce.data_consegna?.toIso8601String(),
         }),
       );
