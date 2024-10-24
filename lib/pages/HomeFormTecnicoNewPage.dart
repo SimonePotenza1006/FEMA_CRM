@@ -24,6 +24,7 @@ import 'DettaglioInterventoByTecnicoPage.dart';
 import 'InterventoTecnicoForm.dart';
 import 'MenuSopralluoghiTecnicoPage.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 
 class HomeFormTecnicoNewPage extends StatefulWidget{
   final UtenteModel? userData;
@@ -40,14 +41,30 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
+  Map<int, int> _menuItemClickCount = {};
   // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   // Map<String, dynamic> _deviceData = <String, dynamic>{};
 
   @override
   void initState() {
     super.initState();
+    if(Platform.isAndroid){
+      _menuItemClickCount.clear();
+      for (int i = 0; i < _menuItems.length; i++) {
+        _menuItemClickCount[i] = 0;
+      };
+    }
     saveIngresso();
   }
+
+  final List<MenuItem> _menuItems = [
+    MenuItem(icon: Icons.more_time, label: 'TIMBRATURA'),
+    MenuItem(icon: Icons.snippet_folder_outlined, label: 'RICHIESTA ORDINE'),
+    MenuItem(icon: Icons.remove_red_eye_outlined, label: 'SOPRALLUOGHI'),
+    MenuItem(icon: Icons.emoji_transportation_sharp, label: 'SPESE SU VEICOLO'),
+    MenuItem(icon: Icons.calendar_month_sharp, label: 'CALENDARIO'),
+    MenuItem(icon: Icons.build, label: 'CREA INTERVENTO'),
+  ];
 
   int _calculateHoveredIndex(Offset position) {
     final center = Offset(650 / 2, 650 / 2); // Use the same size as in CustomPaint
@@ -165,14 +182,32 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     }
   }
 
+  int _lastClickedIndex = 0;
+
   void _navigateToPage(int index) {
-    switch (index) {
-      case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => CalendarioUtentePage(utente: widget.userData!)),
-        );
-        break;
+    if(Platform.isAndroid){
+      if (_lastClickedIndex != index) {
+        _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
+        _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
+      }
+    }
+
+    if(Platform.isAndroid){
+      if (_menuItemClickCount.containsKey(index)) {
+        _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
+      } else {
+        _menuItemClickCount[index] = 1;
+      }
+    }
+
+    if ((_menuItemClickCount[index] ?? 0) % 2 == 0 && _hoveredIndex != -1) {
+      switch (index) {
+        case 4:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CalendarioUtentePage(utente: widget.userData!)),
+          );
+          break;
       case 1:
         Navigator.push(
           context,
@@ -197,6 +232,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData!)),
         );
         break;
+      case 5:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => InterventoTecnicoForm(userData: widget.userData!)),
+        );
+        break;
+      }
     }
   }
 
@@ -240,7 +282,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         padding: EdgeInsets.only(top: 40, bottom: 40),
         child: LayoutBuilder(
             builder: (context, constraints){
-              if (constraints.maxWidth < 800) {
+              if (constraints.maxWidth <= 800) {
                 // Tablet/Mobile layout
                 return SingleChildScrollView(
                   child: Column(
@@ -1019,6 +1061,7 @@ class MenuPainter extends CustomPainter {
     MenuItem(icon: Icons.remove_red_eye_outlined, label: 'SOPRALLUOGHI'),
     MenuItem(icon: Icons.emoji_transportation_sharp, label: 'SPESE SU VEICOLO'),
     MenuItem(icon: Icons.calendar_month_sharp, label: 'CALENDARIO'),
+    MenuItem(icon: Icons.build, label: 'CREA INTERVENTO'),
   ];
 
   TextPainter labelPainter = TextPainter(

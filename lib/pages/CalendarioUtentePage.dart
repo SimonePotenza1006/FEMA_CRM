@@ -187,6 +187,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         itemCount: details.appointments.length,
                         itemBuilder: (context, index) {
                           Appointment appointment = details.appointments.elementAt(index)!;
+
                           return GestureDetector(
                             onTap: () {
                               if (appointment.recurrenceId is InterventoModel) {
@@ -211,7 +212,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 return AlertDialog(
                                   title: Text("Info Intervento"),
                                   content: Text('Cliente: '+intervento!.cliente!.denominazione!+
-                                      '\nDestinazione: '+intervento!.destinazione!.indirizzo!+', '+intervento!.destinazione!.citta!+'\n\n'+intervento!.descrizione!+'\n\nPer utente: '+intervento!.utente!.nome!+' '+intervento!.utente!.cognome!),
+                                      '\nDestinazione: '+intervento!.destinazione!.indirizzo!+', '+intervento!.destinazione!.citta!+'\n\n'
+                                      +intervento!.descrizione!+'\n\nTecnico: '+intervento!.utente!.nome!.toUpperCase()+' '+intervento!.utente!.cognome!.toUpperCase()),
                                   actions: [
                                     TextButton(
                                       child: Text("Chiudi"),
@@ -361,14 +363,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void combineAppointments() {
     appointments = [];
     appointments.addAll(allInterventiByUtente.map((intervento) {
-      print('ut: '+intervento.utente!.toString()+' '+widget.utente.toString());
+
       DateTime startTime = intervento.data!;
+
       DateTime endTime = startTime.add(Duration(hours: 1));
       String? utente = intervento.utente != null ? intervento.utente?.nomeCompleto() : 'NON ASSEGNATO';
       String? subject = "${intervento.descrizione}";
       return CustomAppointmentModel(
-        startTime: startTime,
-        endTime: endTime,
+        startTime: startTime.hour == 0 ? startTime.add(Duration(hours: 8)) : startTime,
+        endTime: startTime.hour == 0 ? startTime.add(Duration(hours: 9)) : endTime,
         subject: "${intervento.descrizione}",
         recurrenceId: intervento,
         color: intervento.utente!.id == widget.utente!.id ? Colors.red : Colors.grey,
@@ -379,8 +382,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       DateTime startTime = commissione.data!;
       DateTime endTime = startTime.add(Duration(hours: 3));
       return CustomAppointmentModel(
-        startTime: startTime,
-        endTime: endTime,
+        startTime: startTime.hour == 0 ? startTime.add(Duration(hours: 8)) : startTime,
+        endTime: startTime.hour == 0 ? startTime.add(Duration(hours: 11)) : endTime,
         subject: commissione.descrizione!,
         recurrenceId: commissione,
         color: Colors.yellow[900]!,
