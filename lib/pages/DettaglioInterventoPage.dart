@@ -1493,9 +1493,19 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          'Fasi riparazione:',
-                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Fasi riparazione:',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.copy),
+                                              onPressed: (){
+                                                copiaFasiRiparazioneNegliAppunti(fasiRiparazione);
+                                              },
+                                            )
+                                          ],
                                         ),
                                         ...fasiRiparazione.map((fase) => SizedBox(
                                             width: 370,
@@ -1700,6 +1710,24 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
     );
   }
+
+  void copiaFasiRiparazioneNegliAppunti(List<FaseRiparazioneModel> fasiRiparazione) {
+    if (fasiRiparazione.isEmpty) return; // Se la lista è vuota, non fa nulla
+
+    // Costruisce una stringa contenente tutte le fasi
+    String fasiStringa = fasiRiparazione.map((fase) {
+      return '${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, '
+          '${fase.utente?.nome ?? ''} ${fase.utente?.cognome ?? ''} - '
+          '${fase.descrizione ?? ''}';
+    }).join('\n');  // Unisce le fasi con una nuova linea tra ognuna
+
+    // Copia la stringa negli appunti
+    Clipboard.setData(ClipboardData(text: fasiStringa));
+
+    // Puoi mostrare un messaggio di conferma, ad esempio con uno SnackBar
+    print("Fasi copiate negli appunti");
+  }
+
 
   Widget buildRelazioneForm({required String title}) {
     return SizedBox(

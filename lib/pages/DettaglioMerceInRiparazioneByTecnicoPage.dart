@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../databaseHandler/DbHelper.dart';
+import '../model/FaseRiparazioneModel.dart';
 import '../model/ProdottoModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneFaseRiparazionePage.dart';
@@ -27,6 +29,7 @@ class DettaglioMerceInRiparazioneByTecnicoPage extends StatefulWidget {
 
 class _DettaglioMerceInRiparazioneByTecnicoPageState
     extends State<DettaglioMerceInRiparazioneByTecnicoPage> {
+
   TextEditingController importoPreventivatoController = TextEditingController();
   final TextEditingController diagnosiController = TextEditingController();
   final TextEditingController risoluzioneController = TextEditingController();
@@ -38,6 +41,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<ProdottoModel> selectedProdotti = [];
   late TextEditingController searchController;
   bool isSearching = false;
+  DbHelper? dbHelper;
+  late Future<List<FaseRiparazioneModel>> allFasi;
+  List<FaseRiparazioneModel> fasiRiparazione = [];
+
+
 
   Widget _buildSearchField() {
     return TextField(
@@ -56,6 +64,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   @override
   void initState() {
     super.initState();
+    dbHelper = DbHelper();
+    allFasi = dbHelper!.getFasiByMerce(widget.intervento);
+    allFasi.then((fasi){
+      setState(() {
+        fasiRiparazione = fasi;
+      });
+    });
     getAllProdotti();
     searchController = TextEditingController();
   }
@@ -122,9 +137,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           actions: [
             TextButton(
               onPressed: () {
-
+                saveLocazione();
                 Navigator.of(context).pop(); // Chiude il dialog
-
               },
               child: Text('SI'),
             ),
@@ -169,6 +183,32 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          if (fasiRiparazione.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Fasi riparazione:',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                                ...fasiRiparazione.map((fase) => SizedBox(
+                                    width: 370,
+                                    child:ListTile(
+                                      title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, ${fase.utente?.nome} ${fase.utente?.cognome}'),
+                                      subtitle: Text('${fase.descrizione}'),
+                                    )
+                                )
+                                ),
+                              ],
+                            ),
+                          if(fasiRiparazione.isEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 14,),
+                                Text('Nessuna fase ancora registrata', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                              ],
+                            ),
                           _buildDetailRow(title:'Data arrivo', value: widget.intervento.data != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.intervento.merce!.data!) : '', context: context),
                           _buildDetailRow(title:'Articolo', value: widget.intervento.merce?.articolo ?? '', context: context),
                           _buildDetailRow(title:'Accessori', value: widget.intervento.merce?.accessori ?? '', context: context),
@@ -324,48 +364,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                           ),
                           SizedBox(height: 20,),
-                          SizedBox(
-                            width: 500,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: 250,
-                                  child: TextFormField(
-                                    controller: prodottiInstallatiController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Prodotti installati'.toUpperCase(),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(color: Colors.grey),
-                                      ),
-                                    ),
-                                    maxLines: null,
-                                  ),
-                                ),
-                                SizedBox(height: 12),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if(prodottiInstallatiController.text.isNotEmpty){
-                                      saveProdotti();
-                                    } else{
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('Non puoi salvare dei prodotti nulli!'),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.red,
-                                    onPrimary: Colors.white,
-                                  ),
-                                  child: Text('Salva prodotti'.toUpperCase()),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 20),
                           SizedBox(height: 12),
                           Center(
                             child: Text('SELEZIONARE I PRODOTTI INSTALLATI SE PRESENTI IN MAGAZZINO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
@@ -571,13 +569,54 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
-  // Future<void> saveLocazione() async{
-  //   try{
-  //     final response = await http.Post
-  //   } catch(e){
-  //
-  //   }
-  // }
+  Future<void> saveLocazione() async {
+    print('ok');
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': int.parse(widget.intervento.merce!.id!.toString()),
+          'data': widget.intervento.merce?.data != null
+              ? widget.intervento.merce?.data?.toIso8601String()
+              : null,
+          'articolo': widget.intervento.merce?.articolo,
+          'accessori': widget.intervento.merce?.accessori,
+          'difetto_riscontrato': widget.intervento.merce?.difetto_riscontrato,
+          'password': widget.intervento.merce?.password,
+          'dati': widget.intervento.merce?.dati,
+          'presenza_magazzino': !(widget.intervento.merce?.presenza_magazzino ?? false),
+          'preventivo': widget.intervento.merce?.preventivo,
+          'importo_preventivo': widget.intervento.merce?.importo_preventivato,
+          'preventivo_accettato': widget.intervento.merce?.preventivo_accettato,
+          'diagnosi': widget.intervento.merce?.diagnosi,
+          'risoluzione': widget.intervento.merce?.risoluzione,
+          'data_conclusione': widget.intervento.merce?.data_conclusione != null
+              ? widget.intervento.merce?.data_conclusione?.toIso8601String()
+              : null,
+          'data_consegna': widget.intervento.merce?.data_consegna,
+        }),
+      );
+      if (response.statusCode == 201) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Locazione della merce cambiata con successo'),
+            );
+          },
+        );
+        setState(() {
+          widget.intervento.merce?.presenza_magazzino = !(widget.intervento.merce?.presenza_magazzino ?? false);
+        });
+      } else {
+        // Errore dal server
+        print('Errore! Risposta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore! $e');
+    }
+  }
 
   Future<void> saveRelazioni() async{
     try{
