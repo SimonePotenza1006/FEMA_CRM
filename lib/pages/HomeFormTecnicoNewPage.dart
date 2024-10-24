@@ -330,7 +330,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Interventi',
+                              'Interventi personali',
                               style: TextStyle(
                                   fontSize: 30.0, fontWeight: FontWeight.bold),
                             ),
@@ -409,11 +409,11 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   child: ListTile(
                                     contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                     title: Text(
-                                      '${intervento.descrizione} \n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
+                                      '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                       style: textStyle,
                                     ),
                                     subtitle: Text(
-                                      intervento.cliente?.denominazione.toString() ?? '',
+                                      '${intervento.descrizione}',
                                       style: textStyle,
                                     ),
                                     trailing: Column(
