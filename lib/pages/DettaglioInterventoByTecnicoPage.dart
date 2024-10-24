@@ -5,6 +5,7 @@ import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/pages/CreazioneScadenzaPage.dart';
 import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
+import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:fema_crm/pages/SalvataggioCredenzialiClientePage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
@@ -178,6 +179,120 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+  void modificaOrarioFine() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': DateTime.now().toIso8601String(),//widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': true,//widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Orario di fine intervento salvato con successo!'),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente)),
+        );
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaOrarioInizio() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': DateTime.now().toIso8601String(),//widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Orario di inizio intervento salvato con successo!'),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente)),
+        );
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -339,19 +454,32 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                     SizedBox(height: 20),
                     buildInfoRow(
-                      title: 'ID intervento',
+                      title: 'Intervento nr',
                       value: widget.intervento.id!,
                       context: context,
                     ),
                     SizedBox(height: 15),
                     buildInfoRow(
+                      title: 'Cliente',
+                      value: widget.intervento.cliente?.denominazione?? 'N/A',
+                      context: context,
+                    ),
+                    SizedBox(height : 15),
+                    buildInfoRow(
+                      title: 'Destinazione',
+                      value: widget.intervento.destinazione?.indirizzo?? 'N/A',
+                      context: context,
+                    ),
+
+                    /*SizedBox(height: 15),
+                    buildInfoRow(
                       title: 'Data creazione',
                       value: formatDate(widget.intervento.data_apertura_intervento),
                       context: context,
-                    ),
+                    ),*/
                     SizedBox(height: 15),
                     buildInfoRow(
-                      title: 'Data accordata',
+                      title: 'Data appuntamento',
                       value: formatDate(widget.intervento.data),
                       context: context,
                     ),
@@ -361,7 +489,39 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       value: formatTime(widget.intervento.orario_appuntamento),
                       context: context,
                     ),
-                    SizedBox(height: 15),
+                    if (widget.intervento.orario_inizio == null) ElevatedButton(
+                      onPressed: () {
+                        modificaOrarioInizio();
+                      },
+                      style: ElevatedButton.styleFrom(minimumSize: Size(450, 35),
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        textStyle: TextStyle(fontSize: 20),
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                      child: Text(
+                        'INIZIA INTERVENTO',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+
+                    if (widget.intervento.orario_inizio != null && widget.intervento.orario_fine == null) ElevatedButton(
+                      onPressed: () {
+                        modificaOrarioFine();
+                      },
+                      style: ElevatedButton.styleFrom(minimumSize: Size(450, 35),
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        textStyle: TextStyle(fontSize: 20),
+                        primary: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      ),
+                      child: Text(
+                        'TERMINA INTERVENTO',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+
+                   /* SizedBox(height: 15),
                     buildInfoRow(
                       title: 'Orario Inizio',
                       value: formatTime(widget.intervento.orario_inizio),
@@ -372,25 +532,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       title: 'Orario Fine',
                       value: formatTime(widget.intervento.orario_fine),
                       context: context,
-                    ),
-                    SizedBox(height: 15),
-                    buildInfoRow(
-                      title: 'Cliente',
-                      value: widget.intervento.cliente?.denominazione?? 'N/A',
-                      context: context,
-                    ),
+                    ),*/
+
                     SizedBox(height: 15),
                     buildInfoRow(
                       title: 'Descrizione',
                       value: widget.intervento.descrizione?? 'N/A',
                       context: context,
                     ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Destinazione',
-                      value: widget.intervento.destinazione?.indirizzo?? 'N/A',
-                      context: context,
-                    ),
+
                     SizedBox(height : 15),
                     buildInfoRow(
                       title: 'Cellulare destinazione',
