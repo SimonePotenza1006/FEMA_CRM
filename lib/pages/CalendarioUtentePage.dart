@@ -310,29 +310,29 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
-  Future<void> getAllInterventiByUtente() async {
-    try {
-      print('getAllInterventiByUtente chiamato');
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/utente/${int.parse(widget.utente!.id.toString())}');
-      var response = await http.get(apiUrl);
-      if (response.statusCode == 200) {
-        print('getAllInterventiByUtente: successo, status code: ${response.statusCode}');
-        var jsonData = jsonDecode(response.body);
-        List<InterventoModel> interventi = [];
-        for (var item in jsonData) {
-          interventi.add(InterventoModel.fromJson(item));
-        }
-        setState(() {
-          allInterventiByUtente = interventi;
-        });
-      } else {
-        print('getAllInterventiByUtente: fallita con status code ${response.statusCode}');
-        throw Exception('Failed to load data from API: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Errore durante la chiamata all\'API getAllInterventi: $e');
-    }
-  }
+  // Future<void> getAllInterventiByUtente() async {
+  //   try {
+  //     print('getAllInterventiByUtente chiamato');
+  //     var apiUrl = Uri.parse('$ipaddressProva/api/intervento/utente/${int.parse(widget.utente!.id.toString())}');
+  //     var response = await http.get(apiUrl);
+  //     if (response.statusCode == 200) {
+  //       print('getAllInterventiByUtente: successo, status code: ${response.statusCode}');
+  //       var jsonData = jsonDecode(response.body);
+  //       List<InterventoModel> interventi = [];
+  //       for (var item in jsonData) {
+  //         interventi.add(InterventoModel.fromJson(item));
+  //       }
+  //       setState(() {
+  //         allInterventiByUtente = interventi;
+  //       });
+  //     } else {
+  //       print('getAllInterventiByUtente: fallita con status code ${response.statusCode}');
+  //       throw Exception('Failed to load data from API: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Errore durante la chiamata all\'API getAllInterventi: $e');
+  //   }
+  // }
 
   Future<void> getAllInterventiBySettore() async {
     try {

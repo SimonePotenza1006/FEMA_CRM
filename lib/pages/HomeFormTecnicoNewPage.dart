@@ -242,6 +242,31 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     }
   }
 
+  Future<List<InterventoModel>> getAllInterventiBySettore() async {
+    try {
+      print('getAllInterventiBySettore chiamato');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        print('getAllInterventiByUtente: successo, status code: ${response.statusCode}');
+        var jsonData = jsonDecode(response.body);
+        List<InterventoModel> interventi = [];
+        for (var item in jsonData) {
+          if (InterventoModel.fromJson(item).data != null && InterventoModel.fromJson(item).utente != null && InterventoModel.fromJson(item).utente?.id.toString() != widget.userData?.id.toString() && (InterventoModel.fromJson(item).concluso != true)) //solo gli interventi con data e utente
+            interventi.add(InterventoModel.fromJson(item));
+        }
+        return interventi;
+      } else {
+        print('getAllInterventiBySettore: fallita con status code ${response.statusCode}');
+        return [];
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API getAllInterventi: $e');
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -357,6 +382,127 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       const SizedBox(height: 10.0),
                       FutureBuilder<List<InterventoModel>>(
                         future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<InterventoModel> interventi = snapshot.data!;
+                            interventi = interventi.where((intervento) => intervento.merce == null).toList();
+                            interventi = interventi.where((intervento) {
+                              return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                            }).toList();
+                            if (interventi.isEmpty) {
+                              return Center(child: Text('Nessun intervento trovato'));
+                            }
+
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: interventi.length,
+                              itemBuilder: (context, index) {
+                                InterventoModel intervento = interventi[index];
+
+                                // Metodo per mappare la priorità al colore corrispondente
+                                Color getPriorityColor(Priorita priorita) {
+                                  switch (priorita) {
+                                    case Priorita.BASSA:
+                                      return Colors.lightGreen;
+                                    case Priorita.MEDIA:
+                                      return Colors.yellow; // grigio chiaro
+                                    case Priorita.ALTA:
+                                      return Colors.orange; // giallo chiaro
+                                    case Priorita.URGENTE:
+                                      return Colors.red; // azzurro chiaro
+                                    default:
+                                      return Colors.blueGrey[200]!;
+                                  }
+                                }
+
+                                // Determina il colore in base alla priorità
+                                Color backgroundColor =  getPriorityColor(intervento.priorita!);
+
+                                TextStyle textStyle = intervento.concluso ?? false
+                                    ? TextStyle(color: Colors.white, fontSize: 15)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                return Card(
+                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                    title: Text(
+                                      '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
+                                      style: textStyle,
+                                    ),
+                                    subtitle: Text(
+                                      '${intervento.descrizione}',
+                                      style: textStyle,
+                                    ),
+                                    trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                        if (intervento.concluso ?? false)
+                                          Icon(Icons.check, color: Colors.white, size: 15), // Check icon
+                                        Text(
+                                          intervento.data != null
+                                              ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                              : 'Data non disponibile',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          intervento.orario_appuntamento != null
+                                              ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                              : 'Nessun orario di appuntamento',
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DettaglioInterventoByTecnicoPage(
+                                            utente: widget.userData!,
+                                            intervento: intervento,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    tileColor: backgroundColor,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 50.0),
+                      Center(
+                        child: Text(
+                          'Interventi di settore',
+                          style: TextStyle(
+                              fontSize: 30.0, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+                      FutureBuilder<List<InterventoModel>>(
+                        future: getAllInterventiBySettore(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
