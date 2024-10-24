@@ -190,13 +190,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           return GestureDetector(
                             onTap: () {
                               if (appointment.recurrenceId is InterventoModel) {
+                                InterventoModel intervento = appointment.recurrenceId as InterventoModel;
                                 if ((appointment.recurrenceId as InterventoModel).utente!.id == widget.utente!.id)
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) {
 
-                                          InterventoModel intervento = appointment.recurrenceId as InterventoModel;
+
                                           return DettaglioInterventoByTecnicoPage(
                                               utente: widget.utente!, intervento: intervento);
 
@@ -204,7 +205,23 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
                                     ),
                                   );
-                              else null;
+                              else  showDialog(
+                                  context: context!,
+                                  builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Info Intervento"),
+                                  content: Text('Cliente: '+intervento!.cliente!.denominazione!+
+                                      '\nDestinazione: '+intervento!.destinazione!.indirizzo!+', '+intervento!.destinazione!.citta!+'\n\n'+intervento!.descrizione!+'\n\nPer utente: '+intervento!.utente!.nome!+' '+intervento!.utente!.cognome!),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Chiudi il dialog
+                                      },
+                                    ),
+                                  ],
+                                );});
+                                //null; //alert info intervento
                             } else
                             Navigator.push(
                               context,
