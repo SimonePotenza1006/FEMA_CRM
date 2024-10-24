@@ -82,6 +82,21 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
        fasiRiparazione = fasi;
       });
     });
+    if(widget.intervento.merce != null){
+      allFasi.then((fasi) {
+        // Separiamo le fasi concluse e non concluse
+        final fasiNonConcluse = fasi.where((fase) => fase.conclusione != true).toList();
+        final fasiConcluse = fasi.where((fase) => fase.conclusione == true).toList();
+        // Uniamo le fasi in un'unica lista con quelle concluse per ultime
+        setState(() {
+          fasiRiparazione = [...fasiNonConcluse, ...fasiConcluse];
+          // Impostiamo rapportinoController.text con le descrizioni delle fasi, andando a capo
+          rapportinoController.text = fasiRiparazione.map((fase) {
+            return '${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, ${fase.utente?.nomeCompleto() ?? ''} - ${fase.descrizione ?? ''}';
+          }).join('\n'); // Unisce le descrizioni con una nuova linea tra ognuna
+        });
+      });
+    }
     getProdottiByIntervento();
     getRelazioni();
     getNoteByIntervento();
@@ -579,6 +594,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       default:
         prioritaColor = Colors.blueGrey[200];
     }
+
+    final fasiNonConcluse = fasiRiparazione.where((fase) => fase.conclusione != true).toList();
+    final fasiConcluse = fasiRiparazione.where((fase) => fase.conclusione == true).toList();
 
     String descrizioneInterventoSub = widget.intervento.descrizione!.length < 30
         ? widget.intervento.descrizione!
@@ -1489,41 +1507,43 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                         context: context
                                     ),
                                   ),
-                                  if (fasiRiparazione.isNotEmpty)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'Fasi riparazione:',
-                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(Icons.copy),
-                                              onPressed: (){
-                                                copiaFasiRiparazioneNegliAppunti(fasiRiparazione);
-                                              },
-                                            )
-                                          ],
+                                if (fasiRiparazione.isNotEmpty)
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Titolo della sezione
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Fasi riparazione:',
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.copy),
+                                            onPressed: () {
+                                              // Funzione per copiare negli appunti
+                                              copiaFasiRiparazioneNegliAppunti(fasiRiparazione);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      ...fasiNonConcluse.map((fase) => SizedBox(
+                                        width: 370,
+                                        child: ListTile(
+                                          title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, ${fase.utente?.nome} ${fase.utente?.cognome}'),
+                                          subtitle: Text('${fase.descrizione}'),
                                         ),
-                                        ...fasiRiparazione.map((fase) => SizedBox(
-                                            width: 370,
-                                            child:ListTile(
-                                              title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)},${fase.utente?.nome} ${fase.utente?.cognome}'),
-                                              subtitle: Text('${fase.descrizione}'),
-                                            )
-                                          )
-                                            ),
-                                      ],
-                                    ),
-                                  if(fasiRiparazione.isEmpty)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(height: 14,),
-                                        //Text('Nessuna nota relativa all\'intervento', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                                      ],
+                                      )),
+
+                                      // Se esiste una fase conclusa, la mostriamo per ultima
+                                      if (fasiConcluse.isNotEmpty) SizedBox(
+                                        width: 370,
+                                        child: ListTile(
+                                          title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fasiConcluse.first.data!)}, ${fasiConcluse.first.utente?.nome} ${fasiConcluse.first.utente?.cognome}'),
+                                          subtitle: Text('${fasiConcluse.first.descrizione}'),
+                                        ),
+                                      ),
+                                     ],
                                     ),
                                 ],
                               ),
@@ -1712,19 +1732,22 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   void copiaFasiRiparazioneNegliAppunti(List<FaseRiparazioneModel> fasiRiparazione) {
-    if (fasiRiparazione.isEmpty) return; // Se la lista è vuota, non fa nulla
-
-    // Costruisce una stringa contenente tutte le fasi
-    String fasiStringa = fasiRiparazione.map((fase) {
-      return '${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, '
-          '${fase.utente?.nome ?? ''} ${fase.utente?.cognome ?? ''} - '
-          '${fase.descrizione ?? ''}';
-    }).join('\n');  // Unisce le fasi con una nuova linea tra ognuna
-
-    // Copia la stringa negli appunti
+    if (fasiRiparazione.isEmpty) return;
+    final fasiNonConcluse = fasiRiparazione.where((fase) => fase.conclusione != true).toList();
+    final fasiConcluse = fasiRiparazione.where((fase) => fase.conclusione == true).toList();
+    String fasiStringa = [
+      ...fasiNonConcluse.map((fase) {
+        return '${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, '
+            '${fase.utente?.nome ?? ''} ${fase.utente?.cognome ?? ''} - '
+            '${fase.descrizione ?? ''}';
+      }),
+      ...fasiConcluse.map((fase) {
+        return '${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, '
+            '${fase.utente?.nome ?? ''} ${fase.utente?.cognome ?? ''} - '
+            '${fase.descrizione ?? ''}';
+      }),
+    ].join('\n');
     Clipboard.setData(ClipboardData(text: fasiStringa));
-
-    // Puoi mostrare un messaggio di conferma, ad esempio con uno SnackBar
     print("Fasi copiate negli appunti");
   }
 

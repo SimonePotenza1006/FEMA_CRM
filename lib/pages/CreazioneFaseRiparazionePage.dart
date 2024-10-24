@@ -88,6 +88,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'data': now,
           'descrizione': _descrizioneController.text,
+          'conclusione' : false,
           'utente': widget.utente.toMap(),
           'merce': widget.merce.toMap(),
         }),

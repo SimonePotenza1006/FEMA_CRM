@@ -213,7 +213,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           _buildDetailRow(title:'Articolo', value: widget.intervento.merce?.articolo ?? '', context: context),
                           _buildDetailRow(title:'Accessori', value: widget.intervento.merce?.accessori ?? '', context: context),
                           _buildDetailRow(title:'Difetto Riscontrato', value: widget.intervento.merce?.difetto_riscontrato ?? '', context: context),
-                          //_buildDetailRotitle:w('Data Presa in Carico:', widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_presa_in_carico!) : ''),
                           _buildDetailRow(title:'Password', value: widget.intervento.merce?.password ?? '', context: context),
                           _buildDetailRow(title:'Dati', value: widget.intervento.merce?.dati ?? '', context: context),
                           Row(
@@ -284,7 +283,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  width: 250,
+                                  width: 500,
                                   child: TextFormField(
                                     controller: diagnosiController,
                                     decoration: InputDecoration(
@@ -328,7 +327,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  width: 250,
+                                  width: 500,
                                   child: TextFormField(
                                     controller: risoluzioneController,
                                     decoration: InputDecoration(
@@ -478,7 +477,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     Center(
                       child: ElevatedButton(
                         onPressed: () {
-                          consegna();
+                          showConsegnaDialog(context);
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.red,
@@ -557,8 +556,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     backgroundColor: Colors.red,
                     label: "Concludi riparazione".toUpperCase(),
                     onTap: () {
-                      concludi();
-                      saveStatusIntervento();
+                      showRepairSummaryDialog(context);
                     }
                   ),
               ],
@@ -567,6 +565,146 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         ],
       ),
     );
+  }
+
+  Future<void> saveFaseConsegna(String faseConsegna) async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/fasi'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data': DateTime.now().toIso8601String(),
+          'descrizione': "CONSEGNA - " + faseConsegna,
+          'conclusione' : false,
+          'utente': widget.utente.toMap(),
+          'merce': widget.merce.toMap(),
+        }),
+      );
+    }catch(e){
+      print('Qualcosa non va $e');
+    }
+  }
+
+  void showConsegnaDialog(BuildContext context) {
+    TextEditingController _consegnaController = TextEditingController();
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Chiave per gestire il form
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Inserire i dettagli della consegna"),
+          content: Form(
+            key: _formKey,
+            child: TextFormField(
+              controller: _consegnaController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Inserisci i dettagli della consegna qui...',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'I dettagli della consegna non possono essere vuoti'; // Messaggio di errore
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Controlla se il form è valido (cioè non vuoto)
+                if (_formKey.currentState!.validate()) {
+                  // Inserisci qui le azioni specifiche per la consegna
+                  saveFaseConsegna(_consegnaController.text);
+                  consegna();
+                }
+              },
+              child: Text("Concludi"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Chiude l'AlertDialog
+              },
+              child: Text("Annulla"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showRepairSummaryDialog(BuildContext context) {
+    TextEditingController _summaryController = TextEditingController();
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // Chiave per gestire il form
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Scrivi un piccolo riepilogo della riparazione"),
+          content: Form(
+            key: _formKey,
+            child: TextFormField(
+              controller: _summaryController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Inserisci il riepilogo qui...',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Il riepilogo non può essere vuoto'; // Messaggio di errore
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Controlla se il form è valido (cioè non vuoto)
+                if (_formKey.currentState!.validate()) {
+                  saveFaseConclusione(_summaryController.text);
+                  concludi();
+                  saveStatusIntervento();
+                  Navigator.of(context).pop(); // Chiude l'AlertDialog
+                }
+              },
+              child: Text("Concludi"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Chiude l'AlertDialog
+              },
+              child: Text("Annulla"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Future<void> saveFaseConclusione(String faseConclusiva) async{
+    try{
+      final response = await http.post(
+       Uri.parse('$ipaddressProva/api/fasi'),
+       headers: {'Content-Type': 'application/json'},
+       body: jsonEncode({
+          'data': DateTime.now().toIso8601String(),
+          'descrizione': "CONCLUSIONE - " + faseConclusiva,
+          'conclusione' : true,
+          'utente': widget.utente.toMap(),
+          'merce': widget.merce.toMap(),
+       }),
+      );
+    }catch(e){
+      print('Qualcosa non va $e');
+    }
   }
 
   Future<void> saveLocazione() async {
@@ -610,7 +748,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           widget.intervento.merce?.presenza_magazzino = !(widget.intervento.merce?.presenza_magazzino ?? false);
         });
       } else {
-        // Errore dal server
         print('Errore! Risposta: ${response.statusCode}');
       }
     } catch (e) {
@@ -668,6 +805,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'data_consegna': DateTime.now().toIso8601String(),
         }),
       );
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Merce consegnata!'),
@@ -928,7 +1066,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'posizione_gps' : widget.intervento.posizione_gps,
-          //'orario_inizio': widget.merce.data_presa_in_carico?.toIso8601String(),
+          'orario_inizio': fasiRiparazione.first.data?.toIso8601String(),
           'orario_fine': DateTime.now().toIso8601String(),
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': null,
@@ -966,7 +1104,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> concludi() async {
     try {
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/merceInRiparazione'),
