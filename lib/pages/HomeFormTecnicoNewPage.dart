@@ -492,6 +492,103 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           }
                         },
                       ),
+                      FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                        future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
+                            relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce == null).toList();
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: relazioni.length,
+                              itemBuilder: (context, index) {
+                                RelazioneUtentiInterventiModel relazione = relazioni[index];
+                                //Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
+
+                                // Metodo per mappare la priorità al colore corrispondente
+                                Color getPriorityColor(Priorita priorita) {
+                                  switch (priorita) {
+                                    case Priorita.BASSA:
+                                      return Colors.lightGreen;
+                                    case Priorita.MEDIA:
+                                      return Colors.yellow; // grigio chiaro
+                                    case Priorita.ALTA:
+                                      return Colors.orange; // giallo chiaro
+                                    case Priorita.URGENTE:
+                                      return Colors.red; // azzurro chiaro
+                                    default:
+                                      return Colors.blueGrey[200]!;
+                                  }
+                                }
+
+                                // Determina il colore in base alla priorità
+                                Color backgroundColor =  getPriorityColor(relazione.intervento!.priorita!);
+
+                                TextStyle textStyle = relazione.intervento!.concluso ?? false
+                                    ? TextStyle(color: Colors.white, fontSize: 15)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+                                /*TextStyle textStyle = relazione.intervento!.concluso ?? false
+                                    ? TextStyle(color: Colors.white, fontSize: 15)
+                                    : TextStyle(color: Colors.black, fontSize: 15);*/
+                                return ListTile(
+                                  title: Text(
+                                    '${relazione.intervento?.descrizione}',
+                                    style: textStyle,
+                                  ),
+                                  subtitle: Text(
+                                    relazione.intervento?.cliente?.denominazione.toString()?? '',
+                                    style: textStyle,
+                                  ),
+                                  trailing: Column(
+                                    children: [
+                                      Text(
+                                        // Formatta la data secondo il tuo formato desiderato
+                                        relazione.intervento?.data!= null
+                                            ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
+                                            : 'Data non disponibile',
+                                        style: TextStyle(
+                                          fontSize: 16, // Stile opzionale per la data
+                                          color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        relazione.intervento?.orario_appuntamento!= null
+                                            ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                            : 'Nessun orario di appuntamento',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DettaglioInterventoByTecnicoPage(
+                                              utente: widget.userData!,
+                                              intervento: relazione.intervento!,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  tileColor: backgroundColor,
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
+                        },
+                      ),
+
                       const SizedBox(height: 50.0),
                       Center(
                         child: Text(
