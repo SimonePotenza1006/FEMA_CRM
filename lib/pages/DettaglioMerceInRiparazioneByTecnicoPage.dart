@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fema_crm/model/InterventoModel.dart';
 import 'package:fema_crm/pages/AggiuntaNotaByTecnicoPage.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import '../model/ProdottoModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneFaseRiparazionePage.dart';
 import 'CreazioneScadenzaPage.dart';
+import 'GalleriaFotoInterventoPage.dart';
 import 'SalvataggioCredenzialiClientePage.dart';
 
 class DettaglioMerceInRiparazioneByTecnicoPage extends StatefulWidget {
@@ -29,28 +32,53 @@ class DettaglioMerceInRiparazioneByTecnicoPage extends StatefulWidget {
 
 class _DettaglioMerceInRiparazioneByTecnicoPageState
     extends State<DettaglioMerceInRiparazioneByTecnicoPage> {
-
   TextEditingController importoPreventivatoController = TextEditingController();
   final TextEditingController diagnosiController = TextEditingController();
   final TextEditingController risoluzioneController = TextEditingController();
   final TextEditingController prodottiInstallatiController = TextEditingController();
+  final searchController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<ProdottoModel> allProdotti = [];
   List<ProdottoModel> filteredProdotti = [];
   List<ProdottoModel> selectedProdotti = [];
-  late TextEditingController searchController;
+  //late TextEditingController searchController;
   bool isSearching = false;
   DbHelper? dbHelper;
   late Future<List<FaseRiparazioneModel>> allFasi;
   List<FaseRiparazioneModel> fasiRiparazione = [];
+  Future<List<Uint8List>>? _futureImages;
+  bool modificaImportoPreventivo = false;
 
-
+  Future<List<Uint8List>> fetchImages() async {
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    http.Response? response;
+    try {
+      response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final images = jsonData.map<Uint8List>((imageData) {
+          final base64String = imageData['imageData'];
+          final bytes = base64Decode(base64String);
+          return bytes.buffer.asUint8List();
+        }).toList();
+        return images; // no need to wrap with Future
+      } else {
+        throw Exception('Errore durante la chiamata al server: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata al server: $e');
+      if (response!= null) {
+        //print('Risposta del server: ${response.body}');
+      }
+      throw e; // rethrow the exception
+    }
+  }
 
   Widget _buildSearchField() {
     return TextField(
       controller: searchController,
-      autofocus: true,
+      //autofocus: true,
       decoration: InputDecoration(
         hintText: 'Cerca prodotti...'.toUpperCase(),
         border: InputBorder.none,
@@ -72,7 +100,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       });
     });
     getAllProdotti();
-    searchController = TextEditingController();
+    _futureImages = fetchImages();
   }
 
   void startSearch() {
@@ -183,6 +211,52 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Container(
+                            width: 600,
+                            child: FutureBuilder<List<Uint8List>>(
+                              future: _futureImages,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Wrap(
+                                    spacing: 16,
+                                    runSpacing: 16,
+                                    children: snapshot.data!.asMap().entries.map((entry) {
+                                      int index = entry.key;
+                                      Uint8List imageData = entry.value;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => PhotoViewPage(
+                                                images: snapshot.data!,
+                                                initialIndex: index, // Passa l'indice dell'immagine cliccata
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          width: 150, // aumenta la larghezza del container
+                                          height: 170, // aumenta l'altezza del container
+                                          decoration: BoxDecoration(
+                                            border: Border.all(width: 1), // aggiungi bordo al container
+                                          ),
+                                          child: Image.memory(
+                                            imageData,
+                                            fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Text('Nessuna foto presente nel database!');
+                                } else {
+                                  return Center(child: CircularProgressIndicator());
+                                }
+                              },
+                            ),
+                          ),
                           if (fasiRiparazione.isNotEmpty)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,6 +283,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 Text('Nessuna fase ancora registrata', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
                               ],
                             ),
+                          _buildDetailRow(title: 'Cliente', value: widget.intervento.cliente!.denominazione!),
                           _buildDetailRow(title:'Data arrivo', value: widget.intervento.data != null ? DateFormat('dd/MM/yyyy  HH:mm').format(widget.intervento.merce!.data!) : '', context: context),
                           _buildDetailRow(title:'Articolo', value: widget.intervento.merce?.articolo ?? '', context: context),
                           _buildDetailRow(title:'Accessori', value: widget.intervento.merce?.accessori ?? '', context: context),
@@ -227,51 +302,64 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               )
                             ],
                           ),
-
                           _buildDetailRow(title:'Preventivo', value: widget.intervento.merce?.preventivo != null ? (widget.intervento.merce!.preventivo! ? 'Richiesto' : 'non richiesto') : '', context: context),
                           if (widget.merce.preventivo != null && widget.merce.preventivo == true)
                             SizedBox(
                               child: Column(
                                 children: [
-                                  _buildDetailRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito", context: context),
-                                  SizedBox(
-                                      width: 500,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          SizedBox(
-                                            width: 210,
-                                            child: TextFormField(
-                                              controller: importoPreventivatoController,
-                                              keyboardType: TextInputType.number,
-                                              decoration: InputDecoration(
-                                                labelText: 'Importo Preventivato'.toUpperCase(),
-                                                border: OutlineInputBorder(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _buildDetailRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito", context: context),
+                                      IconButton(
+                                        icon: Icon(Icons.edit),
+                                        onPressed : ((){
+                                          setState(() {
+                                            modificaImportoPreventivo = !modificaImportoPreventivo;
+                                          });
+                                        })
+                                      )
+                                    ],
+                                  ),
+                                  if(modificaImportoPreventivo == true)
+                                    SizedBox(
+                                        width: 500,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 220,
+                                              child: TextFormField(
+                                                controller: importoPreventivatoController,
+                                                keyboardType: TextInputType.number,
+                                                decoration: InputDecoration(
+                                                  labelText: 'Importo Preventivato'.toUpperCase(),
+                                                  border: OutlineInputBorder(),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              if(importoPreventivatoController.text.isNotEmpty){
-                                                saveImportoPreventivo();
-                                              } else{
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text('Non puoi salvare un preventivo nullo!'),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              primary: Colors.red,
-                                              onPrimary: Colors.white,
+                                            SizedBox(width: 10),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                if(importoPreventivatoController.text.isNotEmpty){
+                                                  saveImportoPreventivo();
+                                                } else{
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text('Non puoi salvare un preventivo nullo!'),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                primary: Colors.red,
+                                                onPrimary: Colors.white,
+                                              ),
+                                              child: Text('Salva importo Preventivo'.toUpperCase()),
                                             ),
-                                            child: Text('Salva importo Preventivo'.toUpperCase()),
-                                          ),
-                                        ],
-                                      )
-                                  ),
+                                          ],
+                                        )
+                                    ),
                                 ],
                               ),
                             ),
@@ -933,9 +1021,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> saveImportoPreventivo() async {
     try {
-      // Ottieni la data attuale come stringa ISO 8601
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       double? importo = double.parse(importoPreventivatoController.text);
       final response = await http.post(

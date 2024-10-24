@@ -64,6 +64,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   bool _preventivoRichiesto = false;
   bool _orarioDisponibile = false;
   TimeOfDay _selectedTime = TimeOfDay.now();
+  Priorita? _selectedPriorita;
 
   @override
   void initState() {
@@ -301,6 +302,45 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           ),
                         ),
                         const SizedBox(height: 20),
+                        SizedBox(
+                          width: 400,
+                          child: DropdownButtonFormField<Priorita>(
+                            value: _selectedPriorita,
+                            onChanged: (Priorita? newValue) {
+                              setState(() {
+                                _selectedPriorita = newValue;
+                              });
+                            },
+                            // Filtra solo i valori desiderati: Acconto e Pagamento
+                            items: [Priorita.BASSA, Priorita.MEDIA, Priorita.ALTA, Priorita.URGENTE]
+                                .map<DropdownMenuItem<Priorita>>((Priorita value) {
+                              String label = "";
+                              if (value == Priorita.BASSA) {
+                                label = 'BASSA';
+                              } else if (value == Priorita.MEDIA) {
+                                label = 'MEDIA';
+                              } else if (value == Priorita.ALTA) {
+                                label = 'ALTA';
+                              } else if (value == Priorita.URGENTE) {
+                                label = 'URGENTE';
+                              }
+                              return DropdownMenuItem<Priorita>(
+                                value: value,
+                                child: Text(label),
+                              );
+                            }).toList(),
+                            decoration: InputDecoration(
+                              labelText: 'PRIORITÀ',
+                            ),
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Selezionare la priorità';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(height : 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -859,6 +899,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'numerazione_danea' : null,
+            'priorita' : _selectedPriorita.toString().split('.').last,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : orario.toIso8601String(),
