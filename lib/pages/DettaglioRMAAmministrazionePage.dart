@@ -48,7 +48,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   /*Future<http.Response?> getIntervento() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/restituzioneMerce/${int.parse(widget.merce.id.toString())}');
+      var apiUrl = Uri.parse('$ipaddress/api/restituzioneMerce/${int.parse(widget.merce.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -83,7 +83,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var decodedData = jsonDecode(data.body);
       var interventoData = decodedData[0]; // Adjusted here
       InterventoModel intervento = InterventoModel.fromJson(interventoData);*/ // Adjusted here
-      final url = '$ipaddressProva/api/immagine/restituzioneMerce/${widget.merce.id.toString()}/images';
+      final url = '$ipaddress/api/immagine/restituzioneMerce/${widget.merce.id.toString()}/images';
       http.Response? response;
       try {
         response = await http.get(Uri.parse(url));
@@ -130,7 +130,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -404,7 +404,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -440,7 +440,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDataRicon() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -498,7 +498,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('$ipaddressProva/api/restituzioneMerce'),
+                              Uri.parse('$ipaddress/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -568,7 +568,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('$ipaddressProva/api/restituzioneMerce'),
+                              Uri.parse('$ipaddress/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -616,7 +616,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDataRientro() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -651,7 +651,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaRimborso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -1257,7 +1257,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       double? importo = double.parse(importoPreventivatoController.text);
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1304,7 +1304,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1348,7 +1348,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1392,7 +1392,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1436,7 +1436,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -1482,7 +1482,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       String? dataAccettazione = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,

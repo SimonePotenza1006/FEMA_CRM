@@ -51,7 +51,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveIngresso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/ingresso'),
+        Uri.parse('$ipaddress/api/ingresso'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'orario': formattedDate,
@@ -70,7 +70,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -94,7 +94,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/merceInRiparazione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/merceInRiparazione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<MerceInRiparazioneModel> allMerceByUtente = [];
@@ -118,7 +118,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -142,7 +142,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
