@@ -364,15 +364,10 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             return Center(child: Text('Errore: ${snapshot.error}'));
                           } else if (snapshot.hasData) {
                             List<InterventoModel> interventi = snapshot.data!;
-
-                            // Filtra ulteriormente nel FutureBuilder per sicurezza
                             interventi = interventi.where((intervento) => intervento.merce == null).toList();
-
-                            // Modifica il filtro per includere interventi senza data o con data corrispondente a `selectedDate`
                             interventi = interventi.where((intervento) {
                               return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                             }).toList();
-
                             if (interventi.isEmpty) {
                               return Center(child: Text('Nessun intervento trovato'));
                             }
@@ -383,18 +378,38 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               itemCount: interventi.length,
                               itemBuilder: (context, index) {
                                 InterventoModel intervento = interventi[index];
-                                Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
+
+                                // Metodo per mappare la priorità al colore corrispondente
+                                Color getPriorityColor(Priorita priorita) {
+                                  switch (priorita) {
+                                    case Priorita.BASSA:
+                                      return Colors.lightGreen;
+                                    case Priorita.MEDIA:
+                                      return Colors.yellow; // grigio chiaro
+                                    case Priorita.ALTA:
+                                      return Colors.orange; // giallo chiaro
+                                    case Priorita.URGENTE:
+                                      return Colors.red; // azzurro chiaro
+                                    default:
+                                      return Colors.blueGrey[200]!;
+                                  }
+                                }
+
+                                // Determina il colore in base alla priorità
+                                Color backgroundColor =  getPriorityColor(intervento.priorita!);
+
                                 TextStyle textStyle = intervento.concluso ?? false
                                     ? TextStyle(color: Colors.white, fontSize: 15)
                                     : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                 return Card(
-                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                                   elevation: 4,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                   child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                     title: Text(
-                                      '${intervento.descrizione}',
+                                      '${intervento.descrizione} \n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                       style: textStyle,
                                     ),
                                     subtitle: Text(
@@ -402,13 +417,17 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       style: textStyle,
                                     ),
                                     trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
+                                        // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                        if (intervento.concluso ?? false)
+                                          Icon(Icons.check, color: Colors.white, size: 15), // Check icon
                                         Text(
                                           intervento.data != null
                                               ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                               : 'Data non disponibile',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 14,
                                             color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                           ),
                                         ),
@@ -417,7 +436,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                               ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                               : 'Nessun orario di appuntamento',
                                           style: TextStyle(
-                                            fontSize: 10,
+                                            fontSize: 9,
                                             color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                           ),
                                         ),
@@ -700,100 +719,119 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           ),
                         ),
                         const SizedBox(height: 10.0),
-                        FutureBuilder<List<InterventoModel>>(
-                          future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<InterventoModel> interventi = snapshot.data!;
+                    FutureBuilder<List<InterventoModel>>(
+                      future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Errore: ${snapshot.error}'));
+                        } else if (snapshot.hasData) {
+                          List<InterventoModel> interventi = snapshot.data!;
+                          interventi = interventi.where((intervento) => intervento.merce == null).toList();
+                          interventi = interventi.where((intervento) {
+                            return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                          }).toList();
+                          if (interventi.isEmpty) {
+                            return Center(child: Text('Nessun intervento trovato'));
+                          }
 
-                              // Filtra ulteriormente nel FutureBuilder per sicurezza
-                              interventi = interventi.where((intervento) => intervento.merce == null).toList();
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: interventi.length,
+                            itemBuilder: (context, index) {
+                              InterventoModel intervento = interventi[index];
 
-                              // Modifica il filtro per includere interventi senza data o con data corrispondente a `selectedDate`
-                              interventi = interventi.where((intervento) {
-                                return intervento.data == null || intervento.data!.isSameDay(selectedDate);
-                              }).toList();
-
-                              if (interventi.isEmpty) {
-                                return Center(child: Text('Nessun intervento trovato'));
+                              // Metodo per mappare la priorità al colore corrispondente
+                              Color getPriorityColor(Priorita priorita) {
+                                switch (priorita) {
+                                  case Priorita.BASSA:
+                                    return Colors.lightGreen;
+                                  case Priorita.MEDIA:
+                                    return Colors.yellow; // grigio chiaro
+                                  case Priorita.ALTA:
+                                    return Colors.orange; // giallo chiaro
+                                  case Priorita.URGENTE:
+                                    return Colors.red; // azzurro chiaro
+                                  default:
+                                    return Colors.blueGrey[200]!;
+                                }
                               }
 
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: interventi.length,
-                                itemBuilder: (context, index) {
-                                  InterventoModel intervento = interventi[index];
-                                  Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
-                                  TextStyle textStyle = intervento.concluso ?? false
-                                      ? TextStyle(color: Colors.white, fontSize: 15)
-                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+                              // Determina il colore in base alla priorità
+                              Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
-                                  return Card(
-                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    elevation: 4,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                    child: ListTile(
-                                      title: Text(
-                                        '${intervento.descrizione}',
-                                        style: textStyle,
-                                      ),
-                                      subtitle: Text(
-                                        intervento.cliente?.denominazione.toString() ?? '',
-                                        style: textStyle,
-                                      ),
-                                      trailing: Column(
-                                        children: [
-                                          Text(
-                                            intervento.data != null
-                                                ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                                : 'Data non disponibile',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: intervento.concluso ?? false ? Colors.white : Colors.black,
-                                            ),
+                              TextStyle textStyle = intervento.concluso ?? false
+                                  ? TextStyle(color: Colors.white, fontSize: 15)
+                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                              return Card(
+                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                  title: Text(
+                                    '${intervento.descrizione}',
+                                    style: textStyle,
+                                  ),
+                                  subtitle: Text(
+                                    intervento.cliente?.denominazione.toString() ?? '',
+                                    style: textStyle,
+                                  ),
+                                  trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                        if (intervento.concluso ?? false)
+                                          Icon(Icons.check, color: Colors.white, size: 15), // Check icon
+                                        Text(
+                                          intervento.data != null
+                                              ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                              : 'Data non disponibile',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                           ),
-                                          Text(
-                                            intervento.orario_appuntamento != null
-                                                ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                                : 'Nessun orario di appuntamento',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: intervento.concluso ?? false ? Colors.white : Colors.black,
-                                            ),
+                                        ),
+                                        Text(
+                                          intervento.orario_appuntamento != null
+                                              ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                              : 'Nessun orario di appuntamento',
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                           ),
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData!,
-                                              intervento: intervento,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      tileColor: backgroundColor,
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  );
-                                },
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DettaglioInterventoByTecnicoPage(
+                                          utente: widget.userData!,
+                                          intervento: intervento,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  tileColor: backgroundColor,
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
                               );
-                            } else {
-                              return Center(child: Text('Nessun intervento trovato'));
-                            }
-                          },
-                        ),
-                        FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                            },
+                          );
+                        } else {
+                          return Center(child: Text('Nessun intervento trovato'));
+                        }
+                      },
+                    ),
+                    FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                           future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
