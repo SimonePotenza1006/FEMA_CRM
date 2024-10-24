@@ -60,7 +60,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     'inserimento_importo' : 100,
     'importo_restante' : 150,
     'assegna_gruppo' : 130,
-    'tipologia' : 180
+    'tipologia' : 180,
+    'stato' : 100
   };
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   bool isLoading = true;
@@ -979,6 +980,24 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     minimumWidth: 230,
                   ),
                   GridColumn(
+                    columnName: 'stato',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text('STATO', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                    width: _columnWidths['stato']?? double.nan,
+                    minimumWidth: 100,
+                  ),
+                  GridColumn(
                     columnName: 'inserimento_importo',
                     label : Container(
                         padding: EdgeInsets.all(8),
@@ -1427,6 +1446,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       double? importo = intervento.importo_intervento != null ? intervento.importo_intervento : 0;
       double? acconto = intervento.acconto != null ? intervento.acconto : 0;
       double? restante_da_pagare = importo! - acconto!;
+      String? stato = (intervento.orario_inizio == null && intervento.orario_fine == null)
+          ? "Assegbnato".toUpperCase()
+          : (intervento.orario_inizio != null && intervento.orario_fine == null)
+          ? "In lavorazione".toUpperCase()
+          : (intervento.orario_inizio != null && intervento.orario_fine != null)
+          ? "Concluso".toUpperCase()
+          : "///";
+
+
 
       List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
       String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
@@ -1520,6 +1548,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           DataGridCell<String>(
             columnName: 'responsabile',
             value: intervento.utente?.nomeCompleto() ?? 'NON ASSEGNATO',
+          ),
+          DataGridCell<String>(
+            columnName: 'stato',
+            value: stato,
           ),
           DataGridCell<Widget>(
             columnName: 'inserimento_importo',

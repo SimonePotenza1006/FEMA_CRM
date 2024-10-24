@@ -721,11 +721,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       final merce = MerceInRiparazioneModel.fromJson(jsonDecode(data.body));
       bool assigned = responsabile != null ? true : false;
       try{
+        String prioritaString = _selectedPriorita.toString().split('.').last;
         final response = await http.post(
           Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'numerazione_danea' : null,
+            'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,//_dataOdierna.toIso8601String(),
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,
@@ -893,13 +895,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     bool assigned = responsabile != null ? true : false;
     if(_orarioDisponibile == true){
       try {
+        String prioritaString = _selectedPriorita.toString().split('.').last;
+        print('$prioritaString');
         final orario = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, _selectedTime.hour, _selectedTime.minute);
         response = await http.post(
           Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'numerazione_danea' : null,
-            'priorita' : _selectedPriorita.toString().split('.').last,
+            'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : orario.toIso8601String(),
@@ -938,11 +942,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
     else{
       try {
+        String prioritaString = _selectedPriorita.toString().split('.').last;
         response = await http.post(
           Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'numerazione_danea' : null,
+            'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,

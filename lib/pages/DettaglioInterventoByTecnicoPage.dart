@@ -219,7 +219,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               foregroundColor: Colors.white,
               children : [
                 if (widget.intervento.utente?.id == widget.utente.id)
-                  if (widget.intervento.orario_inizio == null)
+                  if (widget.intervento.orario_inizio == null  && (widget.utente.id == "9" || widget.utente.id == "4" || widget.intervento.id == "5"))
                     SpeedDialChild(
                       child: Icon(Icons.lock_clock_outlined, color: Colors.white),
                       backgroundColor: Colors.red,
@@ -231,7 +231,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         ),
                       ),
                     ),
-                if(widget.intervento.concluso == false && widget.intervento.orario_inizio != null &&  widget.intervento.utente?.id == widget.utente.id && widget.intervento.merce == null)
+                if(widget.intervento.concluso == false && widget.intervento.orario_inizio != null &&  widget.intervento.utente?.id == widget.utente.id && widget.intervento.merce == null && (widget.utente.id == "9" || widget.utente.id == "4" || widget.intervento.id == "5"))
                   SpeedDialChild(
                     child: Icon(Icons.cases_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
@@ -251,6 +251,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     context,
                     MaterialPageRoute(
                       builder: (context) => AggiuntaNotaByTecnicoPage(intervento: widget.intervento, utente: widget.utente!),
+                    ),
+                  ),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.camera_alt_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'ALLEGA RAPPORTINO'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AggiuntaFotoPage(intervento: widget.intervento, utente: widget.utente),
                     ),
                   ),
                 ),
