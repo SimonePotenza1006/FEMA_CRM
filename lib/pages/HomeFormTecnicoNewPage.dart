@@ -469,7 +469,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             } else if (snapshot.hasData) {
                               List<InterventoModel> merce = snapshot.data!;
                               if(merce.isEmpty){
-                                return Center(child: Text('Nessuna mece in riparazione'));
+                                return Center(child: Text(''));
                               }
                               return ListView.builder(
                                   shrinkWrap: true,
@@ -802,7 +802,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               return Center(child: Text('Errore: ${snapshot.error}'));
                             } else if (snapshot.hasData) {
                               List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
-                              relazioni = relazioni.where((relazione) => relazione.intervento!.data!.isSameDay(selectedDate)).toList();
+                              relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce == null).toList();
                               return ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
@@ -885,7 +885,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               } else if (snapshot.hasData) {
                                 List<InterventoModel> merce = snapshot.data!;
                                 if(merce.isEmpty){
-                                  return Center(child: Text('Nessuna mece in riparazione'));
+                                  return Center(child: Text(''));
                                 }
                                 return ListView.builder(
                                     shrinkWrap: true,
@@ -936,6 +936,78 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 return Center(child: Text('Nessuna merce trovata'));
                               }
                             }
+                        ),
+                        FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                          future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
+                              relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce != null).toList();
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: relazioni.length,
+                                itemBuilder: (context, index) {
+                                  RelazioneUtentiInterventiModel relazione = relazioni[index];
+                                  Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
+                                  TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                                  return ListTile(
+                                    title: Text(
+                                      '${relazione.intervento?.descrizione}',
+                                      style: textStyle,
+                                    ),
+                                    subtitle: Text(
+                                      relazione.intervento?.cliente?.denominazione.toString()?? '',
+                                      style: textStyle,
+                                    ),
+                                    trailing: Column(
+                                      children: [
+                                        Text(
+                                          // Formatta la data secondo il tuo formato desiderato
+                                          relazione.intervento?.data!= null
+                                              ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
+                                              : 'Data non disponibile',
+                                          style: TextStyle(
+                                            fontSize: 16, // Stile opzionale per la data
+                                            color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          relazione.intervento?.orario_appuntamento!= null
+                                              ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                              : 'Nessun orario di appuntamento',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DettaglioMerceInRiparazioneByTecnicoPage(
+                                                utente: widget.userData!,
+                                                intervento: relazione.intervento!,
+                                                merce: relazione.intervento!.merce!,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                    tileColor: backgroundColor,
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text(''));
+                            }
+                          },
                         ),
                         const SizedBox(height: 50.0),
                         const Text(

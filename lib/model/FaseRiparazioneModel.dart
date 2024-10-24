@@ -6,6 +6,7 @@ class FaseRiparazioneModel{
   String? id;
   DateTime? data;
   String? descrizione;
+  bool? conclusione;
   UtenteModel? utente;
   MerceInRiparazioneModel? merce;
 
@@ -13,6 +14,7 @@ class FaseRiparazioneModel{
       this.id,
       this.data,
       this.descrizione,
+      this.conclusione,
       this.utente,
       this.merce
       );
@@ -22,6 +24,7 @@ class FaseRiparazioneModel{
       'id' : id,
       'data' : data?.toIso8601String(),
       'descrizione' : descrizione,
+      'conclusione' : conclusione,
       'utente' : utente?.toMap(),
       'merce' : merce?.toMap()
     };
@@ -32,6 +35,7 @@ class FaseRiparazioneModel{
     id = map['id'];
     map['data'] != null ? DateTime.parse(map['data']) : null;
     descrizione = map['descrizione'];
+    conclusione = map['conclusione'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
     merce = map['merce'] != null ? MerceInRiparazioneModel.fromMap(map['merce']) : null;
   }
@@ -40,6 +44,7 @@ class FaseRiparazioneModel{
     'id' : id,
     'data' : data?.toIso8601String(),
     'descrizione' : descrizione,
+    'conclusione' : conclusione,
     'utente' : utente?.toJson(),
     'merce' : merce?.toJson()
   };
@@ -49,6 +54,7 @@ class FaseRiparazioneModel{
       json['id']?.toString(),
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['descrizione'].toString(),
+      json['conclusione'],
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
       json['merce'] != null ? MerceInRiparazioneModel.fromJson(json['merce']) : null
     );
