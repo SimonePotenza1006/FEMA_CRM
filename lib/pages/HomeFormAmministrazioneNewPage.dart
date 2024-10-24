@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 import '../main.dart';
 import '../model/CommissioneModel.dart';
 import '../model/CustomAppointmentModel.dart';
@@ -40,6 +41,7 @@ import 'CreazioneNuovoUtentePage.dart';
 import 'DettaglioCommissioneAmministrazionePage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
 import 'DettaglioInterventoPage.dart';
+import 'DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'ListaNoteUtentiPage.dart';
 import 'ListaUtentiPage.dart';
 import 'ParentFolderPage.dart';
@@ -307,6 +309,28 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } catch (e) {
       print('Error fetching interventi: $e');
       return [];
+    }
+  }
+
+  Future<List<InterventoModel>> getMerce() async{
+    try{
+
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce'));
+      if(response.statusCode == 200){
+        var responseData = json.decode(response.body);
+        List<InterventoModel> interventi = [];
+        for(var interventoJson in responseData){
+          InterventoModel intervento = InterventoModel.fromJson(interventoJson);
+          if (intervento.concluso != null)
+          interventi.add(intervento);
+        }
+        return interventi;
+      } else {
+        return [];
+      }
+    } catch(e){
+      print('Errore fetch merce: $e');
+      return[];
     }
   }
 
@@ -1946,6 +1970,78 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           return Center(child: Text('Nessun intervento trovato'));
                         }
                       },
+                    ),
+
+                    const SizedBox(height: 50.0),
+                    Center(
+                      child: Text(
+                        'MERCE IN RIPARAZIONE',
+                        style: TextStyle(
+                            fontSize: 30.0, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                    FutureBuilder<List<InterventoModel>>(
+                        future: getMerce(),
+                        builder:(context, snapshot){
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<InterventoModel> merce = snapshot.data!;
+                            if(merce.isEmpty){
+                              return Center(child: Text(''));
+                            }
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: merce.length,
+                                itemBuilder:(context, index){
+                                  InterventoModel singolaMerce = merce[index];
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
+                                    child: ListTile(
+                                      title: Text(
+                                        '${singolaMerce.merce?.articolo}',
+                                      ),
+                                      subtitle: Text(
+                                        '${singolaMerce.merce?.difetto_riscontrato}',
+                                      ),
+                                      trailing: Column(
+                                        children: [
+                                          Text('Data arrivo merce:'),
+                                          SizedBox(height: 3),
+                                          Text('${singolaMerce.data_apertura_intervento != null ? intl.DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
+                                        ],
+                                      ),
+                                      onTap: (){
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                                  intervento: singolaMerce,
+                                                  merce : singolaMerce.merce!,
+                                                  utente : widget.userData!
+                                              ),
+                                            )
+                                        );
+                                      },
+                                      tileColor: Colors.white60,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  );
+                                }
+                            );
+                          } else{
+                            return Center(child: Text('Nessuna merce trovata'));
+                          }
+                        }
                     ),
 
                     const SizedBox(height: 50.0),

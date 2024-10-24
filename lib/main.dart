@@ -565,7 +565,8 @@ class _LoginFormState extends State<LoginForm> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: <Widget>[
-                          TextFormField(
+                          TextField(
+                            onSubmitted: (value) {login();},
                             controller: _conUserId,
                             decoration: InputDecoration(
                               labelText: 'Username',
@@ -577,7 +578,8 @@ class _LoginFormState extends State<LoginForm> {
                             autofillHints: [AutofillHints.username],
                           ),
                           SizedBox(height: 15),
-                          TextFormField(
+                          TextField(
+                            onSubmitted: (value) {login();},
                             controller: _conPassword,
                             obscureText: true,
                             decoration: InputDecoration(

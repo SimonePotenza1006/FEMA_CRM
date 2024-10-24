@@ -92,7 +92,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               Navigator.pop(context);
             },
           ),
-          actions: [
+          /*actions: [
             IconButton(
                 onPressed: () {
                   Navigator.push(
@@ -105,7 +105,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   );
                 },
                 icon: Icon(Icons.add, color: Colors.white))
-          ],
+          ],*/
         ),
         body: Column(
           children: [
