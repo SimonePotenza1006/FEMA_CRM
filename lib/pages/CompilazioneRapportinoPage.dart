@@ -15,7 +15,6 @@ import '../model/CategoriaInterventoSpecificoModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/ImmagineModel.dart';
 import 'dart:ui' as ui;
-import 'HomeFormTecnico.dart';
 import 'package:path/path.dart' as basename;
 
 class CompilazioneRapportinoPage extends StatefulWidget {

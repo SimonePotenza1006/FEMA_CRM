@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fema_crm/model/CommissioneModel.dart';
-import 'HomeFormTecnico.dart';
 
 class DettaglioCommissioneAmministrazionePage extends StatefulWidget {
   final CommissioneModel commissione;

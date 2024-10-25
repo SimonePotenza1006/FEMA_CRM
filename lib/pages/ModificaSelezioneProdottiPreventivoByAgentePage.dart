@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:fema_crm/pages/HomeFormTecnico.dart';
+import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:fema_crm/pages/ReportPreventiviPage.dart';
 import 'package:flutter/material.dart';
 import 'package:fema_crm/model/ProdottoModel.dart';
@@ -299,7 +299,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          HomeFormTecnico(userData: widget.preventivo.utente),
+                                          HomeFormTecnicoNewPage(userData: widget.preventivo.utente),
                                     ),
                                   );
                                 },

@@ -1216,6 +1216,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                           ],
                         ),
+                      TextButton(
+                        onPressed:() {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Conferma'
+                        ),
+                      )
                     ],
                   ),
                 )
