@@ -1131,7 +1131,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   ),
                   GridColumn(
                     allowSorting: true,
-                    columnName: 'tipologia'.toUpperCase(),
+                    columnName: 'tipologia',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
                       alignment: Alignment.center,
