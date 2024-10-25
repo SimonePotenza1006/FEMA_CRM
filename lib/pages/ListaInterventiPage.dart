@@ -34,7 +34,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllGruppi() async {
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -61,7 +61,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllInterventi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -458,7 +458,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveImporto(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

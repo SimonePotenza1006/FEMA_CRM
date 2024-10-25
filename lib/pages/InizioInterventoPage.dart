@@ -46,7 +46,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddressProva/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -73,7 +73,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddressProva/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -267,7 +267,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       final now = DateTime.now();
 
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,

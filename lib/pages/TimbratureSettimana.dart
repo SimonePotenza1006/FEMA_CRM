@@ -685,7 +685,7 @@ print('ssA '+settimanaA.toString());
 
   Future<void> getAllMarcatempo() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -741,7 +741,7 @@ print('ssA '+settimanaA.toString());
         if (true){//tipoTimbratura == "INGRESSO") {
           print(DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String()+' '+DateTime.now().toIso8601String());
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : row.idmt,
@@ -762,7 +762,7 @@ print('ssA '+settimanaA.toString());
             }),
           ).then((value) async {
             if (row.idmt2 != null) { final response = await http.post(
-              Uri.parse('$ipaddress/marcatempo'),
+              Uri.parse('$ipaddressProva/marcatempo'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'id' : row.idmt2,
@@ -783,7 +783,7 @@ print('ssA '+settimanaA.toString());
               }),
             );} else if (row.oraIngresso2 != null) {
               final response = await http.post(
-                Uri.parse('$ipaddress/marcatempo'),
+                Uri.parse('$ipaddressProva/marcatempo'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'id' : '',
@@ -821,7 +821,7 @@ print('ssA '+settimanaA.toString());
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,
@@ -864,7 +864,7 @@ print('ssA '+settimanaA.toString());
 
   Future<void> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<UtenteModel> utenti = [];
