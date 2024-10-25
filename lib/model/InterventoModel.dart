@@ -10,6 +10,7 @@ import 'VeicoloModel.dart';
 
 class InterventoModel {
   String? id;
+  bool? attivo;
   String? numerazione_danea;
   Priorita? priorita;
   DateTime? data_apertura_intervento;
@@ -20,6 +21,7 @@ class InterventoModel {
   DateTime? orario_fine;
   String? descrizione;
   double? importo_intervento;
+  double? saldo_tecnico;
   bool? prezzo_ivato;
   int? iva;
   double? acconto;
@@ -32,6 +34,7 @@ class InterventoModel {
   String? note;
   String? relazione_tecnico;
   String? firma_cliente;
+  UtenteModel? utente_apertura;
   UtenteModel? utente;
   ClienteModel? cliente;
   VeicoloModel? veicolo;
@@ -44,6 +47,7 @@ class InterventoModel {
 
   InterventoModel(
       this.id,
+      this.attivo,
       this.numerazione_danea,
       this.priorita,
       this.data_apertura_intervento,
@@ -54,6 +58,7 @@ class InterventoModel {
       this.orario_fine,
       this.descrizione,
       this.importo_intervento,
+      this.saldo_tecnico,
       this.prezzo_ivato,
       this.iva,
       this.acconto,
@@ -66,6 +71,7 @@ class InterventoModel {
       this.note,
       this.relazione_tecnico,
       this.firma_cliente,
+      this.utente_apertura,
       this.utente,
       this.cliente,
       this.veicolo,
@@ -80,6 +86,7 @@ class InterventoModel {
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
+      'attivo' : attivo,
       'numerazione_danea' : numerazione_danea,
       'priorita' : priorita.toString().split('.').last,
       'data_apertura_intervento': data_apertura_intervento?.toIso8601String(),
@@ -90,6 +97,7 @@ class InterventoModel {
       'orario_fine': orario_fine?.toIso8601String(),
       'descrizione': descrizione,
       'importo_intervento': importo_intervento,
+      'saldo_tecnico' : saldo_tecnico,
       'prezzo_ivato' : prezzo_ivato,
       'iva' : iva,
       'acconto' : acconto,
@@ -102,6 +110,7 @@ class InterventoModel {
       'note': note,
       'relazione_tecnico' : relazione_tecnico,
       'firma_cliente': firma_cliente,
+      'utente_apertura' : utente_apertura?.toMap(),
       'utente': utente?.toMap(),
       'cliente': cliente?.toMap(),
       'veicolo': veicolo?.toMap(),
@@ -119,6 +128,7 @@ class InterventoModel {
 
   InterventoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
+    attivo = map['attivo'];
     numerazione_danea = map['numerazione_danea'];
     priorita = Priorita.values.firstWhere(
             (type) => type.toString() == 'priorita.${map['priorita']}');
@@ -130,6 +140,7 @@ class InterventoModel {
     map['orario_fine'] != null ? DateTime.parse(map['orario_fine']) : null;
     descrizione = map['descrizione'];
     importo_intervento = map['importo_intervento'];
+    saldo_tecnico = map['saldo_tecnico'];
     prezzo_ivato = map['prezzo_ivato'];
     iva = map['iva'];
     acconto = map['acconto'];
@@ -142,6 +153,7 @@ class InterventoModel {
     note = map['note'];
     relazione_tecnico = map['relazione_tecnico'];
     firma_cliente = map['firma_cliente'];
+    utente_apertura = map['utente_apertura'] != null ? UtenteModel.fromMap(map['utente_apertura']) : null;
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
     cliente = map['cliente'] != null ? ClienteModel.fromMap(map['cliente']) : null;
     veicolo = map['veicolo'] != null ? VeicoloModel.fromMap(map['veicolo']) : null;
@@ -156,6 +168,7 @@ class InterventoModel {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'attivo' : attivo,
     'numerazione_danea' : numerazione_danea,
     'priorita' : priorita.toString().split('.').last,
     'data_apertura_intervento' : data_apertura_intervento?.toIso8601String(),
@@ -166,6 +179,7 @@ class InterventoModel {
     'orario_fine': orario_fine?.toIso8601String(),
     'descrizione': descrizione,
     'importo_intervento': importo_intervento,
+    'saldo_tecnico' : saldo_tecnico,
     'prezzo_ivato' : prezzo_ivato,
     'iva' : iva,
     'acconto' : acconto,
@@ -178,6 +192,7 @@ class InterventoModel {
     'note': note,
     'relazione_tecnico' : relazione_tecnico,
     'firma_cliente': firma_cliente,
+    'utente_apertura' : utente_apertura?.toJson(),
     'utente': utente?.toJson(),
     'cliente': cliente?.toJson(),
     'veicolo': veicolo?.toJson(),
@@ -193,6 +208,7 @@ class InterventoModel {
   factory InterventoModel.fromJson(Map<String, dynamic> json) {
     return InterventoModel(
       json['id']?.toString(),
+      json['attivo'],
       json['numerazione_danea']?.toString(),
       _getPrioritaFromString(json['priorita']),
       json['data_apertura_intervento'] != null ? DateTime.parse(json['data_apertura_intervento']) : null,
@@ -203,6 +219,7 @@ class InterventoModel {
       json['orario_fine'] != null ? DateTime.parse(json['orario_fine']) : null,
       json['descrizione']?.toString(),
       json['importo_intervento'] != null ? double.parse(json['importo_intervento'].toString()) : null,
+      json['saldo_tecnico'] != null ? double.parse(json['saldo_tecnico'].toString()) : null,
       json['prezzo_ivato'],
       json['iva'],
       json['acconto'] != null ? double.parse(json['acconto'].toString()) : null,
@@ -215,6 +232,7 @@ class InterventoModel {
       json['note']?.toString(),
       json['relazione_tecnico']?.toString(),
       json['firma_cliente'],
+      json['utente_apertura'] != null ? UtenteModel.fromJson(json['utente_apertura']) : null,
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
       json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
       json['veicolo'] != null ? VeicoloModel.fromJson(json['veicolo']) : null,

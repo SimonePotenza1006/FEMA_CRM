@@ -643,6 +643,4 @@ class _DbHelper1State extends State<DbHelper1>{
       print('Errore durante la chiamata all\'API: $e');
     }
   }
-
-
 }

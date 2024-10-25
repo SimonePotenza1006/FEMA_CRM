@@ -7,6 +7,7 @@ import 'package:fema_crm/model/NotaTecnicoModel.dart';
 import 'package:fema_crm/model/RelazioneDdtProdottiModel.dart';
 import 'package:fema_crm/model/RelazioneProdottiInterventoModel.dart';
 import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
+import 'package:fema_crm/pages/TableInterventiPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -485,13 +486,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
-  void modificaDescrizione() async{
+  void eliminaIntervento() async{
     try{
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
+          'attivo' :false,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -500,8 +502,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'posizione_gps' : widget.intervento.posizione_gps,
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
-          'descrizione': descrizioneController.text.toUpperCase(),
+          'descrizione': widget.intervento.descrizione,
           'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
           'iva' : widget.intervento.iva,
           'acconto' : widget.intervento.acconto,
@@ -514,6 +517,67 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'note': widget.intervento.note,
           'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Intervento eliminato con successo!'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TableInterventiPage(),
+        ),
+      );
+    } catch(e){
+      print('Errore $e');
+    }
+  }
+
+  void modificaDescrizione() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'attivo' : widget.intervento.attivo,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': descrizioneController.text.toUpperCase(),
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
           'utente': widget.intervento.utente?.toMap(),
           'cliente': widget.intervento.cliente?.toMap(),
           'veicolo': widget.intervento.veicolo?.toMap(),
@@ -574,6 +638,33 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  Future<void> showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Impedisce di chiudere il dialog toccando all'esterno
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Conferma eliminazione'),
+          content: Text('Eliminare definitivamente l\'intervento?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Chiude il dialog con risposta "NO"
+              },
+              child: Text('NO'),
+            ),
+            TextButton(
+              onPressed: () {
+                 eliminaIntervento();
+              },
+              child: Text('SI'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -609,6 +700,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           style: TextStyle(color: Colors.white),
         ),
         actions: [
+          Tooltip(
+            message: 'Elimina intervento',  // The text that will appear in the tooltip
+            preferBelow: true,       // This makes the tooltip appear below the icon
+            child: IconButton(
+              icon: Icon(Icons.delete_forever, color: Colors.white, size: 30),
+              onPressed: () {
+                showDeleteConfirmationDialog(context);
+              },
+            ),
+          ),
+          SizedBox(width: 10),
           Tooltip(
             message: 'Salva modifiche',  // The text that will appear in the tooltip
             preferBelow: true,       // This makes the tooltip appear below the icon
@@ -668,6 +770,24 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Cliente',
+                                      value: widget.intervento.cliente?.denominazione ?? 'N/A', context: context),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {
+                                    _showClientiDialog();
+                                  },
+                                )
+                              ],
                             ),
                             SizedBox(height: 10),
                             Row(
@@ -756,6 +876,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     ],
                                   )
                               ),
+                            SizedBox(height : 10),
+                            buildInfoRow(
+                                title: 'Apertura',
+                                value: widget.intervento.utente_apertura?.nomeCompleto() ?? 'N/A',
+                                context: context
+                            ),
                             SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -1002,23 +1128,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   ),
                                 ],
                               ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(
-                                  width: 500,
-                                  child: buildInfoRow(
-                                      title: 'Cliente',
-                                      value: widget.intervento.cliente?.denominazione ?? 'N/A', context: context),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.edit),
-                                  onPressed: () {
-                                    _showClientiDialog();
-                                  },
-                                )
-                              ],
                             ),
                             // Row(
                             //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2045,6 +2154,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
+          'attivo' : widget.intervento.attivo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -2055,6 +2165,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': descrizione,  // Using potentially updated descrizione
           'importo_intervento': importo,  // Using potentially updated importo
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato': widget.intervento.prezzo_ivato,
           'iva' : widget.intervento.iva,
           'acconto': widget.intervento.acconto,
@@ -2067,6 +2178,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'note': widget.intervento.note,
           'relazione_tecnico': rapportinoController.text,
           'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
           'utente': widget.intervento.utente?.toMap(),
           'cliente': cliente?.toMap(),
           'veicolo': widget.intervento.veicolo?.toMap(),
@@ -2114,6 +2226,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
+            'attivo' : widget.intervento.attivo,
             'numerazione_danea' : widget.intervento.numerazione_danea,
             'priorita' : widget.intervento.priorita.toString().split('.').last,
             'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -2124,6 +2237,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
             'descrizione': widget.intervento.descrizione,
             'importo_intervento': widget.intervento.importo_intervento,
+            'saldo_tecnico' : widget.intervento.saldo_tecnico,
             'prezzo_ivato' : widget.intervento.prezzo_ivato,
             'iva' : widget.intervento.iva,
             'acconto' : widget.intervento.acconto,
@@ -2136,6 +2250,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'note': widget.intervento.note,
             'relazione_tecnico' : widget.intervento.relazione_tecnico,
             'firma_cliente': widget.intervento.firma_cliente,
+            'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
             'utente': _responsabileSelezionato?.toMap(),
             'cliente': widget.intervento.cliente?.toMap(),
             'veicolo': widget.intervento.veicolo?.toMap(),

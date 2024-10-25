@@ -937,7 +937,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     onTap: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => CreazioneRMAPage()),
+                        MaterialPageRoute(builder: (context) => CreazioneRMAPage(utente:widget.userData)),
                       );
                     },
                   ),

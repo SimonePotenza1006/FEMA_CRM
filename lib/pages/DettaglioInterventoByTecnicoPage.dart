@@ -7,6 +7,7 @@ import 'package:fema_crm/pages/CreazioneScadenzaPage.dart';
 import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:fema_crm/pages/SalvataggioCredenzialiClientePage.dart';
+import 'package:fema_crm/pages/SceltaRapportinoPage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -180,60 +181,60 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   void modificaOrarioFine() async{
-    try{
-      final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.intervento.id?.toString(),
-          'numerazione_danea' : widget.intervento.numerazione_danea,
-          'priorita' : widget.intervento.priorita.toString().split('.').last,
-          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
-          'data': widget.intervento.data?.toIso8601String(),
-          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
-          'posizione_gps' : widget.intervento.posizione_gps,
-          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
-          'orario_fine': DateTime.now().toIso8601String(),//widget.intervento.orario_fine?.toIso8601String(),
-          'descrizione': widget.intervento.descrizione,
-          'importo_intervento': widget.intervento.importo_intervento,
-          'prezzo_ivato' : widget.intervento.prezzo_ivato,
-          'iva' : widget.intervento.iva,
-          'acconto' : widget.intervento.acconto,
-          'assegnato': widget.intervento.assegnato,
-          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
-          'conclusione_parziale' : widget.intervento.conclusione_parziale,
-          'concluso': true,//widget.intervento.concluso,
-          'saldato': widget.intervento.saldato,
-          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
-          'note': widget.intervento.note,
-          'relazione_tecnico' : widget.intervento.relazione_tecnico,
-          'firma_cliente': widget.intervento.firma_cliente,
-          'utente': widget.intervento.utente?.toMap(),
-          'cliente': widget.intervento.cliente?.toMap(),
-          'veicolo': widget.intervento.veicolo?.toMap(),
-          'merce' :widget.intervento.merce?.toMap(),
-          'tipologia': widget.intervento.tipologia?.toMap(),
-          'categoria_intervento_specifico':
-          widget.intervento.categoria_intervento_specifico?.toMap(),
-          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-          'destinazione': widget.intervento.destinazione?.toMap(),
-          'gruppo' : widget.intervento.gruppo?.toMap()
-        }),
-      );
-      if(response.statusCode == 201){
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Orario di fine intervento salvato con successo!'),
-          ),
-        );
-        Navigator.pushReplacement(
+    // try{
+    //   final response = await http.post(
+    //     Uri.parse('$ipaddressProva/api/intervento'),
+    //     headers: {'Content-Type': 'application/json'},
+    //     body: jsonEncode({
+    //       'id': widget.intervento.id?.toString(),
+    //       'numerazione_danea' : widget.intervento.numerazione_danea,
+    //       'priorita' : widget.intervento.priorita.toString().split('.').last,
+    //       'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+    //       'data': widget.intervento.data?.toIso8601String(),
+    //       'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+    //       'posizione_gps' : widget.intervento.posizione_gps,
+    //       'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+    //       'orario_fine': DateTime.now().toIso8601String(),//widget.intervento.orario_fine?.toIso8601String(),
+    //       'descrizione': widget.intervento.descrizione,
+    //       'importo_intervento': widget.intervento.importo_intervento,
+    //       'prezzo_ivato' : widget.intervento.prezzo_ivato,
+    //       'iva' : widget.intervento.iva,
+    //       'acconto' : widget.intervento.acconto,
+    //       'assegnato': widget.intervento.assegnato,
+    //       'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+    //       'conclusione_parziale' : widget.intervento.conclusione_parziale,
+    //       'concluso': true,
+    //       'saldato': widget.intervento.saldato,
+    //       'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+    //       'note': widget.intervento.note,
+    //       'relazione_tecnico' : widget.intervento.relazione_tecnico,
+    //       'firma_cliente': widget.intervento.firma_cliente,
+    //       'utente': widget.intervento.utente?.toMap(),
+    //       'cliente': widget.intervento.cliente?.toMap(),
+    //       'veicolo': widget.intervento.veicolo?.toMap(),
+    //       'merce' :widget.intervento.merce?.toMap(),
+    //       'tipologia': widget.intervento.tipologia?.toMap(),
+    //       'categoria_intervento_specifico':
+    //       widget.intervento.categoria_intervento_specifico?.toMap(),
+    //       'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+    //       'destinazione': widget.intervento.destinazione?.toMap(),
+    //       'gruppo' : widget.intervento.gruppo?.toMap()
+    //     }),
+    //   );
+    //   if(response.statusCode == 201){
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(
+    //         content: Text('Orario di fine intervento salvato con successo!'),
+    //       ),
+    //     );
+        Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente)),
+          MaterialPageRoute(builder: (context) => SceltaRapportinoPage(utente: widget.utente, intervento: widget.intervento,)),
         );
-      }
-    } catch(e){
-      print('Qualcosa non va: $e');
-    }
+    //   }
+    // } catch(e){
+    //   print('Qualcosa non va: $e');
+    // }
   }
 
   void modificaOrarioInizio() async{
@@ -243,16 +244,18 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
+          'attivo' : widget.intervento.attivo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
           'posizione_gps' : widget.intervento.posizione_gps,
-          'orario_inizio': DateTime.now().toIso8601String(),//widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_inizio': DateTime.now().toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
           'iva' : widget.intervento.iva,
           'acconto' : widget.intervento.acconto,
@@ -265,6 +268,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'note': widget.intervento.note,
           'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
           'utente': widget.intervento.utente?.toMap(),
           'cliente': widget.intervento.cliente?.toMap(),
           'veicolo': widget.intervento.veicolo?.toMap(),
@@ -369,17 +373,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                   ),
                 ),
-                SpeedDialChild(
-                  child: Icon(Icons.camera_alt_outlined, color: Colors.white),
-                  backgroundColor: Colors.red,
-                  label: 'ALLEGA RAPPORTINO'.toUpperCase(),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AggiuntaFotoPage(intervento: widget.intervento, utente: widget.utente),
-                    ),
-                  ),
-                ),
+                // SpeedDialChild(
+                //   child: Icon(Icons.camera_alt_outlined, color: Colors.white),
+                //   backgroundColor: Colors.red,
+                //   label: 'ALLEGA RAPPORTINO'.toUpperCase(),
+                //   onTap: () => Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => AggiuntaFotoPage(intervento: widget.intervento, utente: widget.utente),
+                //     ),
+                //   ),
+                // ),
                 SpeedDialChild(
                   child: Icon(Icons.camera_alt_outlined, color: Colors.white),
                   backgroundColor: Colors.red,
@@ -500,38 +504,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       value: formatTime(widget.intervento.orario_appuntamento),
                       context: context,
                     ),
-                    if (widget.intervento.orario_inizio == null) ElevatedButton(
-                      onPressed: () {
-                        modificaOrarioInizio();
-                      },
-                      style: ElevatedButton.styleFrom(minimumSize: Size(450, 35),
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                        textStyle: TextStyle(fontSize: 20),
-                        primary: Colors.red,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      ),
-                      child: Text(
-                        'INIZIA INTERVENTO',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-
-                    if (widget.intervento.orario_inizio != null && widget.intervento.orario_fine == null) ElevatedButton(
-                      onPressed: () {
-                        modificaOrarioFine();
-                      },
-                      style: ElevatedButton.styleFrom(minimumSize: Size(450, 35),
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                        textStyle: TextStyle(fontSize: 20),
-                        primary: Colors.red,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      ),
-                      child: Text(
-                        'TERMINA INTERVENTO',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-
                    /* SizedBox(height: 15),
                     buildInfoRow(
                       title: 'Orario Inizio',
@@ -731,24 +703,59 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     )),
                   ],
                 ),
-              SizedBox(height: 40),
-              ElevatedButton.icon(
+              SizedBox(height: 25),
+              if (widget.intervento.orario_inizio == null) ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PDFInterventoPage(
-                        intervento: widget.intervento,
-                      ),
-                    ),
-                  );
+                  modificaOrarioInizio();
                 },
-                icon: Icon(Icons.picture_as_pdf, color: Colors.white),
-                label: Text('Genera PDF', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
+                style: ElevatedButton.styleFrom(minimumSize: Size(450, 35),
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                  textStyle: TextStyle(fontSize: 20),
+                  primary: Colors.red,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                ),
+                child: Text(
+                  'INIZIA INTERVENTO',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
+
+              if (widget.intervento.orario_inizio != null && widget.intervento.orario_fine == null) ElevatedButton(
+                onPressed: () {
+                  modificaOrarioFine();
+                },
+                style: ElevatedButton.styleFrom(minimumSize: Size(450, 35),
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                  textStyle: TextStyle(fontSize: 20),
+                  primary: Colors.red,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                ),
+                child: Text(
+                  'TERMINA INTERVENTO',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(
+                height: 40,
+              ),
+              if(widget.utente.id!.toString() == "9" || widget.utente.id!.toString() == "4" || widget.utente.id!.toString() == "5")
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PDFInterventoPage(
+                          intervento: widget.intervento,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.picture_as_pdf, color: Colors.white),
+                  label: Text('Genera PDF', style: TextStyle(color: Colors.white)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, // Imposta il colore di sfondo a rosso
+                  ),
+                ),
             ],
           ),
         ),

@@ -271,6 +271,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
+          'attivo' : widget.intervento.attivo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -281,6 +282,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
           'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
           'iva' : widget.intervento.iva,
           'assegnato': widget.intervento.assegnato,
@@ -291,6 +293,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'note': widget.intervento.note,
           'relazione_tecnico' : widget.intervento.relazione_tecnico,
           'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
           'utente': widget.intervento.utente?.toMap(),
           'cliente': widget.intervento.cliente?.toMap(),
           'veicolo': widget.intervento.veicolo?.toMap(),

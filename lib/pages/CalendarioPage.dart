@@ -308,21 +308,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               Navigator.pop(context);
             },
           ),
-          actions: [
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return CreazioneInterventoByAmministrazionePage();
-                      },
-                    ),
-                  );
-                },
-                icon: Icon(Icons.add, color: Colors.white)
-            )
-          ],
         ),
         body: Column(
           children: [

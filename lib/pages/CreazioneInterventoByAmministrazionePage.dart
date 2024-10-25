@@ -20,7 +20,9 @@ import 'CreazioneClientePage.dart';
 import 'NuovaDestinazionePage.dart';
 
 class CreazioneInterventoByAmministrazionePage extends StatefulWidget {
-  const CreazioneInterventoByAmministrazionePage({Key? key}) : super(key: key);
+  final UtenteModel utente;
+
+  const CreazioneInterventoByAmministrazionePage({Key? key, required this.utente}) : super(key: key);
 
   @override
   _CreazioneInterventoByAmministrazionePageState createState() =>
@@ -726,6 +728,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'attivo' : true,
             'numerazione_danea' : null,
             'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,//_dataOdierna.toIso8601String(),
@@ -736,6 +739,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
+            'saldo_tecnico' : null,
             'prezzo_ivato' : null,
             'iva' : null,
             'assegnato': assigned,
@@ -747,6 +751,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'note': _notaController.text.isNotEmpty ? _notaController.text : null,
             'relazione_tecnico' : null,
             'firma_cliente': null,
+            'utente_apertura' : widget.utente.toMap(),
             'utente': responsabile?.toMap(),
             'cliente': selectedCliente?.toMap(),
             'veicolo': null,
@@ -902,6 +907,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'attivo' : true,
             'numerazione_danea' : null,
             'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
@@ -912,6 +918,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
+            'saldo_tecnico' : null,
             'prezzo_ivato' : null,
             'iva': null,
             'assegnato': assigned,
@@ -923,6 +930,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'note': null,
             'relazione_tecnico' : null,
             'firma_cliente': null,
+            'utente_apertura' : widget.utente.toMap(),
             'utente': responsabile?.toMap(),
             'cliente': selectedCliente?.toMap(),
             'veicolo': null,
@@ -947,6 +955,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'attivo' : true,
             'numerazione_danea' : null,
             'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
@@ -957,6 +966,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
+            'saldo_tecnico' : null,
             'prezzo_ivato': null,
             'iva' : null,
             'assegnato': true,
@@ -968,6 +978,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'note': null,
             'relazione_tecnico' : null,
             'firma_cliente': null,
+            'utente_apertura' : widget.utente.toMap(),
             'utente': responsabile?.toMap(),
             'cliente': selectedCliente?.toMap(),
             'veicolo': null,
