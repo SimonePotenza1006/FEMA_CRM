@@ -227,7 +227,7 @@ class _LoginFormState extends State<LoginForm> {
       context: context,
       builder: (context) => AlertDialog(
         title: new Text('Numero di licenza', style: TextStyle(fontWeight: FontWeight.w600),),
-        content: new Text('Dispositivo non ancora registrato: Inserisci il numero di licenza per utilizzare l\'applicazione Fema'),
+        content: new Text('Dispositivo $idd non ancora registrato: Inserisci il numero di licenza per utilizzare l\'applicazione Fema'),
         actions: <Widget>[
           Form(
               key: _formKeyLice,
@@ -605,11 +605,16 @@ class _LoginFormState extends State<LoginForm> {
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ),
+                          SizedBox(height: 44),
+                          Row(mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text('REL. 25.10.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),
                         ],
                       ),
                     ),
                   ),
                   SizedBox(height: 30),
+
                 ],
               ),
             ),
