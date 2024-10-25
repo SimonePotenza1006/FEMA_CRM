@@ -450,16 +450,16 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         Text(
                                           intervento.data != null
                                               ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                              : 'Data non disponibile',
+                                              : 'Nessun appuntamento stabilito',
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 11,
                                             color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                           ),
                                         ),
                                         Text(
                                           intervento.orario_appuntamento != null
                                               ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                              : 'Nessun orario di appuntamento',
+                                              : 'Nessun orario stabilito',
                                           style: TextStyle(
                                             fontSize: 9,
                                             color: intervento.concluso ?? false ? Colors.white : Colors.black,
@@ -534,11 +534,11 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     : TextStyle(color: Colors.black, fontSize: 15);*/
                                 return ListTile(
                                   title: Text(
-                                    '${relazione.intervento?.descrizione}',
+                                    '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
                                     style: textStyle,
                                   ),
                                   subtitle: Text(
-                                    relazione.intervento?.cliente?.denominazione.toString()?? '',
+                                    '${relazione.intervento?.descrizione}',
                                     style: textStyle,
                                   ),
                                   trailing: Column(
@@ -547,16 +547,16 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         // Formatta la data secondo il tuo formato desiderato
                                         relazione.intervento?.data!= null
                                             ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
-                                            : 'Data non disponibile',
+                                            : 'Nessun appuntamento stabilito',
                                         style: TextStyle(
-                                          fontSize: 16, // Stile opzionale per la data
+                                          fontSize: 11, // Stile opzionale per la data
                                           color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
                                         ),
                                       ),
                                       Text(
                                         relazione.intervento?.orario_appuntamento!= null
                                             ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
-                                            : 'Nessun orario di appuntamento',
+                                            : 'Nessun orario stabilito',
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
@@ -663,16 +663,16 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         Text(
                                           intervento.data != null
                                               ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                              : 'Data non disponibile',
+                                              : 'Nessun appuntamento stabilito',
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 11,
                                             color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                           ),
                                         ),
                                         Text(
                                           intervento.orario_appuntamento != null
                                               ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                              : 'Nessun orario di appuntamento',
+                                              : 'Nessun orario stabilito',
                                           style: TextStyle(
                                             fontSize: 9,
                                             color: intervento.concluso ?? false ? Colors.white : Colors.black,
@@ -882,22 +882,15 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     trailing: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
+                                        Text('Data arrivo merce:', style: textStyle),
+                                        SizedBox(height: 3),
                                         Text(
-                                          relazione.intervento?.data != null
-                                              ? '${relazione.intervento!.data!.day}/${relazione.intervento!.data!.month}/${relazione.intervento!.data!.year}'
+                                          relazione.intervento?.data_apertura_intervento != null
+                                              ? DateFormat("dd/MM/yyyy").format(relazione.intervento!.data_apertura_intervento!)
                                               : 'Data non disponibile',
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Text(
-                                          relazione.intervento?.orario_appuntamento != null
-                                              ? '${relazione.intervento!.orario_appuntamento!.hour}:${relazione.intervento!.orario_appuntamento!.minute}'
-                                              : 'Nessun orario di appuntamento',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.black,
+                                            color: relazione.intervento?.concluso ?? false ? Colors.white : Colors.black,
                                           ),
                                         ),
                                       ],
@@ -1159,39 +1152,36 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 child: ListTile(
                                   contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                   title: Text(
-                                    '${intervento.descrizione}',
+                                    '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                     style: textStyle,
                                   ),
                                   subtitle: Text(
-                                    intervento.cliente?.denominazione.toString() ?? '',
+                                    '${intervento.descrizione}',
                                     style: textStyle,
                                   ),
                                   trailing: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        // Condizione per visualizzare l'icona di check se l'intervento è concluso
-                                        if (intervento.concluso ?? false)
-                                          Icon(Icons.check, color: Colors.white, size: 15), // Check icon
-                                        Text(
-                                          intervento.data != null
-                                              ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                              : 'Data non disponibile',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
-                                          ),
+                                    children: [
+                                      Text(
+                                        // Formatta la data secondo il tuo formato desiderato
+                                        intervento.data!= null
+                                            ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                            : 'Nessun appuntamento stabilito',
+                                        style: TextStyle(
+                                          fontSize: 11, // Stile opzionale per la data
+                                          color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                         ),
-                                        Text(
-                                          intervento.orario_appuntamento != null
-                                              ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                              : 'Nessun orario di appuntamento',
-                                          style: TextStyle(
-                                            fontSize: 9,
-                                            color: intervento.concluso ?? false ? Colors.white : Colors.black,
-                                          ),
+                                      ),
+                                      Text(
+                                        intervento.orario_appuntamento!= null
+                                            ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                            : 'Nessun orario stabilito',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
+                                  ),
                                   onTap: () {
                                     Navigator.push(
                                       context,
@@ -1237,11 +1227,11 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
                                   return ListTile(
                                     title: Text(
-                                      '${relazione.intervento?.descrizione}',
+                                      '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
                                       style: textStyle,
                                     ),
                                     subtitle: Text(
-                                      relazione.intervento?.cliente?.denominazione.toString()?? '',
+                                      '${relazione.intervento?.descrizione}',
                                       style: textStyle,
                                     ),
                                     trailing: Column(
@@ -1250,16 +1240,16 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                           // Formatta la data secondo il tuo formato desiderato
                                           relazione.intervento?.data!= null
                                               ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
-                                              : 'Data non disponibile',
+                                              : 'Nessun appuntamento stabilito',
                                           style: TextStyle(
-                                            fontSize: 16, // Stile opzionale per la data
+                                            fontSize: 11, // Stile opzionale per la data
                                             color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
                                           ),
                                         ),
                                         Text(
                                           relazione.intervento?.orario_appuntamento!= null
                                               ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
-                                              : 'Nessun orario di appuntamento',
+                                              : 'Nessun orario stabilito',
                                           style: TextStyle(
                                             fontSize: 16,
                                             color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
@@ -1333,10 +1323,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         return Colors.blueGrey[200]!;
                                     }
                                   }
-
-                                  // Determina il colore in base alla priorità
                                   Color backgroundColor =  getPriorityColor(intervento.priorita!);
-
                                   TextStyle textStyle = intervento.concluso ?? false
                                       ? TextStyle(color: Colors.white, fontSize: 15)
                                       : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
@@ -1364,16 +1351,16 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                           Text(
                                             intervento.data != null
                                                 ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                                : 'Data non disponibile',
+                                                : 'Nessun appuntamento stabilito',
                                             style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 11,
                                               color: intervento.concluso ?? false ? Colors.white : Colors.black,
                                             ),
                                           ),
                                           Text(
                                             intervento.orario_appuntamento != null
                                                 ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                                : 'Nessun orario di appuntamento',
+                                                : 'Nessun orario stabilito',
                                             style: TextStyle(
                                               fontSize: 9,
                                               color: intervento.concluso ?? false ? Colors.white : Colors.black,
@@ -1572,32 +1559,25 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     child: ListTile(
                                       contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                       title: Text(
-                                        '${relazione.intervento?.descrizione ?? "Descrizione non disponibile"}',
+                                        '${relazione.intervento?.cliente!.denominazione} \n${relazione.intervento?.descrizione}',
                                         style: textStyle,
                                       ),
                                       subtitle: Text(
-                                        relazione.intervento?.cliente?.denominazione ?? 'Cliente non disponibile',
+                                        '${relazione.intervento?.merce?.difetto_riscontrato}',
                                         style: textStyle,
                                       ),
                                       trailing: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
+                                          Text('Data arrivo merce:', style: textStyle),
+                                          SizedBox(height: 3),
                                           Text(
-                                            relazione.intervento?.data != null
-                                                ? '${relazione.intervento!.data!.day}/${relazione.intervento!.data!.month}/${relazione.intervento!.data!.year}'
+                                            relazione.intervento?.data_apertura_intervento != null
+                                                ? DateFormat("dd/MM/yyyy").format(relazione.intervento!.data_apertura_intervento!)
                                                 : 'Data non disponibile',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          Text(
-                                            relazione.intervento?.orario_appuntamento != null
-                                                ? '${relazione.intervento!.orario_appuntamento!.hour}:${relazione.intervento!.orario_appuntamento!.minute}'
-                                                : 'Nessun orario di appuntamento',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black,
+                                              color: relazione.intervento?.concluso ?? false ? Colors.white : Colors.black,
                                             ),
                                           ),
                                         ],

@@ -48,9 +48,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     'codice_danea' : 200,
     'priorita' : 45,
     'data_apertura_intervento': 210,
-    'data': 150,
+    'data': 200,
     'cliente': 200,
-    'orario_appuntamento': 260,
+    'orario_appuntamento': 150,
     'descrizione': 300,
     'responsabile' : 230,
     'importo_intervento': 150,
@@ -893,7 +893,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         ),
                       ),
                       child: ColumnFilter(
-                        columnName: 'Data'.toUpperCase(),
+                        columnName: 'APPUNTAMENTO'.toUpperCase(),
                         onFilterApplied: (filtro) {
                           setState(() {
                             _dataSource.filtraColonna('data', filtro);
@@ -902,7 +902,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       ),
                     ),
                     width: _columnWidths['data']?? double.nan,
-                    minimumWidth: 150,
+                    minimumWidth: 200,
                   ),
                   GridColumn(
                     columnName: 'orario_appuntamento',
@@ -918,7 +918,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         ),
                       ),
                       child: ColumnFilter(
-                        columnName: 'Orario appuntamento'.toUpperCase(),
+                        columnName: 'Orario'.toUpperCase(),
                         onFilterApplied: (filtro) {
                           setState(() {
                             _dataSource.filtraColonna('orario_appuntamento', filtro);
@@ -927,7 +927,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       ),
                     ),
                     width: _columnWidths['orario_appuntamento']?? double.nan,
-                    minimumWidth: 120, // Imposta la larghezza minima
+                    minimumWidth: 150, // Imposta la larghezza minima
                   ),
                   GridColumn(
                     columnName: 'descrizione',

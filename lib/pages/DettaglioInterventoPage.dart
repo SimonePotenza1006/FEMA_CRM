@@ -806,13 +806,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 buildInfoRow(
-                                    title: 'Data accordata',
+                                    title: 'Appuntamento',
                                     value: formatDate(widget.intervento.data),
                                     context: context
                                 ),
                                 SizedBox(width: 20),
                                 buildInfoRow(
-                                    title: 'Orario appuntamento',
+                                    title: 'Orario',
                                     value: formatTime(widget.intervento.orario_appuntamento),
                                     context: context
                                 ),
@@ -837,7 +837,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                       children: [
                                         Flexible( // Permette al testo di adattarsi alla dimensione
                                           child: Text(
-                                            'Modifica data intervento'.toUpperCase(),
+                                            'Modifica data appuntamento'.toUpperCase(),
                                             style: TextStyle(color: Colors.white, fontSize: 12),
                                             textAlign: TextAlign.center, // Centra il testo
                                             softWrap: true, // Permette al testo di andare a capo
@@ -948,61 +948,57 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      buildInfoRow(
-                                          title: 'Orario Inizio',
-                                          value: widget.intervento.orario_inizio != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
-                                          context: context
-                                      ),
-                                      if (widget.intervento.orario_inizio == null)
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: InkWell(
-                                            onTap: () => _selectTime(context),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.access_time),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                  _selectedTime.format(context),
-                                                  style: TextStyle(fontSize: 16),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                      Row(
+                                         children:[
+                                           buildInfoRow(
+                                               title: 'Orario Inizio',
+                                               value: widget.intervento.orario_inizio != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
+                                               context: context
+                                           ),
+                                           SizedBox(width : 10),
+                                           Align(
+                                             alignment: Alignment.center,
+                                             child: InkWell(
+                                               onTap: () => _selectTime(context),
+                                               child: Row(
+                                                 children: [
+                                                   Icon(Icons.edit),
+                                                 ],
+                                               ),
+                                             ),
+                                           ),
+                                         ]
+                                      )
                                     ],
                                   ),
                                   // Divisore verticale
                                   SizedBox(
                                     width: 20,
                                   ),
-                                  // Seconda colonna
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      buildInfoRow(
-                                          title: 'Orario Fine',
-                                          value: widget.intervento.orario_fine != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_fine!) : "N/A",
-                                          context: context
+                                ],
+                              ),
+                            ),
+                            IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  buildInfoRow(
+                                      title: 'Orario Fine',
+                                      value: widget.intervento.orario_fine != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_fine!) : "N/A",
+                                      context: context
+                                  ),
+                                  SizedBox(width : 10),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: InkWell(
+                                      onTap: () => _selectTime2(context),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit),
+                                          SizedBox(width: 8),
+                                        ],
                                       ),
-                                      if (widget.intervento.orario_fine == null)
-                                        Align(
-                                          alignment: Alignment.center,
-                                          child: InkWell(
-                                            onTap: () => _selectTime2(context),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.access_time),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                  _selectedTime2.format(context),
-                                                  style: TextStyle(fontSize: 16),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                    ],
+                                    ),
                                   ),
                                 ],
                               ),

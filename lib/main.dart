@@ -548,7 +548,7 @@ class _LoginFormState extends State<LoginForm> {
                   SizedBox(height: 40),
                   Container(
                     width: 300,
-                    height: 300,
+                    height: 318,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -605,7 +605,7 @@ class _LoginFormState extends State<LoginForm> {
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ),
-                          SizedBox(height: 44),
+                          SizedBox(height: 30),
                           Row(mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Text('REL. 25.10.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),
