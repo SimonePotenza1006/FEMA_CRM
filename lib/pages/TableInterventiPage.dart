@@ -1447,7 +1447,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       double? acconto = intervento.acconto != null ? intervento.acconto : 0;
       double? restante_da_pagare = importo! - acconto!;
       String? stato = (intervento.orario_inizio == null && intervento.orario_fine == null)
-          ? "Assegbnato".toUpperCase()
+          ? "Assegnato".toUpperCase()
           : (intervento.orario_inizio != null && intervento.orario_fine == null)
           ? "In lavorazione".toUpperCase()
           : (intervento.orario_inizio != null && intervento.orario_fine != null)

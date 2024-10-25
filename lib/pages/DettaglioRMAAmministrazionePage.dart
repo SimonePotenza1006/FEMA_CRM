@@ -45,6 +45,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   DateTime? selectedDateRicon = null;
   DateTime? selectedDateRientro = null;
   bool _rimborso = false;
+  bool _cambio = false;
+  bool _concluso = false;
 
   /*Future<http.Response?> getIntervento() async {
     try {
@@ -300,38 +302,127 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           modificaRimborso();
                         },
                       ),
-                      /*Text(
-                        displayedValue.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),*/
-                      /*if (isValueTooLong && context != null)
-                        IconButton(
-                          icon: Icon(Icons.info_outline),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text("${title.toUpperCase()}"),
-                                  content: Text(value),
-                                  actions: [
-                                    TextButton(
-                                      child: Text("Chiudi"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),*/
+
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildCambioRow({required String title, required bool value, BuildContext? context}) {
+    //bool isValueTooLong = value.length > 20;
+    //String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
+    return SizedBox(
+      width: 500,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Switch(
+                        value: _cambio,
+                        onChanged: (value) {
+                          setState(() {
+                            _cambio = value ?? false;
+                          });
+                          modificaCambio();
+                        },
+                      ),
+
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildConclusoRow({required String title, required bool value, BuildContext? context}) {
+    //bool isValueTooLong = value.length > 20;
+    //String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
+    return SizedBox(
+      width: 500,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Switch(
+                        value: _concluso,
+                        onChanged: (value) {
+                          setState(() {
+                            _concluso = value ?? false;
+                          });
+                          modificaConcluso();
+                        },
+                      ),
+
                     ],
                   ),
                 ),
@@ -683,6 +774,76 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+  void modificaCambio() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.merce.id.toString(),
+          'prodotto' : widget.merce.prodotto.toString(),
+          'data_acquisto': widget.merce.data_acquisto?.toIso8601String(),
+          'difetto_riscontrato' : widget.merce.difetto_riscontrato.toString(),//difettoController.text.toUpperCase(),
+          'fornitore' : widget.merce.fornitore?.toMap(),
+          'data_riconsegna': widget.merce.data_riconsegna?.toIso8601String(),
+          'utenteRiconsegna': widget.merce.utenteRiconsegna?.toMap(),
+          'rimborso': widget.merce.rimborso,
+          'cambio': _cambio,//widget.merce.cambio,
+          'data_rientro_ufficio' : widget.merce.data_rientro_ufficio?.toIso8601String(),
+          'utenteRitiro': widget.merce.utenteRitiro?.toMap(),
+          'concluso': widget.merce.concluso
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Modifica cambio salvata con successo!'),
+          ),
+        );
+        setState(() {
+          //widget.merce.difetto_riscontrato = difettoController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaConcluso() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.merce.id.toString(),
+          'prodotto' : widget.merce.prodotto.toString(),
+          'data_acquisto': widget.merce.data_acquisto?.toIso8601String(),
+          'difetto_riscontrato' : widget.merce.difetto_riscontrato.toString(),//difettoController.text.toUpperCase(),
+          'fornitore' : widget.merce.fornitore?.toMap(),
+          'data_riconsegna': widget.merce.data_riconsegna?.toIso8601String(),
+          'utenteRiconsegna': widget.merce.utenteRiconsegna?.toMap(),
+          'rimborso': widget.merce.rimborso,
+          'cambio': widget.merce.cambio,
+          'data_rientro_ufficio' : widget.merce.data_rientro_ufficio?.toIso8601String(),
+          'utenteRitiro': widget.merce.utenteRitiro?.toMap(),
+          'concluso': _concluso//widget.merce.concluso
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Procedura conclusa con successo!'),
+          ),
+        );
+        setState(() {
+          //widget.merce.difetto_riscontrato = difettoController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
   Future<void> _selezionaDataRicon() async {
     final DateTime? dataSelezionata = await showDatePicker(
       locale: const Locale('it', 'IT'),
@@ -943,7 +1104,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             buildRimborsoRow(title: "rimborso", value: widget.merce.rimborso!, context: context),
                             //buildInfoRow(title: "rimborso", value: widget.merce.rimborso != null ? (widget.merce.rimborso != true ? "NO" : "SI"): "N/A", context: context),
                             SizedBox(height: 10.0),
-                            buildInfoRow(title: "cambio", value: widget.merce.cambio != null ? (widget.merce.cambio != true ? "NO" : "SI"): "N/A", context: context),
+                            buildCambioRow(title: "cambio", value: widget.merce.cambio!, context: context),
+                            //buildInfoRow(title: "cambio", value: widget.merce.cambio != null ? (widget.merce.cambio != true ? "NO" : "SI"): "N/A", context: context),
                             SizedBox(height: 10.0),
                             Row(
                               children: [
@@ -1005,7 +1167,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                             //buildInfoRow(title: "utente Ritiro", value: widget.merce.utenteRitiro != null ? widget.merce.utenteRitiro!.nome!+' '+widget.merce.utenteRitiro!.cognome! : 'N/A', context: context),
                             SizedBox(height: 10.0),
-                            buildInfoRow(title: "concluso", value: widget.merce.concluso != null ? (widget.merce.concluso != true ? "NO" : "SI"): "N/A", context: context),
+                            buildConclusoRow(title: "concluso", value: widget.merce.concluso!, context: context),
+                            //buildInfoRow(title: "concluso", value: widget.merce.concluso != null ? (widget.merce.concluso != true ? "NO" : "SI"): "N/A", context: context),
                             Container(
                               child: SizedBox(
                                 width: 400,
