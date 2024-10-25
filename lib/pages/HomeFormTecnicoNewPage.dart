@@ -248,7 +248,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        print('getAllInterventiByUtente: successo, status code: ${response.statusCode}');
+        print('getAllInterventiBySettore: successo, status code: ${response.statusCode}');
         var jsonData = jsonDecode(response.body);
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
@@ -394,7 +394,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                             }).toList();
                             if (interventi.isEmpty) {
-                              return Center(child: Text('Nessun intervento trovato'));
+                              return Center(child: Text(''));
                             }
 
                             return ListView.builder(
@@ -488,7 +488,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               },
                             );
                           } else {
-                            return Center(child: Text('Nessun intervento trovato'));
+                            return Center(child: Text(''));
                           }
                         },
                       ),
@@ -508,9 +508,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               itemCount: relazioni.length,
                               itemBuilder: (context, index) {
                                 RelazioneUtentiInterventiModel relazione = relazioni[index];
-                                //Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
-
-                                // Metodo per mappare la priorità al colore corrispondente
                                 Color getPriorityColor(Priorita priorita) {
                                   switch (priorita) {
                                     case Priorita.BASSA:
@@ -584,7 +581,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               },
                             );
                           } else {
-                            return Center(child: Text('Nessun intervento trovato'));
+                            return Center(child: Text(''));
                           }
                         },
                       ),
@@ -612,16 +609,14 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                             }).toList();
                             if (interventi.isEmpty) {
-                              return Center(child: Text('Nessun intervento trovato'));
+                              return Center(child: Text(''));
                             }
-
                             return ListView.builder(
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: interventi.length,
                               itemBuilder: (context, index) {
                                 InterventoModel intervento = interventi[index];
-
                                 // Metodo per mappare la priorità al colore corrispondente
                                 Color getPriorityColor(Priorita priorita) {
                                   switch (priorita) {
@@ -706,7 +701,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               },
                             );
                           } else {
-                            return Center(child: Text('Nessun intervento trovato'));
+                            return Center(child: Text(''));
                           }
                         },
                       ),
@@ -720,68 +715,218 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       ),
                       const SizedBox(height: 20.0),
                       FutureBuilder<List<InterventoModel>>(
-                          future: getMerce(
-                              widget.userData!.id.toString()
-                          ),
-                          builder:(context, snapshot){
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<InterventoModel> merce = snapshot.data!;
-                              if(merce.isEmpty){
-                                return Center(child: Text(''));
-                              }
-                              return ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: NeverScrollableScrollPhysics(),
-                                  itemCount: merce.length,
-                                  itemBuilder:(context, index){
-                                    InterventoModel singolaMerce = merce[index];
-                                    return Card(
-                                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
-                                      child: ListTile(
-                                        title: Text(
-                                          '${singolaMerce.merce?.articolo}',
-                                        ),
-                                        subtitle: Text(
-                                          '${singolaMerce.merce?.difetto_riscontrato}',
-                                        ),
-                                        trailing: Column(
-                                          children: [
-                                            Text('Data arrivo merce:'),
-                                            SizedBox(height: 3),
-                                            Text('${singolaMerce.data_apertura_intervento != null ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
-                                          ],
-                                        ),
-                                        onTap: (){
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
-                                                  intervento: singolaMerce,
-                                                  merce : singolaMerce.merce!,
-                                                  utente : widget.userData!
-                                                ),
-                                              )
-                                          );
-                                        },
-                                        tileColor: Colors.white60,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                      ),
-                                    );
-                                  }
-                              );
-                            } else{
-                              return Center(child: Text('Nessuna merce trovata'));
+                        future: getMerce(widget.userData!.id.toString()),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<InterventoModel> merce = snapshot.data!;
+
+                            // Filtra i dati della lista per mostrare solo quelli con merce presente
+                            merce = merce.where((item) => item.merce != null).toList();
+
+                            if (merce.isEmpty) {
+                              return Center(child: Text(''));
                             }
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: merce.length,
+                              itemBuilder: (context, index) {
+                                InterventoModel singolaMerce = merce[index];
+
+                                // Metodo per mappare la priorità al colore corrispondente
+                                Color getPriorityColor(Priorita priorita) {
+                                  switch (priorita) {
+                                    case Priorita.BASSA:
+                                      return Colors.lightGreen;
+                                    case Priorita.MEDIA:
+                                      return Colors.yellow;
+                                    case Priorita.ALTA:
+                                      return Colors.orange;
+                                    case Priorita.URGENTE:
+                                      return Colors.red;
+                                    default:
+                                      return Colors.blueGrey[200]!;
+                                  }
+                                }
+
+                                // Determina il colore in base alla priorità della merce
+                                Color backgroundColor = getPriorityColor(singolaMerce.priorita ?? Priorita.BASSA);
+
+                                TextStyle textStyle = singolaMerce.concluso ?? false
+                                    ? TextStyle(color: Colors.white, fontSize: 15)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                return Card(
+                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                    title: Text(
+                                      '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                      style: textStyle,
+                                    ),
+                                    subtitle: Text(
+                                      '${singolaMerce.merce?.difetto_riscontrato ?? "Difetto non specificato"}',
+                                      style: textStyle,
+                                    ),
+                                    trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text('Data arrivo merce:', style: textStyle),
+                                        SizedBox(height: 3),
+                                        Text(
+                                          singolaMerce.data_apertura_intervento != null
+                                              ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
+                                              : 'Data non disponibile',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: singolaMerce.concluso ?? false ? Colors.white : Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                            intervento: singolaMerce,
+                                            merce: singolaMerce.merce!,
+                                            utente: widget.userData!,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    tileColor: backgroundColor,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: Text('Nessuna merce trovata'));
                           }
+                        },
+                      ),
+                      FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                        future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (snapshot.hasData) {
+                            List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
+
+                            // Filtra la lista per includere solo relazioni con merce associata e non conclusi
+                            relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce != null).toList();
+
+                            if (relazioni.isEmpty) {
+                              return Center(child: Text(''));
+                            }
+
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: relazioni.length,
+                              itemBuilder: (context, index) {
+                                RelazioneUtentiInterventiModel relazione = relazioni[index];
+
+                                // Funzione per ottenere il colore basato sulla priorità dell'intervento
+                                Color getPriorityColor(Priorita priorita) {
+                                  switch (priorita) {
+                                    case Priorita.BASSA:
+                                      return Colors.lightGreen;
+                                    case Priorita.MEDIA:
+                                      return Colors.yellow;
+                                    case Priorita.ALTA:
+                                      return Colors.orange;
+                                    case Priorita.URGENTE:
+                                      return Colors.red;
+                                    default:
+                                      return Colors.blueGrey[200]!;
+                                  }
+                                }
+
+                                // Determina il colore di sfondo in base alla priorità
+                                Color backgroundColor = getPriorityColor(relazione.intervento!.priorita ?? Priorita.BASSA);
+
+                                TextStyle textStyle = TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                );
+
+                                return Card(
+                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                    title: Text(
+                                      '${relazione.intervento?.cliente!.denominazione} \n${relazione.intervento?.descrizione}',
+                                      style: textStyle,
+                                    ),
+                                    subtitle: Text(
+                                      '${relazione.intervento?.merce?.difetto_riscontrato}',
+                                      style: textStyle,
+                                    ),
+                                    trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          relazione.intervento?.data != null
+                                              ? '${relazione.intervento!.data!.day}/${relazione.intervento!.data!.month}/${relazione.intervento!.data!.year}'
+                                              : 'Data non disponibile',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          relazione.intervento?.orario_appuntamento != null
+                                              ? '${relazione.intervento!.orario_appuntamento!.hour}:${relazione.intervento!.orario_appuntamento!.minute}'
+                                              : 'Nessun orario di appuntamento',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                            utente: widget.userData!,
+                                            intervento: relazione.intervento!,
+                                            merce: relazione.intervento!.merce!,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    tileColor: backgroundColor,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            return Center(child: Text(''));
+                          }
+                        },
                       ),
                       const SizedBox(height: 50.0),
                       Center(
@@ -833,7 +978,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               },
                             );
                           } else {
-                            return Center(child: Text('Nessun intervento trovato'));
+                            return Center(child: Text(''));
                           }
                         },
                       ),
@@ -976,7 +1121,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                           }).toList();
                           if (interventi.isEmpty) {
-                            return Center(child: Text('Nessun intervento trovato'));
+                            return Center(child: Text(''));
                           }
 
                           return ListView.builder(
@@ -1001,8 +1146,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     return Colors.blueGrey[200]!;
                                 }
                               }
-
-                              // Determina il colore in base alla priorità
                               Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
                               TextStyle textStyle = intervento.concluso ?? false
@@ -1070,7 +1213,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             },
                           );
                         } else {
-                          return Center(child: Text('Nessun intervento trovato'));
+                          return Center(child: Text(''));
                         }
                       },
                     ),
@@ -1141,7 +1284,125 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 },
                               );
                             } else {
-                              return Center(child: Text('Nessun intervento trovato'));
+                              return Center(child: Text(''));
+                            }
+                          },
+                        ),
+                        Center(
+                          child: Text(
+                            'Interventi di settore'.toUpperCase(),
+                            style: TextStyle(
+                                fontSize: 30.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 20.0),
+                        FutureBuilder<List<InterventoModel>>(
+                          future: getAllInterventiBySettore(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<InterventoModel> interventi = snapshot.data!;
+                              interventi = interventi.where((intervento) => intervento.merce == null).toList();
+                              interventi = interventi.where((intervento) {
+                                return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                              }).toList();
+                              if (interventi.isEmpty) {
+                                return Center(child: Text(''));
+                              }
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: interventi.length,
+                                itemBuilder: (context, index) {
+                                  InterventoModel intervento = interventi[index];
+                                  // Metodo per mappare la priorità al colore corrispondente
+                                  Color getPriorityColor(Priorita priorita) {
+                                    switch (priorita) {
+                                      case Priorita.BASSA:
+                                        return Colors.lightGreen;
+                                      case Priorita.MEDIA:
+                                        return Colors.yellow; // grigio chiaro
+                                      case Priorita.ALTA:
+                                        return Colors.orange; // giallo chiaro
+                                      case Priorita.URGENTE:
+                                        return Colors.red; // azzurro chiaro
+                                      default:
+                                        return Colors.blueGrey[200]!;
+                                    }
+                                  }
+
+                                  // Determina il colore in base alla priorità
+                                  Color backgroundColor =  getPriorityColor(intervento.priorita!);
+
+                                  TextStyle textStyle = intervento.concluso ?? false
+                                      ? TextStyle(color: Colors.white, fontSize: 15)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                      title: Text(
+                                        '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
+                                        style: textStyle,
+                                      ),
+                                      subtitle: Text(
+                                        '${intervento.descrizione}',
+                                        style: textStyle,
+                                      ),
+                                      trailing: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                          if (intervento.concluso ?? false)
+                                            Icon(Icons.check, color: Colors.white, size: 15), // Check icon
+                                          Text(
+                                            intervento.data != null
+                                                ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                                : 'Data non disponibile',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                            ),
+                                          ),
+                                          Text(
+                                            intervento.orario_appuntamento != null
+                                                ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                                : 'Nessun orario di appuntamento',
+                                            style: TextStyle(
+                                              fontSize: 9,
+                                              color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DettaglioInterventoByTecnicoPage(
+                                              utente: widget.userData!,
+                                              intervento: intervento,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      tileColor: backgroundColor,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text(''));
                             }
                           },
                         ),
@@ -1155,68 +1416,105 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                         ),
                         const SizedBox(height: 20.0),
                         FutureBuilder<List<InterventoModel>>(
-                            future: getMerce(
-                                widget.userData!.id.toString()
-                            ),
-                            builder:(context, snapshot){
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return Center(child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return Center(child: Text('Errore: ${snapshot.error}'));
-                              } else if (snapshot.hasData) {
-                                List<InterventoModel> merce = snapshot.data!;
-                                if(merce.isEmpty){
-                                  return Center(child: Text(''));
-                                }
-                                return ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    itemCount: merce.length,
-                                    itemBuilder:(context, index){
-                                      InterventoModel singolaMerce = merce[index];
-                                      return Card(
-                                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                        elevation: 4,
-                                        shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
-                                        child: ListTile(
-                                          title: Text(
-                                            '${singolaMerce.merce?.articolo}',
-                                          ),
-                                          subtitle: Text(
-                                            '${singolaMerce.merce?.difetto_riscontrato}',
-                                          ),
-                                          trailing: Column(
-                                            children: [
-                                              Text('Data arrivo merce:'),
-                                              SizedBox(height: 3),
-                                              Text('${singolaMerce.data_apertura_intervento != null ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
-                                            ],
-                                          ),
-                                          onTap: (){
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
-                                                      intervento: singolaMerce,
-                                                      merce : singolaMerce.merce!,
-                                                      utente : widget.userData!
-                                                  ),
-                                                )
-                                            );
-                                          },
-                                          tileColor: Colors.white60,
-                                          shape: RoundedRectangleBorder(
-                                            side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                );
-                              } else{
-                                return Center(child: Text('Nessuna merce trovata'));
+                          future: getMerce(widget.userData!.id.toString()),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<InterventoModel> merce = snapshot.data!;
+
+                              // Filtra i dati della lista per mostrare solo quelli con merce presente
+                              merce = merce.where((item) => item.merce != null).toList();
+                              if (merce.isEmpty) {
+                                return Center(child: Text(''));
                               }
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: merce.length,
+                                itemBuilder: (context, index) {
+                                  InterventoModel singolaMerce = merce[index];
+
+                                  // Metodo per mappare la priorità al colore corrispondente
+                                  Color getPriorityColor(Priorita priorita) {
+                                    switch (priorita) {
+                                      case Priorita.BASSA:
+                                        return Colors.lightGreen;
+                                      case Priorita.MEDIA:
+                                        return Colors.yellow;
+                                      case Priorita.ALTA:
+                                        return Colors.orange;
+                                      case Priorita.URGENTE:
+                                        return Colors.red;
+                                      default:
+                                        return Colors.blueGrey[200]!;
+                                    }
+                                  }
+
+                                  // Determina il colore in base alla priorità della merce
+                                  Color backgroundColor = getPriorityColor(singolaMerce.priorita ?? Priorita.BASSA);
+
+                                  TextStyle textStyle = singolaMerce.concluso ?? false
+                                      ? TextStyle(color: Colors.white, fontSize: 15)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                      title: Text(
+                                        '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                        style: textStyle,
+                                      ),
+                                      subtitle: Text(
+                                        '${singolaMerce.merce?.difetto_riscontrato ?? "Difetto non specificato"}',
+                                        style: textStyle,
+                                      ),
+                                      trailing: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text('Data arrivo merce:', style: textStyle),
+                                          SizedBox(height: 3),
+                                          Text(
+                                            singolaMerce.data_apertura_intervento != null
+                                                ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
+                                                : 'Data non disponibile',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: singolaMerce.concluso ?? false ? Colors.white : Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                              intervento: singolaMerce,
+                                              merce: singolaMerce.merce!,
+                                              utente: widget.userData!,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      tileColor: backgroundColor,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text('Nessuna merce trovata'));
                             }
+                          },
                         ),
                         FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                           future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
@@ -1227,61 +1525,101 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               return Center(child: Text('Errore: ${snapshot.error}'));
                             } else if (snapshot.hasData) {
                               List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
+
+                              // Filtra la lista per includere solo relazioni con merce associata e non conclusi
                               relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce != null).toList();
+
+                              if (relazioni.isEmpty) {
+                                return Center(child: Text(''));
+                              }
+
                               return ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: relazioni.length,
                                 itemBuilder: (context, index) {
                                   RelazioneUtentiInterventiModel relazione = relazioni[index];
-                                  Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
-                                  TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
-                                  return ListTile(
-                                    title: Text(
-                                      '${relazione.intervento?.descrizione}',
-                                      style: textStyle,
-                                    ),
-                                    subtitle: Text(
-                                      relazione.intervento?.cliente?.denominazione.toString()?? '',
-                                      style: textStyle,
-                                    ),
-                                    trailing: Column(
-                                      children: [
-                                        Text(
-                                          // Formatta la data secondo il tuo formato desiderato
-                                          relazione.intervento?.data!= null
-                                              ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
-                                              : 'Data non disponibile',
-                                          style: TextStyle(
-                                            fontSize: 16, // Stile opzionale per la data
-                                            color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+
+                                  // Funzione per ottenere il colore basato sulla priorità dell'intervento
+                                  Color getPriorityColor(Priorita priorita) {
+                                    switch (priorita) {
+                                      case Priorita.BASSA:
+                                        return Colors.lightGreen;
+                                      case Priorita.MEDIA:
+                                        return Colors.yellow;
+                                      case Priorita.ALTA:
+                                        return Colors.orange;
+                                      case Priorita.URGENTE:
+                                        return Colors.red;
+                                      default:
+                                        return Colors.blueGrey[200]!;
+                                    }
+                                  }
+
+                                  // Determina il colore di sfondo in base alla priorità
+                                  Color backgroundColor = getPriorityColor(relazione.intervento!.priorita ?? Priorita.BASSA);
+
+                                  TextStyle textStyle = TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  );
+
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                      title: Text(
+                                        '${relazione.intervento?.descrizione ?? "Descrizione non disponibile"}',
+                                        style: textStyle,
+                                      ),
+                                      subtitle: Text(
+                                        relazione.intervento?.cliente?.denominazione ?? 'Cliente non disponibile',
+                                        style: textStyle,
+                                      ),
+                                      trailing: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            relazione.intervento?.data != null
+                                                ? '${relazione.intervento!.data!.day}/${relazione.intervento!.data!.month}/${relazione.intervento!.data!.year}'
+                                                : 'Data non disponibile',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          relazione.intervento?.orario_appuntamento!= null
-                                              ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
-                                              : 'Nessun orario di appuntamento',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                          Text(
+                                            relazione.intervento?.orario_appuntamento != null
+                                                ? '${relazione.intervento!.orario_appuntamento!.hour}:${relazione.intervento!.orario_appuntamento!.minute}'
+                                                : 'Nessun orario di appuntamento',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
+                                              utente: widget.userData!,
+                                              intervento: relazione.intervento!,
+                                              merce: relazione.intervento!.merce!,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      tileColor: backgroundColor,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
                                     ),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              DettaglioMerceInRiparazioneByTecnicoPage(
-                                                utente: widget.userData!,
-                                                intervento: relazione.intervento!,
-                                                merce: relazione.intervento!.merce!,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                    tileColor: backgroundColor,
                                   );
                                 },
                               );

@@ -1,11 +1,10 @@
 import 'dart:convert';
 
+import 'package:fema_crm/pages/HomeFormTecnicoNewPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart'; // Importo il pacchetto per formattare le date
 import 'package:fema_crm/model/CommissioneModel.dart';
-
-import 'HomeFormTecnico.dart';
 
 class DettaglioCommissioneTecnicoPage extends StatefulWidget {
   final CommissioneModel commissione;
@@ -118,7 +117,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeFormTecnico(
+            builder: (context) => HomeFormTecnicoNewPage(
               userData: widget.commissione.utente,
             ),
           ),
