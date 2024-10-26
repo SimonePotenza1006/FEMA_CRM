@@ -181,6 +181,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var formattedRelazione = relazione != null
           ? relazione.toString()
           : '';
+
+
+
+
     } catch(e){
       print('Errore durante la formattazione delle stringhe: $e');
     }
@@ -195,6 +199,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     var formattedOrarioFine = orarioFine != null
         ? DateFormat('HH:mm').format(DateTime.parse(orarioFine.toString()))
         : '';
+
+    String? formattedCliente = (widget.intervento.cliente?.denominazione?.length ?? 0) > 40
+        ? widget.intervento.cliente!.denominazione!.substring(0, 40)
+        : widget.intervento.cliente?.denominazione;
 
     var codDanea = widget.intervento.numerazione_danea != null ? widget.intervento.numerazione_danea.toString() : '';
 
@@ -393,9 +401,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   pw.Padding(
                                     padding: pw.EdgeInsets.only(right: 3),
                                     child: pw.Text(
-                                      widget.intervento.cliente
-                                          ?.denominazione ??
-                                          '',
+                                      formattedCliente!,
                                       style: pw.TextStyle(fontSize: 9),
                                     ),
                                   ),
@@ -568,9 +574,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   pw.Padding(
                                     padding: pw.EdgeInsets.only(right: 3),
                                     child: pw.Text(
-                                      widget.intervento.destinazione
-                                          ?.denominazione ??
-                                          '',
+                                      formattedCliente,
                                       style: pw.TextStyle(fontSize: 9),
                                     ),
                                   ),

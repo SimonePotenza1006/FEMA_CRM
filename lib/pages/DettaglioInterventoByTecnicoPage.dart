@@ -11,6 +11,8 @@ import 'package:fema_crm/pages/SceltaRapportinoPage.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -56,6 +58,44 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<RelazioneDdtProdottoModel> prodotti = [];
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
   DDTModel? finalDdt;
+  String _indirizzo = "";
+
+  Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
+    try {
+      //List<Placemark> placemarks =
+      return placemarkFromCoordinates(latitude, longitude).then((value) {
+
+        return value.isNotEmpty ? '${value[0].street}, ${value[0].subThoroughfare} ${value[0].locality}, ${value[0].administrativeArea} ${value[0].postalCode}'
+            : '';
+      });
+      //Placemark place = placemarks[0];
+      //return '${place.street},${place.subThoroughfare} ${place.locality}, ${place.administrativeArea} ${place.postalCode}';//, ${place.country}';
+    } catch (e) {
+      print("Errore durante la conversione delle coordinate in indirizzo: $e");
+      return "Indirizzo non disponibile";
+    }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((value) =>
+          getAddressFromCoordinates(value.latitude, value.longitude).then((value2) {
+            setState(() {
+              //_gps = "${position.latitude}, ${position.longitude}";
+              _indirizzo = value2.toString();
+            });
+          })
+      );
+      /*String indirizzo = await getAddressFromCoordinates(position.latitude, position.longitude);
+      setState(() {
+        _gps = "${position.latitude}, ${position.longitude}";
+        _indirizzo = indirizzo.toString();
+      });*/
+    } catch (e) {
+      print("Errore durante l'ottenimento della posizione: $e");
+    }
+  }
+
 
   @override
   void initState() {
@@ -63,13 +103,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     getAllNoteByIntervento();
     getRelazioni();
     getProdotti();
+    _getCurrentLocation();
   }
 
   Future<http.Response?> getDdtByIntervento() async{
     late http.Response response;
     try{
       response = await http.get(
-        Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
+        Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
           DDTModel ddt = DDTModel.fromJson(jsonData);
@@ -117,7 +158,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
       final ddt = DDTModel.fromJson(jsonDecode(data.body));
       try{
-        var apiUrl = Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}');
+        var apiUrl = Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}');
         var response = await http.get(apiUrl);
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
@@ -141,7 +182,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -161,7 +202,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllNoteByIntervento() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}');
+      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -183,7 +224,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaOrarioFine() async{
     // try{
     //   final response = await http.post(
-    //     Uri.parse('$ipaddressProva/api/intervento'),
+    //     Uri.parse('$ipaddress/api/intervento'),
     //     headers: {'Content-Type': 'application/json'},
     //     body: jsonEncode({
     //       'id': widget.intervento.id?.toString(),
@@ -240,7 +281,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaOrarioInizio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -250,7 +291,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
           'data': widget.intervento.data?.toIso8601String(),
           'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
-          'posizione_gps' : widget.intervento.posizione_gps,
+          'posizione_gps' : _indirizzo,
           'orario_inizio': DateTime.now().toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
@@ -521,19 +562,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     buildInfoRow(
                       title: 'Descrizione',
                       value: widget.intervento.descrizione?? 'N/A',
-                      context: context,
-                    ),
-
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Cellulare destinazione',
-                      value: widget.intervento.destinazione?.cellulare?? 'N/A',
-                      context: context,
-                    ),
-                    SizedBox(height : 15),
-                    buildInfoRow(
-                      title: 'Telefono destinazione',
-                      value: widget.intervento.destinazione?.telefono?? 'N/A',
                       context: context,
                     ),
                     SizedBox(height : 15),

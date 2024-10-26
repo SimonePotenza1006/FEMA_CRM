@@ -41,7 +41,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   VeicoloModel? selectedVeicolo;
   TipologiaSpesaVeicoloModel? selectedTipologia;
   String? selectedFornitore;
-  XFile? pickedImage;
+  List<XFile> pickedImages =  [];
   DateTime data = DateTime.now();
   DateTime? dataScadenzaPolizza;
   DateTime? dataScadenzaBollo;
@@ -311,43 +311,66 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   ),
                   SizedBox(height: 20),
                   Center(
-                    child: Row(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        IconButton(
-                          icon: Icon(Icons.camera_alt),
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.red, // Sfondo rosso
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Angoli arrotondati
+                            ),
+                          ),
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: Colors.white, // Icona bianca
+                            size: 30,
+                          ),
+                          label: Text(
+                            "Allega ricevuta".toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white, // Testo bianco
+                              fontSize: 16,
+                            ),
+                          ),
                           onPressed: () {
                             takePicture();
                           },
-                          iconSize: 50,
                         ),
-                        if (pickedImage != null)
-                          Container(
-                            width: 50,
-                            height: 50,
-                            child: InkWell(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      child: Image.file(
-                                        File(pickedImage!.path),
-                                        fit: BoxFit.contain,
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                              child: Image.file(File(pickedImage!.path)),
+                        SizedBox(height: 10),
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Colors.red, // Sfondo rosso
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Angoli arrotondati
                             ),
                           ),
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: Colors.white, // Icona bianca
+                            size: 30,
+                          ),
+                          label: Text(
+                            "Allega contachilometri".toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white, // Testo bianco
+                              fontSize: 16,
+                            ),
+                          ),
+                          onPressed: () {
+                            takePicture();
+                          },
+                        )
                       ],
                     ),
                   ),
+                  SizedBox(height: 20),
+                  _buildImagePreview(),
                   SizedBox(height: 24,),
                   ElevatedButton(
-                    onPressed: pickedImage != null
+                    onPressed: pickedImages.length > 0
                         ? () {
                       if (_formKey.currentState!.validate()) {
                         showDialog(
@@ -377,7 +400,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     }
                         : null, // Se pickedImage è null, il pulsante è disabilitato
                     style: ElevatedButton.styleFrom(
-                      primary: pickedImage != null ? Colors.red : Colors.grey, // Cambia il colore quando è disabilitato
+                      primary: pickedImages.length >= 2 ? Colors.red : Colors.grey, // Cambia il colore quando è disabilitato
                       onPrimary: Colors.white,
                       textStyle: TextStyle(fontWeight: FontWeight.bold),
                     ),
@@ -401,6 +424,35 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         ),
       )
           : null,
+    );
+  }
+
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    setState(() {
+                      pickedImages.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -496,7 +548,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     if(selectedTipologia?.descrizione == "TAGLIANDO"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/veicolo'),
+          Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -536,7 +588,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if(selectedTipologia?.descrizione == "INVERSIONE GOMME") {
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/veicolo'),
+          Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -576,7 +628,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if(selectedTipologia?.descrizione == "POLIZZA") {
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/veicolo'),
+          Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -616,7 +668,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if(selectedTipologia?.descrizione == "SOSTITUZIONE GOMME"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/veicolo'),
+          Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -656,7 +708,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if (selectedTipologia?.descrizione == "BOLLO"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/veicolo'),
+          Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -696,7 +748,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if (selectedTipologia?.descrizione == "REVISIONE"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/veicolo'),
+          Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -736,7 +788,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else {
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/veicolo'),
+          Uri.parse('$ipaddress/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -792,7 +844,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (differenza_sostituzione_gomme >= (int.parse(veicolo.soglia_sostituzione.toString()) - 100)) {
           try {
             final response = await http.post(
-              Uri.parse('$ipaddressProva/api/noteTecnico'),
+              Uri.parse('$ipaddress/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
@@ -809,7 +861,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (differenza_inversione_gomme >= (int.parse(veicolo.soglia_inversione.toString()) - 100)) {
           try {
             final response = await http.post(
-              Uri.parse('$ipaddressProva/api/noteTecnico'),
+              Uri.parse('$ipaddress/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
@@ -826,7 +878,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (differenza_tagliando >= (int.parse(veicolo.soglia_tagliando.toString()) - 100)) {
           try {
             final response = await http.post(
-              Uri.parse('$ipaddressProva/api/noteTecnico'),
+              Uri.parse('$ipaddress/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
@@ -851,7 +903,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     var notaS = _noteSpesaController.text.isEmpty ? _noteSpesaController.text : null;
     try {
       response = await http.post(
-        Uri.parse('$ipaddressProva/api/spesaVeicolo'),
+        Uri.parse('$ipaddress/api/spesaVeicolo'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -875,7 +927,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllSpese() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/spesaVeicolo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/spesaVeicolo/ordered');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -915,7 +967,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllVeicoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/veicolo');
+      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -959,48 +1011,53 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveImmagine() async {
     final data = await saveSpesa();
     try {
-      if(data == null){
+      if (data == null) {
         throw Exception('Dati della spesa non disponibili.');
       }
       final spesa = SpesaVeicoloModel.fromJson(jsonDecode(data.body));
-      try{
+      try {
         if (spesa.idSpesaVeicolo == null) {
           throw Exception('Id spesa veicolo is null');
         }
-        if (spesa.idSpesaVeicolo.toString().isEmpty ||!spesa.idSpesaVeicolo.toString().trim().contains(RegExp(r'^[0-9]+$'))) {
+        if (spesa.idSpesaVeicolo
+            .toString()
+            .isEmpty || !spesa.idSpesaVeicolo.toString().trim().contains(
+            RegExp(r'^[0-9]+$'))) {
           throw Exception('Id spesa veicolo is not a valid number');
         }
-        var request = http.MultipartRequest(
-          'POST',
-          Uri.parse('$ipaddressProva/api/immagine/spesa/${int.parse(spesa.idSpesaVeicolo.toString())}'),
-        );
-        request.files.add(
-          await http.MultipartFile.fromPath(
-            'spesa', // Field name
-            pickedImage!.path, // File path
-            contentType: MediaType('image', 'jpeg'),
-          ),
-        );
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print('File inviato con successo');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Spesa registrata!'),
+        for (var foto in pickedImages) {
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddress/api/immagine/spesa/${int.parse(
+                spesa.idSpesaVeicolo.toString())}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'spesa', // Field name
+              foto.path, // File path
+              contentType: MediaType('image', 'jpeg'),
             ),
           );
-        } else {
-          print('Errore durante l\'invio del file: ${response.statusCode}');
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Spesa registrata!'),
+              ),
+            );
+          } else {
+            print('Errore durante l\'invio del file: ${response.statusCode}');
+          }
+          Navigator.pop(context);
         }
-        Navigator.pop(context);
       } catch (e) {
         print('Errore durante l\'invio del file: $e');
       }
     } catch (e) {
-      print('Errore durante l\'invio del file: $e');
+      print('errorwe $e');
     }
   }
-
 
 
   Widget _buildTextFormField(TextEditingController controller, String label, String hintText, {List<TextInputFormatter>? inputFormatters}) {
@@ -1033,18 +1090,32 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
-    if (pickedFile != null) {
-      setState(() {
-        pickedImage = pickedFile;
-      });
+    // Verifica se sei su Android
+    if (Platform.isAndroid) {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+      if (pickedFile != null) {
+        setState(() {
+          pickedImages.add(pickedFile);
+        });
+      }
+    }
+    // Verifica se sei su Windows
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
     }
   }
 
   Future<void> getTipologieSpesa() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaSpesaVeicolo');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaSpesaVeicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

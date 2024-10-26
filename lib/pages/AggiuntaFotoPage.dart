@@ -21,10 +21,10 @@ class _AggiuntaFotoPageState extends State<AggiuntaFotoPage> {
   List<XFile> pickedImages = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  final ImagePicker _picker = ImagePicker();
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-
     // Verifica se sei su Android
     if (Platform.isAndroid) {
       final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
@@ -44,6 +44,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           pickedImages.addAll(pickedFiles);
         });
       }
+    }
+  }
+
+  Future<void> pickImagesFromGallery() async {
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        pickedImages.addAll(pickedFiles);
+      });
     }
   }
 
@@ -70,7 +79,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -146,6 +155,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       onPrimary: Colors.white,
                     ),
                     child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: pickImagesFromGallery,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      onPrimary: Colors.white,
+                    ),
+                    child: Text('Allega foto da galleria', style: TextStyle(fontSize: 18.0)),
                   ),
                   _buildImagePreview(),
                   SizedBox(height: 20),

@@ -29,7 +29,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
   List<ClienteModel> filteredClienti = [];
   List<ProdottoModel> prodottiOrdinati = [];
   ProdottoModel? selectedProdotto;
-  //FornitoreModel? selectedFornitore;
+  FornitoreModel? selectedFornitore;
   ClienteModel? selectedCliente;
   late TextEditingController searchController;
   final TextEditingController _descrizioneController = TextEditingController();
@@ -47,7 +47,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllProdotti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/prodotto'));
+      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ProdottoModel> prodotti = [];
@@ -66,10 +66,31 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+  Future<void> getAllFornitori() async {
+    try {
+      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        List<FornitoreModel> fornitori = [];
+        for (var item in jsonData) {
+          fornitori.add(FornitoreModel.fromJson(item));
+        }
+        setState(() {
+          allFornitori = fornitori;
+          filteredFornitori = fornitori;
+        });
+      } else {
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata all\'API: $e');
+    }
+  }
+
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -115,6 +136,69 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         selectedDate2 = picked;
       });
     }
+  }
+
+  void _showFornitoriDialog() {
+    TextEditingController searchController = TextEditingController(); // Aggiungi un controller
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) { // Usa StatefulBuilder per aggiornare lo stato del dialogo
+            return AlertDialog(
+              title: const Text('Seleziona Fornitore', textAlign: TextAlign.center),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController, // Aggiungi il controller
+                      onChanged: (value) {
+                        setState(() {
+                          filteredFornitori = allFornitori
+                              .where((fornitore) => fornitore.denominazione!
+                              .toLowerCase()
+                              .contains(value.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Cerca fornitore',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: filteredFornitori.map((fornitore) {
+                            return ListTile(
+                              leading: const Icon(Icons.contact_page_outlined),
+                              title: Text(
+                                  '${fornitore.denominazione}'),
+                              onTap: () {
+                                _aggiornaFornitoreSelezionato(fornitore);
+                                setState(() {
+                                  selectedFornitore = fornitore;
+                                  //print('Cliente selezionato: ${selectedCliente?.denominazione}');
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   void _showClientiDialog() {
@@ -186,13 +270,19 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     });
   }
 
+  void _aggiornaFornitoreSelezionato(FornitoreModel fornitore){
+    setState(() {
+      selectedFornitore = fornitore;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     searchController = TextEditingController();
     getAllClienti();
     getAllProdotti();
-    //getAllFornitori();
+    getAllFornitori();
     selectedDate = DateTime.now();
     selectedDate2 = DateTime.now();// Inizializza la data selezionata con la data corrente
   }
@@ -278,6 +368,30 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       borderRadius: BorderRadius.circular(10),
                       borderSide: BorderSide.none,
                     ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  _showFornitoriDialog();
+                },
+                child: SizedBox(//Padding(
+                  height: 50,
+                  //padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        (selectedFornitore?.denominazione != null && selectedFornitore!.denominazione!.length > 18)
+                            ? '${selectedFornitore!.denominazione?.substring(0, 18)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                            : (selectedFornitore?.denominazione ?? 'Seleziona fornitore').toUpperCase(),
+
+                        //selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Icon(Icons.arrow_drop_down),
+                    ],
                   ),
                 ),
               ),
@@ -489,7 +603,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveNota() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/noteTecnico'),
+        Uri.parse('$ipaddress/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : widget.utente.toMap(),
@@ -504,9 +618,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> saveOrdineProdottoNonPresente() async{
+    var fornitore = selectedFornitore != null ? selectedFornitore?.toMap() : null;
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/ordine'),
+        Uri.parse('$ipaddress/api/ordine'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -516,7 +631,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'data_disponibilita' : selectedDate.toIso8601String(),
           'data_ultima' : selectedDate2.toIso8601String(),
           'utente' : widget.utente.toMap(),
-          //'fornitore' : selectedFornitore?.toMap(),
+          'fornitore' : fornitore,
           'prodotto_non_presente' : _prodottoNonPresenteController.text,
           'note' : _noteController.text,
           'presa_visione' : false,
@@ -531,6 +646,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ),
         );
         saveNota();
+        Navigator.pop(context);
       }
     } catch(e){
       print('Errore 3: $e');
@@ -538,11 +654,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
   
   Future<void> saveOrdineProdottiPresenti() async{
+    var fornitore = selectedFornitore != null ? selectedFornitore?.toMap() : null;
     try{
       for(var prodotto in prodottiOrdinati){
         try{
           final response = await http.post(
-            Uri.parse('$ipaddressProva/api/ordine'),
+            Uri.parse('$ipaddress/api/ordine'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'descrizione' : _descrizioneController.text,
@@ -553,7 +670,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               'data_ultima' : selectedDate2.toIso8601String(),
               'utente' : widget.utente.toMap(),
               'prodotto' : prodotto.toMap(),
-              //'fornitore' : selectedFornitore?.toMap(),
+              'fornitore' : fornitore,
               'prodotto_non_presente' : null,
               'note' : _noteController.text,
               'presa_visione' : false,
@@ -563,8 +680,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             }),
           );
           if(response.statusCode == 201){
-
             saveNota();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Prodotto aggiunto correttamente all\'ordine'),
+              ),
+            );
+            Navigator.pop(context);
           }
         } catch(e){
           print('Errore 1: $e');
@@ -610,7 +731,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Widget _buildSearchField() {
     return TextField(
       controller: searchController,
-      autofocus: true,
       decoration: InputDecoration(
         hintText: 'Cerca prodotti...',
         border: InputBorder.none,

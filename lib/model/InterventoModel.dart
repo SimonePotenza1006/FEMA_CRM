@@ -13,6 +13,7 @@ class InterventoModel {
   bool? attivo;
   String? numerazione_danea;
   Priorita? priorita;
+  String? titolo;
   DateTime? data_apertura_intervento;
   DateTime? data;
   DateTime? orario_appuntamento;
@@ -50,6 +51,7 @@ class InterventoModel {
       this.attivo,
       this.numerazione_danea,
       this.priorita,
+      this.titolo,
       this.data_apertura_intervento,
       this.data,
       this.orario_appuntamento,
@@ -89,6 +91,7 @@ class InterventoModel {
       'attivo' : attivo,
       'numerazione_danea' : numerazione_danea,
       'priorita' : priorita.toString().split('.').last,
+      'titolo' : titolo,
       'data_apertura_intervento': data_apertura_intervento?.toIso8601String(),
       'data': data?.toIso8601String(),
       'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
@@ -132,6 +135,7 @@ class InterventoModel {
     numerazione_danea = map['numerazione_danea'];
     priorita = Priorita.values.firstWhere(
             (type) => type.toString() == 'priorita.${map['priorita']}');
+    titolo = map['titolo'];
     map['data_apertura_intervento'] != null ? DateTime.parse(map['data_apertura_intervento']) : null;
     map['data'] != null ? DateTime.parse(map['data']) : null;
     map['orario_appuntamento'] != null ? DateTime.parse(map['orario_appuntamento']) : null;
@@ -171,6 +175,7 @@ class InterventoModel {
     'attivo' : attivo,
     'numerazione_danea' : numerazione_danea,
     'priorita' : priorita.toString().split('.').last,
+    'titolo' : titolo,
     'data_apertura_intervento' : data_apertura_intervento?.toIso8601String(),
     'data': data?.toIso8601String(),
     'orario_appuntamento' : orario_appuntamento?.toIso8601String(),
@@ -211,6 +216,7 @@ class InterventoModel {
       json['attivo'],
       json['numerazione_danea']?.toString(),
       _getPrioritaFromString(json['priorita']),
+      json['titolo'].toString(),
       json['data_apertura_intervento'] != null ? DateTime.parse(json['data_apertura_intervento']) : null,
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['orario_appuntamento'] != null ? DateTime.parse(json['orario_appuntamento']) : null,

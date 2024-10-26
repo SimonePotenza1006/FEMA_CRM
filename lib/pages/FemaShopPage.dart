@@ -48,7 +48,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllRelazioniVendite(String clienteId) async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioniClientiProdotti/cliente/$clienteId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioniClientiProdotti/cliente/$clienteId'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<RelazioneClientiProdottiModel> relazioni = [];
@@ -68,7 +68,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -216,7 +216,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -333,7 +333,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllProdotti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/prodotto'));
+      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ProdottoModel> prodotti = [];
@@ -641,7 +641,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     double totaleVendita = calcolaTotaleSelezionati();
     try{
       response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'attivo' : true,
@@ -700,7 +700,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       final intervento = InterventoModel.fromJson(jsonDecode(data.body));
       try{
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/ddt'),
+          Uri.parse('$ipaddress/api/ddt'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
@@ -742,7 +742,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'data' : DateTime.now().toIso8601String()
         };
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/relazioniClientiProdotti'),
+          Uri.parse('$ipaddress/api/relazioniClientiProdotti'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(relazione),
         );
@@ -776,7 +776,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'seriale': selezione.prodotto.lotto_seriale,
         };
         final response = await http.post(
-          Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento'),
+          Uri.parse('$ipaddress/api/relazioneProdottoIntervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(relazione),
         );
@@ -810,7 +810,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
       double totaleVendita = calcolaTotaleSelezionati();
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : DateTime.now().toIso8601String(),

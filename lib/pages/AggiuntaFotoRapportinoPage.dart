@@ -70,7 +70,7 @@ class _AggiuntaFotoRapportinoPageState extends State<AggiuntaFotoRapportinoPage>
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -147,7 +147,7 @@ class _AggiuntaFotoRapportinoPageState extends State<AggiuntaFotoRapportinoPage>
                       primary: Colors.red,
                       onPrimary: Colors.white,
                     ),
-                    child: Text('ALLEGA RAPPORTINO', style: TextStyle(fontSize: 18.0)),
+                    child: Text('SCATTA FOTO', style: TextStyle(fontSize: 18.0)),
                   ),
                   _buildImagePreview(),
                   SizedBox(height: 20),
