@@ -173,7 +173,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         _dataController.text)); // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/commissione'),
+        Uri.parse('$ipaddressProva/api/commissione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': formattedDate, // Utilizza la data formattata
@@ -196,7 +196,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
