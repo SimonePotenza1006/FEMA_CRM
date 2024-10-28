@@ -6,9 +6,9 @@ class CommissioneModel{
   DateTime? data;
   String? descrizione;
   bool? concluso;
+  bool? attivo;
   String? note;
   UtenteModel? utente;
-
 
   CommissioneModel(
       this.id,
@@ -16,9 +16,10 @@ class CommissioneModel{
       this.data,
       this.descrizione,
       this.concluso,
+      this.attivo,
       this.note,
       this.utente,
-      );
+  );
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic> {
@@ -27,6 +28,7 @@ class CommissioneModel{
       'data' : data?.toIso8601String(),
       'descrizione': descrizione,
       'concluso': concluso,
+      'attivo' : attivo,
       'note': note,
       'utente': utente?.toMap(),
     };
@@ -39,6 +41,7 @@ class CommissioneModel{
     map['data'] != null ? DateTime.parse(map['data']) : null;
     descrizione = map['descrizione'];
     concluso = map['concluso'];
+    attivo = map['attivo'];
     note = map['note'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
   }
@@ -49,6 +52,7 @@ class CommissioneModel{
     'data': data?.toIso8601String(),
     'descrizione': descrizione,
     'concluso': concluso,
+    'attivo' : attivo,
     'note': note,
     'utente': utente?.toJson(),
   };
@@ -60,6 +64,7 @@ class CommissioneModel{
       json['data'] != null ? DateTime.parse(json['data']) : null,
       json['descrizione']?.toString(),
       json['concluso'],
+      json['attivo'],
       json['note']?.toString(),
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
     );

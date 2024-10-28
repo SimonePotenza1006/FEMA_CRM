@@ -15,21 +15,34 @@ class AssegnazioneCommissionePage extends StatefulWidget {
 class _AssegnazioneCommissionePageState
     extends State<AssegnazioneCommissionePage> {
   List<UtenteModel> allUtenti = [];
-
   // Controller for the text fields
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-  final TextEditingController _dataController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-
-  // Selected user
-  UtenteModel? selectedUser;
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  UtenteModel? selectedUtente;
+  DateTime _dataOdierna = DateTime.now();
+  DateTime? selectedDate = null;
 
   @override
   void initState() {
     super.initState();
     getAllUtenti();
+  }
+
+  Future<void> _selezionaData() async {
+    final DateTime? dataSelezionata = await showDatePicker(
+      locale: const Locale('it', 'IT'),
+      context: context,
+      initialDate: _dataOdierna,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
+      setState(() {
+        selectedDate = dataSelezionata;
+      });
+    }
   }
 
   @override
@@ -43,112 +56,77 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
       body: Padding(
         padding: EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            // Date and Time Picker
-            TextFormField(
-              controller: _dataController,
-              readOnly: true,
-              onTap: () async {
-                final DateTime? pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2101),
-                );
-                if (pickedDate != null) {
-                  final TimeOfDay? pickedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (pickedTime != null) {
-                    final DateTime combinedDateTime = DateTime(
-                      pickedDate.year,
-                      pickedDate.month,
-                      pickedDate.day,
-                      pickedTime.hour,
-                      pickedTime.minute,
-                    );
-                    _dataController.text = combinedDateTime.toString();
-                  }
-                }
-              },
-              decoration: InputDecoration(
-                labelText: 'Data e Orario',
-                border: OutlineInputBorder(),
+        child: Center(
+          child:  Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                  onPressed: _selezionaData,
+                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            // Description Field
-            TextFormField(
-              controller: _descrizioneController,
-              decoration: InputDecoration(
-                labelText: 'Descrizione',
-                border: OutlineInputBorder(),
+              if(selectedDate != null)
+                Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
+              const SizedBox(height: 20.0),
+              SizedBox(height: 20),
+              // Description Field
+              SizedBox(
+                width: 450,
+                child: TextFormField(
+                  controller: _descrizioneController,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    labelText: 'Descrizione',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            // Notes Field
-            TextFormField(
-              controller: _noteController,
-              decoration: InputDecoration(
-                labelText: 'Note',
-                border: OutlineInputBorder(),
+
+              SizedBox(height: 20),
+              SizedBox(
+                width: 450,
+                child: TextFormField(
+                  controller: _noteController,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    labelText: 'Note',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            // Button
-            ElevatedButton(
-              onPressed: () {
-                // Show modal with users
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Container(
-                      height: 200,
-                      child: ListView.builder(
-                        itemCount: allUtenti.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(
-                                '${allUtenti[index].nome} ${allUtenti[index].cognome}'),
-                            onTap: () {
-                              setState(() {
-                                selectedUser = allUtenti[index];
-                              });
-                              Navigator.pop(context); // Close modal
-                            },
-                          );
-                        },
-                      ),
-                    );
+              SizedBox(height: 20),
+              // Button
+              SizedBox(
+                width: 450,
+                child: DropdownButtonFormField<UtenteModel>(
+                  value: selectedUtente,
+                  onChanged: (UtenteModel? newValue){
+                    setState(() {
+                      selectedUtente = newValue;
+                    });
                   },
-                );
-              },
-              child: Text('Scegli Utente'),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red,
-                onPrimary: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  items: allUtenti.map((UtenteModel utente){
+                    return DropdownMenuItem<UtenteModel>(
+                      value: utente,
+                      child: Text(utente.nomeCompleto()!),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                      labelText: 'Seleziona tecnico'.toUpperCase()
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            // Selected User
-            if (selectedUser != null)
-              Text(
-                'Utente selezionato: ${selectedUser!.nome} ${selectedUser!.cognome}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-          ],
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(22.0),
         child: ElevatedButton(
           onPressed: () {
             createCommissione();
@@ -169,18 +147,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> createCommissione() async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
-    final formattedDate = formatter.format(DateTime.parse(
-        _dataController.text)); // Formatta la data in base al formatter creato
+    //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/commissione'),
+        Uri.parse('$ipaddressProva/api/commissione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'data': formattedDate, // Utilizza la data formattata
+          'data': null, // Utilizza la data formattata
           'descrizione': _descrizioneController.text,
           'concluso': false,
           'note': _noteController.text,
-          'utente': selectedUser?.toMap(),
+          'utente': selectedUtente?.toMap(),
         }),
       );
       Navigator.pop(context);
@@ -196,7 +173,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

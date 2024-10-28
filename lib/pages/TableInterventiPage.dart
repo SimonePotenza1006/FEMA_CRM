@@ -68,7 +68,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -89,7 +89,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -110,7 +110,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -131,7 +131,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -163,7 +163,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -198,7 +198,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -980,6 +980,28 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     minimumWidth: 230,
                   ),
                   GridColumn(
+                    allowSorting: true,
+                    columnName: 'tipologia',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'SETTORE'.toUpperCase(),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['tipologia']?? double.nan,
+                    minimumWidth: 180, // Imposta la larghezza minima
+                  ),
+                  GridColumn(
                     columnName: 'stato',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -1128,28 +1150,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       )
-                  ),
-                  GridColumn(
-                    allowSorting: true,
-                    columnName: 'tipologia',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'SETTORE'.toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                    width: _columnWidths['tipologia']?? double.nan,
-                    minimumWidth: 180, // Imposta la larghezza minima
                   ),
                 ],
                 onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
@@ -1331,7 +1331,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/gruppi'),
+          Uri.parse('$ipaddressProva/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1548,6 +1548,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           DataGridCell<String>(
             columnName: 'responsabile',
             value: intervento.utente?.nomeCompleto() ?? 'NON ASSEGNATO',
+          ),
+          DataGridCell<String>(
+            columnName: 'tipologia',
+            value: intervento.tipologia?.descrizione ?? '',//int.parse(intervento.tipologia!.id.toString()),
           ),
           DataGridCell<String>(
             columnName: 'stato',
@@ -1808,10 +1812,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 icon: Icon(Icons.folder, color:Colors.grey),
               )
           ),
-          DataGridCell<String>(
-            columnName: 'tipologia',
-            value: intervento.tipologia?.descrizione ?? '',//int.parse(intervento.tipologia!.id.toString()),
-          ),
         ],
       ));
     }
@@ -1859,7 +1859,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1910,7 +1910,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1963,7 +1963,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
