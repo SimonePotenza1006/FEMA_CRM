@@ -1863,6 +1863,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
+          'titolo' : intervento.titolo,
           'attivo' : intervento.attivo,
           'numerazione_danea' : intervento.numerazione_danea,
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
@@ -1914,6 +1915,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': intervento.id,
           'attivo' : intervento.attivo,
+          'titolo' : intervento.titolo,
           'numerazione_danea' : intervento.numerazione_danea,
           'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),
           'data': intervento.data?.toIso8601String(),
@@ -1966,6 +1968,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': intervento.id,
           'attivo' : intervento.attivo,
+          'titolo' : intervento.titolo,
           'numerazione_danea' : codiceDaneaController.text.isNotEmpty ? codiceDaneaController.text : "N/A",
           'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),
           'data': intervento.data?.toIso8601String(),

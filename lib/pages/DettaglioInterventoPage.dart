@@ -494,6 +494,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'attivo' :false,
+          'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -554,6 +555,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'attivo' : widget.intervento.attivo,
+          'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -792,6 +794,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             SizedBox(height: 10),
                             Row(
                               children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Titolo',
+                                      value: widget.intervento.titolo!,
+                                      context: context
+                                  ),
+                                ),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
@@ -2163,6 +2173,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id,
           'attivo' : widget.intervento.attivo,
+          'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),

@@ -40,6 +40,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   DateTime? selectedDate = null;
   String _descrizione = '';
   String _nota = '';
+  String _titolo = '';
   ClienteModel? selectedCliente;
   DestinazioneModel? selectedDestinazione;
   List<ClienteModel> clientiList = [];
@@ -48,6 +49,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<CategoriaInterventoSpecificoModel> allCategorieByTipologia = [];
   TextEditingController _descrizioneController = TextEditingController();
   TextEditingController _notaController = TextEditingController();
+  TextEditingController _titoloController = TextEditingController();
   TipologiaInterventoModel? _selectedTipologia;
   List<UtenteModel> allUtenti = [];
   List<UtenteModel> allCapogruppi = [];
@@ -274,6 +276,20 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               child: Text(value.descrizione!),
                             ),
                           ).toList(),
+                        ),
+                        const SizedBox(height: 20.0),
+                        SizedBox(
+                          width: 600,
+                          child: TextFormField(
+                            controller: _titoloController,
+                            maxLines: null,
+                            decoration:  InputDecoration(labelText: 'Titolo'.toUpperCase()),
+                            onChanged: (value) {
+                              setState(() {
+                                _titolo = value;
+                              });
+                            },
+                          ),
                         ),
                         const SizedBox(height: 20.0),
                         SizedBox(
@@ -730,6 +746,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           body: jsonEncode({
             'attivo' : true,
             'numerazione_danea' : null,
+            'titolo' : _titoloController.text,
             'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,//_dataOdierna.toIso8601String(),
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
@@ -909,6 +926,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           body: jsonEncode({
             'attivo' : true,
             'numerazione_danea' : null,
+            'titolo' : _titoloController.text,
             'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
@@ -957,6 +975,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           body: jsonEncode({
             'attivo' : true,
             'numerazione_danea' : null,
+            'titolo' : _titoloController.text,
             'priorita' : prioritaString,
             'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
             'data_apertura_intervento' : DateTime.now().toIso8601String(),

@@ -192,6 +192,7 @@ class _MenuSceltaSaldoPageState extends State<MenuSceltaSaldoPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
+          'titolo' : widget.intervento.titolo,
           'numerazione_danea': widget.intervento.numerazione_danea,
           'priorita': widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),

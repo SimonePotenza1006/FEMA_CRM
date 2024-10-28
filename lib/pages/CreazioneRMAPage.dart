@@ -773,6 +773,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           body: jsonEncode({
             'attivo' : true,
             'numerazione_danea' : null,
+            //'titolo' : widget.intervento.titolo,
             'data': _dataOdierna.toIso8601String(),
             'data_apertura_intervento' : DateTime.now().toIso8601String(),
             'orario_appuntamento' : null,

@@ -90,6 +90,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
+          'titolo' : widget.intervento.titolo,
           'attivo' : widget.intervento.attivo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),

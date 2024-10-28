@@ -41,6 +41,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
   List<RelazioneClientiProdottiModel> relazioniVecchieVendite = [];
   DestinazioneModel? selectedDestinazione;
   final TextEditingController _descrizioneController = TextEditingController();
+  final TextEditingController _titoloController = TextEditingController();
   ClienteModel? selectedCliente;
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
@@ -646,6 +647,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'attivo' : true,
           'numerazione_danea' : null,
+          'titolo' : "Vendita al banco",
           'data': DateTime.now().toIso8601String(),
           'data_apertura_intervento' : DateTime.now().toIso8601String(),
           'orario_appuntamento' : null,
