@@ -129,7 +129,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllOrdini() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/ordine');
+      var apiUrl = Uri.parse('$ipaddress/api/ordine');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -156,9 +156,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   bool checkVeicoloScadenze(List<VeicoloModel> allVeicoli) {
-    // Data corrente
+
     DateTime now = DateTime.now();
-    // Variabile che indica se ci sono scadenze
+
     bool hasScadenze = false;
 
     // Iteriamo su tutti i veicoli
@@ -226,7 +226,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllVeicoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/veicolo');
+      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -269,7 +269,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -293,7 +293,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -315,7 +315,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<InterventoModel>> getMerce() async{
     try{
 
-      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -339,7 +339,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -390,7 +390,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   //       try {
   //
   //          final response = await http.post(
-  //           Uri.parse('$ipaddressProva/api/noteTecnico'),
+  //           Uri.parse('$ipaddress/api/noteTecnico'),
   //           headers: {'Content-Type': 'application/json'},
   //           body: jsonEncode({
   //             'utente': widget.userData.toMap(),
@@ -422,7 +422,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   //         try {
   //
   //           final response = await http.post(
-  //           Uri.parse('$ipaddressProva/api/noteTecnico'),
+  //           Uri.parse('$ipaddress/api/noteTecnico'),
   //           headers: {'Content-Type': 'application/json'},
   //           body: jsonEncode({
   //             'utente': widget.userData.toMap(),
@@ -452,7 +452,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   //
   //       try {
   //         if(!trovato) final response = await http.post(
-  //           Uri.parse('$ipaddressProva/api/noteTecnico'),
+  //           Uri.parse('$ipaddress/api/noteTecnico'),
   //           headers: {'Content-Type': 'application/json'},
   //           body: jsonEncode({
   //             'utente': widget.userData.toMap(),
@@ -472,7 +472,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -494,7 +494,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllCommissioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/commissione');
+      var apiUrl = Uri.parse('$ipaddress/api/commissione');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -517,7 +517,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getTipologieIntervento() async {
     print('getTipologieIntervento chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -542,7 +542,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllInterventi() async {
     print('getAllInterventi chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -642,7 +642,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<NotaTecnicoModel>> getNote() async {
     try {
       http.Response response = await http.get(
-          Uri.parse('$ipaddressProva/api/noteTecnico/ordered'),
+          Uri.parse('$ipaddress/api/noteTecnico/ordered'),
       );
 
       if (response.statusCode == 200) {
@@ -967,39 +967,236 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   children: [
                 Column(
                 children: [
-                GestureDetector(
-                onTapUp: (details) {
-              if (_hoveredIndex != -1) {
-              _navigateToPage(_hoveredIndex);
-              }
-              },
-                onPanUpdate: (details) {
-                  RenderBox box = context.findRenderObject() as RenderBox;
-                  Offset localOffset = box.globalToLocal(details.globalPosition);
-                  setState(() {
-                    _hoveredIndex = _calculateHoveredIndex(localOffset);
-                  });
-                },
-                child: CustomPaint(
-                  size: Size(500, 500),
-                  painter: MenuPainter(
-                        (index) {
-                      setState(() {
-                        _hoveredIndex = index;
-                      });
-                    },
-                        () {
-                      setState(() {
-                        _hoveredIndex = -1;
-                      });
-                    },
-                    context,
-                    size: Size(500, 500),
-                    hoveredIndex: _hoveredIndex,
-                  ),
-                ),
-              ),
-            ],
+              //   GestureDetector(
+              //   onTapUp: (details) {
+              // if (_hoveredIndex != -1) {
+              // _navigateToPage(_hoveredIndex);
+              // }
+              // },
+              //   onPanUpdate: (details) {
+              //     RenderBox box = context.findRenderObject() as RenderBox;
+              //     Offset localOffset = box.globalToLocal(details.globalPosition);
+              //     setState(() {
+              //       _hoveredIndex = _calculateHoveredIndex(localOffset);
+              //     });
+              //   },
+              //   child: CustomPaint(
+              //     size: Size(500, 500),
+              //     painter: MenuPainter(
+              //           (index) {
+              //         setState(() {
+              //           _hoveredIndex = index;
+              //         });
+              //       },
+              //           () {
+              //         setState(() {
+              //           _hoveredIndex = -1;
+              //         });
+              //       },
+              //       context,
+              //       size: Size(500, 500),
+              //       hoveredIndex: _hoveredIndex,
+              //     ),
+              //   ),
+              // ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.access_time_outlined, text: 'TIMBRATURA',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MenuInterventiPage(utente: widget.userData)),
+                                );
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.build, text: 'INTERVENTI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MenuInterventiPage(utente: widget.userData)),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.calendar_month_sharp, text: 'CALENDARIO',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => CalendarioPage()),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.snippet_folder_outlined, text: 'ORDINI FORNITORE',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MenuOrdiniFornitorePage(utente: widget.userData)),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.euro_rounded, text: 'REGISTRO CASSA',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => RegistroCassaPage(userData: widget.userData)),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.rule_folder_outlined, text: 'RIPARAZIONI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage()),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.remove_red_eye_outlined, text: 'SOPRALLUOGHI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MenuSopralluoghiPage(utente: widget.userData)),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.class_outlined, text: 'COMMISSIONI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.emoji_transportation_sharp, text: 'SPESE SU VEICOLO',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => MenuSopralluoghiPage(utente: widget.userData)),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.do_disturb_alt_rounded, text: 'CREDENZIALI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ListaCredenzialiPage()),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.contact_emergency_rounded, text: 'CLIENTI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ListaClientiPage()),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.warehouse_outlined, text: 'MAGAZZINO',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => TableMagazzinoPage()),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.business_center_outlined, text: 'PREVENTIVI',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => LogisticaPreventiviHomepage(userData: widget.userData)),
+                                );
+                              },
+                            ),
+                          ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                          SizedBox(
+                            width: 350,
+                            child: buildMenuButton(icon: Icons.qr_code_2, text: 'QRCODE',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ScannerQrCodeAmministrazionePage()),
+                                );
+                              },
+                            ),
+                          ),
+
+                  ],
                 ),
                 SizedBox(height: 80),
                 Column(
@@ -1494,7 +1691,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                   ],
                 ),
-              );
+
+              ]));
             } else {
               // Desktop layout
               return SingleChildScrollView(
@@ -1502,6 +1700,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -1741,38 +1940,238 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             )
                           ],
                         ),
-                        GestureDetector(
-                          onTapUp: (details) {
-                            if (_hoveredIndex != -1) {
-                              _navigateToPage(_hoveredIndex);
-                            }
-                          },
-                          onPanUpdate: (details) {
-                            RenderBox box = context.findRenderObject() as RenderBox;
-                            Offset localOffset = box.globalToLocal(details.globalPosition);
-                            setState(() {
-                              _hoveredIndex = _calculateHoveredIndex(localOffset);
-                            });
-                          },
-                          child: CustomPaint(
-                            size: Size(600, 600),
-                            painter: MenuPainter(
-                                  (index) {
-                                setState(() {
-                                  _hoveredIndex = index;
-                                });
-                              },
-                                  () {
-                                setState(() {
-                                  _hoveredIndex = -1;
-                                });
-                              },
-                              context,
-                              size: Size(650, 650),
-                              hoveredIndex: _hoveredIndex,
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.access_time_outlined, text: 'TIMBRATURA',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => MenuInterventiPage(utente: widget.userData)),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.build, text: 'INTERVENTI',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => MenuInterventiPage(utente: widget.userData)),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.calendar_month_sharp, text: 'CALENDARIO',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => CalendarioPage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.snippet_folder_outlined, text: 'ORDINI FORNITORE',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => MenuOrdiniFornitorePage(utente: widget.userData)),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.euro_rounded, text: 'REGISTRO CASSA',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => RegistroCassaPage(userData: widget.userData)),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.rule_folder_outlined, text: 'RIPARAZIONI',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.remove_red_eye_outlined, text: 'SOPRALLUOGHI',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => MenuSopralluoghiPage(utente: widget.userData)),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.class_outlined, text: 'COMMISSIONI',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.emoji_transportation_sharp, text: 'SPESE SU VEICOLO',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => MenuSopralluoghiPage(utente: widget.userData)),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.do_disturb_alt_rounded, text: 'CREDENZIALI',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => ListaCredenzialiPage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.contact_emergency_rounded, text: 'CLIENTI',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => ListaClientiPage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.warehouse_outlined, text: 'MAGAZZINO',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => TableMagazzinoPage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.business_center_outlined, text: 'PREVENTIVI',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => LogisticaPreventiviHomepage(userData: widget.userData)),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.qr_code_2, text: 'QRCODE',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => ScannerQrCodeAmministrazionePage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                        // GestureDetector(
+                        //   onTapUp: (details) {
+                        //     if (_hoveredIndex != -1) {
+                        //       _navigateToPage(_hoveredIndex);
+                        //     }
+                        //   },
+                        //   onPanUpdate: (details) {
+                        //     RenderBox box = context.findRenderObject() as RenderBox;
+                        //     Offset localOffset = box.globalToLocal(details.globalPosition);
+                        //     setState(() {
+                        //       _hoveredIndex = _calculateHoveredIndex(localOffset);
+                        //     });
+                        //   },
+                        //   child: CustomPaint(
+                        //     size: Size(600, 600),
+                        //     painter: MenuPainter(
+                        //           (index) {
+                        //         setState(() {
+                        //           _hoveredIndex = index;
+                        //         });
+                        //       },
+                        //           () {
+                        //         setState(() {
+                        //           _hoveredIndex = -1;
+                        //         });
+                        //       },
+                        //       context,
+                        //       size: Size(650, 650),
+                        //       hoveredIndex: _hoveredIndex,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                     SizedBox(height: 25),
@@ -2111,6 +2510,55 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
     );
   }
+
+  Widget buildMenuButton(
+      {required IconData icon, required String text, required VoidCallback onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red.shade400, Colors.red.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                color: Colors.white,
+                size: 30,
+              ),
+              SizedBox(width: 30),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
 }
 
 
