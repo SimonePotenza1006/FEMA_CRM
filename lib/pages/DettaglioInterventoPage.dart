@@ -25,7 +25,7 @@ import 'GalleriaFotoInterventoPage.dart';
 import 'PDFInterventoPage.dart';
 
 class DettaglioInterventoPage extends StatefulWidget {
-  final InterventoModel intervento;
+   InterventoModel intervento;
 
   DettaglioInterventoPage({required this.intervento});
 
@@ -37,6 +37,7 @@ class DettaglioInterventoPage extends StatefulWidget {
 class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   late Future<List<UtenteModel>> _utentiFuture;
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
+  List<RelazioneUtentiInterventiModel> relazioniNuove = [];
   List<NotaTecnicoModel> allNote = [];
   List<UtenteModel> allUtenti = [];
   late Future<List<ClienteModel>> allClienti;
@@ -2532,6 +2533,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> assegna() async {
+    print('rrees '+_responsabileSelezionato!.toMap().toString());
     print(_selectedUtenti.toString());
     print(_finalSelectedUtenti.toString());
     try {
@@ -2564,7 +2566,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'relazione_tecnico' : widget.intervento.relazione_tecnico,
             'firma_cliente': widget.intervento.firma_cliente,
             'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
-            'utente': _responsabileSelezionato?.toMap(),
+            'utente': _responsabileSelezionato != null ? _responsabileSelezionato : null,//.toMap(),
             'cliente': widget.intervento.cliente?.toMap(),
             'veicolo': widget.intervento.veicolo?.toMap(),
             'merce' : widget.intervento.merce?.toMap(),
@@ -2574,7 +2576,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             'destinazione': widget.intervento.destinazione?.toMap(),
             'gruppo': widget.intervento.gruppo?.toMap()
           }));
+
       if (response.statusCode == 201) {
+        setState(() {
+          widget.intervento = InterventoModel.fromJson(json.decode(response.body.toString()));
+        });
         print('EVVAIIIIIIII');
         if(_selectedUtenti.isNotEmpty){
 
@@ -2607,6 +2613,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   'intervento' : widget.intervento.toMap(),
                 }),
               );
+
+              relazioniNuove.add(RelazioneUtentiInterventiModel.fromJson(json.decode(response.body.toString())));
               print(response.body.toString());
               print(response.statusCode);
             } catch(e) {
@@ -2621,7 +2629,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             duration: Duration(seconds: 3), // Durata dello Snackbar
           ),
         );
-        setState((){ });
+        setState((){otherUtenti = relazioniNuove; });
         /*Navigator.push(
             context,
             MaterialPageRoute(
