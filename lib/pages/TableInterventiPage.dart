@@ -980,6 +980,28 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     minimumWidth: 230,
                   ),
                   GridColumn(
+                    allowSorting: true,
+                    columnName: 'tipologia',
+                    label: Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'SETTORE'.toUpperCase(),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
+                    width: _columnWidths['tipologia']?? double.nan,
+                    minimumWidth: 180, // Imposta la larghezza minima
+                  ),
+                  GridColumn(
                     columnName: 'stato',
                     label: Container(
                       padding: EdgeInsets.all(8.0),
@@ -1128,28 +1150,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       )
-                  ),
-                  GridColumn(
-                    allowSorting: true,
-                    columnName: 'tipologia',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'SETTORE'.toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                    width: _columnWidths['tipologia']?? double.nan,
-                    minimumWidth: 180, // Imposta la larghezza minima
                   ),
                 ],
                 onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
@@ -1550,6 +1550,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             value: intervento.utente?.nomeCompleto() ?? 'NON ASSEGNATO',
           ),
           DataGridCell<String>(
+            columnName: 'tipologia',
+            value: intervento.tipologia?.descrizione ?? '',//int.parse(intervento.tipologia!.id.toString()),
+          ),
+          DataGridCell<String>(
             columnName: 'stato',
             value: stato,
           ),
@@ -1807,10 +1811,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 },
                 icon: Icon(Icons.folder, color:Colors.grey),
               )
-          ),
-          DataGridCell<String>(
-            columnName: 'tipologia',
-            value: intervento.tipologia?.descrizione ?? '',//int.parse(intervento.tipologia!.id.toString()),
           ),
         ],
       ));
