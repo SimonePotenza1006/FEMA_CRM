@@ -521,12 +521,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       value: widget.intervento.cliente?.denominazione?? 'N/A',
                       context: context,
                     ),
-                    SizedBox(height : 15),
+                    /*SizedBox(height : 15),
                     buildInfoRow(
                       title: 'Destinazione',
                       value: widget.intervento.destinazione?.indirizzo?? 'N/A',
                       context: context,
-                    ),
+                    ),*/
 
                     /*SizedBox(height: 15),
                     buildInfoRow(
@@ -565,7 +565,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       value: widget.intervento.descrizione?? 'N/A',
                       context: context,
                     ),
-                    SizedBox(height : 15),
+                    /*SizedBox(height : 15),
                     buildInfoRow(
                       title: 'Indirizzo cliente',
                       value: widget.intervento.cliente?.indirizzo?? 'N/A',
@@ -582,7 +582,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       title: 'Cellulare cliente',
                       value: widget.intervento.cliente?.cellulare?? 'N/A',
                       context: context,
-                    ),
+                    ),*/
                   ],
                 ),
               ),
@@ -980,7 +980,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ],
         ),
       ),
-    ));
+    )
+      );
   }
 
   String formatDate(DateTime? date) {
