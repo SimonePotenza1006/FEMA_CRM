@@ -30,7 +30,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<Uint8List> _loadImage() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {
@@ -44,7 +44,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<Uint8List> getImageSpesa(String idspesa) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {
