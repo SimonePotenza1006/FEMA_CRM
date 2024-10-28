@@ -309,7 +309,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddressProva/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
