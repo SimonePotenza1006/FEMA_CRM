@@ -147,13 +147,15 @@ class _AssegnazioneCommissionePageState
   Future<void> createCommissione() async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
+    var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/commissione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'data': null, // Utilizza la data formattata
+          'data': data, // Utilizza la data formattata
+          'attivo' : true,
           'descrizione': _descrizioneController.text,
           'concluso': false,
           'note': _noteController.text,
