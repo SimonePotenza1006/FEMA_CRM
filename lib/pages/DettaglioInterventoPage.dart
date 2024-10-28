@@ -856,16 +856,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               ],
                             ),
                             SizedBox(height: 10),
+                            SizedBox(
+                              width: 500,
+                              child: buildInfoRow(
+                                  title: 'Titolo',
+                                  value: widget.intervento.titolo!,
+                                  context: context
+                              ),
+                            ),
+                            SizedBox(height: 10),
                             Row(
                               children: [
-                                SizedBox(
-                                  width: 500,
-                                  child: buildInfoRow(
-                                      title: 'Titolo',
-                                      value: widget.intervento.titolo!,
-                                      context: context
-                                  ),
-                                ),
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(

@@ -793,7 +793,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
-    // Verifica se il valore supera i 25 caratteri
     bool isValueTooLong = value.length > 15;
     String displayedValue = isValueTooLong ? value.substring(0, 10) + "..." : value;
     return SizedBox(

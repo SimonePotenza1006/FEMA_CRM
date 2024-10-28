@@ -117,7 +117,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       final int smtpServerPort = 465;
       final String recipient = 'info@femasistemi.it';
 
-      // Configura il server SMTP
+
       final smtpServer = SmtpServer(
         smtpServerHost,
         port: smtpServerPort,
@@ -148,7 +148,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
-  // Metodo per generare il PDF
   Future<Uint8List> _generatePDF() async {
     print('Inizio metodo _generatePDF()');
     print('Creazione documento PDF...');
@@ -166,9 +165,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var formattedOrarioFine = orarioFine != null
           ? DateFormat('HH:mm').format(DateTime.parse(orarioFine.toString()))
           : '';
-
       var importo = widget.intervento.importo_intervento;
-
       var formattedDataCreazione = data != null
           ? DateFormat('dd/MM/yyyy').format(DateTime.parse(data.toString()))
           : '';
@@ -188,6 +185,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } catch(e){
       print('Errore durante la formattazione delle stringhe: $e');
     }
+
     const IconData euro_symbol = IconData(0xe23c, fontFamily: 'MaterialIcons');
     var orarioInizio = widget.intervento.orario_inizio;
     var orarioFine = widget.intervento.orario_fine;
@@ -226,7 +224,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     print('Ora inizio: ${formattedOrarioInizio}');
     print('Ora fine : ${formattedOrarioFine}');
     var veicolo = widget.intervento.veicolo != null ? widget.intervento.veicolo?.descrizione : "";
-
     try {
       print('Dentro al try');
       pdf.addPage(
