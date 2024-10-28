@@ -55,7 +55,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMerce() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/restituzioneMerce');
+      var apiUrl = Uri.parse('$ipaddress/api/restituzioneMerce');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
