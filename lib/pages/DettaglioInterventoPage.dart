@@ -11,7 +11,9 @@ import 'package:fema_crm/pages/TableInterventiPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../model/ClienteModel.dart';
 import '../model/FaseRiparazioneModel.dart';
@@ -65,6 +67,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
   DbHelper? dbHelper;
+  List<XFile> pickedImages = [];
 
   @override
   void initState() {
@@ -251,7 +254,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -353,7 +356,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         return response;
@@ -375,7 +378,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
        } else {
          final ddt = DDTModel.fromJson(jsonDecode(data.body));
          try{
-           final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+           final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}'));
            var responseData = json.decode(response.body);
            if(response.statusCode == 200){
              List<RelazioneDdtProdottoModel> prodotti = [];
@@ -397,7 +400,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getProdottiByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<RelazioneProdottiInterventoModel> prodotti = [];
@@ -424,11 +427,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     return sum + (prezzoFornitore * quantita);
   });
 
-
-
   Future<void> getNoteByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<NotaTecnicoModel> note =[];
@@ -448,7 +449,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -468,7 +469,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -489,7 +490,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void eliminaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -550,7 +551,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -667,6 +668,58 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  Widget _buildImagePreview() {
+    return SizedBox(width: 600,
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    setState(() {
+                      pickedImages.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> takePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    // Verifica se sei su Android
+    if (Platform.isAndroid) {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+      if (pickedFile != null) {
+        setState(() {
+          pickedImages.add(pickedFile);
+        });
+      }
+    }
+    // Verifica se sei su Windows
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -702,6 +755,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           style: TextStyle(color: Colors.white),
         ),
         actions: [
+          Tooltip(
+            message: 'Allega foto',  // The text that will appear in the tooltip
+            preferBelow: true,       // This makes the tooltip appear below the icon
+            child: IconButton(
+              icon: Icon(Icons.attach_file, color: Colors.white, size: 30),
+              onPressed: () {
+                takePicture();
+              },
+            ),
+          ),
+          SizedBox(width: 10),
           Tooltip(
             message: 'Elimina intervento',  // The text that will appear in the tooltip
             preferBelow: true,       // This makes the tooltip appear below the icon
@@ -1718,6 +1782,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               },
                             ),
                           ),
+                          _buildImagePreview(),
                         ],
                       ),
                       //Inizio container foto
@@ -2168,7 +2233,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -2241,7 +2306,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     print(_selectedUtenti.toString());
     print(_finalSelectedUtenti.toString());
     try {
-      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+      final response = await http.post(Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
@@ -2287,7 +2352,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             try{
               print('sono quiiiiii');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'utente' : utente?.toMap(),

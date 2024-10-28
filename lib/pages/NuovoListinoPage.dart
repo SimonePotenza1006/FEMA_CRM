@@ -85,7 +85,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> createNewListino(String descrizione, double prezzo,
       CategoriaInterventoSpecificoModel categoria) async {
-    final url = Uri.parse('$ipaddress/api/listino');
+    final url = Uri.parse('$ipaddressProva/api/listino');
     final body = jsonEncode({
       'descrizione': descrizione,
       'prezzo': prezzo,

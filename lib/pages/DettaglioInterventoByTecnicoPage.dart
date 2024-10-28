@@ -110,7 +110,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.get(
-        Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+        Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
           DDTModel ddt = DDTModel.fromJson(jsonData);
@@ -158,7 +158,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
       final ddt = DDTModel.fromJson(jsonDecode(data.body));
       try{
-        var apiUrl = Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}');
+        var apiUrl = Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}');
         var response = await http.get(apiUrl);
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
@@ -182,7 +182,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -202,7 +202,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllNoteByIntervento() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}');
+      var apiUrl = Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -224,7 +224,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaOrarioFine() async{
     // try{
     //   final response = await http.post(
-    //     Uri.parse('$ipaddress/api/intervento'),
+    //     Uri.parse('$ipaddressProva/api/intervento'),
     //     headers: {'Content-Type': 'application/json'},
     //     body: jsonEncode({
     //       'id': widget.intervento.id?.toString(),
@@ -281,7 +281,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaOrarioInizio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -516,7 +516,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       context: context,
                     ),
                     SizedBox(height: 15),
-                    buildInfoRow(
+                    buildTileRow(
                       title: 'Cliente',
                       value: widget.intervento.cliente?.denominazione?? 'N/A',
                       context: context,
@@ -873,6 +873,115 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         ),
       ),
     );
+  }
+
+  Widget buildTileRow({required String title, required String value, BuildContext? context}) {
+    // Verifica se il valore supera i 25 caratteri
+    bool isValueTooLong = value.length > 15;
+    String displayedValue = isValueTooLong ? value.substring(0, 10) + "..." : value;
+    return
+      ExpansionTile(
+          children: [
+            buildInfoRow(
+              title: 'Destinazione',
+              value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
+              context: context,
+            ),
+            buildInfoRow(
+              title: 'Indirizzo cliente',
+              value: widget.intervento.cliente?.indirizzo ?? 'N/A',
+              context: context,
+            ),
+            buildInfoRow(
+              title: 'Telefono cliente',
+              value: widget.intervento.cliente?.telefono ?? 'N/A',
+              context: context,
+            ),
+            buildInfoRow(
+              title: 'Cellulare cliente',
+              value: widget.intervento.cliente?.cellulare ?? 'N/A',
+              context: context,
+            ),
+          ],
+      title:
+      SizedBox(
+      width: 450,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+
+                      Text(
+                        displayedValue.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (isValueTooLong && context != null)
+                        IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("${title.toUpperCase()}"),
+                                  content: Text(value),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    ));
   }
 
   String formatDate(DateTime? date) {
