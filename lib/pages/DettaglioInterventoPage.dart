@@ -13,6 +13,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../model/ClienteModel.dart';
@@ -718,6 +719,77 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           pickedImages.addAll(pickedFiles);
         });
       }
+    }
+  }
+
+  Future<void> savePics() async {
+    try {
+      // Mostra il caricamento
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Impedisce la chiusura del dialog premendo fuori
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Caricamento in corso..."),
+              ],
+            ),
+          );
+        },
+      );
+
+      for (var image in pickedImages) {
+        if (image.path != null && image.path.isNotEmpty) {
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'intervento', // Field name
+              image.path, // File path
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+          } else {
+            print('Errore durante l\'invio del file: ${response.statusCode}');
+          }
+        } else {
+          print('Errore: Il percorso del file non è valido');
+        }
+      }
+
+      pickedImages.clear();
+      Navigator.pop(context); // Chiudi il dialog di caricamento
+
+      // Mostra il messaggio di caricamento completato
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Successo"),
+            content: Text("Caricamento completato!"),
+            actions: [
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.pop(context); // Chiudi l'alert di successo
+                  Navigator.pop(context); // Torna alla pagina precedente
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      Navigator.pop(context); // Chiudi il dialog di caricamento in caso di errore
+      print('Errore durante l\'invio del file: $e');
     }
   }
 
@@ -1784,6 +1856,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                           ),
                           _buildImagePreview(),
+                          SizedBox(height: 20),
+                          pickedImages.isNotEmpty ? ElevatedButton(
+                            onPressed: pickedImages.isNotEmpty ? savePics : null, // Attiva solo se ci sono immagini
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.red,
+                              onPrimary: Colors.white,
+                            ),
+                            child: Text('Salva Foto', style: TextStyle(fontSize: 18.0)),
+                          ) : Container(),
                         ],
                       ),
                       //Inizio container foto
