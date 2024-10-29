@@ -1456,10 +1456,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           prioritaColor = Colors.orange; // giallo chiaro
           break;
         case Priorita.URGENTE:
-          backgroundColor = Colors.red; // azzurro chiaro
+          prioritaColor = Colors.red; // azzurro chiaro
           break;
         default:
-          backgroundColor = Colors.blueGrey[200];
+          prioritaColor = Colors.blueGrey[200];
       }
 
       double? importo = intervento.importo_intervento != null ? intervento.importo_intervento : 0;
