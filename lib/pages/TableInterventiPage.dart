@@ -65,6 +65,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   };
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   bool isLoading = true;
+  bool _isLoading = true;
 
   Future<void> getAllUtenti() async{
     try{
@@ -159,6 +160,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> getAllInterventi() async {
+
     setState(() {
       isLoading = true; // Inizio del caricamento
     });
@@ -178,11 +180,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           interventoUtentiMap[int.parse(intervento.id.toString())] = relazioni.map((relazione) => relazione.utente!).toList();
         }
         setState(() {
+          _isLoading = false;
           _allInterventi = interventi;
           _filteredInterventi = interventi.toList();
           _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
         });
       } else {
+        _isLoading = false;
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
     } catch (e) {
