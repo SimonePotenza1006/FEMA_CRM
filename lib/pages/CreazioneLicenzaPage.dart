@@ -48,7 +48,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          'CREAZIONE LICENZA',
+          'GESTIONE LICENZE',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -137,7 +137,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                                     controller: TextEditingController(
                                         text: _controller.text),
                                         onChanged: (value) {
-                                          model.note = value;
+                                          _controller.text = value;
                                     },
                                   ),
                                 )),
@@ -146,13 +146,13 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                                         alignment: Alignment.center,
                                         child:
                                         ElevatedButton(
-                                          onPressed: () {
-                                            noteLicenza(model.descrizione!, _controller.text).whenComplete(() {
+                                          onPressed:  (_controller.value.text != model.note) ? () {
+                                            noteLicenza(model, _controller.value.text).whenComplete(() {
                                                   setState(() {
                                                     //_editedRowIndex = null; // Resetta la riga in modifica
                                                   });
                                                 });
-                                            },
+                                            } : null,
                                           child: Text('SALVA'),
                                         ),)),
                               ]);
@@ -172,7 +172,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<List<LicenzaModel>> futureLicenze() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/licenza');
+      var apiUrl = Uri.parse('$ipaddress/api/licenza');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -227,10 +227,13 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
     );
   }
 
-  Future<void> noteLicenza(String idLicenza, String note) async {
-    final url = Uri.parse('$ipaddressProva/api/licenza/$idLicenza');
+  Future<void> noteLicenza(LicenzaModel licenza, String note) async {
+    print(licenza.note.toString()+' '+note);
+    final url = Uri.parse('$ipaddress/api/licenza/nuova');
     final body = jsonEncode({
-      'id': idLicenza,
+      'id': licenza.id!,
+      'descrizione': licenza.descrizione,
+      'utilizzato': true,
       'note': note
     });
     try {
@@ -239,7 +242,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         print('Licenza modificata con successo!');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -247,7 +250,6 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
             duration: Duration(seconds: 3), // Durata dello Snackbar
           ),
         );
-        _licenzaController.clear();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -263,7 +265,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   }
 
   Future<void> createNewLicenza() async {
-    final url = Uri.parse('$ipaddressProva/api/licenza/nuova');
+    final url = Uri.parse('$ipaddress/api/licenza/nuova');
     final body = jsonEncode({
       'descrizione': _licenzaController.text,
       'utilizzato': false

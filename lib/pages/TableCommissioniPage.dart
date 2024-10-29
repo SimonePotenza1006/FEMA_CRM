@@ -1,4 +1,4 @@
-import 'dart:convert';
+/*import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -35,7 +35,7 @@ class _TableCommissioniPageState extends State<TableCommissioniPage>{
       isLoading = true; // Inizio del caricamento
     });
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/commissione/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/commissione/ordered');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -270,4 +270,4 @@ class CommissioneDataSource extends DataGridSource{
   BuildContext context;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-}
+}*/
