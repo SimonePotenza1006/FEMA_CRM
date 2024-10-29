@@ -170,6 +170,51 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<InterventoModel> interventi = [];
+        interventi = (jsonData as List)
+            .take(21) // Limita a 20 elementi
+            .map((item) => InterventoModel.fromJson(item))
+            .toList();
+        /*for (var item in jsonData) {
+          interventi.add(InterventoModel.fromJson(item));
+        }*/
+        // Recuperare tutte le relazioni utenti-interventi
+        Map<int, List<UtenteModel>> interventoUtentiMap = {};
+        for (var intervento in interventi) {
+          var relazioni = await getRelazioni(int.parse(intervento.id.toString()));
+          interventoUtentiMap[int.parse(intervento.id.toString())] = relazioni.map((relazione) => relazione.utente!).toList();
+        }
+        setState(() {
+          _isLoading = false;
+          _allInterventi = interventi;
+          _filteredInterventi = interventi.toList();
+          _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
+        });
+      } else {
+        _isLoading = false;
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error during API call: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false; // Fine del caricamento
+      });
+    }
+  }
+
+  Future<void> getAllInterventiTot() async {
+
+    setState(() {
+      isLoading = true; // Inizio del caricamento
+    });
+    try {
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<InterventoModel> interventi = [];
         for (var item in jsonData) {
           interventi.add(InterventoModel.fromJson(item));
         }
@@ -358,6 +403,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     getAllUtenti().whenComplete(() => print('Utenti ok'));
     _filteredInterventi = _allInterventi.toList();
     _changeSheet(0);
+    getAllInterventiTot();
   }
 
   @override

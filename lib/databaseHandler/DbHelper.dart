@@ -257,7 +257,8 @@ class DbHelper{
 
               singleRuolo['id'].toString(),
               singleRuolo['descrizione'],
-              singleRuolo['utilizzato']
+              singleRuolo['utilizzato'],
+              singleRuolo['note']
           );
           //print("ooooruoaldiookkppp");//singleRuolo["descrizione"]);
           //Adding interv to the list.
