@@ -45,7 +45,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> createAzienda() async {
-    final url = Uri.parse('$ipaddressProva/api/azienda');
+    final url = Uri.parse('$ipaddress/api/azienda');
     final body = jsonEncode({
       'nome': denominazioneController.text.toString(),
       'luogo_di_lavoro': luogoLavoroController.text.toString(),

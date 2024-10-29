@@ -110,7 +110,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getProdotti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/prodotto');
+      var apiUrl = Uri.parse('$ipaddress/api/prodotto');
       print('Fetching products from: $apiUrl');
 
       var response = await http.get(apiUrl);
