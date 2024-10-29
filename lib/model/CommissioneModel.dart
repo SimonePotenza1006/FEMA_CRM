@@ -1,3 +1,4 @@
+import 'InterventoModel.dart';
 import 'UtenteModel.dart';
 
 class CommissioneModel{
@@ -9,6 +10,7 @@ class CommissioneModel{
   bool? attivo;
   String? note;
   UtenteModel? utente;
+  InterventoModel? intervento;
 
   CommissioneModel(
       this.id,
@@ -19,6 +21,7 @@ class CommissioneModel{
       this.attivo,
       this.note,
       this.utente,
+      this.intervento
   );
 
   Map<String, dynamic> toMap() {
@@ -31,6 +34,7 @@ class CommissioneModel{
       'attivo' : attivo,
       'note': note,
       'utente': utente?.toMap(),
+      'intervento' : intervento?.toMap(),
     };
     return map;
   }
@@ -44,6 +48,7 @@ class CommissioneModel{
     attivo = map['attivo'];
     note = map['note'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
+    intervento = map['intervento'] != null ? InterventoModel.fromMap(map['intervento']) : null;
   }
 
   Map<String, dynamic> toJson() =>{
@@ -55,6 +60,7 @@ class CommissioneModel{
     'attivo' : attivo,
     'note': note,
     'utente': utente?.toJson(),
+    'intervento' : intervento?.toJson()
   };
 
   factory CommissioneModel.fromJson(Map<String, dynamic> json) {
@@ -67,6 +73,7 @@ class CommissioneModel{
       json['attivo'],
       json['note']?.toString(),
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
+      json['intervento'] != null ? InterventoModel.fromJson(json['intervento']) : null
     );
   }
 }

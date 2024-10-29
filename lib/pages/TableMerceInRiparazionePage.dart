@@ -37,14 +37,14 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
     'codice_danea' : 200,
     'priorita' : 45,
     'cliente': 200,
-    'data_apertura_intervento': 210,
+    'data_apertura_intervento': 240,
     'articolo': 300,
     'difetto' : 300,
     'responsabile' : 230,
     'richiesta_preventivo' : 200,
-    'importo_preventivato': 150,
+    'importo_preventivato': 250,
     'tipologia' : 180,
-    'stato' : 100
+    'stato' : 150
   };
   bool isLoading = true;
   bool _isLoading = true;
@@ -396,6 +396,14 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
                               ),
                             ),
                           ),
+                          child: ColumnFilter(
+                            columnName: 'Preventivo'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('richiesta_preventivo', filtro);
+                              });
+                            },
+                          ),
                         ),
                         width: _columnWidths['richiesta_preventivo']?? double.nan,
                         minimumWidth: 300, // Imposta la larghezza minima
@@ -412,6 +420,14 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
                                 width: 1,
                               ),
                             ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'importo preventivo'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('importo_preventivato', filtro);
+                              });
+                            },
                           ),
                         ),
                         width: _columnWidths['importo_preventivato']?? double.nan,
@@ -489,8 +505,8 @@ class InterventoDataSource extends DataGridSource{
     } else {
       interventiFiltrati = _interventions.where((intervento) {
         switch (columnName) {
-          case 'descrizione':
-            bool result = intervento.titolo?.toLowerCase().contains(filtro.toLowerCase()) ?? false;
+          case 'articolo':
+            bool result = intervento.merce?.articolo?.toLowerCase().contains(filtro.toLowerCase()) ?? false;
             return result;
           case 'id_intervento':
             bool result = intervento.id?.toLowerCase().contains(filtro.toLowerCase()) ?? false;
@@ -498,17 +514,14 @@ class InterventoDataSource extends DataGridSource{
           case 'data_apertura_intervento':
             bool result = intervento.data_apertura_intervento?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
             return result;
-          case 'data':
-            bool result = intervento.data?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
-            return result;
-          case 'orario_appuntamento':
-            bool result = intervento.orario_appuntamento?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
+          case 'difetto':
+            bool result = intervento.merce?.difetto_riscontrato?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
             return result;
           case 'cliente':
             bool result = intervento.cliente?.denominazione!.toLowerCase().contains(filtro.toLowerCase()) ?? false;
             return result;
-          case 'importo_intervento' :
-            bool result = intervento.importo_intervento?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
+          case 'importo_preventivato' :
+            bool result = intervento.merce?.importo_preventivato?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
             return result;
           case 'responsabile':
             return (intervento.utente?.nome?.toLowerCase().contains(filtro.toLowerCase()) ?? false) ||
