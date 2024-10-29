@@ -193,7 +193,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologieSpesa() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaSpesaVeicolo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaSpesaVeicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -233,7 +233,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllSpese() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/spesaVeicolo/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/spesaVeicolo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

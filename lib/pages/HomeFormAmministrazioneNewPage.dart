@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/pages/CreazioneLicenzaPage.dart';
 import 'package:fema_crm/pages/CreazioneRMAPage.dart';
 import 'package:fema_crm/pages/MenuInterventiPage.dart';
 import 'package:fema_crm/pages/TableAccessiApplicazionePage.dart';
@@ -107,7 +108,7 @@ class _HomeFormAmministrazioneNewPageState
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -156,7 +157,7 @@ class _HomeFormAmministrazioneNewPageState
 
   Future<void> getAllOrdini() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/ordine');
+      var apiUrl = Uri.parse('$ipaddressProva/api/ordine');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -253,7 +254,7 @@ class _HomeFormAmministrazioneNewPageState
 
   Future<void> getAllVeicoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/veicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -296,7 +297,7 @@ class _HomeFormAmministrazioneNewPageState
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -320,7 +321,7 @@ class _HomeFormAmministrazioneNewPageState
     try {
       String userId = widget.userData.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -342,7 +343,7 @@ class _HomeFormAmministrazioneNewPageState
   Future<List<InterventoModel>> getMerce(String userId) async{
     try{
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce/$userId'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -365,7 +366,7 @@ class _HomeFormAmministrazioneNewPageState
     try {
       String userId = widget.userData.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -416,7 +417,7 @@ class _HomeFormAmministrazioneNewPageState
   //       try {
   //
   //          final response = await http.post(
-  //           Uri.parse('$ipaddress/api/noteTecnico'),
+  //           Uri.parse('$ipaddressProva/api/noteTecnico'),
   //           headers: {'Content-Type': 'application/json'},
   //           body: jsonEncode({
   //             'utente': widget.userData.toMap(),
@@ -448,7 +449,7 @@ class _HomeFormAmministrazioneNewPageState
   //         try {
   //
   //           final response = await http.post(
-  //           Uri.parse('$ipaddress/api/noteTecnico'),
+  //           Uri.parse('$ipaddressProva/api/noteTecnico'),
   //           headers: {'Content-Type': 'application/json'},
   //           body: jsonEncode({
   //             'utente': widget.userData.toMap(),
@@ -478,7 +479,7 @@ class _HomeFormAmministrazioneNewPageState
   //
   //       try {
   //         if(!trovato) final response = await http.post(
-  //           Uri.parse('$ipaddress/api/noteTecnico'),
+  //           Uri.parse('$ipaddressProva/api/noteTecnico'),
   //           headers: {'Content-Type': 'application/json'},
   //           body: jsonEncode({
   //             'utente': widget.userData.toMap(),
@@ -498,7 +499,7 @@ class _HomeFormAmministrazioneNewPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -520,7 +521,7 @@ class _HomeFormAmministrazioneNewPageState
 
   Future<void> getAllCommissioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/commissione');
+      var apiUrl = Uri.parse('$ipaddressProva/api/commissione');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -543,7 +544,7 @@ class _HomeFormAmministrazioneNewPageState
   Future<void> getTipologieIntervento() async {
     print('getTipologieIntervento chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -568,7 +569,7 @@ class _HomeFormAmministrazioneNewPageState
   Future<void> getAllInterventi() async {
     print('getAllInterventi chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -668,7 +669,7 @@ class _HomeFormAmministrazioneNewPageState
   Future<List<NotaTecnicoModel>> getNote() async {
     try {
       http.Response response = await http.get(
-        Uri.parse('$ipaddress/api/noteTecnico/ordered'),
+        Uri.parse('$ipaddressProva/api/noteTecnico/ordered'),
       );
 
       if (response.statusCode == 200) {
@@ -867,6 +868,15 @@ class _HomeFormAmministrazioneNewPageState
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => CreazioneNuovoUtentePage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text('Crea licenza', style: TextStyle(color: Colors.white),),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CreazioneLicenzaPage()),
                       );
                     },
                   ),
