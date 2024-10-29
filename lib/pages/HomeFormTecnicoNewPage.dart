@@ -423,8 +423,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
                                 TextStyle textStyle = intervento.concluso ?? false
-                                    ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                    : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                 return Card(
                                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -437,7 +437,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       style: textStyle,
                                     ),
                                     subtitle: Text(
-                                      '${intervento.descrizione}',
+                                      '${intervento.titolo}',
                                       style: textStyle,
                                     ),
                                     trailing: Column(
@@ -450,13 +450,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                           intervento.data != null
                                               ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                               : 'Nessun appuntamento stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                         Text(
                                           intervento.orario_appuntamento != null
                                               ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                               : 'Nessun orario stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -520,8 +520,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 Color backgroundColor =  getPriorityColor(relazione.intervento!.priorita!);
 
                                 TextStyle textStyle = relazione.intervento?.concluso ?? false
-                                    ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                    : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
                                 /*TextStyle textStyle = relazione.intervento!.concluso ?? false
                                     ? TextStyle(color: Colors.white, fontSize: 15)
                                     : TextStyle(color: Colors.black, fontSize: 15);*/
@@ -541,13 +541,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         relazione.intervento?.data!= null
                                             ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
                                             : 'Nessun appuntamento stabilito',
-                                        style: TextStyle(fontSize: 10, color: Colors.white),
+                                        style: TextStyle(fontSize: 10, color: Colors.black),
                                       ),
                                       Text(
                                         relazione.intervento?.orario_appuntamento!= null
                                             ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
                                             : 'Nessun orario stabilito',
-                                        style: TextStyle(fontSize: 10, color: Colors.white),
+                                        style: TextStyle(fontSize: 10, color: Colors.black),
                                       ),
                                     ],
                                   ),
@@ -624,8 +624,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
                                 TextStyle textStyle = intervento.concluso ?? false
-                                    ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                    : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                 return Card(
                                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -646,18 +646,18 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       children: [
                                         // Condizione per visualizzare l'icona di check se l'intervento è concluso
                                         if (intervento.concluso ?? false)
-                                          Icon(Icons.check, color: Colors.white, size: 15), // Check icon
+                                          Icon(Icons.check, color: Colors.black, size: 15), // Check icon
                                         Text(
                                           intervento.data != null
                                               ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                               : 'Nessun appuntamento stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                         Text(
                                           intervento.orario_appuntamento != null
                                               ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                               : 'Nessun orario stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -738,8 +738,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 Color backgroundColor = getPriorityColor(singolaMerce.priorita ?? Priorita.BASSA);
 
                                 TextStyle textStyle = singolaMerce.concluso ?? false
-                                    ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                    : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                 return Card(
                                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -758,13 +758,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     trailing: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.white)),
+                                        Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.black)),
                                         SizedBox(height: 3),
                                         Text(
                                           singolaMerce.data_apertura_intervento != null
                                               ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
                                               : 'Data non disponibile',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -838,8 +838,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 Color backgroundColor = getPriorityColor(relazione.intervento!.priorita ?? Priorita.BASSA);
 
                                 TextStyle textStyle = relazione.intervento?.concluso ?? false
-                                    ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                    : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                 return Card(
                                   margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -858,13 +858,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     trailing: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.white)),
+                                        Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.black)),
                                         SizedBox(height: 3),
                                         Text(
                                           relazione.intervento?.data_apertura_intervento != null
                                               ? DateFormat("dd/MM/yyyy").format(relazione.intervento!.data_apertura_intervento!)
                                               : 'Data non disponibile',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -921,14 +921,14 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 CommissioneModel commissione = commissioni[index];
                                 return ListTile(
                                   title: Text(
-                                      '${commissione.descrizione.toString()}'),
-                                  subtitle: Text(commissione.note?? ''),
+                                      '${commissione.descrizione.toString()}', style: TextStyle(color: Colors.black)),
+                                  subtitle: Text(commissione.note?? '', style: TextStyle(color: Colors.black)),
                                   trailing: Text(
                                     commissione.data!= null
                                         ? '${commissione.data!.day}/${commissione.data!.month}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
                                         : 'Data non disponibile',
                                     style: TextStyle(
-                                        fontSize: 16),
+                                        fontSize: 16, color: Colors.black),
                                   ),
                                   onTap: () {
                                     Navigator.push(
@@ -1115,8 +1115,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
                               TextStyle textStyle = intervento.concluso ?? false
-                                  ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                  : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                  ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                               return Card(
                                 margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -1129,7 +1129,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     style: textStyle,
                                   ),
                                   subtitle: Text(
-                                    '${intervento.descrizione}',
+                                    '${intervento.titolo}',
                                     style: textStyle,
                                   ),
                                   trailing: Column(
@@ -1139,13 +1139,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         intervento.data!= null
                                             ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                             : 'Nessun appuntamento stabilito',
-                                        style: TextStyle(fontSize: 10, color: Colors.white),
+                                        style: TextStyle(fontSize: 10, color: Colors.black),
                                       ),
                                       Text(
                                         intervento.orario_appuntamento!= null
                                             ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                             : 'Nessun orario stabilito',
-                                        style: TextStyle(fontSize: 10, color: Colors.white),
+                                        style: TextStyle(fontSize: 10, color: Colors.black),
                                       ),
                                     ],
                                   ),
@@ -1192,31 +1192,33 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   RelazioneUtentiInterventiModel relazione = relazioni[index];
                                   Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
                                   TextStyle textStyle = relazione.intervento?.concluso ?? false
-                                      ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                      : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
                                   return ListTile(
                                     title: Text(
                                       '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
                                       style: textStyle,
                                     ),
                                     subtitle: Text(
-                                      '${relazione.intervento?.descrizione}',
+                                      '${relazione.intervento?.titolo}',
                                       style: textStyle,
                                     ),
                                     trailing: Column(
                                       children: [
+                                        if (relazione.intervento?.concluso ?? false)
+                                          Icon(Icons.check, color: Colors.white, size: 15),
                                         Text(
                                           // Formatta la data secondo il tuo formato desiderato
                                           relazione.intervento?.data!= null
                                               ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
                                               : 'Nessun appuntamento stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                         Text(
                                           relazione.intervento?.orario_appuntamento!= null
                                               ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
                                               : 'Nessun orario stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.white),
+                                          style: TextStyle(fontSize: 10, color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -1289,8 +1291,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
                                   TextStyle textStyle = intervento.concluso ?? false
-                                      ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                      : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                   return Card(
                                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -1303,7 +1305,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         style: textStyle,
                                       ),
                                       subtitle: Text(
-                                        '${intervento.descrizione}',
+                                        '${intervento.titolo}',
                                         style: textStyle,
                                       ),
                                       trailing: Column(
@@ -1316,13 +1318,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                             intervento.data != null
                                                 ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
                                                 : 'Nessun appuntamento stabilito',
-                                            style: TextStyle(fontSize: 10, color: Colors.white),
+                                            style: TextStyle(fontSize: 10, color: Colors.black),
                                           ),
                                           Text(
                                             intervento.orario_appuntamento != null
                                                 ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
                                                 : 'Nessun orario stabilito',
-                                            style: TextStyle(fontSize: 10, color: Colors.white),
+                                            style: TextStyle(fontSize: 10, color: Colors.black),
                                           ),
                                         ],
                                       ),
@@ -1402,8 +1404,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   Color backgroundColor = getPriorityColor(singolaMerce.priorita ?? Priorita.BASSA);
 
                                   TextStyle textStyle = singolaMerce.concluso ?? false
-                                      ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                      : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                   return Card(
                                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -1422,13 +1424,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       trailing: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.white)),
+                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.black)),
                                           SizedBox(height: 3),
                                           Text(
                                             singolaMerce.data_apertura_intervento != null
                                                 ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
                                                 : 'Data non disponibile',
-                                            style: TextStyle(fontSize: 10, color: Colors.white),
+                                            style: TextStyle(fontSize: 10, color: Colors.black),
                                           ),
                                         ],
                                       ),
@@ -1502,8 +1504,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   Color backgroundColor = getPriorityColor(relazione.intervento!.priorita ?? Priorita.BASSA);
 
                                   TextStyle textStyle = relazione.intervento?.concluso ?? false
-                                      ? TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)
-                                      : TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold);
+                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
                                   return Card(
                                     margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -1512,7 +1514,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     child: ListTile(
                                       contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                       title: Text(
-                                        '${relazione.intervento?.cliente!.denominazione} \n${relazione.intervento?.descrizione}',
+                                        '${relazione.intervento?.cliente!.denominazione}\n${relazione.intervento?.descrizione}',
                                         style: textStyle,
                                       ),
                                       subtitle: Text(
@@ -1522,13 +1524,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       trailing: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.white)),
+                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.black)),
                                           SizedBox(height: 3),
                                           Text(
                                             relazione.intervento?.data_apertura_intervento != null
                                                 ? DateFormat("dd/MM/yyyy").format(relazione.intervento!.data_apertura_intervento!)
                                                 : 'Data non disponibile',
-                                            style: TextStyle(fontSize: 10, color: Colors.white),
+                                            style: TextStyle(fontSize: 10, color: Colors.black),
                                           ),
                                         ],
                                       ),
@@ -1580,15 +1582,15 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 itemBuilder: (context, index) {
                                   CommissioneModel commissione = commissioni[index];
                                   return ListTile(
-                                    title: Text('${commissione.descrizione.toString()}'),
-                                    subtitle: Text(commissione.note ?? ''),
+                                    title: Text('${commissione.descrizione.toString()}', style: TextStyle(color: Colors.black)),
+                                    subtitle: Text(commissione.note ?? '', style: TextStyle(color: Colors.black)),
                                     trailing: Text(
                                       // Formatta la data secondo il tuo formato desiderato
                                       commissione.data != null
                                           ? '${commissione.data!.day}/${commissione.data!.month}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
                                           : 'Data non disponibile',
                                       style: TextStyle(
-                                          fontSize: 16), // Stile opzionale per la data
+                                          fontSize: 16, color: Colors.black), // Stile opzionale per la data
                                     ),
                                     onTap: () {
                                       Navigator.push(
