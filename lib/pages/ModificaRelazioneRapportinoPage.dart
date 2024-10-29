@@ -86,7 +86,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -106,6 +106,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'iva' : widget.intervento.iva,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
           'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
