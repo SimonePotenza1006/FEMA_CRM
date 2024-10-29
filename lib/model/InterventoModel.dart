@@ -28,6 +28,7 @@ class InterventoModel {
   double? acconto;
   bool? assegnato;
   bool? accettato_da_tecnico;
+  bool? annullato;
   bool? conclusione_parziale;
   bool? concluso;
   bool? saldato;
@@ -66,6 +67,7 @@ class InterventoModel {
       this.acconto,
       this.assegnato,
       this.accettato_da_tecnico,
+      this.annullato,
       this.conclusione_parziale,
       this.concluso,
       this.saldato,
@@ -106,6 +108,7 @@ class InterventoModel {
       'acconto' : acconto,
       'assegnato': assegnato,
       'accettato_da_tecnico' : accettato_da_tecnico,
+      'annullato' : annullato,
       'conclusione_parziale' : conclusione_parziale,
       'concluso': concluso,
       'saldato': saldato,
@@ -150,6 +153,7 @@ class InterventoModel {
     acconto = map['acconto'];
     assegnato = map['assegnato'];
     accettato_da_tecnico = map['accettato_da_tecnico'];
+    annullato = map['annullato'];
     conclusione_parziale = map['conclusione_parziale'];
     concluso = map['concluso'];
     saldato = map['saldato'];
@@ -190,6 +194,7 @@ class InterventoModel {
     'acconto' : acconto,
     'assegnato': assegnato,
     'accettato_da_tecnico' : accettato_da_tecnico,
+    'annullato' : annullato,
     'conclusione_parziale' : conclusione_parziale,
     'concluso': concluso,
     'saldato': saldato,
@@ -231,6 +236,7 @@ class InterventoModel {
       json['acconto'] != null ? double.parse(json['acconto'].toString()) : null,
       json['assegnato'],
       json['accettato_da_tecnico'],
+      json['annullato'],
       json['conclusione_parziale'],
       json['concluso'],
       json['saldato'],
@@ -330,9 +336,6 @@ class InterventoModel {
     }).toList();
   }
 }
-
-
-
 
 enum Priorita{
   NULLA,

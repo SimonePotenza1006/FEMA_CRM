@@ -188,7 +188,7 @@ class _MenuSceltaSaldoPageState extends State<MenuSceltaSaldoPage> {
     var importo = saldoController.text.isNotEmpty ? double.tryParse(saldoController.text.toString()) : null;
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -209,6 +209,7 @@ class _MenuSceltaSaldoPageState extends State<MenuSceltaSaldoPage> {
           'acconto': widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico': widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
           'conclusione_parziale': widget.intervento.conclusione_parziale,
           'concluso': true,
           'saldato': isInterventoSaldato,

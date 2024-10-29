@@ -110,7 +110,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.get(
-        Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+        Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
           DDTModel ddt = DDTModel.fromJson(jsonData);
@@ -158,7 +158,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
       final ddt = DDTModel.fromJson(jsonDecode(data.body));
       try{
-        var apiUrl = Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}');
+        var apiUrl = Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}');
         var response = await http.get(apiUrl);
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
@@ -182,7 +182,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -202,7 +202,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllNoteByIntervento() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}');
+      var apiUrl = Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -224,7 +224,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaOrarioFine() async{
     // try{
     //   final response = await http.post(
-    //     Uri.parse('$ipaddress/api/intervento'),
+    //     Uri.parse('$ipaddressProva/api/intervento'),
     //     headers: {'Content-Type': 'application/json'},
     //     body: jsonEncode({
     //       'id': widget.intervento.id?.toString(),
@@ -281,7 +281,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaOrarioInizio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -303,6 +303,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'acconto' : widget.intervento.acconto,
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
           'conclusione_parziale' : widget.intervento.conclusione_parziale,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,
