@@ -776,6 +776,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       MaterialPageRoute(
                         builder: (context) => PDFInterventoPage(
                           intervento: widget.intervento,
+                          note: allNote,
                         ),
                       ),
                     );

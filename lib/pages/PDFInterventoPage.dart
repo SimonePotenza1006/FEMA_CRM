@@ -13,13 +13,16 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../model/NotaTecnicoModel.dart';
+
 // Definiamo il widget per la generazione del PDF
 class PDFInterventoPage extends StatefulWidget {
   final InterventoModel intervento;
+  List<NotaTecnicoModel> note;
   //final String descrizione;
 
   PDFInterventoPage(
-      {required this.intervento,
+      {required this.intervento, required this.note
       });
 
   @override
@@ -842,8 +845,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 pw.SizedBox(height: 15),
                 pw.Text('${widget.intervento.relazione_tecnico?.toUpperCase() ?? ''}',
                     style: pw.TextStyle(fontSize: 10)),
-
-                pw.SizedBox(height: 200),
+                pw.SizedBox(height: 15),
+                pw.Text('Note degli utenti:',
+                    style: pw.TextStyle(fontSize: 10)),
+                ...widget.note.map((nota) => pw.Text(
+                  '${nota.utente?.nomeCompleto()} : ${nota.nota}',
+                    style: pw.TextStyle(fontSize: 10))),
+                pw.SizedBox(height: 230),
                 if(widget.intervento.conclusione_parziale == true)
                   pw.Padding(
                     padding: pw.EdgeInsets.symmetric(horizontal: 8),

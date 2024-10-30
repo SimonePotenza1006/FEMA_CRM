@@ -20,6 +20,7 @@ import '../model/ClienteModel.dart';
 import '../model/CommissioneModel.dart';
 import '../model/FaseRiparazioneModel.dart';
 import '../model/InterventoModel.dart';
+import '../model/TipologiaPagamento.dart';
 import '../model/UtenteModel.dart';
 import 'AggiuntaManualeProdottiDDTPage.dart';
 import 'GalleriaFotoInterventoPage.dart';
@@ -37,6 +38,8 @@ class DettaglioInterventoPage extends StatefulWidget {
 
 class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   late Future<List<UtenteModel>> _utentiFuture;
+  List<TipologiaPagamentoModel> tipologiePagamento = [];
+  TipologiaPagamentoModel? selectedTipologia;
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
   List<RelazioneUtentiInterventiModel> relazioniNuove = [];
   List<NotaTecnicoModel> allNote = [];
@@ -113,6 +116,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     getNoteByIntervento();
     getProdottiDdt();
     _fetchUtentiAttivi();
+    getMetodiPagamento();
     _futureImages = fetchImages();
     rapportinoController.text = (widget.intervento.relazione_tecnico != null ? widget.intervento.relazione_tecnico : '//')!;
     titoloController.text = widget.intervento.titolo != null ? widget.intervento.titolo! : '//';
@@ -363,6 +367,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+
+
   Future<http.Response?> getDDTByIntervento() async{
     try{
       final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
@@ -404,6 +410,24 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
        }
     } catch(e) {
       print('Errore 2 nel recupero delle relazioni: $e');
+    }
+  }
+
+  Future<void> getMetodiPagamento() async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiapagamento'));
+      var responseData = json.decode(response.body);
+      if(response.statusCode == 200){
+        List<TipologiaPagamentoModel> tipologie = [];
+        for(var item in responseData){
+          tipologie.add(TipologiaPagamentoModel.fromJson(item));
+        }
+        setState(() {
+          tipologiePagamento = tipologie;
+        });
+      }
+    } catch(e){
+      print('Errore: $e');
     }
   }
 
@@ -1018,6 +1042,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   MaterialPageRoute(
                     builder: (context) => PDFInterventoPage(
                       intervento: widget.intervento,
+                      note: allNote,
                       //descrizione: widget.intervento.relazione_tecnico.toString(),
                     ),
                   ),
@@ -1235,6 +1260,83 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                               Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
                                                 child: Text(
                                                   'Modifica Descrizione'.toUpperCase(),
+                                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                                  textAlign: TextAlign.center, // Centra il testo
+                                                  softWrap: true, // Permette al testo di andare a capo
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),
+                            SizedBox(height : 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Note',
+                                      value: widget.intervento.note ?? 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      modificaNotaVisibile = !modificaNotaVisibile;
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ],
+                            ),
+                            if(modificaNotaVisibile)
+                              SizedBox(
+                                  width: 500,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 300,
+                                        child: TextFormField(
+                                          maxLines: null,
+                                          controller: noteController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Nota',
+                                            hintText: 'Aggiungi una nota',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 170,
+                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                        decoration: BoxDecoration(
+                                          // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                        ),
+                                        child: FloatingActionButton(
+                                          heroTag: "Tag12",
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.intervento.note = noteController.text;
+                                            });
+                                          },
+                                          backgroundColor: Colors.red,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                                child: Text(
+                                                  'Modifica Nota'.toUpperCase(),
                                                   style: TextStyle(color: Colors.white, fontSize: 12),
                                                   textAlign: TextAlign.center, // Centra il testo
                                                   softWrap: true, // Permette al testo di andare a capo
@@ -1813,86 +1915,67 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
-                                      title: 'Note',
-                                      value: widget.intervento.note ?? 'N/A',
-                                      context: context
+                                    title: 'Metodo di pagamento',
+                                    value: widget.intervento.tipologia_pagamento != null
+                                        ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
+                                        : 'N/A',
+                                    context: context,
                                   ),
                                 ),
-                                TextButton(
+                                IconButton(
+                                  icon: Icon(Icons.edit),
                                   onPressed: () {
-                                    setState(() {
-                                      modificaNotaVisibile = !modificaNotaVisibile;
-                                    });
-                                  },
-                                  child: Icon(
-                                    Icons.edit,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              ],
-                            ),
-                            if(modificaNotaVisibile)
-                              SizedBox(
-                                  width: 500,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: 300,
-                                        child: TextFormField(
-                                          maxLines: null,
-                                          controller: noteController,
-                                          decoration: InputDecoration(
-                                            labelText: 'Nota',
-                                            hintText: 'Aggiungi una nota',
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(10),
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        TipologiaPagamentoModel? tempSelectedTipologia = selectedTipologia;
+
+                                        return AlertDialog(
+                                          title: Text("Seleziona Metodo di Pagamento"),
+                                          content: StatefulBuilder(
+                                            builder: (BuildContext context, StateSetter setState) {
+                                              return DropdownButton<TipologiaPagamentoModel>(
+                                                value: tempSelectedTipologia,
+                                                isExpanded: true,
+                                                items: tipologiePagamento.map((tipologia) {
+                                                  return DropdownMenuItem<TipologiaPagamentoModel>(
+                                                    value: tipologia,
+                                                    child: Text(tipologia.descrizione ?? "Sconosciuto"),
+                                                  );
+                                                }).toList(),
+                                                onChanged: (TipologiaPagamentoModel? newValue) {
+                                                  setState(() {
+                                                    tempSelectedTipologia = newValue;
+                                                    widget.intervento.tipologia_pagamento = newValue;
+                                                  });
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Chiude il dialog senza salvare
+                                              },
+                                              child: Text("Annulla"),
                                             ),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 170,
-                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                                        decoration: BoxDecoration(
-                                          // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                                        ),
-                                        child: FloatingActionButton(
-                                          heroTag: "Tag12",
-                                          onPressed: () {
-                                            setState(() {
-                                              widget.intervento.note = noteController.text;
-                                            });
-                                          },
-                                          backgroundColor: Colors.red,
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                                child: Text(
-                                                  'Modifica Nota'.toUpperCase(),
-                                                  style: TextStyle(color: Colors.white, fontSize: 12),
-                                                  textAlign: TextAlign.center, // Centra il testo
-                                                  softWrap: true, // Permette al testo di andare a capo
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                              ),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: 'Metodo di pagamento',
-                                  value: widget.intervento.tipologia_pagamento != null
-                                      ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
-                                      : 'N/A',
-                                  context: context
-                              ),
+                                            TextButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  selectedTipologia = tempSelectedTipologia;
+                                                  //widget.intervento.tipologia_pagamento = ;
+                                                });
+                                                Navigator.of(context).pop(); // Chiude il dialog dopo aver salvato
+                                              },
+                                              child: Text("Conferma"),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                             SizedBox(
                               height: 162,
