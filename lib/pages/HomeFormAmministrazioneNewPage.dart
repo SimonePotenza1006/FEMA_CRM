@@ -1654,7 +1654,13 @@ class _HomeFormAmministrazioneNewPageState
                                       /*TextStyle textStyle = relazione.intervento!.concluso ?? false
                                     ? TextStyle(color: Colors.white, fontSize: 15)
                                     : TextStyle(color: Colors.black, fontSize: 15);*/
-                                      return ListTile(
+                                      return
+                                        Card(
+                                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                          elevation: 4,
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                          child:
+                                        ListTile(
                                         title: Text(
                                           '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
                                           style: textStyle,
@@ -1693,6 +1699,11 @@ class _HomeFormAmministrazioneNewPageState
                                           );
                                         },
                                         tileColor: backgroundColor,
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        )
                                       );
                                     },
                                   );
@@ -2514,7 +2525,13 @@ class _HomeFormAmministrazioneNewPageState
                                 TextStyle textStyle = relazione.intervento?.concluso ?? false
                                     ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
                                     : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
-                                return ListTile(
+                                return
+                                  Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child:
+                                  ListTile(
                                   title: Text(
                                     '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
                                     style: textStyle,
@@ -2553,6 +2570,11 @@ class _HomeFormAmministrazioneNewPageState
                                     );
                                   },
                                   tileColor: backgroundColor,
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  )
                                 );
                               },
                             );
