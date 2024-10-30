@@ -1910,6 +1910,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           case 'importo_intervento' :
             bool result = intervento.importo_intervento?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
             return result;
+          case 'codice_danea' :
+            bool result = intervento.numerazione_danea?.toString().toLowerCase().contains(filtro.toLowerCase()) ?? false;
+            return result;
           case 'responsabile':
             return (intervento.utente?.nome?.toLowerCase().contains(filtro.toLowerCase()) ?? false) ||
                 (intervento.utente?.cognome?.toLowerCase().contains(filtro.toLowerCase()) ?? false);

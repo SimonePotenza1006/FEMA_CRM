@@ -1,3 +1,4 @@
+import 'package:fema_crm/pages/TableCommissioniPage.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'AssegnazioneCommissionePage.dart';
@@ -92,7 +93,7 @@ class _MenuCommissioniPageState extends State<MenuCommissioniPage> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) =>
-              ReportCommissioniPage()),
+              TableCommissioniPage()),
         );
         break;
       case 2:

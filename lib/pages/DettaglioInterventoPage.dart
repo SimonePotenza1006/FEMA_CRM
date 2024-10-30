@@ -17,8 +17,10 @@ import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../model/ClienteModel.dart';
+import '../model/CommissioneModel.dart';
 import '../model/FaseRiparazioneModel.dart';
 import '../model/InterventoModel.dart';
+import '../model/TipologiaPagamento.dart';
 import '../model/UtenteModel.dart';
 import 'AggiuntaManualeProdottiDDTPage.dart';
 import 'GalleriaFotoInterventoPage.dart';
@@ -36,10 +38,13 @@ class DettaglioInterventoPage extends StatefulWidget {
 
 class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   late Future<List<UtenteModel>> _utentiFuture;
+  List<TipologiaPagamentoModel> tipologiePagamento = [];
+  TipologiaPagamentoModel? selectedTipologia;
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
   List<RelazioneUtentiInterventiModel> relazioniNuove = [];
   List<NotaTecnicoModel> allNote = [];
   List<UtenteModel> allUtenti = [];
+  List<CommissioneModel> allCommissioni = [];
   late Future<List<ClienteModel>> allClienti;
   late Future<List<FaseRiparazioneModel>> allFasi;
   List<ClienteModel> clientiList =[];
@@ -63,10 +68,12 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   bool modificaImportoVisibile = false;
   bool modificaNotaVisibile = false;
   bool modificaTitoloVisible = false;
+  bool modificaSaldoTecnicoVisibile = false;
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
   final TextEditingController titoloController = TextEditingController();
+  final TextEditingController saldoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
@@ -105,11 +112,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         });
       });
     }
+    getCommissioni();
     getProdottiByIntervento();
     getRelazioni();
     getNoteByIntervento();
     getProdottiDdt();
     _fetchUtentiAttivi();
+    getMetodiPagamento();
     _futureImages = fetchImages();
     rapportinoController.text = (widget.intervento.relazione_tecnico != null ? widget.intervento.relazione_tecnico : '//')!;
     titoloController.text = widget.intervento.titolo != null ? widget.intervento.titolo! : '//';
@@ -360,6 +369,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+
+
   Future<http.Response?> getDDTByIntervento() async{
     try{
       final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
@@ -401,6 +412,42 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
        }
     } catch(e) {
       print('Errore 2 nel recupero delle relazioni: $e');
+    }
+  }
+
+  Future<void> getMetodiPagamento() async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiapagamento'));
+      var responseData = json.decode(response.body);
+      if(response.statusCode == 200){
+        List<TipologiaPagamentoModel> tipologie = [];
+        for(var item in responseData){
+          tipologie.add(TipologiaPagamentoModel.fromJson(item));
+        }
+        setState(() {
+          tipologiePagamento = tipologie;
+        });
+      }
+    } catch(e){
+      print('Errore: $e');
+    }
+  }
+
+  Future<void> getCommissioni()async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddressProva/api/commissione/intervento/${widget.intervento.id}'));
+      var responseData = json.decode(response.body);
+      if(response.statusCode == 200){
+        List<CommissioneModel> commissioni = [];
+        for(var item in responseData){
+          commissioni.add(CommissioneModel.fromJson(item));
+        }
+        setState(() {
+          allCommissioni = commissioni;
+        });
+      }
+    } catch(e) {
+      print('errore fetching commissioni $e');
     }
   }
 
@@ -997,6 +1044,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   MaterialPageRoute(
                     builder: (context) => PDFInterventoPage(
                       intervento: widget.intervento,
+                      note: allNote,
                       //descrizione: widget.intervento.relazione_tecnico.toString(),
                     ),
                   ),
@@ -1214,6 +1262,83 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                               Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
                                                 child: Text(
                                                   'Modifica Descrizione'.toUpperCase(),
+                                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                                  textAlign: TextAlign.center, // Centra il testo
+                                                  softWrap: true, // Permette al testo di andare a capo
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),
+                            SizedBox(height : 10),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: 'Note',
+                                      value: widget.intervento.note ?? 'N/A',
+                                      context: context
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      modificaNotaVisibile = !modificaNotaVisibile;
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ],
+                            ),
+                            if(modificaNotaVisibile)
+                              SizedBox(
+                                  width: 500,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 300,
+                                        child: TextFormField(
+                                          maxLines: null,
+                                          controller: noteController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Nota',
+                                            hintText: 'Aggiungi una nota',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 170,
+                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                        decoration: BoxDecoration(
+                                          // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                        ),
+                                        child: FloatingActionButton(
+                                          heroTag: "Tag12",
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.intervento.note = noteController.text;
+                                            });
+                                          },
+                                          backgroundColor: Colors.red,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                                child: Text(
+                                                  'Modifica Nota'.toUpperCase(),
                                                   style: TextStyle(color: Colors.white, fontSize: 12),
                                                   textAlign: TextAlign.center, // Centra il testo
                                                   softWrap: true, // Permette al testo di andare a capo
@@ -1771,46 +1896,27 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   ),
                                 ]
                             ),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: "Saldo tecnico",
-                                  context: context,
-                                  value : widget.intervento.saldo_tecnico.toString() ?? "N/A"
-                              ),
-                            ),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: "Posizione gps",
-                                  context: context,
-                                  value : widget.intervento.posizione_gps ?? "N/A"
-                              ),
-                            ),
                             Row(
                               children: [
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
-                                      title: 'Note',
-                                      value: widget.intervento.note ?? 'N/A',
-                                      context: context
+                                      title: "Saldo tecnico",
+                                      context: context,
+                                      value : widget.intervento.saldo_tecnico.toString() ?? "N/A"
                                   ),
                                 ),
-                                TextButton(
-                                  onPressed: () {
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: (){
                                     setState(() {
-                                      modificaNotaVisibile = !modificaNotaVisibile;
+                                      modificaSaldoTecnicoVisibile = !modificaSaldoTecnicoVisibile;
                                     });
-                                  },
-                                  child: Icon(
-                                    Icons.edit,
-                                    color: Colors.black,
-                                  ),
-                                )
+                                  }
+                                ),
                               ],
                             ),
-                            if(modificaNotaVisibile)
+                            if(modificaSaldoTecnicoVisibile)
                               SizedBox(
                                   width: 500,
                                   child: Row(
@@ -1820,10 +1926,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                         width: 300,
                                         child: TextFormField(
                                           maxLines: null,
-                                          controller: noteController,
+                                          controller: saldoController,
                                           decoration: InputDecoration(
-                                            labelText: 'Nota',
-                                            hintText: 'Aggiungi una nota',
+                                            labelText: 'Saldo tecnico',
+                                            hintText: 'Aggiungi il saldo del tecnico',
                                             border: OutlineInputBorder(
                                               borderRadius: BorderRadius.circular(10),
                                             ),
@@ -1837,11 +1943,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                           // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
                                         ),
                                         child: FloatingActionButton(
-                                          heroTag: "Tag12",
+                                          heroTag: "Tag4",
                                           onPressed: () {
-                                            setState(() {
-                                              widget.intervento.note = noteController.text;
-                                            });
+                                            if(saldoController.text.isNotEmpty){
+                                              modificaSaldo();
+                                            } else {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('Non è possibile salvare un titolo vuoto!'),
+                                                ),
+                                              );
+                                            }
                                           },
                                           backgroundColor: Colors.red,
                                           child: Column(
@@ -1850,7 +1962,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                             children: [
                                               Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
                                                 child: Text(
-                                                  'Modifica Nota'.toUpperCase(),
+                                                  'Modifica saldo'.toUpperCase(),
                                                   style: TextStyle(color: Colors.white, fontSize: 12),
                                                   textAlign: TextAlign.center, // Centra il testo
                                                   softWrap: true, // Permette al testo di andare a capo
@@ -1866,12 +1978,76 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             SizedBox(
                               width: 500,
                               child: buildInfoRow(
-                                  title: 'Metodo di pagamento',
-                                  value: widget.intervento.tipologia_pagamento != null
-                                      ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
-                                      : 'N/A',
-                                  context: context
+                                  title: "Posizione gps",
+                                  context: context,
+                                  value : widget.intervento.posizione_gps ?? "N/A"
                               ),
+                            ),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                    title: 'Metodo di pagamento',
+                                    value: widget.intervento.tipologia_pagamento != null
+                                        ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
+                                        : 'N/A',
+                                    context: context,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        TipologiaPagamentoModel? tempSelectedTipologia = selectedTipologia ?? widget.intervento.tipologia_pagamento;
+
+                                        return AlertDialog(
+                                          title: Text("Seleziona Metodo di Pagamento"),
+                                          content: StatefulBuilder(
+                                            builder: (BuildContext context, StateSetter setState) {
+                                              return DropdownButton<TipologiaPagamentoModel>(
+                                                value: tempSelectedTipologia,
+                                                isExpanded: true,
+                                                items: tipologiePagamento.map((tipologia) {
+                                                  return DropdownMenuItem<TipologiaPagamentoModel>(
+                                                    value: tipologia,
+                                                    child: Text(tipologia.descrizione ?? "Sconosciuto"),
+                                                  );
+                                                }).toList(),
+                                                onChanged: (TipologiaPagamentoModel? newValue) {
+                                                  setState(() {
+                                                    tempSelectedTipologia = newValue;
+                                                  });
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Chiude il dialog senza salvare
+                                              },
+                                              child: Text("Annulla"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  selectedTipologia = tempSelectedTipologia; // Salva il valore selezionato
+                                                  widget.intervento.tipologia_pagamento = tempSelectedTipologia;
+                                                });
+                                                Navigator.of(context).pop(); // Chiude il dialog dopo aver salvato
+                                              },
+                                              child: Text("Conferma"),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                             SizedBox(
                               height: 162,
@@ -2082,7 +2258,127 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ],
                   ),
                 ),
+                SizedBox(height : 16),
+                ElevatedButton(
+                  onPressed: () {
+                    TextEditingController descriptionController = TextEditingController();
+                    TextEditingController notesController = TextEditingController();
+                    UtenteModel? selectedUser;
+                    DateTime? selectedDate;
 
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Crea Commissione'),
+                          content: StatefulBuilder(
+                            builder: (BuildContext context, StateSetter setState) {
+                              return SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Bottone per selezionare la data
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        DateTime? pickedDate = await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime(2000),
+                                          lastDate: DateTime(2100),
+                                        );
+                                        if (pickedDate != null) {
+                                          setState(() {
+                                            selectedDate = pickedDate;
+                                          });
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.grey[200],
+                                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                      ),
+                                      child: Text(
+                                        selectedDate != null
+                                            ? 'Data selezionata: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'
+                                            : 'Seleziona Data',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    // Campo di testo per la descrizione
+                                    TextFormField(
+                                      controller: descriptionController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Descrizione',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    // Campo di testo per le note
+                                    TextFormField(
+                                      controller: notesController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Note',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    // Dropdown per la selezione dell'utente
+                                    DropdownButtonFormField<UtenteModel>(
+                                      decoration: InputDecoration(
+                                        labelText: 'Seleziona Utente',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      value: selectedUser,
+                                      items: allUtenti.map((utente) {
+                                        return DropdownMenuItem<UtenteModel>(
+                                          value: utente,
+                                          child: Text(utente.nomeCompleto() ?? "Anonimo"),
+                                        );
+                                      }).toList(),
+                                      onChanged: (UtenteModel? newValue) {
+                                        setState(() {
+                                          selectedUser = newValue;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                if (descriptionController.text.isNotEmpty &&
+                                    notesController.text.isNotEmpty &&
+                                    selectedUser != null  ){
+                                  creaCommissione(selectedUser!, descriptionController.text, notesController.text, selectedDate);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Completa tutti i campi prima di assegnare")),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                'ASSEGNA',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                    textStyle: TextStyle(fontSize: 18),
+                    primary: Colors.red,
+                  ),
+                  child: Text(
+                    'CREA COMMISSIONE',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
                 SizedBox(height : 16),
                 ElevatedButton(
                   onPressed: () {
@@ -2143,6 +2439,38 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                   ),
                 SizedBox(height: 16),
+                if(allCommissioni.isEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Nessuna commissione creata', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                    ],
+                  ),
+                SizedBox(height: 16),
+                if(allCommissioni.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Commissioni:',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      ...allCommissioni.map((commissione) => ListTile(
+                        title: Text(
+                          'Creazione: ${commissione.data_creazione}, utente: ${commissione.utente?.nomeCompleto()}',
+                          style: TextStyle(
+                            color: commissione.concluso! ? Colors.green : Colors.red,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Descrizione: ${commissione.descrizione}, note: ${commissione.note}',
+                          style: TextStyle(
+                            color: commissione.concluso! ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      )),
+                    ],
+                  ),
                 if(allProdotti.isEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -2225,6 +2553,109 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         ),
       ),
     );
+  }
+
+  void modificaSaldo() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'attivo' : widget.intervento.attivo,
+          'titolo' : titoloController.text.toUpperCase(),
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : double.tryParse(saldoController.text),
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Saldo tecnico modificato con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.saldo_tecnico = double.tryParse(saldoController.text);
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
+    String? formattedData = data != null ? data.toIso8601String() : null;
+    final url = Uri.parse('$ipaddressProva/api/commissione');
+    final body = jsonEncode({
+      'data': formattedData, // Usa la stringa ISO solo se 'data' non è null
+      'descrizione': descrizione,
+      'concluso': false,
+      'note': note,
+      'utente': utente.toMap(),
+      'intervento': widget.intervento.toMap(),
+      'attivo': true,
+    });
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+      if (response.statusCode == 201) {
+        print('Commissione creata!');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DettaglioInterventoPage(
+              intervento: widget.intervento,
+            ),
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Commissione assegnata!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        throw Exception('Errore durante la creazione della commissione');
+      }
+    } catch (e) {
+      print('Errore durante la richiesta HTTP: $e');
+    }
   }
 
   void copiaFasiRiparazioneNegliAppunti(List<FaseRiparazioneModel> fasiRiparazione) {
@@ -2537,6 +2968,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
     ClienteModel? cliente = selectedCliente != null ? selectedCliente : widget.intervento.cliente;
     DestinazioneModel? destinazione = selectedDestinazione != null ? selectedDestinazione : widget.intervento.destinazione;
+    TipologiaPagamentoModel? pagamento = selectedTipologia ?? widget.intervento.tipologia_pagamento;
 
     try {
       // Making HTTP request to update the 'intervento
@@ -2578,7 +3010,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'merce': widget.intervento.merce?.toMap(),
           'tipologia': widget.intervento.tipologia?.toMap(),
           'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
-          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'tipologia_pagamento': pagamento?.toMap(),
           'destinazione': destinazione?.toMap(),
           'gruppo': widget.intervento.gruppo?.toMap(),
         }),
