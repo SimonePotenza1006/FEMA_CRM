@@ -35,6 +35,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   final _noteController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  int? activeSaveIndex;
 
   @override
   void initState() {
@@ -60,28 +61,16 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
           child: Form(
               key: _formKey,
               child: Center(
-                child: Column(
+                child:
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   //mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 20),
-                    _buildTextFormField(_licenzaController, 'Licenza',
-                        'Inserisci una licenza'),
 
                     SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          createNewLicenza();
-                        }
-                      },
-                      child: Text('SALVA', style: TextStyle(color: Colors.white)),
-                      style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.red),
-                      ),
-                    ),
-                    SizedBox(height: 30),
                     FutureBuilder<List<LicenzaModel>>(
                       future: futureLicenze(),
                       builder: (context, snapshot) {
@@ -90,10 +79,15 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                         } else if (snapshot.hasError) {
                           return Center(child: Text('Error: ${snapshot.error}'));
                         } else {
+                          // Inizializza la lista delle note se è vuota
+
+
                           return DataTable(
                             headingRowHeight: 30,
                             //columnSpacing: 10,
-                            dataRowMinHeight:  30,
+                            dataRowMinHeight:  20,
+                            dataRowMaxHeight: 34,
+
                             border: TableBorder.all(color: Colors.grey),
                             columns: [
                               DataColumn(
@@ -108,20 +102,27 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                               DataColumn(label: Text('UTILIZZATA')),
                               DataColumn(
                                 label: Container(
-                                  width: 140, // Imposta la larghezza se necessario
+                                  width: 190, // Imposta la larghezza se necessario
                                   child: Text(
                                     'NOTE',
                                     textAlign: TextAlign.center, // Centra il testo
                                   ),
                                 ),
                               ),
-                              DataColumn(label: Text('')),
+                              //DataColumn(label: Text('')),
                             ],
-                            rows: snapshot.data!.map((model) {
-                              TextEditingController _controller = TextEditingController(text: model.note);
+                            rows: snapshot.data!.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              LicenzaModel model = entry.value;
+
+                              //TextEditingController _controller = TextEditingController(text: model.note);
+                              //bool isModified = false; // Flag per controllare se la nota è stata modificata
+
+
                               return DataRow(cells: [
                                 DataCell(
-                                    Container(width: 140,
+                                    Container(
+                                        width: 140,
                                       alignment: Alignment.center,
                                       child: Text(model.descrizione!))),
                                 DataCell(
@@ -130,19 +131,49 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                                     child:
                                     Text(model.utilizzato! ? 'SI' : 'NO'))),
                                 DataCell(
-                                  Container(width: 140,
+                                  Container(width: 190,
                                   alignment: Alignment.centerLeft,
-                                  child:
-                                    TextField(
-                                    controller: TextEditingController(
+                                  child: Text(model.note ?? '')
+                                  /*TextField(
+                                    controller: TextEditingController(text: notes[index]),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        notes[index] = value; // Aggiorna solo la nota in memoria
+                                        activeSaveIndex = index; // Imposta l'indice attivo quando si digita
+                                      });
+                                    },
+                                  ),*/
+                                    /*TextField(
+                                      controller: _controller,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          activeSaveIndex = index; // Imposta l'indice attivo quando si digita
+                                        });
+                                      },
+                                    ),*/
+                                    /*controller: TextEditingController(
                                         text: _controller.text),
                                         onChanged: (value) {
                                           _controller.text = value;
-                                    },
-                                  ),
+                                    },*/
+
                                 )),
-                                DataCell(
-                                    Container(
+                                /*DataCell(
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: ElevatedButton(
+                                      onPressed: (activeSaveIndex == index) ? () {
+                                        noteLicenza(model, notes[index]).whenComplete(() {
+                                          setState(() {
+                                            //isModified = false;
+                                            // Ricarica i dati o fai altre operazioni se necessario
+                                          });
+                                        });
+                                      } : null, // Disabilita il bottone se non è stato modificato
+                                      child: Text('SALVA'),
+                                    ),
+                                  ),
+                                    /*Container(
                                         alignment: Alignment.center,
                                         child:
                                         ElevatedButton(
@@ -154,7 +185,8 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                                                 });
                                             } : null,
                                           child: Text('SALVA'),
-                                        ),)),
+                                        ),)*/
+                                ),*/
                               ]);
                             }).toList(),
                           );
@@ -163,6 +195,34 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                     ),
                   ],
                 ),
+                Column(children: [
+                  SizedBox(width: 40),]),
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                    SizedBox(height: 20),
+                    _buildTextFormField(_licenzaController, 'Licenza',
+                        'Inserisci una licenza'),
+
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          createNewLicenza();
+                        }
+                      },
+                      child: Text('CREA', style: TextStyle(color: Colors.white)),
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.red),
+                      ),
+                    ),
+
+                  ],)
+
+                ],),
+
               )
           ),
         ),
@@ -172,7 +232,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<List<LicenzaModel>> futureLicenze() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/licenza');
+      var apiUrl = Uri.parse('$ipaddressProva/api/licenza/all');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -181,7 +241,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
           licenze.add(LicenzaModel.fromJson(item));
         }
         // Recuperare tutte le relazioni utenti-interventi
-      return licenze;
+      return licenze.reversed.toList();
       } else {
 
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -229,7 +289,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<void> noteLicenza(LicenzaModel licenza, String note) async {
     print(licenza.note.toString()+' '+note);
-    final url = Uri.parse('$ipaddress/api/licenza/nuova');
+    final url = Uri.parse('$ipaddressProva/api/licenza/nuova');
     final body = jsonEncode({
       'id': licenza.id!,
       'descrizione': licenza.descrizione,
@@ -265,7 +325,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   }
 
   Future<void> createNewLicenza() async {
-    final url = Uri.parse('$ipaddress/api/licenza/nuova');
+    final url = Uri.parse('$ipaddressProva/api/licenza/nuova');
     final body = jsonEncode({
       'descrizione': _licenzaController.text,
       'utilizzato': false
