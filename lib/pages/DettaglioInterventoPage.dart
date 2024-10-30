@@ -68,10 +68,12 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   bool modificaImportoVisibile = false;
   bool modificaNotaVisibile = false;
   bool modificaTitoloVisible = false;
+  bool modificaSaldoTecnicoVisibile = false;
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController importoController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
   final TextEditingController titoloController = TextEditingController();
+  final TextEditingController saldoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
@@ -1894,14 +1896,85 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   ),
                                 ]
                             ),
-                            SizedBox(
-                              width: 500,
-                              child: buildInfoRow(
-                                  title: "Saldo tecnico",
-                                  context: context,
-                                  value : widget.intervento.saldo_tecnico.toString() ?? "N/A"
-                              ),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 500,
+                                  child: buildInfoRow(
+                                      title: "Saldo tecnico",
+                                      context: context,
+                                      value : widget.intervento.saldo_tecnico.toString() ?? "N/A"
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: (){
+                                    setState(() {
+                                      modificaSaldoTecnicoVisibile = !modificaSaldoTecnicoVisibile;
+                                    });
+                                  }
+                                ),
+                              ],
                             ),
+                            if(modificaSaldoTecnicoVisibile)
+                              SizedBox(
+                                  width: 500,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 300,
+                                        child: TextFormField(
+                                          maxLines: null,
+                                          controller: saldoController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Saldo tecnico',
+                                            hintText: 'Aggiungi il saldo del tecnico',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 170,
+                                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                        decoration: BoxDecoration(
+                                          // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                        ),
+                                        child: FloatingActionButton(
+                                          heroTag: "Tag4",
+                                          onPressed: () {
+                                            if(saldoController.text.isNotEmpty){
+                                              modificaSaldo();
+                                            } else {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('Non è possibile salvare un titolo vuoto!'),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          backgroundColor: Colors.red,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                                child: Text(
+                                                  'Modifica saldo'.toUpperCase(),
+                                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                                  textAlign: TextAlign.center, // Centra il testo
+                                                  softWrap: true, // Permette al testo di andare a capo
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),
                             SizedBox(
                               width: 500,
                               child: buildInfoRow(
@@ -1928,7 +2001,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
-                                        TipologiaPagamentoModel? tempSelectedTipologia = selectedTipologia;
+                                        TipologiaPagamentoModel? tempSelectedTipologia = selectedTipologia ?? widget.intervento.tipologia_pagamento;
 
                                         return AlertDialog(
                                           title: Text("Seleziona Metodo di Pagamento"),
@@ -1946,7 +2019,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                                 onChanged: (TipologiaPagamentoModel? newValue) {
                                                   setState(() {
                                                     tempSelectedTipologia = newValue;
-                                                    widget.intervento.tipologia_pagamento = newValue;
                                                   });
                                                 },
                                               );
@@ -1962,8 +2034,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                             TextButton(
                                               onPressed: () {
                                                 setState(() {
-                                                  selectedTipologia = tempSelectedTipologia;
-                                                  //widget.intervento.tipologia_pagamento = ;
+                                                  selectedTipologia = tempSelectedTipologia; // Salva il valore selezionato
+                                                  widget.intervento.tipologia_pagamento = tempSelectedTipologia;
                                                 });
                                                 Navigator.of(context).pop(); // Chiude il dialog dopo aver salvato
                                               },
@@ -2483,6 +2555,67 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  void modificaSaldo() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'attivo' : widget.intervento.attivo,
+          'titolo' : titoloController.text.toUpperCase(),
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : double.tryParse(saldoController.text),
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Saldo tecnico modificato con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.saldo_tecnico = double.tryParse(saldoController.text);
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
   Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
     String? formattedData = data != null ? data.toIso8601String() : null;
     final url = Uri.parse('$ipaddressProva/api/commissione');
@@ -2835,6 +2968,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
     ClienteModel? cliente = selectedCliente != null ? selectedCliente : widget.intervento.cliente;
     DestinazioneModel? destinazione = selectedDestinazione != null ? selectedDestinazione : widget.intervento.destinazione;
+    TipologiaPagamentoModel? pagamento = selectedTipologia ?? widget.intervento.tipologia_pagamento;
 
     try {
       // Making HTTP request to update the 'intervento
@@ -2876,7 +3010,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'merce': widget.intervento.merce?.toMap(),
           'tipologia': widget.intervento.tipologia?.toMap(),
           'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
-          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'tipologia_pagamento': pagamento?.toMap(),
           'destinazione': destinazione?.toMap(),
           'gruppo': widget.intervento.gruppo?.toMap(),
         }),
