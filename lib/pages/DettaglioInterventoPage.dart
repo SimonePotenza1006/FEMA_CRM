@@ -17,6 +17,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../model/ClienteModel.dart';
+import '../model/CommissioneModel.dart';
 import '../model/FaseRiparazioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/UtenteModel.dart';
@@ -40,6 +41,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   List<RelazioneUtentiInterventiModel> relazioniNuove = [];
   List<NotaTecnicoModel> allNote = [];
   List<UtenteModel> allUtenti = [];
+  List<CommissioneModel> allCommissioni = [];
   late Future<List<ClienteModel>> allClienti;
   late Future<List<FaseRiparazioneModel>> allFasi;
   List<ClienteModel> clientiList =[];
@@ -105,6 +107,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         });
       });
     }
+    getCommissioni();
     getProdottiByIntervento();
     getRelazioni();
     getNoteByIntervento();
@@ -260,7 +263,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -362,7 +365,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         return response;
@@ -384,7 +387,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
        } else {
          final ddt = DDTModel.fromJson(jsonDecode(data.body));
          try{
-           final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+           final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}'));
            var responseData = json.decode(response.body);
            if(response.statusCode == 200){
              List<RelazioneDdtProdottoModel> prodotti = [];
@@ -404,9 +407,27 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+  Future<void> getCommissioni()async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddressProva/api/commissione/intervento/${widget.intervento.id}'));
+      var responseData = json.decode(response.body);
+      if(response.statusCode == 200){
+        List<CommissioneModel> commissioni = [];
+        for(var item in responseData){
+          commissioni.add(CommissioneModel.fromJson(item));
+        }
+        setState(() {
+          allCommissioni = commissioni;
+        });
+      }
+    } catch(e) {
+      print('errore fetching commissioni $e');
+    }
+  }
+
   Future<void> getProdottiByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<RelazioneProdottiInterventoModel> prodotti = [];
@@ -435,7 +456,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getNoteByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<NotaTecnicoModel> note =[];
@@ -455,7 +476,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -475,7 +496,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -496,7 +517,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void eliminaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -558,7 +579,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaTitolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -619,7 +640,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void annullaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -677,7 +698,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -871,7 +892,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -2082,7 +2103,127 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ],
                   ),
                 ),
+                SizedBox(height : 16),
+                ElevatedButton(
+                  onPressed: () {
+                    TextEditingController descriptionController = TextEditingController();
+                    TextEditingController notesController = TextEditingController();
+                    UtenteModel? selectedUser;
+                    DateTime? selectedDate;
 
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Crea Commissione'),
+                          content: StatefulBuilder(
+                            builder: (BuildContext context, StateSetter setState) {
+                              return SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Bottone per selezionare la data
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        DateTime? pickedDate = await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime(2000),
+                                          lastDate: DateTime(2100),
+                                        );
+                                        if (pickedDate != null) {
+                                          setState(() {
+                                            selectedDate = pickedDate;
+                                          });
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.grey[200],
+                                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                      ),
+                                      child: Text(
+                                        selectedDate != null
+                                            ? 'Data selezionata: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'
+                                            : 'Seleziona Data',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    // Campo di testo per la descrizione
+                                    TextFormField(
+                                      controller: descriptionController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Descrizione',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    // Campo di testo per le note
+                                    TextFormField(
+                                      controller: notesController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Note',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    // Dropdown per la selezione dell'utente
+                                    DropdownButtonFormField<UtenteModel>(
+                                      decoration: InputDecoration(
+                                        labelText: 'Seleziona Utente',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      value: selectedUser,
+                                      items: allUtenti.map((utente) {
+                                        return DropdownMenuItem<UtenteModel>(
+                                          value: utente,
+                                          child: Text(utente.nomeCompleto() ?? "Anonimo"),
+                                        );
+                                      }).toList(),
+                                      onChanged: (UtenteModel? newValue) {
+                                        setState(() {
+                                          selectedUser = newValue;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                if (descriptionController.text.isNotEmpty &&
+                                    notesController.text.isNotEmpty &&
+                                    selectedUser != null  ){
+                                  creaCommissione(selectedUser!, descriptionController.text, notesController.text, selectedDate);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("Completa tutti i campi prima di assegnare")),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                'ASSEGNA',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                    textStyle: TextStyle(fontSize: 18),
+                    primary: Colors.red,
+                  ),
+                  child: Text(
+                    'CREA COMMISSIONE',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
                 SizedBox(height : 16),
                 ElevatedButton(
                   onPressed: () {
@@ -2143,6 +2284,38 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                   ),
                 SizedBox(height: 16),
+                if(allCommissioni.isEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Nessuna commissione creata', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                    ],
+                  ),
+                SizedBox(height: 16),
+                if(allCommissioni.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Commissioni:',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      ...allCommissioni.map((commissione) => ListTile(
+                        title: Text(
+                          'Creazione: ${commissione.data_creazione}, utente: ${commissione.utente?.nomeCompleto()}',
+                          style: TextStyle(
+                            color: commissione.concluso! ? Colors.green : Colors.red,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Descrizione: ${commissione.descrizione}, note: ${commissione.note}',
+                          style: TextStyle(
+                            color: commissione.concluso! ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      )),
+                    ],
+                  ),
                 if(allProdotti.isEmpty)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -2225,6 +2398,48 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         ),
       ),
     );
+  }
+
+  Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
+    String? formattedData = data != null ? data.toIso8601String() : null;
+    final url = Uri.parse('$ipaddressProva/api/commissione');
+    final body = jsonEncode({
+      'data': formattedData, // Usa la stringa ISO solo se 'data' non è null
+      'descrizione': descrizione,
+      'concluso': false,
+      'note': note,
+      'utente': utente.toMap(),
+      'intervento': widget.intervento.toMap(),
+      'attivo': true,
+    });
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+      if (response.statusCode == 201) {
+        print('Commissione creata!');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DettaglioInterventoPage(
+              intervento: widget.intervento,
+            ),
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Commissione assegnata!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        throw Exception('Errore durante la creazione della commissione');
+      }
+    } catch (e) {
+      print('Errore durante la richiesta HTTP: $e');
+    }
   }
 
   void copiaFasiRiparazioneNegliAppunti(List<FaseRiparazioneModel> fasiRiparazione) {
@@ -2541,7 +2756,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -2616,7 +2831,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     print(_selectedUtenti.toString());
     print(_finalSelectedUtenti.toString());
     try {
-      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+      final response = await http.post(Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
@@ -2668,7 +2883,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             try{
               print('eliminazione vecchie relazioni');
               final response = await http.delete(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi/'+relaz.id.toString()),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/'+relaz.id.toString()),
                 headers: {'Content-Type': 'application/json'},
                 /*body: jsonEncode({
                   'utente' : relaz?.toMap(),
@@ -2686,7 +2901,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             try{
               print('sono quiiiiii');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'utente' : utente?.toMap(),

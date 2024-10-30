@@ -92,7 +92,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
@@ -100,7 +100,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       'descrizione': widget.commissione.descrizione,
       'concluso': true,
       'note': widget.commissione.note,
-      'utente': widget.commissione.utente
+      'utente': widget.commissione.utente,
+      'intervento' : widget.commissione.intervento?.toMap(),
+      'attivo' : widget.commissione.attivo
     });
     try {
       final response = await http.post(

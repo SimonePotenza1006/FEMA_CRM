@@ -20,7 +20,6 @@ class PDFInterventoPage extends StatefulWidget {
 
   PDFInterventoPage(
       {required this.intervento,
-      //required this.descrizione
       });
 
   @override
@@ -211,6 +210,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         : (widget.intervento.data != null ? DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.intervento.data.toString())) : "");
 
     var relazione = widget.intervento.relazione_tecnico;
+    var nota = widget.intervento.note;
 
     var formattedImporto = importo != null
         ? importo.toStringAsFixed(2)
@@ -834,11 +834,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   ),
                 ),
                 // Aggiungo la row richiesta
-                pw.SizedBox(height: 30),
+                pw.Text('Descrizione : ${widget.intervento.descrizione?.toUpperCase() ?? ''}',
+                    style: pw.TextStyle(fontSize: 10)),
+                pw.SizedBox(height: 15),
+                pw.Text('Nota : ${widget.intervento.note?.toUpperCase() ?? ''}',
+                    style: pw.TextStyle(fontSize: 10)),
+                pw.SizedBox(height: 15),
                 pw.Text('${widget.intervento.relazione_tecnico?.toUpperCase() ?? ''}',
                     style: pw.TextStyle(fontSize: 10)),
-                pw.SizedBox(height: 270),
-                if(widget.intervento.conclusione_parziale == false)
+
+                pw.SizedBox(height: 200),
+                if(widget.intervento.conclusione_parziale == true)
                   pw.Padding(
                     padding: pw.EdgeInsets.symmetric(horizontal: 8),
                     child: pw.Text(

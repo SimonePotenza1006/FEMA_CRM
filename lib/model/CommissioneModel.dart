@@ -71,7 +71,7 @@ class CommissioneModel{
       json['descrizione']?.toString(),
       json['concluso'],
       json['attivo'],
-      json['note']?.toString(),
+      json['note'],
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
       json['intervento'] != null ? InterventoModel.fromJson(json['intervento']) : null
     );
