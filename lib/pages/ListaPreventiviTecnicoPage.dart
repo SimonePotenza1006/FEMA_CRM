@@ -275,7 +275,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       await findAgente();
       String? agenteId = agente?.id;
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/preventivo/ordered'));
+          .get(Uri.parse('$ipaddress/api/preventivo/ordered'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<PreventivoModel> allPreventiviByAgente = [];
@@ -304,7 +304,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
