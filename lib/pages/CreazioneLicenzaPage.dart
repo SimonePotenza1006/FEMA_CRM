@@ -36,6 +36,9 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   int? activeSaveIndex;
+  Map<String, TextEditingController> _noteControllers = {};
+  Map<String, ValueNotifier<bool>> _isSaveEnabled = {};
+  int? _currentlyEditingId;
 
   @override
   void initState() {
@@ -54,6 +57,20 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreazioneLicenzaPage()));
+              //getAllInterventi();
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -80,7 +97,18 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                           return Center(child: Text('Error: ${snapshot.error}'));
                         } else {
                           // Inizializza la lista delle note se è vuota
+                          if (_noteControllers.isEmpty) {
+                            for (var licenza in snapshot.data!) {
+                              var controller = TextEditingController(text: licenza.note);
+                              _noteControllers[licenza.id!] = controller;
+                              _isSaveEnabled[licenza.id!] = ValueNotifier(false);
 
+                              controller.addListener(() {
+                                // Aggiorna il ValueNotifier in base al contenuto del campo di testo
+                                _isSaveEnabled[licenza.id!]!.value = controller.text.isNotEmpty;
+                              });
+                            }
+                          }
 
                           return DataTable(
                             headingRowHeight: 30,
@@ -102,20 +130,20 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                               DataColumn(label: Text('UTILIZZATA')),
                               DataColumn(
                                 label: Container(
-                                  width: 190, // Imposta la larghezza se necessario
+                                  width: 210, // Imposta la larghezza se necessario
                                   child: Text(
                                     'NOTE',
                                     textAlign: TextAlign.center, // Centra il testo
                                   ),
                                 ),
                               ),
-                              //DataColumn(label: Text('')),
+
                             ],
                             rows: snapshot.data!.asMap().entries.map((entry) {
                               int index = entry.key;
                               LicenzaModel model = entry.value;
 
-                              //TextEditingController _controller = TextEditingController(text: model.note);
+                              TextEditingController _controller = TextEditingController(text: model.note);
                               //bool isModified = false; // Flag per controllare se la nota è stata modificata
 
 
@@ -131,9 +159,52 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                                     child:
                                     Text(model.utilizzato! ? 'SI' : 'NO'))),
                                 DataCell(
-                                  Container(width: 190,
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(model.note ?? '')
+                                  Container(width: 210,
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(children: [
+
+                                      IconButton(
+                                      onPressed: () {
+    showDialog(
+    context: context,
+    builder: (BuildContext context) {
+    return
+    StatefulBuilder(
+    builder: (context, setState) {
+    // Variabile per memorizzare l'aliquota IVA selezionata
+    return AlertDialog(
+    title: Text('Modifica note'),
+    actions: <Widget>[
+    TextFormField(
+    controller: _controller,
+    decoration: InputDecoration(
+    labelText: 'Note',
+    border: OutlineInputBorder(),
+    ),
+
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
+    ),
+      TextButton(
+        onPressed: () {
+          noteLicenza(model, _controller.text).then((_) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => CreazioneLicenzaPage()),
+            );
+          });;
+
+        },
+        child: Text('Salva note'),
+      ),
+    ]);});});
+
+
+                                      }, icon: Icon(Icons.create, color: Colors.grey),),
+                                      Text(model.note ?? ''),
+                                    ],)//Text(model.note ?? '')
+                                  )
+                                ),
+
                                   /*TextField(
                                     controller: TextEditingController(text: notes[index]),
                                     onChanged: (value) {
@@ -157,7 +228,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                                           _controller.text = value;
                                     },*/
 
-                                )),
+
                                 /*DataCell(
                                   Container(
                                     alignment: Alignment.center,
@@ -230,9 +301,17 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
     );
   }
 
+  @override
+  void dispose() {
+    for (var controller in _noteControllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
   Future<List<LicenzaModel>> futureLicenze() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/licenza/all');
+      var apiUrl = Uri.parse('$ipaddressProva/api/licenza/all');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -289,7 +368,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<void> noteLicenza(LicenzaModel licenza, String note) async {
     print(licenza.note.toString()+' '+note);
-    final url = Uri.parse('$ipaddress/api/licenza/nuova');
+    final url = Uri.parse('$ipaddressProva/api/licenza/nuova');
     final body = jsonEncode({
       'id': licenza.id!,
       'descrizione': licenza.descrizione,
@@ -302,7 +381,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         print('Licenza modificata con successo!');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -325,7 +404,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   }
 
   Future<void> createNewLicenza() async {
-    final url = Uri.parse('$ipaddress/api/licenza/nuova');
+    final url = Uri.parse('$ipaddressProva/api/licenza/nuova');
     final body = jsonEncode({
       'descrizione': _licenzaController.text,
       'utilizzato': false

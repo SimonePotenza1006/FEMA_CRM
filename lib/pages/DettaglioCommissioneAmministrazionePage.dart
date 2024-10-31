@@ -302,7 +302,7 @@ class _DettaglioCommissioneAmministrazionePageState
 
 
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
