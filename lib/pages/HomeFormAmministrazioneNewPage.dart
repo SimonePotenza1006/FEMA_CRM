@@ -1042,10 +1042,17 @@ class _HomeFormAmministrazioneNewPageState
                                   width: 350,
                                   child: buildMenuButton(icon: Icons.access_time_outlined, text: 'TIMBRATURA',
                                     onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => MenuInterventiPage(utente: widget.userData)),
-                                      );
+                                      if(widget.userData.id == "2" || widget.userData.id == "13"){
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => TimbratureEdit(utente: widget.userData)),
+                                        );
+                                      } else{
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => TimbraturaPage(utente: widget.userData)),
+                                        );
+                                      }
                                     },
                                   ),
                                 ),

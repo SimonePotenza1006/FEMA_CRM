@@ -35,12 +35,6 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
         _menuItemClickCount[i] = 0;
       };
     }
-    /*getAllVeicoli().then((_) {
-      getNote();
-    });
-    getAllOrdini();
-    _scheduleGetAllOrdini();
-    fetchData();*/
   }
 
   @override
@@ -63,49 +57,146 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
           )
         ],
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              //crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(height: 10),
-                GestureDetector(
-                  onTapUp: (details) {
-                    if (_hoveredIndex != -1) {
-                      _navigateToPage(_hoveredIndex);
-                    }
-                  },
-                  onPanUpdate: (details) {
-                    RenderBox box = context.findRenderObject() as RenderBox;
-                    Offset localOffset = box.globalToLocal(details.globalPosition);
-                    setState(() {
-                      _hoveredIndex = _calculateHoveredIndex(localOffset);
-                    });
-                  },
-                  child: CustomPaint(
-                    size: Size(500, 500),
-                    painter: MenuPainter(
-                          (index) {
-                        setState(() {
-                          _hoveredIndex = index;
-                        });
-                      },
-                          () {
-                        setState(() {
-                          _hoveredIndex = -1;
-                        });
-                      },
-                      context,
-                      size: Size(500, 500),
-                      hoveredIndex: _hoveredIndex,
-                    ),
+      body: LayoutBuilder(
+        builder: (context, constraints){
+          if(constraints.maxWidth >= 800){
+            return Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    //crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTapUp: (details) {
+                          if (_hoveredIndex != -1) {
+                            _navigateToPage(_hoveredIndex);
+                          }
+                        },
+                        onPanUpdate: (details) {
+                          RenderBox box = context.findRenderObject() as RenderBox;
+                          Offset localOffset = box.globalToLocal(details.globalPosition);
+                          setState(() {
+                            _hoveredIndex = _calculateHoveredIndex(localOffset);
+                          });
+                        },
+                        child: CustomPaint(
+                          size: Size(500, 500),
+                          painter: MenuPainter(
+                                (index) {
+                              setState(() {
+                                _hoveredIndex = index;
+                              });
+                            },
+                                () {
+                              setState(() {
+                                _hoveredIndex = -1;
+                              });
+                            },
+                            context,
+                            size: Size(500, 500),
+                            hoveredIndex: _hoveredIndex,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
+            );
+          } else{
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.add, text: 'CREA INTERVENTO',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CreazioneInterventoByAmministrazionePage(utente: widget.utente)),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.list_outlined, text: 'LISTA INTERVENTI',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.groups, text: 'GRUPPI DI INTERVENTO',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TableGruppiPage()),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
+      )
+    );
+  }
+
+  Widget buildMenuButton(
+      {required IconData icon, required String text, required VoidCallback onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red.shade400, Colors.red.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
             ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                color: Colors.white,
+                size: 30,
+              ),
+              SizedBox(width: 30),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -183,7 +274,7 @@ class MenuPainter extends CustomPainter {
     text: TextSpan(
       text: '',
       style: TextStyle(
-        fontSize: 15,
+        fontSize: 13,
         color: Colors.black,
       ),
     ),
@@ -264,7 +355,7 @@ class MenuPainter extends CustomPainter {
         labelPainter.text = TextSpan(
           text: menuItem.label,
           style: TextStyle(
-              fontSize: 20,
+              fontSize: 18,
               color: Colors.black,
               fontWeight: FontWeight.bold
           ),

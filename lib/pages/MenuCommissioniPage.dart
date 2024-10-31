@@ -25,48 +25,145 @@ class _MenuCommissioniPageState extends State<MenuCommissioniPage> {
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              // crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                GestureDetector(
-                  onTapUp: (details) {
-                    if (_hoveredIndex != -1) {
-                      _navigateToPage(_hoveredIndex);
-                    }
-                  },
-                  onPanUpdate: (details) {
-                    RenderBox box = context.findRenderObject() as RenderBox;
-                    Offset localOffset = box.globalToLocal(details.globalPosition);
-                    setState(() {
-                      _hoveredIndex = _calculateHoveredIndex(localOffset);
-                    });
-                  },
-                  child: CustomPaint(
-                    size: Size(500, 500),
-                    painter: MenuPainter(
-                          (index) {
-                        setState(() {
-                          _hoveredIndex = index;
-                        });
-                      },
-                          () {
-                        setState(() {
-                          _hoveredIndex = -1;
-                        });
-                      },
-                      context,
-                      size: Size(500, 500),
-                      hoveredIndex: _hoveredIndex,
-                    ),
+      body: LayoutBuilder(
+        builder: (context, constraints){
+          if(constraints.maxWidth >= 800){
+            return Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    // crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      GestureDetector(
+                        onTapUp: (details) {
+                          if (_hoveredIndex != -1) {
+                            _navigateToPage(_hoveredIndex);
+                          }
+                        },
+                        onPanUpdate: (details) {
+                          RenderBox box = context.findRenderObject() as RenderBox;
+                          Offset localOffset = box.globalToLocal(details.globalPosition);
+                          setState(() {
+                            _hoveredIndex = _calculateHoveredIndex(localOffset);
+                          });
+                        },
+                        child: CustomPaint(
+                          size: Size(500, 500),
+                          painter: MenuPainter(
+                                (index) {
+                              setState(() {
+                                _hoveredIndex = index;
+                              });
+                            },
+                                () {
+                              setState(() {
+                                _hoveredIndex = -1;
+                              });
+                            },
+                            context,
+                            size: Size(500, 500),
+                            hoveredIndex: _hoveredIndex,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
+            );
+          } else {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.playlist_add, text: 'ASSEGNA COMMISSIONE',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AssegnazioneCommissionePage()),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.bar_chart, text: 'REPORT COMMISSIONI',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => TableCommissioniPage()),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.folder_shared_outlined, text: 'COMMISSIONI/UTENTE',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ReportCommissioniPerAgentePage()),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
+      )
+    );
+  }
+
+  Widget buildMenuButton(
+      {required IconData icon, required String text, required VoidCallback onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red.shade400, Colors.red.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
             ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                color: Colors.white,
+                size: 30,
+              ),
+              SizedBox(width: 30),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -1434,7 +1434,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<GruppoInterventiModel> allGruppiConclusi = [];
   List<GruppoInterventiModel> allGruppiNonConclusi = [];
   InterventoModel? _selectedIntervento;
-  bool prezzoIvato = false;
+  bool hasIva = false; // Nuova variabile per tracciare se l'IVA è presente
   bool ventidue = false;
   bool dieci = false;
   bool quattro = false;
@@ -1629,112 +1629,129 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return
-                      StatefulBuilder(
-                        builder: (context, setState) {
-                          // Variabile per memorizzare l'aliquota IVA selezionata
-                          return AlertDialog(
-                            title: Text('Inserisci un importo'),
-                            actions: <Widget>[
-                              TextFormField(
-                                controller: importoController,
-                                decoration: InputDecoration(
-                                  labelText: 'Importo',
-                                  border: OutlineInputBorder(),
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return AlertDialog(
+                          title: Text('Inserisci un importo'),
+                          actions: <Widget>[
+                            TextFormField(
+                              controller: importoController,
+                              decoration: InputDecoration(
+                                labelText: 'Importo',
+                                border: OutlineInputBorder(),
+                              ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consente solo numeri e fino a 2 decimali
+                              ],
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            ),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: !hasIva,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      hasIva = !value!; // Se NO IVA è selezionato, hasIva è false
+                                      selectedIva = 0; // Nessuna aliquota selezionata per NO IVA
+                                      ventidue = false;
+                                      dieci = false;
+                                      quattro = false;
+                                    });
+                                  },
                                 ),
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
-                                ],
-                                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                              ),
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: intervento.prezzo_ivato,
-                                    onChanged: (bool? value) {
-                                      setState(() {
-                                        intervento.prezzo_ivato = value;
-                                        prezzoIvato = value!;
-                                      });
-                                    },
-                                  ),
-                                  Text('IVA INCLUSA'),
-                                ],
-                              ),
-                              if (prezzoIvato == true)
-                                Container(
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Checkbox(
-                                            value: ventidue,
-                                            onChanged: (bool? value) {
-                                              setState(() {
-                                                ventidue = value!;
-                                                dieci = false;
-                                                quattro = false;
-                                                selectedIva = 22; // Setta l'IVA a 22%
-                                                print('IVA selezionata: $selectedIva');
-                                              });
-                                            },
-                                          ),
-                                          Text(' 22%'),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Checkbox(
-                                            value: dieci,
-                                            onChanged: (bool? value) {
-                                              setState(() {
-                                                dieci = value!;
-                                                ventidue = false;
-                                                quattro = false;
-                                                selectedIva = 10; // Setta l'IVA a 10%
-                                                print('IVA selezionata: $selectedIva');
-                                              });
-                                            },
-                                          ),
-                                          Text(' 10%'),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          Checkbox(
-                                            value: quattro,
-                                            onChanged: (bool? value) {
-                                              setState(() {
-                                                quattro = value!;
-                                                ventidue = false;
-                                                dieci = false;
-                                                selectedIva = 4; // Setta l'IVA a 4%
-                                                print('IVA selezionata: $selectedIva');
-                                              });
-                                            },
-                                          ),
-                                          Text(' 4%'),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                Text('IVA INCLUSA'),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: hasIva,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      hasIva = value!; // Se AGGIUNGI IVA è selezionato, hasIva è true
+                                      if (!hasIva) {
+                                        selectedIva = 0; // Reset dell'aliquota IVA se NO IVA è selezionato
+                                      }
+                                    });
+                                  },
                                 ),
-                              TextButton(
-                                onPressed: () {
-                                  print('IVA passata: $selectedIva'); // Stampa l'IVA prima di chiamare saveImporto
-                                  saveImporto(intervento, prezzoIvato, selectedIva).then((_) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => TableInterventiPage()),
-                                    );
-                                  });
-                                },
-                                child: Text('Salva importo'),
+                                Text('AGGIUNGI IVA'),
+                              ],
+                            ),
+                            if (hasIva) // Mostra la selezione solo se hasIva è true
+                              Container(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                          value: ventidue,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              ventidue = value!;
+                                              dieci = false;
+                                              quattro = false;
+                                              selectedIva = 22; // Setta l'IVA a 22%
+                                              print('IVA selezionata: $selectedIva');
+                                            });
+                                          },
+                                        ),
+                                        Text(' 22%'),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                          value: dieci,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              dieci = value!;
+                                              ventidue = false;
+                                              quattro = false;
+                                              selectedIva = 10; // Setta l'IVA a 10%
+                                              print('IVA selezionata: $selectedIva');
+                                            });
+                                          },
+                                        ),
+                                        Text(' 10%'),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                          value: quattro,
+                                          onChanged: (bool? value) {
+                                            setState(() {
+                                              quattro = value!;
+                                              ventidue = false;
+                                              dieci = false;
+                                              selectedIva = 4; // Setta l'IVA a 4%
+                                              print('IVA selezionata: $selectedIva');
+                                            });
+                                          },
+                                        ),
+                                        Text(' 4%'),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          );
-                        },
-                      );
+                            TextButton(
+                              onPressed: () {
+                                print('IVA passata: $selectedIva'); // Stampa l'IVA prima di chiamare saveImporto
+                                saveImporto(intervento, hasIva, selectedIva).then((_) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                                  );
+                                });
+                              },
+                              child: Text('Salva importo'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                 );
               },
@@ -2049,7 +2066,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'descrizione': intervento.descrizione,
           'importo_intervento': intervento.importo_intervento,
           'saldo_tecnico' : intervento.saldo_tecnico,
-          'prezzo_ivato' : prezzoIvato,
+          'prezzo_ivato' : intervento.prezzo_ivato,
           'iva' : intervento.iva,
           'assegnato': intervento.assegnato,
           'accettato_da_tecnico' : intervento.accettato_da_tecnico,

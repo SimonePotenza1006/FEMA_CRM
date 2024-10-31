@@ -70,7 +70,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   bool modificaTitoloVisible = false;
   bool modificaSaldoTecnicoVisibile = false;
   final TextEditingController descrizioneController = TextEditingController();
-  final TextEditingController importoController = TextEditingController();
+  final TextEditingController _importoController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
   final TextEditingController titoloController = TextEditingController();
   final TextEditingController saldoController = TextEditingController();
@@ -499,6 +499,198 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       throw Exception('Errore durante il recupero delle note: $e');
     }
   }
+
+  void openImportoDialog(BuildContext context, TextEditingController importoController) {
+    bool hasIva = false;
+    bool ventidue = false;
+    bool dieci = false;
+    bool quattro = false;
+    int selectedIva = 0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Inserisci un importo'),
+              actions: <Widget>[
+                TextFormField(
+                  controller: importoController,
+                  decoration: InputDecoration(
+                    labelText: 'Importo',
+                    border: OutlineInputBorder(),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consente solo numeri e fino a 2 decimali
+                  ],
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: !hasIva,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          hasIva = !value!; // Se NO IVA è selezionato, hasIva è false
+                          selectedIva = 0; // Nessuna aliquota selezionata per NO IVA
+                          ventidue = false;
+                          dieci = false;
+                          quattro = false;
+                        });
+                      },
+                    ),
+                    Text('IVA INCLUSA'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: hasIva,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          hasIva = value!; // Se AGGIUNGI IVA è selezionato, hasIva è true
+                          if (!hasIva) {
+                            selectedIva = 0; // Reset dell'aliquota IVA se NO IVA è selezionato
+                          }
+                        });
+                      },
+                    ),
+                    Text('AGGIUNGI IVA'),
+                  ],
+                ),
+                if (hasIva) // Mostra la selezione solo se hasIva è true
+                  Container(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: ventidue,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  ventidue = value!;
+                                  dieci = false;
+                                  quattro = false;
+                                  selectedIva = 22; // Setta l'IVA a 22%
+                                  print('IVA selezionata: $selectedIva');
+                                });
+                              },
+                            ),
+                            Text(' 22%'),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: dieci,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  dieci = value!;
+                                  ventidue = false;
+                                  quattro = false;
+                                  selectedIva = 10; // Setta l'IVA a 10%
+                                  print('IVA selezionata: $selectedIva');
+                                });
+                              },
+                            ),
+                            Text(' 10%'),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: quattro,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  quattro = value!;
+                                  ventidue = false;
+                                  dieci = false;
+                                  selectedIva = 4; // Setta l'IVA a 4%
+                                  print('IVA selezionata: $selectedIva');
+                                });
+                              },
+                            ),
+                            Text(' 4%'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                TextButton(
+                  onPressed: () {
+                    print('IVA passata: $selectedIva'); // Stampa l'IVA prima di chiamare saveImporto
+                    saveImporto(hasIva, selectedIva, importoController.text);
+                  },
+                  child: Text('Salva importo'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> saveImporto(bool prezzoIvato, int iva, String importo) async {
+    try {
+      print(' IVA : ${iva}');
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id,
+          'attivo' : widget.intervento.attivo,
+          'titolo' : widget.intervento.titolo,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': double.tryParse(importo),
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
+          'prezzo_ivato' : prezzoIvato,
+          'iva' : iva, // Passa l'IVA selezionata come numero intero
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale': widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce': widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        print(response.body.toString());
+        print('EVVAIIIIIIII');
+        prezzoIvato = false;
+        setState(() {
+          widget.intervento.importo_intervento = double.tryParse(importo);
+          widget.intervento.prezzo_ivato = prezzoIvato;
+          widget.intervento.iva = iva;
+        });
+      }
+    } catch (e) {
+      print('Errore durante il salvataggio del intervento: $e');
+    }
+  }
+
 
   Future<void> getRelazioni() async{
     try{
@@ -1522,20 +1714,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     heroTag: "TagDel2",
                                     backgroundColor: Colors.red,
                                     child: Icon(Icons.delete, color: Colors.white),
-                                    /*Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Flexible( // Permette al testo di adattarsi alla dimensione
-                                          child: Text(
-                                            'Modifica data intervento'.toUpperCase(),
-                                            style: TextStyle(color: Colors.white, fontSize: 12),
-                                            textAlign: TextAlign.center, // Centra il testo
-                                            softWrap: true, // Permette al testo di andare a capo
-                                          ),
-                                        ),
-                                      ],
-                                    ),*/
                                   ),
                                 ),
                               ],
@@ -1604,23 +1782,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 ],
                               ),
                             ),
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            //   children: [
-                            //     SizedBox(
-                            //       width: 500,
-                            //       child: buildInfoRow(
-                            //           title: 'Destinazione',
-                            //           value: widget.intervento.destinazione?.denominazione ?? 'N/A', context: context),
-                            //     ),
-                            //     IconButton(
-                            //       icon: Icon(Icons.edit),
-                            //       onPressed: () {
-                            //         _showClientiDialog();
-                            //       },
-                            //     )
-                            //   ],
-                            // ),
                             SizedBox(
                               width: 500,
                               child: buildInfoRow(
@@ -1704,9 +1865,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 SizedBox(
                                   width: 500,
                                   child: buildInfoRow(
-                                      title: 'Importo Intervento',
-                                      value: widget.intervento.importo_intervento?.toStringAsFixed(2) ?? 'N/A',
-                                      context: context
+                                    title: 'Importo intervento',
+                                    value: getPrezzoIvato(widget.intervento), // Usa la funzione per calcolare il valore del prezzo ivato
+                                    context: context,
                                   ),
                                 ),
                                 SizedBox(
@@ -1714,9 +1875,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    setState(() {
-                                      modificaImportoVisibile = !modificaImportoVisibile;
-                                    });
+                                    // setState(() {
+                                    //   modificaImportoVisibile = !modificaImportoVisibile;
+                                    // });
+                                    openImportoDialog(context, _importoController);
                                   },
                                   child: Icon(
                                     Icons.edit,
@@ -1725,21 +1887,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 )
                               ],
                             ),
-                            SizedBox(height: 10),
-                            if(modificaImportoVisibile)
-                              SizedBox(
-                                width: 500,
-                                child: TextFormField(
-                                  controller: importoController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Importo',
-                                    hintText: 'Inserisci l\'importo',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                              ),
                             SizedBox(height: 20),
                             SizedBox(
                               width: 500,
@@ -2616,6 +2763,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+  String getPrezzoIvato(InterventoModel intervento) {
+    if (intervento.importo_intervento != null && intervento.iva != null) {
+      double prezzoIvato = intervento.importo_intervento! * (1 + (intervento.iva! / 100));
+      return "${prezzoIvato.toStringAsFixed(2)}€ (${intervento.iva}%)";
+    }
+    return '';
+  }
+
   Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
     String? formattedData = data != null ? data.toIso8601String() : null;
     final url = Uri.parse('$ipaddressProva/api/commissione');
@@ -2957,9 +3112,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
 
     // Parse importo from controller, or fallback to existing value
-    double? importo = importoController.text.isNotEmpty
-        ? double.tryParse(importoController.text)
-        : widget.intervento.importo_intervento;
+    // double? importo = importoController.text.isNotEmpty
+    //     ? double.tryParse(importoController.text)
+    //     : widget.intervento.importo_intervento;
 
     // Parse descrizione from controller, or fallback to existing value
     String? descrizione = descrizioneController.text.isNotEmpty
@@ -2988,7 +3143,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': descrizione,  // Using potentially updated descrizione
-          'importo_intervento': importo,  // Using potentially updated importo
+          'importo_intervento': widget.intervento.importo_intervento,  // Using potentially updated importo
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato': widget.intervento.prezzo_ivato,
           'iva' : widget.intervento.iva,

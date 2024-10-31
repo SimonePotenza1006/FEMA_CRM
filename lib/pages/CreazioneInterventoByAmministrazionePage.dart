@@ -203,432 +203,868 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ],
         ),
         body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
+          child: LayoutBuilder(
+            builder: (context, constraints){
+              if(constraints.maxWidth >= 800){
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          width: 200,
-                          child: ElevatedButton(
-                            onPressed: _selezionaData,
-                            style: ElevatedButton.styleFrom(primary: Colors.red),
-                            child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
-                          ),
-                        ),
-                        if(selectedDate != null)
-                          Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
-                        const SizedBox(height: 20.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Checkbox(
-                              value: _orarioDisponibile,
-                              onChanged: (value) {
-                                setState(() {
-                                  _orarioDisponibile = value ?? false;
-                                });
-                              },
-                            ),
-                            Text("è disponibile un orario per l'appuntamento".toUpperCase()),
-                          ],
-                        ),
-                        if (_orarioDisponibile)
-                          Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(height: 12),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    _selectTime(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Colors.red, // Colore di sfondo rosso
-                                    onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
-                                  ),
-                                  child: Text('Seleziona Orario'.toUpperCase()),
-                                ),
-                                SizedBox(height: 12),
-                                Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}'.toUpperCase())
-                              ],
-                            ),
-                          ),
-                        SizedBox(height: 15),
-                        DropdownButton<TipologiaInterventoModel>(
-                          value: _selectedTipologia,
-                          hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
-                          onChanged: (TipologiaInterventoModel? newValue) {
-                            setState(() {
-                              _selectedTipologia = newValue;
-                            });
-                          },
-                          items: allTipologie
-                              .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                                (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                              value: value,
-                              child: Text(value.descrizione!),
-                            ),
-                          ).toList(),
-                        ),
-                        const SizedBox(height: 20.0),
-                        SizedBox(
-                          width: 600,
-                          child: TextFormField(
-                            controller: _titoloController,
-                            maxLines: null,
-                            decoration:  InputDecoration(labelText: 'Titolo'.toUpperCase()),
-                            onChanged: (value) {
-                              setState(() {
-                                _titolo = value;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 20.0),
-                        SizedBox(
-                          width: 600,
-                          child: TextFormField(
-                            controller: _descrizioneController,
-                            maxLines: null,
-                            decoration:  InputDecoration(labelText: 'Descrizione'.toUpperCase()),
-                            onChanged: (value) {
-                              setState(() {
-                                _descrizione = value;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: 600,
-                          child: TextFormField(
-                            controller: _notaController,
-                            maxLines: null,
-                            decoration:  InputDecoration(labelText: 'Nota'.toUpperCase()),
-                            onChanged: (value) {
-                              setState(() {
-                                _nota = value;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: 400,
-                          child: DropdownButtonFormField<Priorita>(
-                            value: _selectedPriorita,
-                            onChanged: (Priorita? newValue) {
-                              setState(() {
-                                _selectedPriorita = newValue;
-                              });
-                            },
-                            // Filtra solo i valori desiderati: Acconto e Pagamento
-                            items: [Priorita.BASSA, Priorita.MEDIA, Priorita.ALTA, Priorita.URGENTE]
-                                .map<DropdownMenuItem<Priorita>>((Priorita value) {
-                              String label = "";
-                              if (value == Priorita.BASSA) {
-                                label = 'BASSA';
-                              } else if (value == Priorita.MEDIA) {
-                                label = 'MEDIA';
-                              } else if (value == Priorita.ALTA) {
-                                label = 'ALTA';
-                              } else if (value == Priorita.URGENTE) {
-                                label = 'URGENTE';
-                              }
-                              return DropdownMenuItem<Priorita>(
-                                value: value,
-                                child: Text(label),
-                              );
-                            }).toList(),
-                            decoration: InputDecoration(
-                              labelText: 'PRIORITÀ',
-                            ),
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Selezionare la priorità';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        SizedBox(height : 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 200,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _showClientiDialog();
-                                },
-                                child: SizedBox(
-                                  height: 50,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        (selectedCliente?.denominazione != null && selectedCliente!.denominazione!.length > 15)
-                                            ? '${selectedCliente!.denominazione?.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                                            : (selectedCliente?.denominazione ?? 'Seleziona Cliente').toUpperCase(),  // Testo di fallback
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                      const Icon(Icons.arrow_drop_down),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                            SizedBox(
-                              width: 200,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          CreazioneClientePage(),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                  onPrimary: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                                ),
-                                child: Text('Crea nuovo cliente'.toUpperCase()),
-                              ),
-                            ),
-                          ],
-                        ),
-
-
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 250,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _showDestinazioniDialog();
-                                },
-                                child: SizedBox(
-                                  height: 50,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        (selectedDestinazione?.denominazione != null && selectedDestinazione!.denominazione!.length > 15)
-                                            ? '${selectedDestinazione!.denominazione!.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                                            : (selectedDestinazione?.denominazione ?? 'Seleziona Destinazione').toUpperCase(),  // Testo di fallback
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                      const Icon(Icons.arrow_drop_down),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 20),
-
-                            SizedBox(
-                              //width: 210,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if(selectedCliente != null){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            NuovaDestinazionePage(cliente: selectedCliente!),
-                                      ),
-                                    );
-                                  } else {
-                                    return _showNoClienteDialog();
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                  onPrimary: Colors.white,
-                                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                                ),
-                                child: Text('Crea nuova destinazione'.toUpperCase()),
-                              ),
-                            ),
-                          ],
-                        ),
-
-
-                        const SizedBox(height: 20),
-
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _selectedUtenti = [];
-                                  responsabile = null;
-                                  _finalSelectedUtenti = [];
-                                  _responsabileSelezionato = null;
-                                });
-                                _showSingleUtenteDialog();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20), // Bordo squadrato
-                                ),
-                              ),
-                              child: Text(
-                                'Seleziona tecnico'.toUpperCase(),
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            SizedBox(height: 15),
-                            Text("OPPURE"),
-                            SizedBox(height: 15),
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  _selectedUtenti = [];
-                                  responsabile = null;
-                                  _finalSelectedUtenti = [];
-                                  _responsabileSelezionato = null;
-                                });
-                                _showUtentiDialog();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
-                              child: Text(
-                                'Componi Squadra'.toUpperCase(),
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                        // Aggiungi questo sotto il pulsante per la selezione degli utenti
-                        const SizedBox(height: 20),
-                        DisplayResponsabileUtentiWidget(
-                          responsabile: responsabile,
-                          selectedUtenti: _selectedUtenti,
-                          onSelectedUtentiChanged: _handleSelectedUtentiChanged,
-                        ),
-                        if(_selectedTipologia?.descrizione == "Riparazione Merce")
-                          Center(
-                            child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Form(
-                                      key: _formKey,
-                                      child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            SizedBox(height: 15,),
-                                            _buildTextFormField(
-                                                _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
-                                            SizedBox(height: 15,),
-                                            _buildTextFormField(
-                                                _accessoriController, "Accessori", "Inserisci gli accessori se presenti"),
-                                            SizedBox(height: 15,),
-                                            _buildTextFormField(
-                                                _difettoController, "Difetto", "Inserisci il difetto riscontrato"),
-                                            SizedBox(height: 15,),
-                                            _buildTextFormField(
-                                                _passwordController, "Password", "Inserisci le password, se presenti"),
-                                            SizedBox(height: 15,),
-                                            _buildTextFormField(
-                                                _datiController, "Dati", "Inserisci i dati da salvaguardare"),
-                                            SizedBox(height: 15,),
-                                            Center(
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Checkbox(
-                                                    value: _preventivoRichiesto,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        _preventivoRichiesto = value!;
-                                                      });
-                                                    },
-                                                  ),
-                                                  Text("è richiesto un preventivo".toUpperCase()),
-                                                ],
-                                              ),
-                                            ),
-
-                                            const SizedBox(height: 20),
-                                            SizedBox(height: 15,),
-                                            ElevatedButton(
-                                              onPressed: takePicture,
-                                              style: ElevatedButton.styleFrom(
-                                                primary: Colors.red,
-                                                onPrimary: Colors.white,
-                                              ),
-                                              child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                                            ),
-                                            SizedBox(height: 15,),
-                                            _buildImagePreview(),
-                                          ]
-                                      ),
-                                    ),
-                                  )
-                                ]
-                            ),
-                          ),
-                        const SizedBox(height: 20),
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 20.0),
-                          child: ElevatedButton(
-                            onPressed: ((selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty &&
-                                _selectedTipologia != null && _selectedTipologia?.id != '6') ||
-                                (_selectedTipologia?.id == '6' && _articoloController.text.isNotEmpty && _accessoriController.text.isNotEmpty &&
-                                _difettoController.text.isNotEmpty && _passwordController.text.isNotEmpty && _datiController.text.isNotEmpty &&
-                                    pickedImages.length>0))
-                                ? ()
-                            {
-                              /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 200,
+                                child: ElevatedButton(
+                                  onPressed: _selezionaData,
+                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
+                                ),
+                              ),
+                              if(selectedDate != null)
+                                Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
+                              const SizedBox(height: 20.0),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Checkbox(
+                                    value: _orarioDisponibile,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _orarioDisponibile = value ?? false;
+                                      });
+                                    },
+                                  ),
+                                  Text("è disponibile un orario per l'appuntamento".toUpperCase()),
+                                ],
+                              ),
+                              if (_orarioDisponibile)
+                                Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          _selectTime(context);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.red, // Colore di sfondo rosso
+                                          onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                                        ),
+                                        child: Text('Seleziona Orario'.toUpperCase()),
+                                      ),
+                                      SizedBox(height: 12),
+                                      Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}'.toUpperCase())
+                                    ],
+                                  ),
+                                ),
+                              SizedBox(height: 15),
+                              DropdownButton<TipologiaInterventoModel>(
+                                value: _selectedTipologia,
+                                hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
+                                onChanged: (TipologiaInterventoModel? newValue) {
+                                  setState(() {
+                                    _selectedTipologia = newValue;
+                                  });
+                                },
+                                items: allTipologie
+                                    .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                                      (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
+                                    value: value,
+                                    child: Text(value.descrizione!),
+                                  ),
+                                ).toList(),
+                              ),
+                              const SizedBox(height: 20.0),
+                              SizedBox(
+                                width: 600,
+                                child: TextFormField(
+                                  controller: _titoloController,
+                                  maxLines: null,
+                                  decoration:  InputDecoration(labelText: 'Titolo'.toUpperCase()),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _titolo = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20.0),
+                              SizedBox(
+                                width: 600,
+                                child: TextFormField(
+                                  controller: _descrizioneController,
+                                  maxLines: null,
+                                  decoration:  InputDecoration(labelText: 'Descrizione'.toUpperCase()),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _descrizione = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 600,
+                                child: TextFormField(
+                                  controller: _notaController,
+                                  maxLines: null,
+                                  decoration:  InputDecoration(labelText: 'Nota'.toUpperCase()),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _nota = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 400,
+                                child: DropdownButtonFormField<Priorita>(
+                                  value: _selectedPriorita,
+                                  onChanged: (Priorita? newValue) {
+                                    setState(() {
+                                      _selectedPriorita = newValue;
+                                    });
+                                  },
+                                  // Filtra solo i valori desiderati: Acconto e Pagamento
+                                  items: [Priorita.BASSA, Priorita.MEDIA, Priorita.ALTA, Priorita.URGENTE]
+                                      .map<DropdownMenuItem<Priorita>>((Priorita value) {
+                                    String label = "";
+                                    if (value == Priorita.BASSA) {
+                                      label = 'BASSA';
+                                    } else if (value == Priorita.MEDIA) {
+                                      label = 'MEDIA';
+                                    } else if (value == Priorita.ALTA) {
+                                      label = 'ALTA';
+                                    } else if (value == Priorita.URGENTE) {
+                                      label = 'URGENTE';
+                                    }
+                                    return DropdownMenuItem<Priorita>(
+                                      value: value,
+                                      child: Text(label),
+                                    );
+                                  }).toList(),
+                                  decoration: InputDecoration(
+                                    labelText: 'PRIORITÀ',
+                                  ),
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Selezionare la priorità';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              SizedBox(height : 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 200,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showClientiDialog();
+                                      },
+                                      child: SizedBox(
+                                        height: 50,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              (selectedCliente?.denominazione != null && selectedCliente!.denominazione!.length > 15)
+                                                  ? '${selectedCliente!.denominazione?.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                                  : (selectedCliente?.denominazione ?? 'Seleziona Cliente').toUpperCase(),  // Testo di fallback
+                                              style: const TextStyle(fontSize: 16),
+                                            ),
+                                            const Icon(Icons.arrow_drop_down),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  SizedBox(
+                                    width: 200,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CreazioneClientePage(),
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red,
+                                        onPrimary: Colors.white,
+                                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                      ),
+                                      child: Text('Crea nuovo cliente'.toUpperCase()),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 250,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showDestinazioniDialog();
+                                      },
+                                      child: SizedBox(
+                                        height: 50,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              (selectedDestinazione?.denominazione != null && selectedDestinazione!.denominazione!.length > 15)
+                                                  ? '${selectedDestinazione!.denominazione!.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                                  : (selectedDestinazione?.denominazione ?? 'Seleziona Destinazione').toUpperCase(),  // Testo di fallback
+                                              style: const TextStyle(fontSize: 16),
+                                            ),
+                                            const Icon(Icons.arrow_drop_down),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 20),
+
+                                  SizedBox(
+                                    //width: 210,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        if(selectedCliente != null){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  NuovaDestinazionePage(cliente: selectedCliente!),
+                                            ),
+                                          );
+                                        } else {
+                                          return _showNoClienteDialog();
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red,
+                                        onPrimary: Colors.white,
+                                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                      ),
+                                      child: Text('Crea nuova destinazione'.toUpperCase()),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+
+                              const SizedBox(height: 20),
+
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedUtenti = [];
+                                        responsabile = null;
+                                        _finalSelectedUtenti = [];
+                                        _responsabileSelezionato = null;
+                                      });
+                                      _showSingleUtenteDialog();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20), // Bordo squadrato
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Seleziona tecnico'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  SizedBox(height: 15),
+                                  Text("OPPURE"),
+                                  SizedBox(height: 15),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedUtenti = [];
+                                        responsabile = null;
+                                        _finalSelectedUtenti = [];
+                                        _responsabileSelezionato = null;
+                                      });
+                                      _showUtentiDialog();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Componi Squadra'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Aggiungi questo sotto il pulsante per la selezione degli utenti
+                              const SizedBox(height: 20),
+                              DisplayResponsabileUtentiWidget(
+                                responsabile: responsabile,
+                                selectedUtenti: _selectedUtenti,
+                                onSelectedUtentiChanged: _handleSelectedUtentiChanged,
+                              ),
+                              if(_selectedTipologia?.descrizione == "Riparazione Merce")
+                                Center(
+                                  child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Form(
+                                            key: _formKey,
+                                            child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _accessoriController, "Accessori", "Inserisci gli accessori se presenti"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _difettoController, "Difetto", "Inserisci il difetto riscontrato"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _passwordController, "Password", "Inserisci le password, se presenti"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _datiController, "Dati", "Inserisci i dati da salvaguardare"),
+                                                  SizedBox(height: 15,),
+                                                  Center(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Checkbox(
+                                                          value: _preventivoRichiesto,
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              _preventivoRichiesto = value!;
+                                                            });
+                                                          },
+                                                        ),
+                                                        Text("è richiesto un preventivo".toUpperCase()),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                  const SizedBox(height: 20),
+                                                  SizedBox(height: 15,),
+                                                  ElevatedButton(
+                                                    onPressed: takePicture,
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Colors.red,
+                                                      onPrimary: Colors.white,
+                                                    ),
+                                                    child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                                  ),
+                                                  SizedBox(height: 15,),
+                                                  _buildImagePreview(),
+                                                ]
+                                            ),
+                                          ),
+                                        )
+                                      ]
+                                  ),
+                                ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                child: ElevatedButton(
+                                  onPressed: ((selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty &&
+                                      _selectedTipologia != null && _selectedTipologia?.id != '6') ||
+                                      (_selectedTipologia?.id == '6' && _articoloController.text.isNotEmpty && _accessoriController.text.isNotEmpty &&
+                                          _difettoController.text.isNotEmpty && _passwordController.text.isNotEmpty && _datiController.text.isNotEmpty &&
+                                          pickedImages.length>0))
+                                      ? ()
+                                  {
+                                    /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {
                                 savePics();
                               } else */
-                              if ((responsabile == null && _selectedUtenti!.isEmpty)) { //no tecnico e no squadra
-                                _alertDialog();
+                                    if ((responsabile == null && _selectedUtenti!.isEmpty)) { //no tecnico e no squadra
+                                      _alertDialog();
 
-                              } /*else if (responsabile != null && _selectedUtenti!.isEmpty) { //solo resp
+                                    } /*else if (responsabile != null && _selectedUtenti!.isEmpty) { //solo resp
 
                               }*/
 
-                              else {
-                               // print('no ');
-                                saveRelations();
-                              }
-                            }
-                                : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
-                            style: ElevatedButton.styleFrom(primary: Colors.red),
-                            child:  Text('Salva Intervento'.toUpperCase(), style: TextStyle(color: Colors.white)),
+                                    else {
+                                      // print('no ');
+                                      saveRelations();
+                                    }
+                                  }
+                                      : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
+                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  child:  Text('Salva Intervento'.toUpperCase(), style: TextStyle(color: Colors.white)),
+                                ),
+                              ),
+
+                            ],
                           ),
                         ),
-
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
+                );
+              } else{
+                return Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 200,
+                                child: ElevatedButton(
+                                  onPressed: _selezionaData,
+                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
+                                ),
+                              ),
+                              if(selectedDate != null)
+                                Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
+                              const SizedBox(height: 20.0),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Checkbox(
+                                    value: _orarioDisponibile,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _orarioDisponibile = value ?? false;
+                                      });
+                                    },
+                                  ),
+                                  Text("disponibilità appuntamento".toUpperCase()),
+                                ],
+                              ),
+                              if (_orarioDisponibile)
+                                Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(height: 12),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          _selectTime(context);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          primary: Colors.red, // Colore di sfondo rosso
+                                          onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                                        ),
+                                        child: Text('Seleziona Orario'.toUpperCase()),
+                                      ),
+                                      SizedBox(height: 12),
+                                      Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}'.toUpperCase())
+                                    ],
+                                  ),
+                                ),
+                              SizedBox(height: 15),
+                              SizedBox(
+                                width: 580,
+                                child: DropdownButton<TipologiaInterventoModel>(
+                                  value: _selectedTipologia,
+                                  hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
+                                  onChanged: (TipologiaInterventoModel? newValue) {
+                                    setState(() {
+                                      _selectedTipologia = newValue;
+                                    });
+                                  },
+                                  items: allTipologie
+                                      .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                                        (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
+                                      value: value,
+                                      child: Text(value.descrizione!),
+                                    ),
+                                  ).toList(),
+                                ),
+                              ),
+                              const SizedBox(height: 20.0),
+                              SizedBox(
+                                width: 600,
+                                child: TextFormField(
+                                  controller: _titoloController,
+                                  maxLines: null,
+                                  decoration:  InputDecoration(labelText: 'Titolo'.toUpperCase()),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _titolo = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20.0),
+                              SizedBox(
+                                width: 600,
+                                child: TextFormField(
+                                  controller: _descrizioneController,
+                                  maxLines: null,
+                                  decoration:  InputDecoration(labelText: 'Descrizione'.toUpperCase()),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _descrizione = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 600,
+                                child: TextFormField(
+                                  controller: _notaController,
+                                  maxLines: null,
+                                  decoration:  InputDecoration(labelText: 'Nota'.toUpperCase()),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _nota = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 400,
+                                child: DropdownButtonFormField<Priorita>(
+                                  value: _selectedPriorita,
+                                  onChanged: (Priorita? newValue) {
+                                    setState(() {
+                                      _selectedPriorita = newValue;
+                                    });
+                                  },
+                                  // Filtra solo i valori desiderati: Acconto e Pagamento
+                                  items: [Priorita.BASSA, Priorita.MEDIA, Priorita.ALTA, Priorita.URGENTE]
+                                      .map<DropdownMenuItem<Priorita>>((Priorita value) {
+                                    String label = "";
+                                    if (value == Priorita.BASSA) {
+                                      label = 'BASSA';
+                                    } else if (value == Priorita.MEDIA) {
+                                      label = 'MEDIA';
+                                    } else if (value == Priorita.ALTA) {
+                                      label = 'ALTA';
+                                    } else if (value == Priorita.URGENTE) {
+                                      label = 'URGENTE';
+                                    }
+                                    return DropdownMenuItem<Priorita>(
+                                      value: value,
+                                      child: Text(label),
+                                    );
+                                  }).toList(),
+                                  decoration: InputDecoration(
+                                    labelText: 'PRIORITÀ',
+                                  ),
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Selezionare la priorità';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              SizedBox(height : 20),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 200,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showClientiDialog();
+                                      },
+                                      child: SizedBox(
+                                        height: 50,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              (selectedCliente?.denominazione != null && selectedCliente!.denominazione!.length > 15)
+                                                  ? '${selectedCliente!.denominazione?.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                                  : (selectedCliente?.denominazione ?? 'Seleziona Cliente').toUpperCase(),  // Testo di fallback
+                                              style: const TextStyle(fontSize: 16),
+                                            ),
+                                            const Icon(Icons.arrow_drop_down),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SizedBox(
+                                    width: 200,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CreazioneClientePage(),
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red,
+                                        onPrimary: Colors.white,
+                                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                      ),
+                                      child: Text('Crea nuovo cliente'.toUpperCase()),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+
+                              const SizedBox(height: 25),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 250,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _showDestinazioniDialog();
+                                      },
+                                      child: SizedBox(
+                                        height: 50,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              (selectedDestinazione?.denominazione != null && selectedDestinazione!.denominazione!.length > 15)
+                                                  ? '${selectedDestinazione!.denominazione!.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                                                  : (selectedDestinazione?.denominazione ?? 'Seleziona Destinazione').toUpperCase(),  // Testo di fallback
+                                              style: const TextStyle(fontSize: 16),
+                                            ),
+                                            const Icon(Icons.arrow_drop_down),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 10),
+
+                                  SizedBox(
+                                    //width: 210,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        if(selectedCliente != null){
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  NuovaDestinazionePage(cliente: selectedCliente!),
+                                            ),
+                                          );
+                                        } else {
+                                          return _showNoClienteDialog();
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red,
+                                        onPrimary: Colors.white,
+                                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                                      ),
+                                      child: Text('Crea nuova destinazione'.toUpperCase()),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+
+                              const SizedBox(height: 40),
+
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedUtenti = [];
+                                        responsabile = null;
+                                        _finalSelectedUtenti = [];
+                                        _responsabileSelezionato = null;
+                                      });
+                                      _showSingleUtenteDialog();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20), // Bordo squadrato
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Seleziona tecnico'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  SizedBox(height: 15),
+                                  Text("OPPURE"),
+                                  SizedBox(height: 15),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedUtenti = [];
+                                        responsabile = null;
+                                        _finalSelectedUtenti = [];
+                                        _responsabileSelezionato = null;
+                                      });
+                                      _showUtentiDialog();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Componi Squadra'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Aggiungi questo sotto il pulsante per la selezione degli utenti
+                              const SizedBox(height: 20),
+                              DisplayResponsabileUtentiWidget(
+                                responsabile: responsabile,
+                                selectedUtenti: _selectedUtenti,
+                                onSelectedUtentiChanged: _handleSelectedUtentiChanged,
+                              ),
+                              if(_selectedTipologia?.descrizione == "Riparazione Merce")
+                                Center(
+                                  child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Form(
+                                            key: _formKey,
+                                            child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _articoloController, "Articolo", "Inserisci una descrizione dell'articolo"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _accessoriController, "Accessori", "Inserisci gli accessori se presenti"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _difettoController, "Difetto", "Inserisci il difetto riscontrato"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _passwordController, "Password", "Inserisci le password, se presenti"),
+                                                  SizedBox(height: 15,),
+                                                  _buildTextFormField(
+                                                      _datiController, "Dati", "Inserisci i dati da salvaguardare"),
+                                                  SizedBox(height: 15,),
+                                                  Center(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Checkbox(
+                                                          value: _preventivoRichiesto,
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              _preventivoRichiesto = value!;
+                                                            });
+                                                          },
+                                                        ),
+                                                        Text("è richiesto un preventivo".toUpperCase()),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                  const SizedBox(height: 20),
+                                                  SizedBox(height: 15,),
+                                                  ElevatedButton(
+                                                    onPressed: takePicture,
+                                                    style: ElevatedButton.styleFrom(
+                                                      primary: Colors.red,
+                                                      onPrimary: Colors.white,
+                                                    ),
+                                                    child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                                  ),
+                                                  SizedBox(height: 15,),
+                                                  _buildImagePreview(),
+                                                ]
+                                            ),
+                                          ),
+                                        )
+                                      ]
+                                  ),
+                                ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20.0),
+                                child: ElevatedButton(
+                                  onPressed: ((selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty &&
+                                      _selectedTipologia != null && _selectedTipologia?.id != '6') ||
+                                      (_selectedTipologia?.id == '6' && _articoloController.text.isNotEmpty && _accessoriController.text.isNotEmpty &&
+                                          _difettoController.text.isNotEmpty && _passwordController.text.isNotEmpty && _datiController.text.isNotEmpty &&
+                                          pickedImages.length>0))
+                                      ? ()
+                                  {
+                                    /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {
+                                savePics();
+                              } else */
+                                    if ((responsabile == null && _selectedUtenti!.isEmpty)) { //no tecnico e no squadra
+                                      _alertDialog();
+
+                                    } /*else if (responsabile != null && _selectedUtenti!.isEmpty) { //solo resp
+
+                              }*/
+
+                                    else {
+                                      // print('no ');
+                                      saveRelations();
+                                    }
+                                  }
+                                      : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
+                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  child:  Text('Salva Intervento'.toUpperCase(), style: TextStyle(color: Colors.white)),
+                                ),
+                              ),
+
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            }
+          )
         ),
       ),
     );
