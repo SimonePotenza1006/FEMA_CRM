@@ -58,7 +58,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveIngresso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ingresso'),
+        Uri.parse('$ipaddressProva/api/ingresso'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'orario': formattedDate,
@@ -77,7 +77,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -100,7 +100,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<InterventoModel>> getMerce() async{
     try{
 
-      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce'));
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -123,7 +123,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/merceInRiparazione/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/merceInRiparazione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<MerceInRiparazioneModel> allMerceByUtente = [];
@@ -147,7 +147,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -171,7 +171,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -292,7 +292,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       );
                     },
                   ),
-                  SizedBox(height: 20),
+                  /*SizedBox(height: 20),
                   buildMenuButton(
                     icon: Icons.euro_rounded,
                     text: 'REGISTRO CASSA',
@@ -313,7 +313,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         MaterialPageRoute(builder: (context) => MenuInterventiPage(utente: widget.userData!)),
                       );
                     },
-                  ),
+                  ),*/
                   SizedBox(height: 20),
                   buildMenuButton(
                     icon: Icons.remove_red_eye_outlined,
@@ -378,49 +378,76 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   return Center(child: Text('Errore: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
                   List<InterventoModel> interventi = snapshot.data!;
-                  interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
-                  return ListView.builder(
+                  //interventi = interventi.where((intervento) => intervento.data!.isSameDay(selectedDate)).toList();
+                  interventi = interventi.where((intervento) {
+                    return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                  }).toList();
+                 return ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: interventi.length,
                     itemBuilder: (context, index) {
                       InterventoModel intervento = interventi[index];
-                      Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
-                      TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                      Color getPriorityColor(Priorita priorita) {
+                        switch (priorita) {
+                          case Priorita.BASSA:
+                            return Colors.lightGreen;
+                          case Priorita.MEDIA:
+                            return Colors.yellow; // grigio chiaro
+                          case Priorita.ALTA:
+                            return Colors.orange; // giallo chiaro
+                          case Priorita.URGENTE:
+                            return Colors.red; // azzurro chiaro
+                          default:
+                            return Colors.blueGrey[200]!;
+                        }
+                      }
+
+                      // Determina il colore in base alla priorità
+                      Color backgroundColor =  getPriorityColor(intervento.priorita!);
+
+                      TextStyle textStyle = intervento.concluso ?? false
+                          ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                          : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+                      //Color backgroundColor = intervento.concluso ?? false ? Colors.green : Colors.white;
+                      //TextStyle textStyle = intervento.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
 
                       return Card(
-                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // aggiungi padding orizzontale
+                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6), // aggiungi padding orizzontale
                         elevation: 4, // aggiungi ombreggiatura
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         // aggiungi bordi arrotondati
                         child: ListTile(
+                          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                           title: Text(
-                            '${intervento.descrizione}',
+                            '${intervento.cliente!.denominazione!}\n${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                             style: textStyle,
                           ),
                           subtitle: Text(
-                            intervento.cliente?.denominazione.toString()?? '',
+                            '${intervento.titolo}',
                             style: textStyle,
                           ),
                           trailing: Column(
                             children: [
+                              if (intervento.concluso ?? false)
+                                Icon(Icons.check, color: Colors.black, size: 18), //
                               Text(
                                 // Formatta la data secondo il tuo formato desiderato
                                 intervento.data!= null
                                     ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
-                                    : 'Data non disponibile',
+                                    : 'Data N.D.',
                                 style: TextStyle(
-                                  fontSize: 16, // Stile opzionale per la data
-                                  color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                  fontSize: 13, // Stile opzionale per la data
+                                  color: Colors.black,//intervento.concluso ?? false ? Colors.white : Colors.black,
                                 ),
                               ),
                               Text(
                                 intervento.orario_appuntamento!= null
                                     ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
-                                    : 'Nessun orario di appuntamento',
+                                    : 'Orario appuntamento N.D.',
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  color: intervento.concluso ?? false ? Colors.white : Colors.black,
+                                  fontSize: 13,
+                                  color: Colors.black,//intervento.concluso ?? false ? Colors.white : Colors.black,
                                 ),
                               ),
                             ],
@@ -437,9 +464,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               ),
                             );
                           },
-                          tileColor: backgroundColor,
+                          tileColor: Colors.white60,
                           shape: RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                            side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
@@ -460,34 +487,62 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   return Center(child: Text('Errore: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
                   List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
-                  relazioni = relazioni.where((relazione) => relazione.intervento!.data!.isSameDay(selectedDate)).toList();
+                  relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce == null).toList();//relazione.intervento!.data!.isSameDay(selectedDate)).toList();
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: relazioni.length,
                     itemBuilder: (context, index) {
                       RelazioneUtentiInterventiModel relazione = relazioni[index];
-                      Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
-                      TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
-                      return ListTile(
+                      Color getPriorityColor(Priorita priorita) {
+                        switch (priorita) {
+                          case Priorita.BASSA:
+                            return Colors.lightGreen;
+                          case Priorita.MEDIA:
+                            return Colors.yellow; // grigio chiaro
+                          case Priorita.ALTA:
+                            return Colors.orange; // giallo chiaro
+                          case Priorita.URGENTE:
+                            return Colors.red; // azzurro chiaro
+                          default:
+                            return Colors.blueGrey[200]!;
+                        }
+                      }
+
+                      // Determina il colore in base alla priorità
+                      Color backgroundColor =  getPriorityColor(relazione.intervento!.priorita!);
+                      //TextStyle textStyle = relazione.intervento!.concluso ?? false ? TextStyle(color: Colors.white, fontSize: 15) : TextStyle(color: Colors.black, fontSize: 15);
+                      TextStyle textStyle = relazione.intervento?.concluso ?? false
+                          ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                          : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                      return Card(
+                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          child:
+                        ListTile(contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                         title: Text(
-                          '${relazione.intervento?.descrizione}',
+                          '${relazione.intervento?.cliente!.denominazione!}\n${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
                           style: textStyle,
                         ),
                         subtitle: Text(
-                          relazione.intervento?.cliente?.denominazione.toString()?? '',
+                          '${relazione.intervento?.titolo}',
                           style: textStyle,
                         ),
                         trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            if (relazione.intervento!.concluso ?? false)
+                              Icon(Icons.check, color: Colors.black, size: 18), // Check icon
                             Text(
                               // Formatta la data secondo il tuo formato desiderato
                               relazione.intervento?.data!= null
                                   ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
                                   : 'Data non disponibile',
                               style: TextStyle(
-                                fontSize: 16, // Stile opzionale per la data
-                                color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                fontSize: 13, // Stile opzionale per la data
+                                color: Colors.black,//relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
                               ),
                             ),
                             Text(
@@ -495,8 +550,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
                                   : 'Nessun orario di appuntamento',
                               style: TextStyle(
-                                fontSize: 16,
-                                color: relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                fontSize: 13,
+                                color: Colors.black,//relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
                               ),
                             ),
                           ],
@@ -513,7 +568,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                           );
                         },
-                        tileColor: backgroundColor,
+                        tileColor: Colors.white60,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(color: getPriorityColor(relazione.intervento!.priorita!), width: 8),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                      )
                       );
                     },
                   );

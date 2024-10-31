@@ -340,7 +340,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddress/api/utente/ulogin'),
+          Uri.parse('$ipaddressProva/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -445,7 +445,7 @@ class _LoginFormState extends State<LoginForm> {
 
   bool isAdministratore(UtenteModel userData) {
     print('ruolo '+userData.ruolo!.descrizione!);
-    bool isAdmin = ['10', '12', '4'].contains(userData.id) && userData.ruolo!.descrizione! == "Amministrazione";
+    bool isAdmin = ['12', '4'].contains(userData.id) && userData.ruolo!.descrizione! == "Amministrazione";
     print("isAdministratore: $isAdmin per l'utente con ID ${userData.id} e ruolo ${userData.ruolo?.descrizione}");
     return isAdmin;
   }
