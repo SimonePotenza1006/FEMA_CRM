@@ -28,6 +28,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   @override
+  void initState() {
+    _newUsernameController.text = widget.utente.email!;
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +88,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           SizedBox(height: 15),
                           ElevatedButton(
                             onPressed: () {
-                              saveCredenziali();
+                              saveCredenziali().then((value) => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => DettaglioUtentePage(utente: value)),
+                              ));
                             },
                             style: ElevatedButton.styleFrom(
                               primary: Colors.red, // Background color
@@ -124,13 +134,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
-  Future<void> saveCredenziali() async {
+  Future<UtenteModel> saveCredenziali() async {
+    print('new pass: '+_newPasswordController.text);
     try {
       final newUsername = _newUsernameController.text.isNotEmpty
           ? _newUsernameController.text
           : widget.utente.email;
 
-      final newPassword = _newPasswordController.text.isNotEmpty
+      String? newPassword = _newPasswordController.text.isNotEmpty
           ? _newPasswordController.text
           : widget.utente.password;
 
@@ -150,6 +161,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'tipologia_intervento' : widget.utente.tipologia_intervento?.toMap(),
         }),
       );
+
       if (response.statusCode == 201) {
         print("Utente modificato");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -158,9 +170,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             duration: Duration(seconds: 2),
           ),
         );
+        return UtenteModel.fromJson(json.decode(response.body.toString()));
+      } else {
+        return widget.utente;
       }
     } catch (e) {
       print('Errore durante il salvataggio delle credenziali: $e');
+      return widget.utente;
     }
   }
 }
