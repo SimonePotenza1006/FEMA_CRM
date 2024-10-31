@@ -1,12 +1,10 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-
 import '../model/SpesaVeicoloModel.dart';
-
 
 class DettaglioSpesaVeicoloPage extends StatefulWidget{
   final SpesaVeicoloModel spesa;
@@ -19,28 +17,38 @@ class DettaglioSpesaVeicoloPage extends StatefulWidget{
 
 class _DettaglioSpesaSivisPageState extends State<DettaglioSpesaVeicoloPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  Uint8List? _image;
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  List<Uint8List>? _images;
 
   @override
   void initState() {
     super.initState();
-    _loadImage();
+    _loadImages();
   }
 
-  Future<Uint8List> _loadImage() async {
+  Future<void> _loadImages() async {
+    final images = await loadImages();
+    setState(() {
+      _images = images;
+    });
+  }
+
+  Future<List<Uint8List>> loadImages() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/immagine/spesa/${widget.spesa.idSpesaVeicolo}/images'));
       if (response.statusCode == 200) {
-        return response.bodyBytes;
+        // Decodifica la lista di immagini JSON
+        List<dynamic> imagesJson = jsonDecode(response.body);
+        return imagesJson.map((imageData) => base64Decode(imageData['imageData'])).toList();
       } else {
-        throw Exception('Failed to load image');
+        throw Exception('Failed to load images');
       }
     } catch (e) {
-      print('Error loading image: $e');
-      return Uint8List(0); // Return an empty Uint8List on error
+      print('Error loading images: $e');
+      return [];
     }
   }
+
 
   Future<Uint8List> getImageSpesa(String idspesa) async {
     try {
@@ -74,62 +82,50 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            GestureDetector(
-              onTap: () {
-                if (_image != null) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => Dialog(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        child: Image.memory(_image!),
-                      ),
-                    ),
-                  );
-                }
-              },
-              child: Card(
-                elevation: 5,
-                child: Container(
-                  width: 300,
-                  height: 500,
-                  child: _image != null
-                      ? Image.memory(_image!)
-                      : FutureBuilder<Uint8List>(
-                    future: _loadImage(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return FutureBuilder<Uint8List>(
-                          future: _loadPlaceholderImage(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
-                              return Image.memory(snapshot.data!);
-                            } else if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else {
-                              return Text("Error loading placeholder image");
-                            }
-                          },
-                        );
-                      } else if (snapshot.connectionState == ConnectionState.done && snapshot.data != null) {
-                        // Mostra l'immagine reale quando è caricata
-                        _image = snapshot.data;
-                        return Image.memory(snapshot.data!);
-                      } else {
-                        return Text("No image in database");
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ),
+            _buildImageGallery(),
             const SizedBox(height: 20),
             _buildDetailsSection(),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildImageGallery() {
+    if (_images == null) {
+      return Center(child: CircularProgressIndicator());
+    } else if (_images!.isEmpty) {
+      return Center(
+        child: Text("Nessuna immagine per la spesa selezionata", style: TextStyle(fontWeight: FontWeight.bold),)
+      );
+    } else {
+      return Container(
+        height: 500,
+        child: PageView.builder(
+          itemCount: _images!.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Image.memory(_images![index]),
+                    ),
+                  ),
+                );
+              },
+              child: Card(
+                elevation: 5,
+                child: Image.memory(_images![index], fit: BoxFit.cover),
+              ),
+            );
+          },
+        ),
+      );
+    }
   }
 
   Widget _buildDetailsSection() {
@@ -199,5 +195,4 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
     );
   }
-
 }
