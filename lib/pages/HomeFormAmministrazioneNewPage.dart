@@ -1567,7 +1567,7 @@ class _HomeFormAmministrazioneNewPageState
                                         elevation: 4,
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                         child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                           title: Text(
                                             '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                             style: textStyle,
@@ -1581,18 +1581,18 @@ class _HomeFormAmministrazioneNewPageState
                                             children: [
                                               // Condizione per visualizzare l'icona di check se l'intervento è concluso
                                               if (intervento.concluso ?? false)
-                                                Icon(Icons.check, color: Colors.white, size: 15), // Check icon
+                                                Icon(Icons.check, color: Colors.black, size: 18), // Check icon
                                               Text(
                                                 intervento.data != null
-                                                    ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                                    ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                                     : 'Nessun appuntamento stabilito',
-                                                style: TextStyle(fontSize: 10, color: Colors.black),
+                                                style: TextStyle(fontSize: 13, color: Colors.black),
                                               ),
                                               Text(
                                                 intervento.orario_appuntamento != null
-                                                    ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                                    ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                                     : 'Nessun orario stabilito',
-                                                style: TextStyle(fontSize: 10, color: Colors.black),
+                                                style: TextStyle(fontSize: 13, color: Colors.black),
                                               ),
                                             ],
                                           ),
@@ -1607,9 +1607,9 @@ class _HomeFormAmministrazioneNewPageState
                                               ),
                                             );
                                           },
-                                          tileColor: backgroundColor,
+                                          tileColor: Colors.white60,
                                           shape: RoundedRectangleBorder(
-                                            side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                            side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                         ),
@@ -1661,9 +1661,15 @@ class _HomeFormAmministrazioneNewPageState
                                       /*TextStyle textStyle = relazione.intervento!.concluso ?? false
                                     ? TextStyle(color: Colors.white, fontSize: 15)
                                     : TextStyle(color: Colors.black, fontSize: 15);*/
-                                      return ListTile(
+                                      return Card(
+                                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6), // aggiungi padding orizzontale
+                                      elevation: 4, // aggiungi ombreggiatura
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      // aggiungi bordi arrotondati
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                         title: Text(
-                                          '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
+                                          '${relazione.intervento?.cliente!.denominazione!}\n${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
                                           style: textStyle,
                                         ),
                                         subtitle: Text(
@@ -1672,18 +1678,20 @@ class _HomeFormAmministrazioneNewPageState
                                         ),
                                         trailing: Column(
                                           children: [
+                                            if (relazione.intervento!.concluso ?? false)
+                                              Icon(Icons.check, color: Colors.black, size: 18), //
                                             Text(
                                               // Formatta la data secondo il tuo formato desiderato
                                               relazione.intervento?.data!= null
-                                                  ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
+                                                  ? '${relazione.intervento?.data!.day.toString().padLeft(2, '0')}/${relazione.intervento?.data!.month.toString().padLeft(2, '0')}/${relazione.intervento?.data!.year}'
                                                   : 'Nessun appuntamento stabilito',
-                                              style: TextStyle(fontSize: 10, color: Colors.black),
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
                                             ),
                                             Text(
                                               relazione.intervento?.orario_appuntamento!= null
-                                                  ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                                  ? '${relazione.intervento?.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${relazione.intervento?.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                                   : 'Nessun orario stabilito',
-                                              style: TextStyle(fontSize: 10, color: Colors.black),
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
                                             ),
                                           ],
                                         ),
@@ -1699,7 +1707,12 @@ class _HomeFormAmministrazioneNewPageState
                                             ),
                                           );
                                         },
-                                        tileColor: backgroundColor,
+                                        tileColor: Colors.white60,
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(color: getPriorityColor(relazione.intervento!.priorita!), width: 8),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      )
                                       );
                                     },
                                   );
@@ -1767,9 +1780,9 @@ class _HomeFormAmministrazioneNewPageState
                                         elevation: 4,
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                         child: ListTile(
-                                          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                           title: Text(
-                                            '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
+                                            '${intervento.cliente!.denominazione!}\n${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                             style: textStyle,
                                           ),
                                           subtitle: Text(
@@ -1781,18 +1794,18 @@ class _HomeFormAmministrazioneNewPageState
                                             children: [
                                               // Condizione per visualizzare l'icona di check se l'intervento è concluso
                                               if (intervento.concluso ?? false)
-                                                Icon(Icons.check, color: Colors.white, size: 15), // Check icon
+                                                Icon(Icons.check, color: Colors.black, size: 18), //
                                               Text(
                                                 intervento.data != null
-                                                    ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                                    ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                                     : 'Nessun appuntamento stabilito',
-                                                style: TextStyle(fontSize: 10, color: Colors.black),
+                                                style: TextStyle(fontSize: 13, color: Colors.black),
                                               ),
                                               Text(
                                                 intervento.orario_appuntamento != null
-                                                    ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                                    ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                                     : 'Nessun orario stabilito',
-                                                style: TextStyle(fontSize: 10, color: Colors.black),
+                                                style: TextStyle(fontSize: 13, color: Colors.black),
                                               ),
                                             ],
                                           ),
@@ -1807,9 +1820,9 @@ class _HomeFormAmministrazioneNewPageState
                                               ),
                                             );
                                           },
-                                          tileColor: backgroundColor,
+                                          tileColor: Colors.white60,
                                           shape: RoundedRectangleBorder(
-                                            side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                            side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
                                             borderRadius: BorderRadius.circular(12),
                                           ),
                                         ),
@@ -1852,7 +1865,7 @@ class _HomeFormAmministrazioneNewPageState
                                         subtitle: Text(commissione.note?? '', style: TextStyle(color: Colors.black),),
                                         trailing: Text(
                                           commissione.data!= null
-                                              ? '${commissione.data!.day}/${commissione.data!.month}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
+                                              ? '${commissione.data!.day.toString().padLeft(2, '0')}/${commissione.data!.month.toString().padLeft(2, '0')}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
                                               : 'Data non disponibile',
                                           style: TextStyle(
                                               fontSize: 16, color: Colors.black),
