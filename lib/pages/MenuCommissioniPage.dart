@@ -13,9 +13,7 @@ class MenuCommissioniPage extends StatefulWidget {
 }
 
 class _MenuCommissioniPageState extends State<MenuCommissioniPage> {
-
   int _hoveredIndex = -1;
-
 
   @override
   Widget build(BuildContext context){

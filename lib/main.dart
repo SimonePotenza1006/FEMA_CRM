@@ -311,9 +311,7 @@ class _LoginFormState extends State<LoginForm> {
                           fontSize: 22.0,
                           fontWeight: FontWeight.w600),),
                     ),
-
                   ]))
-
         ],
       ),
     ));} //?? false;

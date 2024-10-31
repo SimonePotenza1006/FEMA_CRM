@@ -899,10 +899,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   ),
                                 ],
                               ),
-
-
                               const SizedBox(height: 40),
-
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
@@ -1003,7 +1000,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                                       ],
                                                     ),
                                                   ),
-
                                                   const SizedBox(height: 20),
                                                   SizedBox(height: 15,),
                                                   ElevatedButton(
@@ -1027,25 +1023,25 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 20.0),
                                 child: ElevatedButton(
-                                  onPressed: ((selectedCliente != null && selectedDestinazione != null && _descrizioneController.text.isNotEmpty &&
-                                      _selectedTipologia != null && _selectedTipologia?.id != '6') ||
-                                      (_selectedTipologia?.id == '6' && _articoloController.text.isNotEmpty && _accessoriController.text.isNotEmpty &&
-                                          _difettoController.text.isNotEmpty && _passwordController.text.isNotEmpty && _datiController.text.isNotEmpty &&
-                                          pickedImages.length>0))
+                                  onPressed: ((
+                                      selectedCliente != null &&
+                                          selectedDestinazione != null &&
+                                          _descrizioneController.text.isNotEmpty &&
+                                          _selectedTipologia != null &&
+                                          _selectedTipologia?.id != '6') ||
+                                            (_selectedTipologia?.id == '6' &&
+                                             _articoloController.text.isNotEmpty &&
+                                             _accessoriController.text.isNotEmpty &&
+                                             _difettoController.text.isNotEmpty &&
+                                             _passwordController.text.isNotEmpty &&
+                                             _datiController.text.isNotEmpty &&
+                                              pickedImages.length>0))
                                       ? ()
                                   {
-                                    /*if (_selectedTipologia?.descrizione == "Riparazione Merce") {
-                                savePics();
-                              } else */
-                                    if ((responsabile == null && _selectedUtenti!.isEmpty)) { //no tecnico e no squadra
+                                    if ((responsabile == null)) { //no tecnico e no squadra
                                       _alertDialog();
-
-                                    } /*else if (responsabile != null && _selectedUtenti!.isEmpty) { //solo resp
-
-                              }*/
-
+                                    }
                                     else {
-                                      // print('no ');
                                       saveRelations();
                                     }
                                   }
@@ -1054,7 +1050,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   child:  Text('Salva Intervento'.toUpperCase(), style: TextStyle(color: Colors.white)),
                                 ),
                               ),
-
                             ],
                           ),
                         ),
@@ -1080,8 +1075,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             actions: <Widget>[
               TextButton(
                   onPressed: (){
-
-
                     if(_selectedTipologia?.id == '6'){
                       savePics().then((value) => Navigator.pop(dialogContext));
                       Navigator.pop(context);
@@ -1229,7 +1222,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> saveRelations() async {
-    final data = _selectedTipologia?.id == '6' ? await saveInterventoPlusMerce() : await saveIntervento();
+    final data = _selectedTipologia?.id == '6' ? await savePics() : await saveIntervento();
     if (_selectedUtenti == null || _selectedUtenti!.isEmpty) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1271,7 +1264,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             _showErrorDialog();
           }
         }
-        //salvataggio pics
         if (_selectedTipologia?.id == '6') try{
           for(var image in pickedImages){
             if(image.path != null && image.path.isNotEmpty){
@@ -1479,13 +1471,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         );
       },
     );
-
     // Carica i clienti in background
     await getAllClienti();
-
     // Chiudi il dialogo e mostra i clienti
     Navigator.of(context).pop(); // Chiudi il dialogo
-
     // Mostra il dialogo con la lista dei clienti
     _showClientiListDialog();
   }
@@ -1493,7 +1482,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void _showClientiListDialog() {
     TextEditingController searchController = TextEditingController();
     List<ClienteModel> filteredClientiList = clientiList; // Inizializzazione della lista filtrata
-
     showDialog(
       context: context,
       builder: (BuildContext context) {

@@ -99,149 +99,147 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // Add this line
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 10),
-                GestureDetector(
-                  onTapUp: (details) {
-                    if (_hoveredIndex != -1) {
-                      _navigateToPage(_hoveredIndex);
-                    }
-                  },
-                  onPanUpdate: (details) {
-                    RenderBox box = context.findRenderObject() as RenderBox;
-                    Offset localOffset = box.globalToLocal(details.globalPosition);
-                    setState(() {
-                      _hoveredIndex = _calculateHoveredIndex(localOffset);
-                    });
-                  },
-                  child: CustomPaint(
-                    size: Size(500, 500),
-                    painter: MenuPainter(
-                          (index) {
-                        setState(() {
-                          _hoveredIndex = index;
-                        });
-                      },
-                          () {
-                        setState(() {
-                          _hoveredIndex = -1;
-                        });
-                      },
-                      context,
-                      size: Size(500, 500),
-                      hoveredIndex: _hoveredIndex,
-                    ),
+      body: LayoutBuilder(
+        builder:(context, constraints){
+          if(constraints.maxWidth >= 800){
+            return Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Add this line
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 10),
+                      GestureDetector(
+                        onTapUp: (details) {
+                          if (_hoveredIndex != -1) {
+                            _navigateToPage(_hoveredIndex);
+                          }
+                        },
+                        onPanUpdate: (details) {
+                          RenderBox box = context.findRenderObject() as RenderBox;
+                          Offset localOffset = box.globalToLocal(details.globalPosition);
+                          setState(() {
+                            _hoveredIndex = _calculateHoveredIndex(localOffset);
+                          });
+                        },
+                        child: CustomPaint(
+                          size: Size(500, 500),
+                          painter: MenuPainter(
+                                (index) {
+                              setState(() {
+                                _hoveredIndex = index;
+                              });
+                            },
+                                () {
+                              setState(() {
+                                _hoveredIndex = -1;
+                              });
+                            },
+                            context,
+                            size: Size(500, 500),
+                            hoveredIndex: _hoveredIndex,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
+              ),
+            );
+          } else {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.playlist_add, text: 'CREA ORDINE',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FormOrdineFornitorePage(utente: widget.utente)),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.bar_chart, text: 'REPORT ORDINI',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ReportOrdineFornitorePage(utente: widget.utente)),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 350,
+                    child: buildMenuButton(icon: Icons.folder_shared_outlined, text: 'REPORT ORDINI',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ReportOrdiniPerUtentePage(utente: widget.utente)),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
+      )
+
     );
   }
 
-  Widget buildButton({required IconData icon, required String text, required VoidCallback onPressed}) {
-    double textSize = 25;
-
-    return Flexible( // Replace Expanded with Flexible
-      child: Card(
-        color: Colors.red,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        elevation: 5,
-        child: InkWell(
-          onTap: onPressed,
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                SizedBox(height: 25),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      icon,
-                      color: Colors.white,
-                      size: textSize,
-                    ),
-                    SizedBox(width: 10.0),
-                    Text(
-                      text,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: textSize,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 25),
-              ],
-            ),
+  Widget buildMenuButton(
+      {required IconData icon, required String text, required VoidCallback onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.red.shade400, Colors.red.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget buildButtonWithBadge({required IconData icon, required String text, required VoidCallback onPressed}) {
-    double textSize = 25;
-
-    return Card(
-      color: Colors.red,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      elevation: 10,
-      child: InkWell(
-        onTap: onPressed,
         child: Padding(
-          padding: EdgeInsets.only(top : 30.0, bottom: 30),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Icon(
                 icon,
                 color: Colors.white,
-                size: textSize,
+                size: 30,
               ),
-              SizedBox(width: 10.0),
-              Text(
-                text,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: textSize,
-                ),
-              ),
-              if (allOrdini.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Container(
-                    padding: EdgeInsets.all(6.0),
-                    decoration: BoxDecoration(
-                      color: Colors.red[900],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      allOrdini.length.toString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.0,
-                      ),
-                    ),
+              SizedBox(width: 30),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+              ),
             ],
           ),
         ),
