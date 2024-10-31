@@ -434,7 +434,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               Text(
                                 // Formatta la data secondo il tuo formato desiderato
                                 intervento.data!= null
-                                    ? '${intervento.data!.day}/${intervento.data!.month}/${intervento.data!.year}'
+                                    ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                     : 'Data N.D.',
                                 style: TextStyle(
                                   fontSize: 13, // Stile opzionale per la data
@@ -443,7 +443,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               ),
                               Text(
                                 intervento.orario_appuntamento!= null
-                                    ? '${intervento.orario_appuntamento?.hour}:${intervento.orario_appuntamento?.minute}'
+                                    ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                     : 'Orario appuntamento N.D.',
                                 style: TextStyle(
                                   fontSize: 13,
@@ -538,7 +538,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             Text(
                               // Formatta la data secondo il tuo formato desiderato
                               relazione.intervento?.data!= null
-                                  ? '${relazione.intervento?.data!.day}/${relazione.intervento?.data!.month}/${relazione.intervento?.data!.year}'
+                                  ? '${relazione.intervento?.data!.day.toString().padLeft(2, '0')}/${relazione.intervento?.data!.month.toString().padLeft(2, '0')}/${relazione.intervento?.data!.year}'
                                   : 'Data non disponibile',
                               style: TextStyle(
                                 fontSize: 13, // Stile opzionale per la data
@@ -547,7 +547,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                             Text(
                               relazione.intervento?.orario_appuntamento!= null
-                                  ? '${relazione.intervento?.orario_appuntamento?.hour}:${relazione.intervento?.orario_appuntamento?.minute}'
+                                  ? '${relazione.intervento?.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${relazione.intervento?.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                   : 'Nessun orario di appuntamento',
                               style: TextStyle(
                                 fontSize: 13,
