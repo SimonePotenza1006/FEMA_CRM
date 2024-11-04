@@ -42,7 +42,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllGruppi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi');
+      var apiUrl = Uri.parse('$ipaddress/api/gruppi');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -255,7 +255,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<List<InterventoModel>> getInterventiByGruppo(String gruppoId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/gruppo/$gruppoId');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/$gruppoId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -344,7 +344,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveImporto(GruppoInterventiModel gruppo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/gruppi'),
+        Uri.parse('$ipaddress/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': gruppo.id,
