@@ -43,7 +43,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -63,7 +63,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -83,7 +83,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllAziende() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/azienda'));
+      final response = await http.get(Uri.parse('$ipaddress/api/azienda'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<AziendaModel> aziende = [];
