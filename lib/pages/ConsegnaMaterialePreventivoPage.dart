@@ -177,7 +177,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAziende() async{
     try{
       var apiUrl = Uri.parse(
-        '$ipaddressProva/api/azienda'
+        '$ipaddress/api/azienda'
       );
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
@@ -218,7 +218,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddressProva/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -343,7 +343,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       late http.Response response;
       try {
         response = await http.post(
-          Uri.parse('$ipaddressProva/api/preventivo'),
+          Uri.parse('$ipaddress/api/preventivo'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -384,7 +384,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddressProva/api/destinazione/cliente/${widget.preventivo.cliente?.id}'));
+          '$ipaddress/api/destinazione/cliente/${widget.preventivo.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

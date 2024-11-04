@@ -173,7 +173,6 @@ class InterventoModel {
     gruppo = map['gruppo'] != null ? GruppoInterventiModel.fromMap(map['gruppo']) : null;
   }
 
-
   Map<String, dynamic> toJson() => {
     'id': id,
     'attivo' : attivo,
