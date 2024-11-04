@@ -97,6 +97,8 @@ class MovimentiModel {
       return TipoMovimentazione.Prelievo;
     } else if (tipoMovimentazione == 'Versamento'){
       return TipoMovimentazione.Versamento;
+    } else if(tipoMovimentazione == 'Chiusura'){
+      return TipoMovimentazione.Chiusura;
     } else {
       throw Exception('Valore non valido per TipoMovimentazione: $tipoMovimentazione');
     }
@@ -111,5 +113,6 @@ enum TipoMovimentazione {
   Acconto,
   Pagamento,
   Prelievo,
-  Versamento
+  Versamento,
+  Chiusura
 }

@@ -51,8 +51,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   GlobalKey<SfSignaturePadState> _signaturePadKey =
   GlobalKey<SfSignaturePadState>();
 
-
-
   @override
   void initState() {
     super.initState();
@@ -62,8 +60,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   Widget build(BuildContext context) {
-    //double fondoCassa = calcolaFondoCassa(movimentiList);
-    //fondoCassa = fondoCassa.clamp(0, 10000);
     fondoCassa = double.parse(
         fondoCassa.toStringAsFixed(2));
     return Scaffold(
@@ -141,6 +137,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     });
                   },
                 ),
+                SpeedDialChild(
+                  child: Icon(Icons.balance_sharp, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Chiusura cassa'.toUpperCase(),
+                  onTap: (){
+                    openChiusuraDialog(context, fondoCassa);
+                  },
+                )
               ],
             ),
           ),
@@ -325,10 +329,36 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  void openChiusuraDialog(BuildContext context, double fondoCassa) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Conferma Chiusura'),
+          content: Text('Confermare la chiusura con un fondo cassa pari a $fondoCassa€?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                confermaChiusura(); // Chiama la funzione di conferma chiusura
+              },
+              child: Text('Sì'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Chiude il dialog senza confermare
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> deletePics(MovimentiModel movimento) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
+        Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
         headers: {'Content-Type': 'application/json'},
       );
       if(response.statusCode == 204){
@@ -345,7 +375,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deleteMovimentazione(MovimentiModel movimento) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/movimenti/${movimento.id}'),
+        Uri.parse('$ipaddressProva/api/movimenti/${movimento.id}'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -500,6 +530,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       return 'Prelievo';
     } else if (tipoMovimentazione == TipoMovimentazione.Versamento){
       return 'Versamento';
+    } else if (tipoMovimentazione == TipoMovimentazione.Chiusura){
+      return 'Chiusura';
     } else {
       return 'Informazione non disponibile';
     }
@@ -519,64 +551,86 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     return fondoCassa;
   }
 
-  Future<void> getAllMovimentazioniExcel() async{
-    try{
-      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
-      var response = await http.get(apiUrl);
-      if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
-        List<MovimentiModel> movimenti = [];
-        for(var item in jsonData){
-          MovimentiModel movimento = MovimentiModel.fromJson(item);
-          DateTime now = DateTime.now();
-          DateTime startOfWeek = DateTime(now.year, now.month, now.day - now.weekday + 1);
-          DateTime endOfWeek = startOfWeek.add(Duration(days: 7));
-          if (movimento.dataCreazione!.isAfter(startOfWeek) && movimento.dataCreazione!.isBefore(endOfWeek)) {
-            movimenti.add(movimento);
-          }
-        }
-        setState(() {
-          movimentiList2 = movimenti;
-        });
-      }
-    } catch(e){
-      print('Error $e');
-    }
-  }
-
-  Future<void> getAllMovimentazioni() async {
+  Future<void> getAllMovimentazioniExcel() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/movimenti/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<MovimentiModel> movimenti = [];
+        DateTime? lastChiusuraDate;
+        // Primo loop per trovare la data dell'ultimo movimento di tipo "Chiusura"
         for (var item in jsonData) {
           MovimentiModel movimento = MovimentiModel.fromJson(item);
-          DateTime now = DateTime.now();
-          DateTime startOfWeek = DateTime(now.year, now.month, now.day - now.weekday + 1);
-          DateTime endOfWeek = startOfWeek.add(Duration(days: 7));
-          if (movimento.dataCreazione!.isAfter(startOfWeek) && movimento.dataCreazione!.isBefore(endOfWeek)) {
-            movimenti.add(movimento);
-          }
-          DateTime startOfPreviousWeek1 = startOfWeek.subtract(Duration(days: 7));
-          DateTime endOfPreviousWeek1 = startOfWeek;
-          DateTime startOfPreviousWeek2 = startOfWeek.subtract(Duration(days: 14));
-          DateTime endOfPreviousWeek2 = startOfPreviousWeek1;
-          DateTime startOfPreviousWeek3 = startOfWeek.subtract(Duration(days: 21));
-          DateTime endOfPreviousWeek3 = startOfPreviousWeek2;
-          if (movimento.dataCreazione!.isAfter(startOfPreviousWeek1) && movimento.dataCreazione!.isBefore(endOfPreviousWeek1)) {
-            fondoCassaSettimana1 = calcolaFondoCassa([movimento]);
-          } else if (movimento.dataCreazione!.isAfter(startOfPreviousWeek2) && movimento.dataCreazione!.isBefore(endOfPreviousWeek2)) {
-            fondoCassaSettimana2 = calcolaFondoCassa([movimento]);
-          } else if (movimento.dataCreazione!.isAfter(startOfPreviousWeek3) && movimento.dataCreazione!.isBefore(endOfPreviousWeek3)) {
-            fondoCassaSettimana3 = calcolaFondoCassa([movimento]);
+          if (movimento.tipo_movimentazione == TipoMovimentazione.Chiusura) {
+            if (lastChiusuraDate == null || movimento.dataCreazione!.isAfter(lastChiusuraDate)) {
+              lastChiusuraDate = movimento.dataCreazione;
+            }
           }
         }
+        // Se troviamo una data di chiusura valida, usiamola come data di inizio
+        DateTime startDate = lastChiusuraDate ?? DateTime(2000); // Default inizio lontano se non ci sono chiusure
+        // Secondo loop per raccogliere i movimenti dopo la data di chiusura
+        for (var item in jsonData) {
+          MovimentiModel movimento = MovimentiModel.fromJson(item);
+          if (movimento.dataCreazione != null && movimento.dataCreazione!.isAfter(startDate)) {
+            movimenti.add(movimento);
+          }
+        }
+        // Aggiornamento dello stato con la lista dei movimenti trovati
         setState(() {
-          fondoCassa = calcolaFondoCassa(movimenti);
-          movimentiList = movimenti; // Calculate fondoCassa here
+          movimentiList2 = movimenti;
         });
+      }
+    } catch (e) {
+      print('Error $e');
+    }
+  }
+
+
+  Future<void> getAllMovimentazioni() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti/ordered');
+      var response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<MovimentiModel> movimenti = [];
+        List<DateTime> dateChiusure = [];
+
+        // Prima iterazione per individuare tutte le date di "Chiusura"
+        for (var item in jsonData) {
+          MovimentiModel movimento = MovimentiModel.fromJson(item);
+
+          // Memorizza le date di "Chiusura" e aggiungi solo i movimenti non di chiusura
+          if (movimento.tipo_movimentazione == TipoMovimentazione.Chiusura) {
+            dateChiusure.add(movimento.dataCreazione!);
+          } else {
+            movimenti.add(movimento); // Aggiungi solo movimenti non di chiusura
+          }
+        }
+
+        // Ordina le date di chiusura in ordine decrescente per trovare l'ultima chiusura
+        dateChiusure.sort((a, b) => b.compareTo(a));
+        DateTime? ultimaDataChiusura = dateChiusure.isNotEmpty ? dateChiusure.first : null;
+
+        // Filtra ulteriormente i movimenti per includere solo quelli successivi all'ultima "Chiusura"
+        List<MovimentiModel> movimentiFiltrati = [];
+        if (ultimaDataChiusura != null) {
+          movimentiFiltrati = movimenti.where((movimento) =>
+          movimento.dataCreazione != null &&
+              movimento.dataCreazione!.isAfter(ultimaDataChiusura)
+          ).toList();
+        } else {
+          movimentiFiltrati = movimenti; // Se non ci sono chiusure, mostra tutti i movimenti
+        }
+
+        // Calcola il fondo cassa basato sui movimenti filtrati
+        setState(() {
+          fondoCassa = calcolaFondoCassa(movimentiFiltrati);
+          movimentiList = movimentiFiltrati; // Mostra solo i movimenti filtrati
+        });
+
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
@@ -602,6 +656,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       );
     }
   }
+
 
   void _showConfirmationDialog() {
     showDialog(
@@ -851,10 +906,69 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  void confermaChiusura() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Evita la chiusura del dialog finché l'operazione è in corso
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/movimenti'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data': DateTime.now().toIso8601String(),
+          'descrizione': "Chiusura cassa al ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}".toUpperCase(),
+          'tipo_movimentazione': "Chiusura",
+          'importo': 0,
+          'utente': widget.userData.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        // Attesa di 1,5 secondi prima di chiamare la funzione `saveFondocassaAfterChiusura`
+        await Future.delayed(Duration(milliseconds: 1500));
+        await saveFondocassaAfterChiusura();
+      }
+    } catch (e) {
+      print('Qualcosa non va $e');
+    } finally {
+      // Chiudi il dialog di caricamento al termine dell'operazione
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> saveFondocassaAfterChiusura() async {
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/movimenti'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data': DateTime.now().toIso8601String(),
+          'descrizione': "Fondo cassa al ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}".toUpperCase(),
+          'tipo_movimentazione': "Versamento",
+          'importo': fondoCassa,
+          'utente': widget.userData.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        setState(() {
+          getAllMovimentazioni(); // Ricarica la lista dei movimenti
+        });
+      }
+    } catch (e) {
+      print('Errore 2: $e');
+    }
+  }
+
+
   Future<void> addUscita() async{
     try{
        final response = await http.post(
-         Uri.parse('$ipaddress/api/movimenti'),
+         Uri.parse('$ipaddressProva/api/movimenti'),
          headers: {'Content-Type': 'application/json'},
          body: jsonEncode({
            'data': DateTime.now().toIso8601String(),
@@ -892,7 +1006,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> addPrelievo(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
@@ -929,7 +1043,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> addVersamento(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
