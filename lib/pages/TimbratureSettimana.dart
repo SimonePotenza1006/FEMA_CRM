@@ -359,7 +359,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
       Text textWidget = columnA.children.first as Text;
       List<String> parts = textWidget.data!.split(' ');
-      print('ppaart '+parts[0].toString());
+      //print('ppaart '+parts[0].toString());
       int settimanaA;
       try {
         settimanaA = getSettimana(DateFormat('dd/MM/yyyy').parse(parts[0].trim()));//int.parse(parts[1]);
@@ -367,7 +367,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         // Handle the case where the week number cannot be parsed
         settimanaA = 0; // or some other default value
       }
-print('ssA '+settimanaA.toString());
+      //print('ssA '+settimanaA.toString());
       Text textWidget2 = columnB.children.first as Text;
       List<String> parts2 = textWidget2.data!.split(' ');
       int settimanaB;
@@ -543,18 +543,18 @@ print('ssA '+settimanaA.toString());
       groupedTimbrature[timbratura.utente!.id!]!.add(timbratura);
     });*/
     //groupedTimbrature = groupBy(allTimbratureEdit, (timbratura) => timbratura.utente);
-    print('vvbcs');
+    //print('vvbcs');
     // Ordina per data
     /*groupedTimbrature.forEach((utente, timbrature) {
       timbrature.sort((a, b) => b.data!.toIso8601String().compareTo(a.data!.toIso8601String()));
     });*/
-    print('azaaza');
+    //print('azaaza');
     // Assegna il risultato a allTimbratureEdit
     /*allTimbratureEdit.clear();
     groupedTimbrature.forEach((utente, timbrature) {
       allTimbratureEdit.addAll(timbrature);
     });*/
-    print(allTimbratureEdit.last.id.toString()+' brbas');
+    //print(allTimbratureEdit.last.id.toString()+' brbas');
 
     _rows.clear();//_rows = [];
     groupedTimbrature.forEach((key, timbrature) {
@@ -564,7 +564,7 @@ print('ssA '+settimanaA.toString());
       });*/
       if (timbrature.length > 0) {
         MarcaTempoModel firstTimbratura = timbrature[0];
-        print('abc '+timbrature[0].id.toString());
+        //print('abc '+timbrature[0].id.toString());
         MarcaTempoModel? secondTimbratura = null;
         if (timbrature.length > 1) secondTimbratura = timbrature[1];
 

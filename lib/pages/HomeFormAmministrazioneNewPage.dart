@@ -303,7 +303,7 @@ class _HomeFormAmministrazioneNewPageState
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
         for(var item in responseData){
           RelazioneUtentiInterventiModel relazione = RelazioneUtentiInterventiModel.fromJson(item);
-          if(relazione.intervento?.concluso == false){
+          if(relazione.intervento?.concluso != true){
             allRelazioniByUtente.add(relazione);
           }
         }
@@ -328,7 +328,9 @@ class _HomeFormAmministrazioneNewPageState
         for (var interventoJson in responseData) {
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           // Aggiungi il filtro per interventi non conclusi
-          allInterventiByUtente.add(intervento);
+          if(intervento.concluso != true){
+            allInterventiByUtente.add(intervento);
+          }
         }
         return allInterventiByUtente;
       } else {
@@ -349,7 +351,9 @@ class _HomeFormAmministrazioneNewPageState
         List<InterventoModel> interventi = [];
         for(var interventoJson in responseData){
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
-          interventi.add(intervento);
+          if(intervento.concluso != true){
+            interventi.add(intervento);
+          }
         }
         return interventi;
       } else {
@@ -579,7 +583,9 @@ class _HomeFormAmministrazioneNewPageState
         for (var item in jsonData) {
           try {
             var intervento = InterventoModel.fromJson(item);
+
             interventi.add(intervento);
+
           } catch (e) {
             print('Errore nella creazione di InterventoModel: $e');
           }

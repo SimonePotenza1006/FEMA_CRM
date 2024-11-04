@@ -5,7 +5,6 @@ import 'package:fema_crm/pages/CalendarioUtentePage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneTecnicoPage.dart';
 import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'package:fema_crm/pages/FormOrdineFornitorePage.dart';
-import 'package:fema_crm/pages/ListInterventiTecnicoPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -27,16 +26,16 @@ import 'MenuSopralluoghiTecnicoPage.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 
-class HomeFormTecnicoNewPage extends StatefulWidget{
+class ListInterventiTecnicoPage extends StatefulWidget{
   final UtenteModel? userData;
 
-  const HomeFormTecnicoNewPage({Key? key, required this.userData}) : super(key:key);
+  const ListInterventiTecnicoPage({Key? key, required this.userData}) : super(key:key);
 
   @override
-  _HomeFormTecnicoNewPageState createState() => _HomeFormTecnicoNewPageState();
+  _ListInterventiTecnicoPageState createState() => _ListInterventiTecnicoPageState();
 }
 
-class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
+class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   DateTime selectedDate = DateTime.now();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
@@ -64,7 +63,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     MenuItem(icon: Icons.remove_red_eye_outlined, label: 'SOPRALLUOGHI'),
     MenuItem(icon: Icons.emoji_transportation_sharp, label: 'SPESE SU VEICOLO'),
     MenuItem(icon: Icons.calendar_month_sharp, label: 'CALENDARIO'),
-    MenuItem(icon: Icons.build, label: 'INTERVENTI'),
+    //MenuItem(icon: Icons.build, label: 'CREA INTERVENTO'),
   ];
 
   int _calculateHoveredIndex(Offset position) {
@@ -78,7 +77,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<void> saveIngresso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/ingresso'),
+        Uri.parse('$ipaddress/api/ingresso'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'orario': formattedDate,
@@ -95,7 +94,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -119,7 +118,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -142,7 +141,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getMerce(String userId) async{
     try{
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -166,7 +165,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -180,7 +179,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
 
         //getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate);
         http.Response response2 = await http
-            .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
+            .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
         if (response2.statusCode == 200) {
           var responseData2 = json.decode(response2.body);
           //print('rrdd2 '+responseData2.toString());
@@ -297,12 +296,12 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData!)),
         );
         break;
-      case 5:
+      /*case 5:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ListInterventiTecnicoPage(userData: widget.userData)),//InterventoTecnicoForm(userData: widget.userData!)),
+          MaterialPageRoute(builder: (context) => InterventoTecnicoForm(userData: widget.userData!)),
         );
-        break;
+        break;*/
       }
     }
   }
@@ -310,7 +309,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -334,7 +333,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getAllInterventi() async {
     try {
       print('getAllInterventi chiamato');
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -360,7 +359,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Home ${widget.userData!.nomeCompleto().toString()}',
+          'INTERVENTI',//'Home ${widget.userData!.nomeCompleto().toString()}',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -377,7 +376,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
               });
             },
           ),
-          IconButton(
+          /*IconButton(
             icon: Icon(
               Icons.logout,
               color: Colors.white,
@@ -388,11 +387,11 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                 MaterialPageRoute(builder: (context) => LoginForm()),
               );
             },
-          ),
+          ),*/
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.only(top: 40, bottom: 40),
+        padding: EdgeInsets.only(top: 12, bottom: 20),
         child: LayoutBuilder(
             builder: (context, constraints){
               if (constraints.maxWidth <= 800) {
@@ -400,7 +399,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                 return SingleChildScrollView(
                   child: Column(
                     children: [
-                      Column(
+                      /*Column(
                         children: [
                           GestureDetector(
                             onTapUp: (details) {
@@ -435,8 +434,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             ),
                           ),
                         ],
-                      ),
-                      SizedBox(height: 25),
+                      ),*/
+                      //SizedBox(height: 25),
                       widget.userData!.id != '19' ? Wrap(children: <Widget>[  //joytek 19
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -2081,7 +2080,7 @@ class MenuPainter extends CustomPainter {
     MenuItem(icon: Icons.remove_red_eye_outlined, label: 'SOPRALLUOGHI'),
     MenuItem(icon: Icons.emoji_transportation_sharp, label: 'SPESE SU VEICOLO'),
     MenuItem(icon: Icons.calendar_month_sharp, label: 'CALENDARIO'),
-    MenuItem(icon: Icons.build, label: 'INTERVENTI'),
+    //MenuItem(icon: Icons.build, label: 'CREA INTERVENTO'),
   ];
 
   TextPainter labelPainter = TextPainter(
