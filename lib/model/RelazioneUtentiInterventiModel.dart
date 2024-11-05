@@ -5,18 +5,21 @@ class RelazioneUtentiInterventiModel{
   int? id;
   InterventoModel? intervento;
   UtenteModel? utente;
+  bool? visualizzato;
 
   RelazioneUtentiInterventiModel({
     this.id,
     this.intervento,
-    this.utente
+    this.utente,
+    this.visualizzato
   });
 
   Map<String, dynamic> toMap(){
     return{
       'id' : id,
       'intervento' : intervento?.toMap(),
-      'utente' : utente?.toMap()
+      'utente' : utente?.toMap(),
+      'visualizzato' : visualizzato,
     };
   }
 
@@ -25,6 +28,7 @@ class RelazioneUtentiInterventiModel{
       id: map['id'],
       intervento: InterventoModel.fromMap(map['intervento']),
       utente: UtenteModel.fromMap(map['utente']),
+      visualizzato: map['visualizzato']
     );
   }
 
@@ -32,13 +36,15 @@ class RelazioneUtentiInterventiModel{
     'id': id,
     'intervento': intervento?.toJson(),
     'utente' : utente?.toJson(),
+    'visualizzato' : visualizzato,
   };
 
   factory RelazioneUtentiInterventiModel.fromJson(Map<String, dynamic> json){
     return RelazioneUtentiInterventiModel(
       id: json['id'],
       intervento: InterventoModel.fromJson(json['intervento']),
-      utente: UtenteModel.fromJson(json['utente'])
+      utente: UtenteModel.fromJson(json['utente']),
+      visualizzato: json['visualizzato']
     );
   }
 }

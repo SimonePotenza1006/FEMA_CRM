@@ -641,6 +641,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id,
           'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
           'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -740,6 +741,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'attivo' :false,
+          'visualizzato' :widget.intervento.visualizzato,
           'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
@@ -802,6 +804,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
           'titolo' : titoloController.text.toUpperCase(),
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
@@ -863,6 +866,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
           'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
@@ -921,6 +925,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
           'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
@@ -2710,6 +2715,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
           'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
           'titolo' : titoloController.text.toUpperCase(),
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
@@ -3133,6 +3139,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': widget.intervento.id,
           'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
           'titolo' : widget.intervento.titolo,
           'numerazione_danea' : widget.intervento.numerazione_danea,
           'priorita' : widget.intervento.priorita.toString().split('.').last,
@@ -3208,7 +3215,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           body: jsonEncode({
             'id': widget.intervento.id,
             'attivo' : widget.intervento.attivo,
-            'titolo' : widget.intervento.titolo,
+            'visualizzato' : widget.intervento.visualizzato,
             'numerazione_danea' : widget.intervento.numerazione_danea,
             'priorita' : widget.intervento.priorita.toString().split('.').last,
             'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),

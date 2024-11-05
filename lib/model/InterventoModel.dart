@@ -11,6 +11,7 @@ import 'VeicoloModel.dart';
 class InterventoModel {
   String? id;
   bool? attivo;
+  bool? visualizzato;
   String? numerazione_danea;
   Priorita? priorita;
   String? titolo;
@@ -50,6 +51,7 @@ class InterventoModel {
   InterventoModel(
       this.id,
       this.attivo,
+      this.visualizzato,
       this.numerazione_danea,
       this.priorita,
       this.titolo,
@@ -91,6 +93,7 @@ class InterventoModel {
     var map = <String, dynamic>{
       'id': id,
       'attivo' : attivo,
+      'visualizzato' : visualizzato,
       'numerazione_danea' : numerazione_danea,
       'priorita' : priorita.toString().split('.').last,
       'titolo' : titolo,
@@ -135,6 +138,7 @@ class InterventoModel {
   InterventoModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     attivo = map['attivo'];
+    visualizzato = map['visualizzato'];
     numerazione_danea = map['numerazione_danea'];
     priorita = Priorita.values.firstWhere(
             (type) => type.toString() == 'priorita.${map['priorita']}');
@@ -176,6 +180,7 @@ class InterventoModel {
   Map<String, dynamic> toJson() => {
     'id': id,
     'attivo' : attivo,
+    'visualizzato' : visualizzato,
     'numerazione_danea' : numerazione_danea,
     'priorita' : priorita.toString().split('.').last,
     'titolo' : titolo,
@@ -218,6 +223,7 @@ class InterventoModel {
     return InterventoModel(
       json['id']?.toString(),
       json['attivo'],
+      json['visualizzato'],
       json['numerazione_danea']?.toString(),
       _getPrioritaFromString(json['priorita']),
       json['titolo'],

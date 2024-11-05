@@ -106,7 +106,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         List<InterventoModel> interventi = [];
         for(var interventoJson in responseData){
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
-          if (intervento.concluso != null)
+          if (intervento.concluso != true)
             interventi.add(intervento);
         }
         return interventi;
@@ -153,7 +153,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
         for(var item in responseData){
           RelazioneUtentiInterventiModel relazione = RelazioneUtentiInterventiModel.fromJson(item);
-
+          if (relazione.intervento!.concluso != true)
           allRelazioniByUtente.add(relazione);
 
         }
@@ -178,7 +178,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         for (var interventoJson in responseData) {
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           // Aggiungi il filtro per interventi non conclusi
-
+          if (intervento.concluso != true)
           allInterventiByUtente.add(intervento);
 
         }
@@ -610,22 +610,51 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         itemCount: merce.length,
                         itemBuilder:(context, index){
                           InterventoModel singolaMerce = merce[index];
+
+                          // Metodo per mappare la priorità al colore corrispondente
+                          Color getPriorityColor(Priorita priorita) {
+                            switch (priorita) {
+                              case Priorita.BASSA:
+                                return Colors.lightGreen;
+                              case Priorita.MEDIA:
+                                return Colors.yellow; // grigio chiaro
+                              case Priorita.ALTA:
+                                return Colors.orange; // giallo chiaro
+                              case Priorita.URGENTE:
+                                return Colors.red; // azzurro chiaro
+                              default:
+                                return Colors.blueGrey[200]!;
+                            }
+                          }
+
+                          // Determina il colore in base alla priorità
+                          Color backgroundColor =  getPriorityColor(singolaMerce.priorita!);
+
+                          TextStyle textStyle = singolaMerce.concluso ?? false
+                              ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                              : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
                           return Card(
                             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             elevation: 4,
                             shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(16)),
                             child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                               title: Text(
                                 '${singolaMerce.cliente!.denominazione}',
+                                style: textStyle,
                               ),
                               subtitle: Text(
                                 '${singolaMerce.merce?.articolo}',
+                                style: textStyle,
                               ),
                               trailing: Column(
                                 children: [
-                                  Text('Data arrivo merce:'),
+                                  Text('Data arrivo merce:',
+                                    style: TextStyle(fontSize: 13, color: Colors.black)),
                                   SizedBox(height: 3),
-                                  Text('${singolaMerce.data_apertura_intervento != null ? intl.DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}')
+                                  Text('${singolaMerce.data_apertura_intervento != null ? intl.DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}',
+                                      style: TextStyle(fontSize: 13, color: Colors.black))
                                 ],
                               ),
                               onTap: (){
@@ -642,7 +671,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               },
                               tileColor: Colors.white60,
                               shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                side: BorderSide(color: getPriorityColor(singolaMerce!.priorita!), width: 8),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),

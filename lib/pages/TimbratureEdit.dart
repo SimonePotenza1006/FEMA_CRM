@@ -283,12 +283,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       groupedTimbrature[timbratura.utente!.id!]!.add(timbratura);
     });*/
     //groupedTimbrature = groupBy(allTimbratureEdit, (timbratura) => timbratura.utente);
-    print('vvbcs');
+    //print('vvbcs');
     // Ordina per data
     /*groupedTimbrature.forEach((utente, timbrature) {
       timbrature.sort((a, b) => b.data!.toIso8601String().compareTo(a.data!.toIso8601String()));
     });*/
-    print('azaaza');
+    //print('azaaza');
     // Assegna il risultato a allTimbratureEdit
     /*allTimbratureEdit.clear();
     groupedTimbrature.forEach((utente, timbrature) {
@@ -304,7 +304,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       });*/
       if (timbrature.length > 0) {
         MarcaTempoModel firstTimbratura = timbrature[0];
-        print('abc '+timbrature[0].id.toString());
+        //print('abc '+timbrature[0].id.toString());
         MarcaTempoModel? secondTimbratura = null;
         if (timbrature.length > 1) secondTimbratura = timbrature[1];
 
@@ -591,7 +591,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         setState(() {
           allTimbratureEdit = allMarcatempos;
           //groupAndSortTimbrature();
-          print('timbr '+allMarcatempos.first.id.toString());
+          //print('timbr '+allMarcatempos.first.id.toString());
         });
 
       }
@@ -858,7 +858,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
         }
-        print('lopjhg '+utenti.length.toString());
+        //print('lopjhg '+utenti.length.toString());
         return utenti;
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -934,7 +934,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         // Annulla la riga precedente se ne esiste una
         _rowsNew.removeWhere((row) => row.isNewRow);
       }
-      print('vbbva');
+      //print('vbbva');
       /*_rows.insert(0, _RowData(//_rows.add(_RowData(
         idmt: '',
         utente: widget.utente,
@@ -1273,7 +1273,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         ])],
       );
       _tables.insert(0, newTable);
-      print('ew43');
+      //print('ew43');
     });
   }
 

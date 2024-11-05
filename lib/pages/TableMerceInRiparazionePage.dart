@@ -667,6 +667,7 @@ class InterventoDataSource extends DataGridSource{
         body: jsonEncode({
           'id': intervento.id,
           'attivo' : intervento.attivo,
+          'visualizzato' : intervento.visualizzato,
           'titolo' : intervento.titolo,
           'numerazione_danea' : codiceDaneaController.text.isNotEmpty ? codiceDaneaController.text : "N/A",
           'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),

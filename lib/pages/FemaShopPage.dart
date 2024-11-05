@@ -646,6 +646,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'attivo' : true,
+          'visualizzato' : false,
           'numerazione_danea' : null,
           'titolo' : "Vendita al banco",
           'data': DateTime.now().toIso8601String(),

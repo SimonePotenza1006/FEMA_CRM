@@ -742,6 +742,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': selectedIntervento?.id,
           'attivo' : selectedIntervento?.attivo,
+          'visualizzato' : selectedIntervento?.visualizzato,
           'titolo' : selectedIntervento?.titolo,
           'priorita' : selectedIntervento?.priorita.toString().split('.').last,
           'numerazione_danea' : selectedIntervento?.numerazione_danea,
@@ -800,6 +801,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         body: jsonEncode({
           'id': selectedIntervento?.id,
           'attivo' : selectedIntervento?.attivo,
+          'visualizzato' : selectedIntervento?.visualizzato,
           'titolo' : selectedIntervento?.titolo,
           'priorita' : selectedIntervento?.priorita.toString().split('.').last,
           'numerazione_danea' : selectedIntervento?.numerazione_danea,
