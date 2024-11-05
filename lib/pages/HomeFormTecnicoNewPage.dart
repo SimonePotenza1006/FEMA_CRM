@@ -173,7 +173,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         for (var interventoJson in responseData) {
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           // Aggiungi il filtro per interventi non conclusi
-          if(intervento.merce == null && intervento.concluso != true){
+          if(intervento.merce == null && intervento.concluso != true && intervento.visualizzato != true){
             allInterventiByUtente.add(intervento);
           }
         }
@@ -187,7 +187,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           //List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
           for(var item in responseData2){
             RelazioneUtentiInterventiModel relazione = RelazioneUtentiInterventiModel.fromJson(item);
-            if(relazione.intervento!.concluso != true){
+            if(relazione.intervento!.concluso != true && relazione.visualizzato != true){
               //print('rrrlint '+relazione.intervento!.toString());
               allInterventiByUtente.add(relazione.intervento!);
             }
@@ -352,6 +352,115 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     } catch (e) {
       print('Errore durante la chiamata all\'API getAllInterventi: $e');
       return [];
+    }
+  }
+
+  void interventoVisualizzato(InterventoModel intervento) async{
+    try{
+      print('iinnt '+intervento.utente.toString()+' '+widget.userData.toString());
+      if (intervento.utente != null && intervento.utente!.id == widget.userData!.id) {
+        print('è interv ');
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.id?.toString(),
+          'attivo' : intervento.attivo,
+          'visualizzato' : true,
+          'titolo' : intervento.titolo,
+          'numerazione_danea' : intervento.numerazione_danea,
+          'priorita' : intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),
+          'data': intervento.data?.toIso8601String(),
+          'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : intervento.posizione_gps,//_indirizzo,
+          'orario_inizio': intervento.orario_inizio?.toIso8601String(),//DateTime.now().toIso8601String(),
+          'orario_fine': intervento.orario_fine?.toIso8601String(),
+          'descrizione': intervento.descrizione,
+          'importo_intervento': intervento.importo_intervento,
+          'saldo_tecnico' : intervento.saldo_tecnico,
+          'prezzo_ivato' : intervento.prezzo_ivato,
+          'iva' : intervento.iva,
+          'acconto' : intervento.acconto,
+          'assegnato': intervento.assegnato,
+          'accettato_da_tecnico' : intervento.accettato_da_tecnico,
+          'annullato' : intervento.annullato,
+          'conclusione_parziale' : intervento.conclusione_parziale,
+          'concluso': intervento.concluso,
+          'saldato': intervento.saldato,
+          'saldato_da_tecnico' : intervento.saldato_da_tecnico,
+          'note': intervento.note,
+          'relazione_tecnico' : intervento.relazione_tecnico,
+          'firma_cliente': intervento.firma_cliente,
+          'utente_apertura' : intervento.utente_apertura?.toMap(),
+          'utente': intervento.utente?.toMap(),
+          'cliente': intervento.cliente?.toMap(),
+          'veicolo': intervento.veicolo?.toMap(),
+          'merce': intervento.merce?.toMap(),
+          'tipologia': intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+            intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': intervento.tipologia_pagamento?.toMap(),
+          'destinazione': intervento.destinazione?.toMap(),
+          'gruppo' : intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento visualizzato!'),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.userData)),
+        );
+      } } else
+        {
+          print('è relaz ');
+          RelazioneUtentiInterventiModel? relazioneiu = null;
+          http.Response response2 = await http
+              .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/interventoutente/'+intervento.id.toString()+'/'+widget.userData!.id.toString()));
+          if (response2.statusCode == 200) {
+            print('res st 200 ');
+            var responseData2 = json.decode(response2.body);
+            //print('rrdd2 '+responseData2.toString());
+            //List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
+
+              RelazioneUtentiInterventiModel relazione = RelazioneUtentiInterventiModel.fromJson(responseData2);
+              if(relazione.intervento!.concluso != true && relazione.visualizzato != true){
+                //print('rrrlint '+relazione.intervento!.toString());
+                relazioneiu = RelazioneUtentiInterventiModel.fromJson(responseData2);
+              }
+
+            //return allRelazioniByUtente;
+          }//else {return [];}
+          print('res st 200 '+relazioneiu!.id.toString());
+          final response = await http.post(
+            Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'id': relazioneiu!.id,
+              'intervento': relazioneiu!.intervento?.toMap(),
+              'utente': relazioneiu!.utente?.toMap(),
+              'visualizzato': true
+            }),
+          );
+          print(response.statusCode);
+          if(response.statusCode == 200){
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Intervento visualizzato!'),
+              ),
+            );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.userData)),
+            );
+          }
+        }
+    } catch(e){
+      print('Qualcosa non va: $e');
     }
   }
 
@@ -553,7 +662,44 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       ],
                                     ),
                                     onTap: () {
-                                      Navigator.push(
+                                      showDialog(
+                                      //barrierDismissible: false,
+                                      context: context,
+                                      builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                        title: new Text(''+intervento.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                                        content: new Text('Cliente: '+intervento.cliente!.denominazione!+'\n'+intervento!.destinazione!.indirizzo!+'\n'
+                                        +'\nData: '+
+                                            (intervento.data != null
+                                            ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
+                                            : 'Nessun appuntamento stabilito')+
+                                        '\nOrario appuntamento: '+ (intervento.orario_appuntamento != null
+                                            ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                            : 'Nessun orario stabilito'), style: TextStyle(fontSize: 14)),
+                                        actions: <Widget>[
+                                          Form(
+                                              //key: _formKeyLice,
+                                              //autovalidateMode: AutovalidateMode.onUserInteraction,
+                                              child:
+                                              Column(
+                                                //scrollDirection: Axis.vertical,
+                                                //direction: Axis.vertical,
+                                                  children: [
+
+
+
+                                                    TextButton(
+                                                      onPressed: () {
+                                                       interventoVisualizzato(intervento);},
+                                                      //Navigator.of(context).pop(true), // <-- SEE HERE
+                                                      child: new Text('PRESA VISIONE', style: TextStyle(
+                                                          fontSize: 22.0,
+                                                          fontWeight: FontWeight.w600),),
+                                                    ),
+                                                  ]))
+                                        ],
+                                      ),
+                                      );
+                                      /*Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => DettaglioInterventoByTecnicoPage(
@@ -561,7 +707,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                             intervento: intervento,
                                           ),
                                         ),
-                                      );
+                                      );*/
                                     },
                                     tileColor: Colors.white60,
                                     shape: RoundedRectangleBorder(
