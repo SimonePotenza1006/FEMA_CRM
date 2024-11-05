@@ -565,7 +565,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
+          '$ipaddressProva/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
