@@ -73,6 +73,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         actions: [
           IconButton(
             icon: Icon(
+              Icons.balance,
+              color: Colors.white,
+            ),
+            onPressed: (){
+              openChiusuraDialog(context, fondoCassa);
+            },
+          ),
+          IconButton(
+            icon: Icon(
               Icons.refresh,
               color: Colors.white,
             ),
@@ -137,14 +146,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     });
                   },
                 ),
-                SpeedDialChild(
-                  child: Icon(Icons.balance_sharp, color: Colors.white),
-                  backgroundColor: Colors.red,
-                  label: 'Chiusura cassa'.toUpperCase(),
-                  onTap: (){
-                    openChiusuraDialog(context, fondoCassa);
-                  },
-                )
               ],
             ),
           ),
@@ -358,7 +359,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deletePics(MovimentiModel movimento) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
+        Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
         headers: {'Content-Type': 'application/json'},
       );
       if(response.statusCode == 204){
@@ -375,7 +376,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deleteMovimentazione(MovimentiModel movimento) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/movimenti/${movimento.id}'),
+        Uri.parse('$ipaddressProva/api/movimenti/${movimento.id}'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -553,7 +554,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMovimentazioniExcel() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -590,7 +591,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMovimentazioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/movimenti/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti/ordered');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -610,9 +611,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           }
         }
 
+        // Stampa tutte le date di chiusura individuate
+        print('Date di chiusura trovate: $dateChiusure');
+
         // Ordina le date di chiusura in ordine decrescente per trovare l'ultima chiusura
         dateChiusure.sort((a, b) => b.compareTo(a));
         DateTime? ultimaDataChiusura = dateChiusure.isNotEmpty ? dateChiusure.first : null;
+
+        // Stampa l'ultima data di chiusura
+        print('Ultima data di chiusura: $ultimaDataChiusura');
 
         // Filtra ulteriormente i movimenti per includere solo quelli successivi all'ultima "Chiusura"
         List<MovimentiModel> movimentiFiltrati = [];
@@ -624,6 +631,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         } else {
           movimentiFiltrati = movimenti; // Se non ci sono chiusure, mostra tutti i movimenti
         }
+
+        // Stampa i movimenti che saranno mostrati a schermo
+        print('Movimenti dopo l\'ultima chiusura (da mostrare a schermo): $movimentiFiltrati');
 
         // Calcola il fondo cassa basato sui movimenti filtrati
         setState(() {
@@ -656,6 +666,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       );
     }
   }
+
 
 
   void _showConfirmationDialog() {
@@ -918,7 +929,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -944,7 +955,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveFondocassaAfterChiusura() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -968,7 +979,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> addUscita() async{
     try{
        final response = await http.post(
-         Uri.parse('$ipaddress/api/movimenti'),
+         Uri.parse('$ipaddressProva/api/movimenti'),
          headers: {'Content-Type': 'application/json'},
          body: jsonEncode({
            'data': DateTime.now().toIso8601String(),
@@ -1006,7 +1017,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> addPrelievo(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
@@ -1043,7 +1054,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> addVersamento(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
