@@ -650,13 +650,13 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         Text(
                                           intervento.data != null
                                               ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
-                                              : 'Nessun appuntamento stabilito',
+                                              : 'Data N.D.',//'Nessun appuntamento stabilito',
                                           style: TextStyle(fontSize: 13, color: Colors.black),
                                         ),
                                         Text(
                                           intervento.orario_appuntamento != null
                                               ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                              : 'Nessun orario stabilito',
+                                              : 'Orario N.D.',//'Nessun orario stabilito',
                                           style: TextStyle(fontSize: 13, color: Colors.black),
                                         ),
                                       ],
