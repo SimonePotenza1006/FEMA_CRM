@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:fema_crm/model/TipologiaInterventoModel.dart';
+import 'package:fema_crm/pages/DettaglioInterventoNewPage.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -271,7 +272,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           _filteredInterventi = _allInterventi.toList();
           break;
         case 1:
-          _filteredInterventi = _allInterventi.where((intervento) => !(intervento.concluso ?? false)).toList();
+          _filteredInterventi = _allInterventi
+              .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
+              .toList();
           break;
         case 2:
           _filteredInterventi = _allInterventi.where((intervento) => (intervento.concluso ?? false) && !(intervento.saldato ?? false)).toList();
@@ -402,7 +405,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     getAllTipologie().whenComplete(() => print('Tipologie ok'));
     getAllUtenti().whenComplete(() => print('Utenti ok'));
     _filteredInterventi = _allInterventi.toList();
-    _changeSheet(0);
+    _changeSheet(1);
     getAllInterventiTot();
   }
 
@@ -1224,18 +1227,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            ElevatedButton(
-                              onPressed: () => _changeSheet(0),
-                              style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                                onPrimary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                elevation: 2.0,
-                              ),
-                              child: Text('Tutti', style: TextStyle(color: Colors.white)),
-                            ),
                             SizedBox(width: 5),
                             ElevatedButton(
                               onPressed: () => _changeSheet(1),
@@ -1288,7 +1279,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               ),
                               child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
                             ),
-                            SizedBox(width: 5),
+                            SizedBox(width : 5),
                             ElevatedButton(
                               onPressed: () => _changeSheet(5),
                               style: ElevatedButton.styleFrom(
@@ -1300,6 +1291,19 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 elevation: 2.0,
                               ),
                               child: Text('Annullati', style: TextStyle(color: Colors.white)),
+                            ),
+                            SizedBox(width: 5),
+                            ElevatedButton(
+                              onPressed: () => _changeSheet(0),
+                              style: ElevatedButton.styleFrom(
+                                primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                                onPrimary: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                elevation: 2.0,
+                              ),
+                              child: Text('Tutti', style: TextStyle(color: Colors.white)),
                             ),
                           ],
                         ),
@@ -2200,7 +2204,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DettaglioInterventoPage(intervento: intervento),
+                    builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
                   ),
                 );
               },

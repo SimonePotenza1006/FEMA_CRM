@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
+import 'DettaglioInterventoNewPage.dart';
 import 'DettaglioInterventoPage.dart';
 
 class TableCommissioniPage extends StatefulWidget{
@@ -363,7 +364,7 @@ class CommissioneDataSource extends DataGridSource{
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DettaglioInterventoPage(intervento: intervento),
+                        builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
                       ),
                     );
                   }

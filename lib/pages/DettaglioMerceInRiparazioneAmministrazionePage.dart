@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../model/InterventoModel.dart';
+import 'DettaglioInterventoNewPage.dart';
 import 'DettaglioInterventoPage.dart';
 import 'GalleriaFotoInterventoPage.dart';
 
@@ -291,7 +292,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DettaglioInterventoPage(intervento: interventoAssociato!),
+                                      builder: (context) => DettaglioInterventoNewPage(intervento: interventoAssociato!),
                                     ),
                                   );
                                 }

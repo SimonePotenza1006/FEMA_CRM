@@ -43,6 +43,7 @@ import 'CreazioneNuovoUtentePage.dart';
 import 'DettaglioCommissioneAmministrazionePage.dart';
 import 'DettaglioCommissioneTecnicoPage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
+import 'DettaglioInterventoNewPage.dart';
 import 'DettaglioInterventoPage.dart';
 import 'DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'ListaNoteUtentiPage.dart';
@@ -1424,7 +1425,7 @@ class _HomeFormAmministrazioneNewPageState
                                                         builder: (context) {
                                                           if (appointment.recurrenceId is InterventoModel) {
                                                             InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                                            return DettaglioInterventoPage(intervento: intervento);
+                                                            return DettaglioInterventoNewPage(intervento: intervento);
                                                           } else {
                                                             CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
                                                             return DettaglioCommissioneAmministrazionePage(commissione: commissione);
@@ -2080,7 +2081,7 @@ class _HomeFormAmministrazioneNewPageState
                                                       builder: (context) {
                                                         if (appointment.recurrenceId is InterventoModel) {
                                                           InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                                          return DettaglioInterventoPage(intervento: intervento);
+                                                          return DettaglioInterventoNewPage(intervento: intervento);
                                                         } else {
                                                           CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
                                                           return DettaglioCommissioneAmministrazionePage(commissione: commissione);

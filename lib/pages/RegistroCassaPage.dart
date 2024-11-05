@@ -13,6 +13,7 @@ import 'dart:io';
 import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
 import 'AggiungiMovimentoPage.dart';
+import 'DettaglioInterventoNewPage.dart';
 import 'DettaglioInterventoPage.dart';
 import 'FemaShopPage.dart';
 import 'ModificaMovimentazionePage.dart';
@@ -243,7 +244,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DettaglioInterventoPage(intervento: movimento.intervento!),
+                                    builder: (context) => DettaglioInterventoNewPage(intervento: movimento.intervento!),
                                   ),
                                 );
                               }

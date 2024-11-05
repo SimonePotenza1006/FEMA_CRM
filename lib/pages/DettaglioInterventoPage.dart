@@ -75,7 +75,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   final TextEditingController titoloController = TextEditingController();
   final TextEditingController saldoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
   DbHelper? dbHelper;
   List<XFile> pickedImages = [];
@@ -368,8 +368,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       });
     }
   }
-
-
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
@@ -1651,30 +1649,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   child: FloatingActionButton(
                                     onPressed: () {
                                       //_selectDate(context);
-
                                         setState(() {
                                           widget.intervento.data = null;
-
                                         });
-
                                     },
                                     heroTag: "TagDel",
                                     backgroundColor: Colors.red,
                                     child: Icon(Icons.delete, color: Colors.white),
-                                    /*Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Flexible( // Permette al testo di adattarsi alla dimensione
-                                          child: Text(
-                                            'Modifica data intervento'.toUpperCase(),
-                                            style: TextStyle(color: Colors.white, fontSize: 12),
-                                            textAlign: TextAlign.center, // Centra il testo
-                                            softWrap: true, // Permette al testo di andare a capo
-                                          ),
-                                        ),
-                                      ],
-                                    ),*/
                                   ),
                                 ),
                                 SizedBox(width: 30),
@@ -3116,17 +3097,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else {
       orario = widget.intervento.orario_appuntamento;
     }
-
-    // Parse importo from controller, or fallback to existing value
-    // double? importo = importoController.text.isNotEmpty
-    //     ? double.tryParse(importoController.text)
-    //     : widget.intervento.importo_intervento;
-
-    // Parse descrizione from controller, or fallback to existing value
     String? descrizione = descrizioneController.text.isNotEmpty
         ? descrizioneController.text
         : widget.intervento.descrizione;
-
     ClienteModel? cliente = selectedCliente != null ? selectedCliente : widget.intervento.cliente;
     DestinazioneModel? destinazione = selectedDestinazione != null ? selectedDestinazione : widget.intervento.destinazione;
     TipologiaPagamentoModel? pagamento = selectedTipologia ?? widget.intervento.tipologia_pagamento;
@@ -3215,6 +3188,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           body: jsonEncode({
             'id': widget.intervento.id,
             'attivo' : widget.intervento.attivo,
+            'titolo' : widget.intervento.titolo,
             'visualizzato' : widget.intervento.visualizzato,
             'numerazione_danea' : widget.intervento.numerazione_danea,
             'priorita' : widget.intervento.priorita.toString().split('.').last,

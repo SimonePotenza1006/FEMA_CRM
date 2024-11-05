@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'DettaglioInterventoNewPage.dart';
 import 'DettaglioInterventoPage.dart';
 
 class DettaglioGruppoPage extends StatefulWidget {
@@ -230,7 +231,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DettaglioInterventoPage(intervento: intervento),
+                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
                 ),
               );
             }

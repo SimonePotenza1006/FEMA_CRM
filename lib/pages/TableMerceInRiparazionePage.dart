@@ -12,6 +12,7 @@ import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneInterventoByAmministrazionePage.dart';
+import 'DettaglioInterventoNewPage.dart';
 import 'ListaClientiPage.dart';
 import 'DettaglioInterventoPage.dart';
 import 'TableInterventiPage.dart';
@@ -766,7 +767,7 @@ class InterventoDataSource extends DataGridSource{
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        DettaglioInterventoPage(intervento: intervento),
+                        DettaglioInterventoNewPage(intervento: intervento),
                   ),
                 );
               },
