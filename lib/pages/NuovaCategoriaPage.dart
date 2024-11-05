@@ -67,7 +67,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> createNewCategoria() async {
     try {
       final response =
-          await http.post(Uri.parse('$ipaddressProva/api/categorieIntervento'),
+          await http.post(Uri.parse('$ipaddress/api/categorieIntervento'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'descrizione': _descrizioneController.text,
