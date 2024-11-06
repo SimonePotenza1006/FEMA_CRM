@@ -374,7 +374,7 @@ class CommissioneDataSource extends DataGridSource{
                     Padding(
                       padding: const EdgeInsets.only(bottom: 1.0),
                       child: Text(
-                        intervento != null ? intervento.titolo! : '///',
+                        intervento != null ? (intervento.titolo ?? '//') : '///',
                         style: TextStyle(
                           color: intervento != null ? Colors.blue : Colors.black,
                         ),

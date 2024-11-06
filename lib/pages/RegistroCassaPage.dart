@@ -380,7 +380,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         Uri.parse('$ipaddressProva/api/movimenti/${movimento.id}'),
         headers: {'Content-Type': 'application/json'},
       );
-
       if (response.statusCode == 204) {
         print('Movimentazione eliminata con successo.');
         Navigator.pop(context);
@@ -402,12 +401,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       backgroundColorHex: '#FFFFFF', // Bianco
       fontFamily: getFontFamily(FontFamily.Arial),
     );
-
     CellStyle greenBackground = CellStyle(
       backgroundColorHex: '#CCFFCC', // Verde chiaro
       fontFamily: getFontFamily(FontFamily.Arial),
     );
-
     // Aggiungi l'intestazione
     sheetObject.appendRow([
       'Data',
@@ -416,13 +413,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       'Descrizione',
       'Utente',
     ]);
-
     // Applica lo stile di sfondo bianco per l'intestazione
     for (var i = 0; i < sheetObject.maxCols; i++) {
       sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0))
           .cellStyle = whiteBackground;
     }
-
     double total = 0;
     for (var spesa in movimentiList2) {
       if (spesa.importo != null) {
@@ -437,7 +432,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         }
       }
     }
-
     int rowIndex = 1; // Inizia dalla seconda riga (indice 1)
     for (var spesa in movimentiList2) {
       String importoFormatted;
@@ -455,7 +449,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       } else {
         importoFormatted = 'N/A';
       }
-
       // Aggiungi la riga
       sheetObject.appendRow([
         spesa.data != null ? DateFormat('yyyy-MM-dd').format(spesa.data!) : 'N/A',
@@ -464,7 +457,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         spesa.descrizione ?? 'N/A',
         spesa.utente?.cognome ?? 'N/A'
       ]);
-
       // Alterna il colore di sfondo tra bianco e verde chiaro
       var backgroundColor = rowIndex % 2 == 0 ? whiteBackground : greenBackground;
       for (var i = 0; i < sheetObject.maxCols; i++) {
@@ -474,7 +466,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
       rowIndex++;
     }
-
     // Aggiungi la riga totale
     sheetObject.appendRow([
       'Totale',
@@ -483,13 +474,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       '',
       ''
     ]);
-
     // Applica lo stile alla riga totale (bianco)
     for (var i = 0; i < sheetObject.maxCols; i++) {
       sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: rowIndex))
           .cellStyle = whiteBackground;
     }
-
     try {
       late String filePath;
       if (Platform.isWindows) {
@@ -594,16 +583,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       var apiUrl = Uri.parse('$ipaddressProva/api/movimenti/ordered');
       var response = await http.get(apiUrl);
-
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<MovimentiModel> movimenti = [];
         List<DateTime> dateChiusure = [];
-
         // Prima iterazione per individuare tutte le date di "Chiusura"
         for (var item in jsonData) {
           MovimentiModel movimento = MovimentiModel.fromJson(item);
-
           // Memorizza le date di "Chiusura" e aggiungi solo i movimenti non di chiusura
           if (movimento.tipo_movimentazione == TipoMovimentazione.Chiusura) {
             dateChiusure.add(movimento.dataCreazione!);
@@ -611,17 +597,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             movimenti.add(movimento); // Aggiungi solo movimenti non di chiusura
           }
         }
-
         // Stampa tutte le date di chiusura individuate
         print('Date di chiusura trovate: $dateChiusure');
-
         // Ordina le date di chiusura in ordine decrescente per trovare l'ultima chiusura
         dateChiusure.sort((a, b) => b.compareTo(a));
         DateTime? ultimaDataChiusura = dateChiusure.isNotEmpty ? dateChiusure.first : null;
-
         // Stampa l'ultima data di chiusura
         print('Ultima data di chiusura: $ultimaDataChiusura');
-
         // Filtra ulteriormente i movimenti per includere solo quelli successivi all'ultima "Chiusura"
         List<MovimentiModel> movimentiFiltrati = [];
         if (ultimaDataChiusura != null) {
@@ -632,10 +614,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         } else {
           movimentiFiltrati = movimenti; // Se non ci sono chiusure, mostra tutti i movimenti
         }
-
         // Stampa i movimenti che saranno mostrati a schermo
         print('Movimenti dopo l\'ultima chiusura (da mostrare a schermo): $movimentiFiltrati');
-
         // Calcola il fondo cassa basato sui movimenti filtrati
         setState(() {
           fondoCassa = calcolaFondoCassa(movimentiFiltrati);
