@@ -20,7 +20,6 @@ class ClienteModel {
   String? pec;
   String? note;
   String? note_tecnico;
-  List<TipologiaInterventoModel>? tipologie_interventi;
 
   ClienteModel(
       this.id,
@@ -42,7 +41,6 @@ class ClienteModel {
       this.pec,
       this.note,
       this.note_tecnico,
-      this.tipologie_interventi,
       );
 
 
@@ -67,7 +65,6 @@ class ClienteModel {
       'pec': pec,
       'note': note,
       'note_tecnico' : note_tecnico,
-      'tipologie_interventi': tipologie_interventi
     };
     return map;
   }
@@ -92,10 +89,6 @@ class ClienteModel {
     pec = map['pec'];
     note = map['note'];
     note_tecnico = map['note_tecnico'];
-    //tipologieIntervento = map['tipologieIntervento'];
-    tipologie_interventi = (map['tipologie_interventi'] as List<dynamic>?)
-        ?.map((data) => TipologiaInterventoModel.fromJson(data as Map<String, dynamic>))
-        .toList() ?? [];
   }
 
   Map<String, dynamic> toJson() => {
@@ -118,7 +111,6 @@ class ClienteModel {
     'pec': pec,
     'note': note,
     'note_tecnico' : note_tecnico,
-    'tipologie_interventi': tipologie_interventi
   };
 
   factory ClienteModel.fromJson(Map<String, dynamic> json) {
@@ -142,9 +134,6 @@ class ClienteModel {
       json['pec'],
       json['note'],
       json['note_tecnico'],
-      (json['tipologie_interventi'] as List<dynamic>?)
-          ?.map((data) => TipologiaInterventoModel.fromJson(data as Map<String, dynamic>))
-          .toList() ?? [],
     );
   }
 

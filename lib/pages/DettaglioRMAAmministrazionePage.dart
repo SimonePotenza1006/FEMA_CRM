@@ -50,7 +50,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   /*Future<http.Response?> getIntervento() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/restituzioneMerce/${int.parse(widget.merce.id.toString())}');
+      var apiUrl = Uri.parse('$ipaddressProva/api/restituzioneMerce/${int.parse(widget.merce.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -85,7 +85,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var decodedData = jsonDecode(data.body);
       var interventoData = decodedData[0]; // Adjusted here
       InterventoModel intervento = InterventoModel.fromJson(interventoData);*/ // Adjusted here
-      final url = '$ipaddress/api/immagine/restituzioneMerce/${widget.merce.id.toString()}/images';
+      final url = '$ipaddressProva/api/immagine/restituzioneMerce/${widget.merce.id.toString()}/images';
       http.Response? response;
       try {
         response = await http.get(Uri.parse(url));
@@ -132,7 +132,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -495,7 +495,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -531,7 +531,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDataRicon() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -589,7 +589,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('$ipaddress/api/restituzioneMerce'),
+                              Uri.parse('$ipaddressProva/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -659,7 +659,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('$ipaddress/api/restituzioneMerce'),
+                              Uri.parse('$ipaddressProva/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -707,7 +707,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDataRientro() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -742,7 +742,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaRimborso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -777,7 +777,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaCambio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -812,7 +812,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaConcluso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/restituzioneMerce'),
+        Uri.parse('$ipaddressProva/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -836,7 +836,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ),
         );
         setState(() {
-          //widget.merce.difetto_riscontrato = difettoController.text;
+
         });
       }
     } catch(e){
@@ -910,41 +910,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             SizedBox(height: 10.0),
                             buildInfoRow(title: 'ID MERCE RMA', value: widget.merce.id!, context: context),
                             SizedBox(height: 10.0),
-                            /*buildInterventoRow(title: "Intervento", valueWidget: GestureDetector(
-                              onTap: () {
-                                if (interventoAssociato != null) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DettaglioInterventoPage(intervento: interventoAssociato!),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Stack(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 1.0), // Aggiunge spazio tra testo e underline
-                                    child: Text(
-                                      interventoAssociato != null ? interventoAssociato!.descrizione!.toUpperCase() : '///',
-                                      style: TextStyle(
-                                        color: interventoAssociato != null ? Colors.blue : Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  if (interventoAssociato != null)
-                                    Positioned(
-                                      bottom: 0, // Posiziona la linea esattamente sotto il testo
-                                      left: 0,
-                                      right: 0,
-                                      child: Container(
-                                        height: 1, // Altezza della linea di sottolineatura
-                                        color: Colors.blue, // Colore della linea di sottolineatura
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ), context : context),*/
                             SizedBox(height: 10,),
                             buildInfoRow(
                                 title: "prodotto", value: widget.merce.prodotto!, context: context),
@@ -1168,518 +1133,63 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             //buildInfoRow(title: "utente Ritiro", value: widget.merce.utenteRitiro != null ? widget.merce.utenteRitiro!.nome!+' '+widget.merce.utenteRitiro!.cognome! : 'N/A', context: context),
                             SizedBox(height: 10.0),
                             buildConclusoRow(title: "concluso", value: widget.merce.concluso!, context: context),
-                            //buildInfoRow(title: "concluso", value: widget.merce.concluso != null ? (widget.merce.concluso != true ? "NO" : "SI"): "N/A", context: context),
-                            Container(
-                              child: SizedBox(
-                                width: 400,
-                                child: FutureBuilder<List<Uint8List>>(
-                                  future: _futureImages,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return Wrap(
-                                        spacing: 16,
-                                        runSpacing: 16,
-                                        children: snapshot.data!.map((imageData) {
-                                          return GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => PhotoViewPage(
-                                                    images: snapshot.data!,
-                                                    initialIndex: snapshot.data!.indexOf(imageData),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            child: Container(
-                                              width: 150, // aumenta la larghezza del container
-                                              height: 170, // aumenta l'altezza del container
-                                              decoration: BoxDecoration(
-                                                border: Border.all(width: 1), // aggiungi bordo al container
-                                              ),
-                                              child: Image.memory(
-                                                imageData,
-                                                fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
-                                      );
-                                    } else if (snapshot.hasError) {
-                                      return Text('Nessuna foto presente nel database!');
-                                    } else {
-                                      return Center(child: CircularProgressIndicator());
-                                    }
-                                  },
-                                ),
-                              ),
-                            )
-                            /*buildInfoRow(title: "Richiesta preventivo", value: widget.merce.preventivo != null ? (widget.merce.preventivo != true ? "NO" : "SI"): "N/A", context: context),
-                            if (widget.merce.preventivo != null && widget.merce.preventivo == true)
-                              buildInfoRow(title: "prezzo preventivato", value: widget.merce.importo_preventivato != null ? widget.merce.importo_preventivato!.toStringAsFixed(2) : "Non Inserito", context: context),
-                            SizedBox(
-                                width: 500,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width: 150,
-                                      child: TextFormField(
-                                        controller: importoPreventivatoController,
-                                        keyboardType: TextInputType.number,
-                                        decoration: InputDecoration(
-                                          labelText: 'Importo Preventivato'.toUpperCase(),
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        saveImportoPreventivo();
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        primary: Colors.red,
-                                        onPrimary: Colors.white,
-                                      ),
-                                      child: Text('Salva importo Preventivo'.toUpperCase()),
-                                    ),
-                                  ],
-                                )
-                            ),
-                            if(widget.merce.data_conclusione != null)
-                              buildInfoRow(title: 'Risoluzione', value: widget.merce.risoluzione ?? "N?A", context: context),
-                            if(widget.merce.data_conclusione != null)
-                              buildInfoRow(title: 'prodotti installati', value: widget.merce.prodotti_installati ?? 'N/A', context: context)*/
                           ],
                         )
                     ),
-                    /*SizedBox(width: 20),
+                    SizedBox(width: 30,),
                     Container(
-                      padding: EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
+                      child: SizedBox(
+                        width: 600,
+                        child: FutureBuilder<List<Uint8List>>(
+                          future: _futureImages,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Wrap(
+                                spacing: 16,
+                                runSpacing: 16,
+                                children: snapshot.data!.map((imageData) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PhotoViewPage(
+                                            images: snapshot.data!,
+                                            initialIndex: snapshot.data!.indexOf(imageData),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      width: 150, // aumenta la larghezza del container
+                                      height: 170, // aumenta l'altezza del container
+                                      decoration: BoxDecoration(
+                                        border: Border.all(width: 1), // aggiungi bordo al container
+                                      ),
+                                      child: Image.memory(
+                                        imageData,
+                                        fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text('Nessuna foto presente nel database!');
+                            } else {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                          },
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildInfoRow(title: "data arrivo", value: widget.merce.data != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data!) : "N/A"),
-                          SizedBox(height: 10.0),
-                          buildInfoRow(title: "data presa in carico", value:(widget.merce.data_presa_in_carico != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_presa_in_carico!) : 'N/A' )),
-                          SizedBox(height: 10.0),
-                          if(widget.merce.preventivo == true)
-                            SizedBox(
-                              child: Column(
-                                children: [
-                                  buildInfoRow(title: "data comunica preventivo", value: (widget.merce.data_comunica_preventivo != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_comunica_preventivo!) : 'N/A' )),
-                                  SizedBox(height: 10.0),
-                                  buildInfoRow(title: "data accettazione preventivo", value:(widget.merce.data_accettazione_preventivo != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_accettazione_preventivo !) : 'N/A' )),
-                                  SizedBox(height: 10),
-                                ],
-                              ),
-                            ),
-                          buildInfoRow(title: 'data conclusione', value: (widget.merce.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_conclusione!) : 'N/A')),
-                          SizedBox(height: 10),
-                          buildInfoRow(title: 'data consegna', value: (widget.merce.data_consegna != null ? DateFormat('dd/MM/yyyy').format(widget.merce.data_consegna!) : "N/A")),
-                          SizedBox(height: 10,),
-                        ],
-                      ),
-                    ),*/
-                    //SizedBox(width: 10,),
-
+                    )
                   ],
                 ),
-                SizedBox(height: 20),
               ],
             ),
           ],
         )
       ),
-      /*floatingActionButton: Stack(
-        children: [
-          Positioned(
-              bottom: 16,
-              right: 16,
-              child: SpeedDial(
-                animatedIcon: AnimatedIcons.menu_close,
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                children: [
-                  if(widget.merce.preventivo == true && widget.merce.data_comunica_preventivo == null)
-                    SpeedDialChild(
-                      child: Icon(Icons.contact_phone_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: "Preventivo comunicato".toUpperCase(),
-                      onTap: () => comunicazionePreventivo(),
-                    ),
-                  if(widget.merce.data_comunica_preventivo != null && widget.merce.data_accettazione_preventivo == null)
-                    SpeedDialChild(
-                      child: Icon(Icons.check_circle_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: "Preventivo accettato".toUpperCase(),
-                      onTap: () => accettazionePreventivo(),
-                    ),
-                  if(widget.merce.data_comunica_preventivo != null && widget.merce.data_accettazione_preventivo == null)
-                    SpeedDialChild(
-                      child: Icon(Icons.dangerous_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: "Preventivo rifiutato".toUpperCase(),
-                      onTap: () => accettazionePreventivo(),
-                    ),
-                  SpeedDialChild(
-                    child: Icon(Icons.fact_check_outlined, color: Colors.white),
-                    backgroundColor: Colors.red,
-                    label: "Lavoro concluso".toUpperCase(),
-                    onTap: () => _showConclusioneDialog(),
-                  ),
-                  if(widget.merce.data_conclusione != null)
-                    SpeedDialChild(
-                      child: Icon(Icons.directions_car_filled_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: "Merce consegnata".toUpperCase(),
-                      onTap: () => consegna(),
-                    )
-                ],
-              )
-          ),
-        ],
-      ),*/
     );
   }
-
-
-/*void _showConclusioneDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('COMPILA LA RISOLUZIONE E GLI EVENTUALI PRODOTTI INSTALLATI'),
-          content: Form( // Avvolgi tutto dentro un Form
-            key: _formKeyConclusione,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextFormField(
-                  controller: _risoluzioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Risoluzione'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) { // Aggiungi validatore
-                    if (value == null || value.isEmpty) {
-                      return 'Inserisci una descrizione valida';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 12),
-                TextFormField(
-                  controller: _prodottiController,
-                  decoration: InputDecoration(
-                    labelText: 'prodotti installati'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) { // Aggiungi validatore
-                    if (value == null || value.isEmpty) {
-                      return 'Scrivere // se non sono stati utilizzati prodotti';
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                if (_formKeyConclusione.currentState!.validate()) { // Convalida il form
-                  conclusioneRiparazione();
-                }
-              },
-              child: Text('Conferma'.toUpperCase()),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-
-
-
-  Future<void> saveImportoPreventivo() async {
-    try {
-      // Ottieni la data attuale come stringa ISO 8601
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      double? importo = double.parse(importoPreventivatoController.text);
-      final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': importo,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
-          'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazionePreventivo,
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Importo preventivato salvato'),
-        ),
-      );
-      setState(() {
-        widget.merce.importo_preventivato = importo;
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
-  Future<void> comunicazionePreventivo() async {
-    try {
-      // Ottieni la data attuale come stringa ISO 8601
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      // Verifica se 'data_consegna' è null e converte in stringa ISO 8601 se necessario
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : DateTime.now().toIso8601String(),
-          'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazionePreventivo,
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Data comunicazione preventivo salvata con successo!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_comunica_preventivo = DateTime.now();
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
-  Future<void> accettazionePreventivo() async {
-    try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
-          'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : DateTime.now().toIso8601String(),
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Il preventivo è stato accettato!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_accettazione_preventivo= DateTime.now();
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
-  Future<void> rifiutoPreventivo() async {
-    try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
-          'preventivo_accettato' : false,
-          'data_accettazione_preventivo' : null,
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Il preventivo è stato accettato!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_accettazione_preventivo= DateTime.now();
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
-  Future<void> conclusioneRiparazione() async {
-    try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataAccettazionePreventivo = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
-          'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazionePreventivo,
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': _risoluzioneController.text,
-          'data_conclusione': DateTime.now().toIso8601String(),
-          'prodotti_installati':_prodottiController.text,
-          'data_consegna': dataConsegna,
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('La riparazione è conclusa!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_conclusione= DateTime.now();
-        widget.merce.risoluzione = _risoluzioneController.text;
-        widget.merce.prodotti_installati = _prodottiController.text;
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }
-
-  Future<void> consegna() async {
-    try {
-      String? dataPresaInCarico = widget.merce.data_presa_in_carico != null ? widget.merce.data_presa_in_carico!.toIso8601String() : null;
-      String? dataComunicazionePreventivo = widget.merce.data_comunica_preventivo != null ? widget.merce.data_comunica_preventivo!.toIso8601String() : null;
-      String? dataAccettazione = widget.merce.data_accettazione_preventivo != null ? widget.merce.data_accettazione_preventivo!.toIso8601String() : null;
-      String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
-      final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.merce.id,
-          'data': widget.merce.data?.toIso8601String(), // Verifica se 'data' è null
-          'articolo': widget.merce.articolo,
-          'accessori': widget.merce.accessori,
-          'difetto_riscontrato': widget.merce.difetto_riscontrato,
-          'data_presa_in_carico': dataPresaInCarico,
-          'password': widget.merce.password,
-          'dati': widget.merce.dati,
-          'presenza_magazzino' : widget.merce.presenza_magazzino,
-          'preventivo': widget.merce.preventivo,
-          'importo_preventivato': widget.merce.importo_preventivato,
-          'data_comunica_preventivo' : dataComunicazionePreventivo,
-          'preventivo_accettato' : widget.merce.preventivo_accettato,
-          'data_accettazione_preventivo' : dataAccettazione,
-          'diagnosi': widget.merce.diagnosi,
-          'risoluzione': widget.merce.risoluzione,
-          'data_conclusione': dataConclusione,
-          'prodotti_installati': widget.merce.prodotti_installati,
-          'data_consegna': DateTime.now().toIso8601String(),
-        }),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('La merce è stata consegnata!'),
-        ),
-      );
-      setState(() {
-        widget.merce.data_consegna= DateTime.now();
-      });
-    } catch (e) {
-      print('Errore durante il salvataggio dell\'importo preventivato: $e');
-    }
-  }*/
-
 }

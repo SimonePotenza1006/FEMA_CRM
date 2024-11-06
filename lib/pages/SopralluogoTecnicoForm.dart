@@ -33,7 +33,8 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
   final TextEditingController indirizzoController = TextEditingController(); // Aggiunto controller per il campo indirizzo
   final TextEditingController descrizioneController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  final ImagePicker _picker = ImagePicker();
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
@@ -57,6 +58,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           pickedImages.addAll(pickedFiles);
         });
       }
+    }
+  }
+
+  Future<void> pickImagesFromGallery() async {
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        pickedImages.addAll(pickedFiles);
+      });
     }
   }
 
@@ -233,14 +243,23 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                   ),
                   SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: takePicture,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                    ),
-                    child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)),
-                  ),
+                      ElevatedButton(
+                        onPressed: takePicture,
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          onPrimary: Colors.white,
+                        ),
+                        child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)),
+                      ),
+                      SizedBox(width: 10,),
+                      ElevatedButton(
+                        onPressed: pickImagesFromGallery,
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.red,
+                          onPrimary: Colors.white,
+                        ),
+                        child: Text('Allega foto da galleria', style: TextStyle(fontSize: 18.0)),
+                      ),
                   _buildImagePreview(),
                   Container(
                     alignment: Alignment.center,
@@ -333,7 +352,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/sopralluogo/${int.parse(sopralluogo.id!.toString())}'),
+              Uri.parse('$ipaddressProva/api/immagine/sopralluogo/${int.parse(sopralluogo.id!.toString())}'),
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -347,12 +366,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               print('File inviato con successo');
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Sopralluogo registrato!'),
+                  content: Text('Foto salvata!'),
                 ),
               );
             } else {
               print('Errore durante l\'invio del file: ${response.statusCode}');
             }
+            Navigator.pop(context);
           } else {
             // Gestisci il caso in cui il percorso del file non è valido
             print('Errore: Il percorso del file non è valido');
@@ -372,7 +392,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try {
       response =
-      await http.post(Uri.parse('$ipaddress/api/sopralluogo'),
+      await http.post(Uri.parse('$ipaddressProva/api/sopralluogo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data': DateTime.now().toIso8601String(),
@@ -398,7 +418,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -430,7 +450,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
