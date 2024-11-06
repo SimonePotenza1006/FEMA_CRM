@@ -273,7 +273,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -295,15 +295,16 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
 
   Future<void> updateMovimento() async{
+    var cliente = selectedCliente != null ? selectedCliente?.toMap() : null;
     try{
       var response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
           'id' : widget.movimento.id,
           'data' : _selectedDate?.toIso8601String(),
           'utente' : _selectedUtente?.toMap(),
-          'cliente' : widget.movimento.utente?.toMap(),
+          'cliente' : cliente,
           'tipo_movimentazione': selectedTipologia.toString().split('.').last,
           'descrizione' : _descrizioneController.text,
           'importo' : double.parse(_importoController.text.toString())

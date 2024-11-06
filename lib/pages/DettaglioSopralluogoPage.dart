@@ -32,10 +32,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<TipologiaInterventoModel> tipologieList = [];
   List<ClienteModel> clientiList = [];
   List<ClienteModel> filteredClientiList = [];
+  final ImagePicker _picker = ImagePicker();
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -65,7 +66,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -128,7 +129,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/sopralluogo/${int.parse(widget.sopralluogo.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/sopralluogo/${int.parse(widget.sopralluogo.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -238,16 +239,33 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton.extended(
-            onPressed: () {
-              takePicture();
-            },
-            label: Text(
-              'Allega foto',
-              style: TextStyle(color: Colors.white),
-            ),
-            icon: Icon(Icons.camera_alt, color: Colors.white),
-            backgroundColor: Colors.red,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FloatingActionButton.extended(
+                onPressed: () {
+                  takePicture();
+                },
+                label: Text(
+                  'SCATTA FOTO',
+                  style: TextStyle(color: Colors.white),
+                ),
+                icon: Icon(Icons.camera_alt, color: Colors.white),
+                backgroundColor: Colors.red,
+              ),
+              SizedBox(width: 5,),
+              FloatingActionButton.extended(
+                onPressed: () {
+                  pickImagesFromGallery();
+                },
+                label: Text(
+                  'ALLEGA FOTO',
+                  style: TextStyle(color: Colors.white),
+                ),
+                icon: Icon(Icons.photo_album_outlined, color: Colors.white),
+                backgroundColor: Colors.red,
+              ),
+            ],
           ),
           SizedBox(height: 10),
           if (pickedImages.isNotEmpty)
@@ -283,6 +301,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  Future<void> pickImagesFromGallery() async {
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        pickedImages.addAll(pickedFiles);
+      });
+    }
+  }
+
   Future<void> saveImageSopralluogo() async {
     final sopralluogo = widget.sopralluogo.id;
     try {
@@ -291,7 +318,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/sopralluogo/${sopralluogo}'),
+            Uri.parse('$ipaddressProva/api/immagine/sopralluogo/${sopralluogo}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(

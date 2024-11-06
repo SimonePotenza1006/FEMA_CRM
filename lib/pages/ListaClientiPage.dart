@@ -22,7 +22,7 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
   TextEditingController searchController = TextEditingController();
   bool isSearching = false;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -143,8 +143,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               color: Colors.white,
             ),
             onPressed: () {
-              // Funzione per ricaricare la pagina
-              setState(() {});
+              getAllClienti();
             },
           ),
         ],

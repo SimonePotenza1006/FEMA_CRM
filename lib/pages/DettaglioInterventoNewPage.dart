@@ -64,11 +64,27 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   List<FaseRiparazioneModel> fasiRiparazione = [];
   TextEditingController rapportinoController = TextEditingController();
   TextEditingController _codiceDaneaController = TextEditingController();
+  bool modificaImportoMerceVisibile = false;
   bool modificaDescrizioneVisible = false;
   bool modificaImportoVisibile = false;
   bool modificaNotaVisibile = false;
   bool modificaTitoloVisible = false;
   bool modificaSaldoTecnicoVisibile = false;
+  bool modificaArticoloVisibile = false;
+  bool modificaAccessoriVisibile = false;
+  bool modificaDifettoVisibile = false;
+  bool modificaPasswordVisibile = false;
+  bool modificaDatiVisibile = false;
+  bool modificaDiagnosiVisibile = false;
+  bool modificaRisoluzioneVisibile = false;
+  final TextEditingController importoMerceController = TextEditingController();
+  final TextEditingController datiController = TextEditingController();
+  final TextEditingController risoluzioneController = TextEditingController();
+  final TextEditingController diagnosiController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController difettoController = TextEditingController();
+  final TextEditingController accessoriController = TextEditingController();
+  final TextEditingController articoloController = TextEditingController();
   final TextEditingController descrizioneController = TextEditingController();
   final TextEditingController _importoController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
@@ -191,6 +207,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         ],
       ),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildStaticDrawer(),  // Drawer statico a sinistra
           Expanded(
@@ -318,95 +335,679 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       padding: EdgeInsets.all(16),
       child:Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'MERCE IN RIPARAZIONE',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Presenza magazzino'.toUpperCase(),
-                    value: widget.intervento.merce?.presenza_magazzino == true ? "SI" : "NO",
-                    context: context
+          SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'MERCE IN RIPARAZIONE',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child : buildInfoRow(
-                    title: 'Articolo',
-                    value: widget.intervento.merce?.articolo ?? 'N/A',
-                    context: context
+                SizedBox(
+                  width: 500,
+                  child: buildInfoRow(
+                      title: 'Presenza magazzino'.toUpperCase(),
+                      value: widget.intervento.merce?.presenza_magazzino == true ? "SI" : "NO",
+                      context: context
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Accessori',
-                    value: widget.intervento.merce?.accessori ?? 'N/A',
-                    context: context
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child : buildInfoRow(
+                          title: 'Articolo',
+                          value: widget.intervento.merce?.articolo ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: (){
+                        setState(() {
+                          modificaArticoloVisibile = !modificaArticoloVisibile;
+                        });
+                      },
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Difetto riscontrato',
-                    value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
-                    context: context
+                if(modificaArticoloVisibile)
+                  SizedBox(
+                      width: 500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: TextFormField(
+                              maxLines: null,
+                              controller: articoloController,
+                              decoration: InputDecoration(
+                                labelText: 'Articolo',
+                                hintText: 'Modifica titolo',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                            decoration: BoxDecoration(
+                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                            ),
+                            child: FloatingActionButton(
+                              heroTag: "TagArticolo",
+                              onPressed: () {
+                                if(articoloController.text.isNotEmpty){
+                                  modificaArticolo();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Non è possibile salvare un articolo vuoto!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              backgroundColor: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                    child: Text(
+                                      'Modifica articolo'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                      textAlign: TextAlign.center, // Centra il testo
+                                      softWrap: true, // Permette al testo di andare a capo
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Accessori',
+                          value: widget.intervento.merce?.accessori ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: (){
+                        setState(() {
+                          modificaAccessoriVisibile = !modificaAccessoriVisibile;
+                        });
+                      },
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Richiesta di preventivo',
-                    value: booleanToString(widget.intervento.merce?.preventivo ?? false),
-                    context: context
+                if(modificaAccessoriVisibile)
+                  SizedBox(
+                      width: 500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: TextFormField(
+                              maxLines: null,
+                              controller: accessoriController,
+                              decoration: InputDecoration(
+                                labelText: 'Accessori',
+                                hintText: 'Modifica accessori',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                            decoration: BoxDecoration(
+                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                            ),
+                            child: FloatingActionButton(
+                              heroTag: "TagAccessori",
+                              onPressed: () {
+                                if(accessoriController.text.isNotEmpty){
+                                  modificaAccessori();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Non è possibile salvare accessori vuoti!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              backgroundColor: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                    child: Text(
+                                      'Modifica accessori'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                      textAlign: TextAlign.center, // Centra il testo
+                                      softWrap: true, // Permette al testo di andare a capo
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Difetto riscontrato',
+                          value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: (){
+                          setState(() {
+                            modificaDifettoVisibile = !modificaDifettoVisibile;
+                          });
+                        }
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Importo preventivato',
-                    value: widget.intervento.merce?.importo_preventivato.toString() ?? 'N/A',
-                    context: context
+                if(modificaDifettoVisibile)
+                  SizedBox(
+                      width: 500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: TextFormField(
+                              maxLines: null,
+                              controller: difettoController,
+                              decoration: InputDecoration(
+                                labelText: 'Difetto riscontrato',
+                                hintText: 'Modifica difetto',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                            decoration: BoxDecoration(
+                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                            ),
+                            child: FloatingActionButton(
+                              heroTag: "TagDifetto",
+                              onPressed: () {
+                                if(difettoController.text.isNotEmpty){
+                                  modificaDifetto();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Non è possibile salvare un difetto vuoto!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              backgroundColor: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                    child: Text(
+                                      'Modifica difetto'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                      textAlign: TextAlign.center, // Centra il testo
+                                      softWrap: true, // Permette al testo di andare a capo
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Richiesta di preventivo',
+                          value: booleanToString(widget.intervento.merce?.preventivo ?? false),
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed : (){
+                        showPreventivoDialog(context);
+                      }
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Password',
-                    value: widget.intervento.merce?.password ?? 'N/A',
-                    context: context
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Importo preventivato',
+                          value: '${widget.intervento.merce?.importo_preventivato.toString()}€' ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon : Icon(Icons.edit),
+                      onPressed: (){
+                        setState(() {
+                          modificaImportoMerceVisibile = !modificaImportoMerceVisibile;
+                        });
+                      },
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Dati',
-                    value: widget.intervento.merce?.dati ?? 'N/A',
-                    context: context
+                if(modificaImportoMerceVisibile)
+                  SizedBox(
+                    width: 500,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 300,
+                          child: TextFormField(
+                            maxLines: null,
+                            controller: importoMerceController,
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d+\.?\d{0,2}'),
+                              ),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Importo preventivato',
+                              hintText: 'Modifica importo preventivato',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 170,
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          child: FloatingActionButton(
+                            heroTag: "TagImporto",
+                            onPressed: () {
+                              if (importoMerceController.text.isNotEmpty) {
+                                modificaImportoMerce();
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Non è possibile salvare un importo nullo!'),
+                                  ),
+                                );
+                              }
+                            },
+                            backgroundColor: Colors.red,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    'Modifica importo preventivato'.toUpperCase(),
+                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                    softWrap: true,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Password',
+                          value: widget.intervento.merce?.password ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: (){
+                          setState(() {
+                            modificaPasswordVisibile = !modificaPasswordVisibile;
+                          });
+                        }
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Diagnosi',
-                    value: widget.intervento.merce?.diagnosi ?? 'N/A',
-                    context: context
+                if(modificaPasswordVisibile)
+                  SizedBox(
+                      width: 500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: TextFormField(
+                              maxLines: null,
+                              controller: passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                hintText: 'Modifica password',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                            decoration: BoxDecoration(
+                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                            ),
+                            child: FloatingActionButton(
+                              heroTag: "TagPassword",
+                              onPressed: () {
+                                if(passwordController.text.isNotEmpty){
+                                  modificaPassword();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Non è possibile salvare una password vuota!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              backgroundColor: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                    child: Text(
+                                      'Modifica password'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                      textAlign: TextAlign.center, // Centra il testo
+                                      softWrap: true, // Permette al testo di andare a capo
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Dati',
+                          value: widget.intervento.merce?.dati ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon : Icon(Icons.edit),
+                      onPressed: (){
+                        setState(() {
+                          modificaDatiVisibile = !modificaDatiVisibile;
+                        });
+                      },
+                    )
+                  ],
                 ),
-              ),
-              SizedBox(
-                width: 500,
-                child: buildInfoRow(
-                    title: 'Risoluzione',
-                    value: widget.intervento.merce?.risoluzione ?? 'N/A',
-                    context: context
+                if(modificaDatiVisibile)
+                  SizedBox(
+                      width: 500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: TextFormField(
+                              maxLines: null,
+                              controller: datiController,
+                              decoration: InputDecoration(
+                                labelText: 'Dati',
+                                hintText: 'Modifica dati',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                            decoration: BoxDecoration(
+                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                            ),
+                            child: FloatingActionButton(
+                              heroTag: "TagDati",
+                              onPressed: () {
+                                if(datiController.text.isNotEmpty){
+                                  modificaDati();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Non è possibile salvare dei dati nulli!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              backgroundColor: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                    child: Text(
+                                      'Modifica dati'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                      textAlign: TextAlign.center, // Centra il testo
+                                      softWrap: true, // Permette al testo di andare a capo
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Diagnosi',
+                          value: widget.intervento.merce?.diagnosi ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed : (){
+                          setState(() {
+                            modificaDiagnosiVisibile = !modificaDiagnosiVisibile;
+                          });
+                        }
+                    )
+                  ],
                 ),
-              ),
-            ],
+                if(modificaDiagnosiVisibile)
+                  SizedBox(
+                      width: 500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: TextFormField(
+                              maxLines: null,
+                              controller: diagnosiController,
+                              decoration: InputDecoration(
+                                labelText: 'Diagnosi',
+                                hintText: 'Modifica diagnosi',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                            decoration: BoxDecoration(
+                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                            ),
+                            child: FloatingActionButton(
+                              heroTag: "TagDiagnosi",
+                              onPressed: () {
+                                if(diagnosiController.text.isNotEmpty){
+                                  modificaDiagnosi();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Non è possibile salvare una diagnosi vuota!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              backgroundColor: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                    child: Text(
+                                      'Modifica diagnosi'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                      textAlign: TextAlign.center, // Centra il testo
+                                      softWrap: true, // Permette al testo di andare a capo
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Risoluzione',
+                          value: widget.intervento.merce?.risoluzione ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: (){
+                        setState(() {
+                          modificaRisoluzioneVisibile = !modificaRisoluzioneVisibile;
+                        });
+                      },
+                    )
+                  ],
+                ),
+                if(modificaRisoluzioneVisibile)
+                  SizedBox(
+                      width: 500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: TextFormField(
+                              maxLines: null,
+                              controller: risoluzioneController,
+                              decoration: InputDecoration(
+                                labelText: 'Risoluzione',
+                                hintText: 'Modifica risoluzione',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                            decoration: BoxDecoration(
+                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                            ),
+                            child: FloatingActionButton(
+                              heroTag: "TagRisoluzione",
+                              onPressed: () {
+                                if(risoluzioneController.text.isNotEmpty){
+                                  modificaRisoluzione();
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Non è possibile salvare una risoluzione vuota!'),
+                                    ),
+                                  );
+                                }
+                              },
+                              backgroundColor: Colors.red,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                    child: Text(
+                                      'modifica Risoluzione'.toUpperCase(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12),
+                                      textAlign: TextAlign.center, // Centra il testo
+                                      softWrap: true, // Permette al testo di andare a capo
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                  ),
+              ],
+            ),
           ),
           SizedBox(width: 70),
           if (fasiRiparazione.isNotEmpty)
@@ -466,7 +1067,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           ),
           SizedBox(height: 12),
           Container(
-            width: 600,
+            width: 1000,
             child: FutureBuilder<List<Uint8List>>(
               future: _futureImages,
               builder: (context, snapshot) {
@@ -512,6 +1113,15 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             ),
           ),
           _buildImagePreview(),
+          SizedBox(height: 20),
+          pickedImages.isNotEmpty ? ElevatedButton(
+            onPressed: pickedImages.isNotEmpty ? savePics : null, // Attiva solo se ci sono immagini
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red,
+              onPrimary: Colors.white,
+            ),
+            child: Text('Salva Foto', style: TextStyle(fontSize: 18.0)),
+          ) : Container(),
         ],
       ),
     );
@@ -1378,6 +1988,10 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
               ],
             ),
           ),
+          if(intervento.merce != null)
+            buildInfoRow(title: 'Data conclusione', value: intervento.merce?.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_conclusione!) : 'N/A'),
+          if(intervento.merce != null)
+            buildInfoRow(title: 'Data consegna', value: intervento.merce?.data_consegna != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_consegna!) : "N/A"),
         ],
       ),
     );
@@ -1832,8 +2446,8 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
-    bool isValueTooLong = value.length > 25;
-    String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
+    bool isValueTooLong = value.length > 20;
+    String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
     return SizedBox(
       width: 287,
       child: Padding(
@@ -1947,7 +2561,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -1973,7 +2587,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         return response;
@@ -1995,7 +2609,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       } else {
         final ddt = DDTModel.fromJson(jsonDecode(data.body));
         try{
-          final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+          final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}'));
           var responseData = json.decode(response.body);
           if(response.statusCode == 200){
             List<RelazioneDdtProdottoModel> prodotti = [];
@@ -2017,7 +2631,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getMetodiPagamento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiapagamento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiapagamento'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<TipologiaPagamentoModel> tipologie = [];
@@ -2035,7 +2649,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getCommissioni()async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/commissione/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/commissione/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<CommissioneModel> commissioni = [];
@@ -2053,7 +2667,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getProdottiByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<RelazioneProdottiInterventoModel> prodotti = [];
@@ -2082,7 +2696,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getNoteByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<NotaTecnicoModel> note =[];
@@ -2102,7 +2716,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -2122,7 +2736,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -2143,7 +2757,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaTitolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -2205,7 +2819,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -2485,7 +3099,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
     String? formattedData = data != null ? data.toIso8601String() : null;
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'data': formattedData, // Usa la stringa ISO solo se 'data' non è null
       'descrizione': descrizione,
@@ -2525,12 +3139,422 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     }
   }
 
+  void modificaArticolo() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : articoloController.text.toUpperCase(),
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Articolo modificato con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.articolo = articoloController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaAccessori() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : accessoriController.text.toUpperCase(),
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Accessori modificati con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.accessori = accessoriController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDifetto() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : difettoController.text.toUpperCase(),
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Difetto riscontrato modificato con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.difetto_riscontrato = difettoController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaPassword() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : passwordController.text.toUpperCase(),
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Password modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.password = passwordController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDati() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': datiController.text.toUpperCase(),
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Dati modificati con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.dati = datiController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDiagnosi() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : diagnosiController.text.toUpperCase(),
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Diagnosi modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.diagnosi = diagnosiController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaImportoMerce() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : double.tryParse(importoMerceController.text.toString()),
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Importo preventivato modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.importo_preventivato =
+              double.tryParse(importoMerceController.text.toString());
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void showPreventivoDialog(BuildContext context) {
+    // Variabile per gestire il valore locale del checkbox
+    bool? isPreventivo = widget.intervento.merce?.preventivo ?? false;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text("È richiesto un preventivo?"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isPreventivo == true,
+                        onChanged: (bool? value) {
+                          setDialogState(() {
+                            isPreventivo = value == true;
+                          });
+                          setState(() {
+                            widget.intervento.merce?.preventivo = value == true;
+                          });
+                        },
+                      ),
+                      Text("Sì"),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isPreventivo == false,
+                        onChanged: (bool? value) {
+                          setDialogState(() {
+                            isPreventivo = value == false;
+                          });
+                          setState(() {
+                            widget.intervento.merce?.preventivo = value == false;
+                          });
+                        },
+                      ),
+                      Text("No"),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: (){
+                    modificaRichiestaPreventivo(intervento.merce!.preventivo!);
+                  },
+                  child: Text("Conferma"),
+                ),
+                SizedBox(width: 5),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Chiudi"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void modificaRichiestaPreventivo(bool preventivo) async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Richiesta preventivo modificata con successo!'),
+          ),
+        );
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaRisoluzione() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : risoluzioneController.text.toUpperCase(),
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Diagnosi modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.diagnosi = diagnosiController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
   Future<void> assegna() async {
     print('rrees '+_responsabileSelezionato!.toMap().toString());
     print(_selectedUtenti.toString());
     print(_finalSelectedUtenti.toString());
     try {
-      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+      final response = await http.post(Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
@@ -2586,7 +3610,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             try{
               print('eliminazione vecchie relazioni');
               final response = await http.delete(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi/'+relaz.id.toString()),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/'+relaz.id.toString()),
                 headers: {'Content-Type': 'application/json'},
               );
               print(response.body.toString());
@@ -2599,7 +3623,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             try{
               print('sono quiiiiii');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'utente' : utente?.toMap(),
@@ -2650,7 +3674,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaSaldo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -2845,7 +3869,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -2910,7 +3934,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Widget _buildImagePreview() {
-    return SizedBox(width: 600,
+    return SizedBox(width: 1200,
       height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -3010,7 +4034,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -3104,7 +4128,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void eliminaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -3211,7 +4235,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(

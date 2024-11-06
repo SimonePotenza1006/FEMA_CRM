@@ -151,7 +151,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: updateCliente,
+                  onPressed: (){
+                    updateCliente();
+                  },
                   child: const Text('Salva Modifiche'),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
@@ -207,54 +209,58 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> updateCliente() async {
     late http.Response response;
+    print("Esecuzione della funzione updateCliente iniziata."); // Debug iniziale
 
+    // Crea il body da inviare con i dati aggiornati
+    final Map<String, dynamic> bodyData = {
+      'id': widget.cliente.id,
+      'codice_fiscale': _codiceFiscaleController.text.toString(),
+      'partita_iva': _partitaIvaController.text.toString(),
+      'denominazione': _denominazioneController.text.toString(),
+      'indirizzo': _indirizzoController.text.toString(),
+      'cap': _capController.text.toString(),
+      'citta': _cittaController.text.toString(),
+      'provincia': _provinciaController.text.toString(),
+      'nazione': _nazioneController.text.toString(),
+      'recapito_fatturazione_elettronica': _fatturazioneElettronicaController.text.toString(),
+      'riferimento_amministrativo': _riferimentoAmministrativoController.text.toString(),
+      'referente': _referenteController.text.toString(),
+      'fax': _faxController.text.toString(),
+      'telefono': _telefonoController.text.toString(),
+      'cellulare': _cellulareController.text.toString(),
+      'email': _emailController.text.toString(),
+      'pec': _pecController.text.toString(),
+      'note': _noteController.text.toString(),
+    };
     try {
-      // Prima aggiorna il cliente esistente
-      response = await http.put(
-        Uri.parse('$ipaddress/api/cliente/${widget.cliente.id}'),
+      print("Body inviato: ${json.encode(bodyData)}"); // Debug del body
+      // Invia la richiesta POST per aggiornare il cliente
+      response = await http.post(
+        Uri.parse('$ipaddressProva/api/cliente'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
         },
-        body: json.encode({
-          'id': widget.cliente.id,
-          'codice_fiscale': _codiceFiscaleController.text.toString(),
-          'partita_iva': _partitaIvaController.text.toString(),
-          'denominazione': _denominazioneController.text.toString(),
-          'indirizzo': _indirizzoController.text.toString(),
-          'cap': _capController.text.toString(),
-          'citta': _cittaController.text.toString(),
-          'provincia': _provinciaController.text.toString(),
-          'nazione': _nazioneController.text.toString(),
-          'recapito_fatturazione_elettronica':
-          _fatturazioneElettronicaController.text.toString(),
-          'riferimento_amministrativo':
-          _riferimentoAmministrativoController.text.toString(),
-          'referente': _referenteController.text.toString(),
-          'fax': _faxController.text.toString(),
-          'telefono': _telefonoController.text.toString(),
-          'cellulare': _cellulareController.text.toString(),
-          'email': _emailController.text.toString(),
-          'pec': _pecController.text.toString(),
-          'note': _noteController.text.toString(),
-          'tipologie_interventi': widget.cliente.tipologie_interventi,
-        }),
+        body: json.encode(bodyData),
       );
-
-      if (response.statusCode == 201 || response.statusCode == 200) {
+      // Stampa il codice di stato della risposta
+      print("Stato risposta POST: ${response.statusCode}");
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print("Cliente modificato correttamente!");
-
-        // Ora carica il file selezionato se esiste
+        // Carica il file se esiste
         if (selectedFile != null) {
           await uploadFile(selectedFile!);
         }
+        // Navigator.pop solo dopo aggiornamento e caricamento completati
         Navigator.pop(context);
-
       } else {
-        print("Errore durante la modifica del cliente: ${response.body}");
+        // In caso di errore, stampa il corpo della risposta
+        print("Errore durante la modifica del cliente: Codice ${response.statusCode}");
+        print("Errore dettagliato: ${response.body}");
       }
     } catch (e) {
-      print("Errore: $e");
+      // Gestione degli errori in caso di eccezioni (es. problemi di connessione)
+      print("Errore durante la modifica del cliente: $e");
     }
   }
 
@@ -263,7 +269,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       // Crea una richiesta multipart per l'upload del file
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/certificazioni/clienti'),
+        Uri.parse('$ipaddressProva/pdfu/certificazioni/clienti'),
       );
 
       // Aggiungi il nome del cliente come parametro

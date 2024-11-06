@@ -34,7 +34,6 @@ class _DettaglioCommissioneAmministrazionePageState
 
   void openAssignDialog() {
     UtenteModel? selectedUser;
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -93,7 +92,7 @@ class _DettaglioCommissioneAmministrazionePageState
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -119,7 +118,6 @@ class _DettaglioCommissioneAmministrazionePageState
         .format(widget.commissione.data ?? DateTime.now());
     String descrizione = widget.commissione.descrizione ?? 'NESSUNA DESCRIZIONE DISPONIBILE';
     String note = widget.commissione.note ?? 'NESSUNA NOTA DISPONIBILE';
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -136,7 +134,7 @@ class _DettaglioCommissioneAmministrazionePageState
               height: 30,
             ),
             Container(
-              width: 400, // Imposta la larghezza del container per centrare i dati
+              width: 700, // Imposta la larghezza del container per centrare i dati
               padding: EdgeInsets.all(16.0),
               decoration: BoxDecoration(
                 color: Colors.grey[200],
@@ -221,7 +219,7 @@ class _DettaglioCommissioneAmministrazionePageState
   }
 
   Future<void> elimina() async{
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
@@ -262,7 +260,7 @@ class _DettaglioCommissioneAmministrazionePageState
   }
 
   Future<void> assegna(UtenteModel utente) async{
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
@@ -302,7 +300,7 @@ class _DettaglioCommissioneAmministrazionePageState
 
 
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
@@ -346,11 +344,11 @@ class _DettaglioCommissioneAmministrazionePageState
   }
 
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
-    bool isValueTooLong = value.length > 10;
-    String displayedValue = isValueTooLong ? value.substring(0, 10) + "..." : value;
+    bool isValueTooLong = value.length > 25;
+    String displayedValue = isValueTooLong ? value.substring(0, 25) + "..." : value;
 
     return SizedBox(
-      width: 320,
+      width: 600,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(
