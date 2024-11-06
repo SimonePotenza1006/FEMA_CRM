@@ -77,7 +77,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<void> saveIngresso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/ingresso'),
+        Uri.parse('$ipaddress/api/ingresso'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'orario': formattedDate,
@@ -94,7 +94,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -118,7 +118,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -141,7 +141,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getMerce(String userId) async{
     try{
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -165,7 +165,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -179,7 +179,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
 
         //getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate);
         http.Response response2 = await http
-            .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
+            .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
         if (response2.statusCode == 200) {
           var responseData2 = json.decode(response2.body);
           //print('rrdd2 '+responseData2.toString());
@@ -309,7 +309,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -333,7 +333,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getAllInterventi() async {
     try {
       print('getAllInterventi chiamato');
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -359,7 +359,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'INTERVENTI',//'Home ${widget.userData!.nomeCompleto().toString()}',
+          'LISTA INTERVENTI',//'Home ${widget.userData!.nomeCompleto().toString()}',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -480,7 +480,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                             List<InterventoModel> interventi = snapshot.data!;
                             interventi = interventi.where((intervento) => intervento.merce == null).toList();
                             interventi = interventi.where((intervento) {
-                              return intervento.data == null || intervento.data!.isBefore(selectedDate.add(Duration(days: 1)));//isSameDay(selectedDate);
+                              return intervento.data == null || intervento.data!.isSameDay(selectedDate);//isBefore(selectedDate.add(Duration(days: 1)));//
                             }).toList();
                             if (interventi.isEmpty) {
                               return Center(child: Text(''));
@@ -1143,7 +1143,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                         },
                       ),
                       const SizedBox(height: 50.0),
-                      Center(
+                      /*Center(
                         child: Text(
                           'Agenda commissioni',
                           style: TextStyle(
@@ -1195,7 +1195,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                             return Center(child: Text(''));
                           }
                         },
-                      ),
+                      ),*/
                     ],
                   ),
                 );
@@ -1297,7 +1297,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'INTERVENTI',
+                                'INTERVENTI PERSONALI',
                                 style: TextStyle(
                                     fontSize: 30.0, fontWeight: FontWeight.bold),
                               ),
@@ -1424,7 +1424,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                         }
                       },
                     ),
-                    FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                    /*FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                           future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -1503,7 +1503,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               return Center(child: Text(''));
                             }
                           },
-                        ),
+                        ),*/
                         ]) : Wrap(children: <Widget>[
 
                           Center(
@@ -1957,7 +1957,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                           },
                         ),
                         const SizedBox(height: 50.0),
-                        const Text(
+                        /*const Text(
                           'AGENDA COMMISSIONI',
                           style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
                         ),
@@ -2005,7 +2005,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               return Center(child: Text('Nessuna commissione trovata'));
                             }
                           },
-                        ),
+                        ),*/
                       ],
                     ),
                   ),
