@@ -42,6 +42,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
+  Offset? _lastPosition;
   Map<int, int> _menuItemClickCount = {};
   // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   // Map<String, dynamic> _deviceData = <String, dynamic>{};
@@ -73,6 +74,42 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     final sectorAngle = (2 * math.pi) / 14; // 14 menu items
     final hoveredIndex = (angle ~/ sectorAngle) % 14;
     return hoveredIndex;
+  }
+
+  Timer? _debounce;
+
+  void _onHover(PointerEvent event) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 100), () {
+      RenderBox box = context.findRenderObject() as RenderBox;
+      Offset localOffset = box.globalToLocal(event.localPosition);
+
+      // Calcola il nuovo indice hoverato
+      int newHoveredIndex = _calculateHoveredIndex(localOffset);
+
+      // Controlla se la posizione è cambiata significativamente
+      if (_lastPosition != null) {
+        double distanceSquared = (_lastPosition!.dx - localOffset.dx) * (_lastPosition!.dx - localOffset.dx) +
+            (_lastPosition!.dy - localOffset.dy) * (_lastPosition!.dy - localOffset.dy);
+
+        if (distanceSquared < 100) { // Usa 100 (10 * 10) per una tolleranza di 10 pixel
+          // Se la distanza è troppo piccola, non aggiornare
+          return;
+        }
+      }
+
+      // Aggiorna solo se l'indice hoverato è cambiato
+      if (newHoveredIndex != _hoveredIndex) {
+        setState(() {
+          _hoveredIndex = newHoveredIndex; // Aggiorna l'indice hoverato
+          _lastPosition = localOffset; // Aggiorna l'ultima posizione
+        });
+      } else {
+        // Se l'indice non è cambiato, aggiorna solo l'ultima posizione
+        _lastPosition = localOffset;
+      }
+    });
   }
 
   Future<void> saveIngresso() async{
@@ -148,7 +185,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         List<InterventoModel> interventi = [];
         for(var interventoJson in responseData){
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
-          if(intervento!.concluso != true){
+          if(intervento!.merce?.data_consegna == null){//if(intervento!.concluso != true){
             interventi.add(intervento);
           }
         }
@@ -511,7 +548,67 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                     children: [
                       Column(
                         children: [
-                          GestureDetector(
+                          MouseRegion(
+                            onEnter: (_) {
+                              // Puoi impostare un valore di hover qui se necessario
+                            },
+                            onExit: (_) {
+                              setState(() {
+                                _hoveredIndex = -1; // Resetta l'indice quando il cursore esce
+                                _lastPosition = null;
+                              });
+                            },
+                            onHover: _onHover,/*(event) {
+                              RenderBox box = context.findRenderObject() as RenderBox;
+                              Offset localOffset = box.globalToLocal(event.localPosition);
+                              int newHoveredIndex = _calculateHoveredIndex(localOffset);
+
+                              // Aggiorna solo se l'indice hoverato è cambiato
+                              if (newHoveredIndex != _hoveredIndex) {
+                                setState(() {
+                                  _hoveredIndex = newHoveredIndex; // Aggiorna l'indice hoverato
+                                });
+                              }
+                            },*/
+                            child: GestureDetector(
+                              onTapUp: (details) {
+                                if (_hoveredIndex != -1) {
+                                  _navigateToPage(_hoveredIndex);
+                                }
+                              },
+                              /*onPanUpdate: (details) {
+                                RenderBox box = context.findRenderObject() as RenderBox;
+                                Offset localOffset = box.globalToLocal(details.globalPosition);
+                                int newHoveredIndex = _calculateHoveredIndex(localOffset);
+                                if (newHoveredIndex != _hoveredIndex) {
+                                  setState(() {
+                                    _hoveredIndex = newHoveredIndex; // Aggiorna solo se l'indice cambia
+                                  });
+                                }
+                              },*/
+                              child: CustomPaint(
+                                size: Size(300, 300),
+                                painter: MenuPainter(
+                                      (index) {
+                                        if (index != _hoveredIndex) {
+                                          setState(() {
+                                            _hoveredIndex = index;
+                                          });
+                                        }
+                                  },
+                                      () {
+                                    setState(() {
+                                      _hoveredIndex = -1; // Reset dell'indice
+                                    });
+                                  },
+                                  context,
+                                  size: Size(300, 300),
+                                  hoveredIndex: _hoveredIndex,
+                                ),
+                              ),
+                            ),
+                          ),
+                          /*GestureDetector(
                             onTapUp: (details) {
                               if (_hoveredIndex != -1) {
                                 _navigateToPage(_hoveredIndex);
@@ -525,24 +622,25 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               });
                             },
                             child: CustomPaint(
-                              size: Size(300, 300),
-                              painter: MenuPainter(
-                                    (index) {
-                                  setState(() {
-                                    _hoveredIndex = index;
-                                  });
-                                },
-                                    () {
-                                  setState(() {
-                                    _hoveredIndex = -1;
-                                  });
-                                },
-                                context,
                                 size: Size(300, 300),
-                                hoveredIndex: _hoveredIndex,
-                              ),
+                                painter: MenuPainter(
+                                      (index) {
+                                    setState(() {
+                                      _hoveredIndex = index;
+                                    });
+                                  },
+                                      () {
+                                    setState(() {
+                                      _hoveredIndex = -1;
+                                    });
+                                  },
+                                  context,
+                                  size: Size(300, 300),
+                                  hoveredIndex: _hoveredIndex,
+                                ),
+
                             ),
-                          ),
+                          ),*/
                         ],
                       ),
                       SizedBox(height: 25),
@@ -553,12 +651,12 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Interventi personali',
+                              'Nuovi Interventi',
                               style: TextStyle(
                                   fontSize: 30.0, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(width: 15),
-                            IconButton(
+                            /*IconButton(
                               icon: Icon(Icons.calendar_today),
                               onPressed: () async {
                                 final DateTime? pickedDate = await showDatePicker(
@@ -573,7 +671,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   });
                                 }
                               },
-                            ),
+                            ),*/
                           ],
                         ),
                       ),
@@ -667,14 +765,14 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       context: context,
                                       builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                                         title: new Text(''+intervento.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                                        content: new Text('Cliente: '+intervento.cliente!.denominazione!+'\n'+intervento!.destinazione!.indirizzo!+'\n'
+                                        content: new Text('Cliente: '+intervento.cliente!.denominazione!+' - '+intervento!.destinazione!.indirizzo!+'\n'
                                         +'\nData: '+
                                             (intervento.data != null
                                             ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
-                                            : 'Nessun appuntamento stabilito')+
+                                            : 'N.D.')+
                                         '\nOrario appuntamento: '+ (intervento.orario_appuntamento != null
                                             ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                            : 'Nessun orario stabilito'), style: TextStyle(fontSize: 14)),
+                                            : 'N.D.'), style: TextStyle(fontSize: 14)),
                                         actions: <Widget>[
                                           Form(
                                               //key: _formKeyLice,
@@ -968,7 +1066,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
 
                       ]),
 
-                      const SizedBox(height: 50.0),
+                      /*const SizedBox(height: 50.0),
                       Center(
                         child: Text(
                           'Interventi di settore',
@@ -1080,7 +1178,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             return Center(child: Text(''));
                           }
                         },
-                      ),
+                      ),*/
                       const SizedBox(height: 50.0),
                       Center(
                         child: Text(
@@ -1164,7 +1262,47 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       ],
                                     ),
                                     onTap: () {
-                                      Navigator.push(
+                                      showDialog(
+                                        //barrierDismissible: false,
+                                        context: context,
+                                        builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                          title: new Text(''+singolaMerce.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                                          content: new Text('Cliente: '+singolaMerce.cliente!.denominazione!+' - '+singolaMerce!.destinazione!.indirizzo!+'\n'
+                                              +'\n'+singolaMerce.merce!.articolo!+' - '+singolaMerce.merce!.difetto_riscontrato!+'\n\nData: '+
+                                              (singolaMerce.data != null
+                                                  ? '${singolaMerce.data!.day.toString().padLeft(2, '0')}/${singolaMerce.data!.month.toString().padLeft(2, '0')}/${singolaMerce.data!.year}'
+                                                  : 'N.D.')+
+                                              '\nOrario appuntamento: '+ (singolaMerce.orario_appuntamento != null
+                                              ? '${singolaMerce.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${singolaMerce.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                              : 'N.D.'),
+                                              style: TextStyle(fontSize: 14)
+
+                                          ),
+                                          actions: <Widget>[
+                                            Form(
+                                              //key: _formKeyLice,
+                                              //autovalidateMode: AutovalidateMode.onUserInteraction,
+                                                child:
+                                                Column(
+                                                  //scrollDirection: Axis.vertical,
+                                                  //direction: Axis.vertical,
+                                                    children: [
+
+
+
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          interventoVisualizzato(singolaMerce);},
+                                                        //Navigator.of(context).pop(true), // <-- SEE HERE
+                                                        child: new Text('PRESA VISIONE', style: TextStyle(
+                                                            fontSize: 22.0,
+                                                            fontWeight: FontWeight.w600),),
+                                                      ),
+                                                    ]))
+                                          ],
+                                        ),
+                                      );
+                                      /*Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
@@ -1173,7 +1311,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                             utente: widget.userData!,
                                           ),
                                         ),
-                                      );
+                                      );*/
                                     },
                                     tileColor: Colors.white60,
                                     shape: RoundedRectangleBorder(
@@ -1354,7 +1492,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       MainAxisSize.min, // Imposta grandezza minima per la colonna
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(35.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 45, vertical: 10),//EdgeInsets.all(20.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1424,20 +1562,21 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   );
                                 },
                               ),
-                              /*SizedBox(height: 20),
+                              SizedBox(height: 20),
                               buildMenuButton(
                                 icon: Icons.build,
-                                text: 'CREA INTERVENTO',
+                                text: 'INTERVENTI',
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => InterventoTecnicoForm(userData: widget.userData!)),
+                                    MaterialPageRoute(builder: (context) => ListInterventiTecnicoPage(userData: widget.userData)),//InterventoTecnicoForm(userData: widget.userData!)),
                                   );
                                 },
-                              ),*/
+                              ),
                             ],
                           ),
                         ),
+                        SizedBox(height: 17,),
                         widget.userData!.id != '19' ? Wrap(children: <Widget>[
                         Center(
                           child: Row(
@@ -1571,7 +1710,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                         }
                       },
                     ),
-                    FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                    /*FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                           future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -1650,7 +1789,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               return Center(child: Text(''));
                             }
                           },
-                        ),
+                        ),*/
                         ]) : Wrap(children: <Widget>[
 
                           Center(
@@ -1786,7 +1925,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           ),
 
                           ]),
-                        Center(
+                        /*Center(
                           child: Text(
                             'Interventi di settore'.toUpperCase(),
                             style: TextStyle(
@@ -1895,7 +2034,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               return Center(child: Text(''));
                             }
                           },
-                        ),
+                        ),*/
                         const SizedBox(height: 50.0),
                         Center(
                           child: Text(

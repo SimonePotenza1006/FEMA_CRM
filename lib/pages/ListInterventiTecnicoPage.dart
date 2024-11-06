@@ -1207,12 +1207,12 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                       MainAxisSize.min, // Imposta grandezza minima per la colonna
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(35.0),
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),//EdgeInsets.all(35.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Center(
+                              /*Center(
                                 child: Text(
                                   "CIAO ${widget.userData!.nome!.toUpperCase().toString()}!",
                                   textAlign: TextAlign.center, // Centra il testo
@@ -1277,7 +1277,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                   );
                                 },
                               ),
-                              /*SizedBox(height: 20),
+                              SizedBox(height: 20),
                               buildMenuButton(
                                 icon: Icons.build,
                                 text: 'CREA INTERVENTO',

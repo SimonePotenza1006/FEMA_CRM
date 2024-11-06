@@ -605,7 +605,7 @@ class _LoginFormState extends State<LoginForm> {
                           SizedBox(height: 30),
                           Row(mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text('REL. 05.11.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),
+                                Text('REL. 06.11.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),
                         ],
                       ),
                     ),
