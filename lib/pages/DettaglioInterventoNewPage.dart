@@ -64,6 +64,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   List<FaseRiparazioneModel> fasiRiparazione = [];
   TextEditingController rapportinoController = TextEditingController();
   TextEditingController _codiceDaneaController = TextEditingController();
+  bool modificaImportoMerceVisibile = false;
   bool modificaDescrizioneVisible = false;
   bool modificaImportoVisibile = false;
   bool modificaNotaVisibile = false;
@@ -76,7 +77,8 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   bool modificaDatiVisibile = false;
   bool modificaDiagnosiVisibile = false;
   bool modificaRisoluzioneVisibile = false;
-  final datiController = TextEditingController();
+  final TextEditingController importoMerceController = TextEditingController();
+  final TextEditingController datiController = TextEditingController();
   final TextEditingController risoluzioneController = TextEditingController();
   final TextEditingController diagnosiController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -588,22 +590,106 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                         ],
                       )
                   ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Richiesta di preventivo',
-                      value: booleanToString(widget.intervento.merce?.preventivo ?? false),
-                      context: context
-                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Richiesta di preventivo',
+                          value: booleanToString(widget.intervento.merce?.preventivo ?? false),
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed : (){
+                        showPreventivoDialog(context);
+                      }
+                    )
+                  ],
                 ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Importo preventivato',
-                      value: widget.intervento.merce?.importo_preventivato.toString() ?? 'N/A',
-                      context: context
-                  ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Importo preventivato',
+                          value: '${widget.intervento.merce?.importo_preventivato.toString()}€' ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    IconButton(
+                      icon : Icon(Icons.edit),
+                      onPressed: (){
+                        setState(() {
+                          modificaImportoMerceVisibile = !modificaImportoMerceVisibile;
+                        });
+                      },
+                    )
+                  ],
                 ),
+                if(modificaImportoMerceVisibile)
+                  SizedBox(
+                    width: 500,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 300,
+                          child: TextFormField(
+                            maxLines: null,
+                            controller: importoMerceController,
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d+\.?\d{0,2}'),
+                              ),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Importo preventivato',
+                              hintText: 'Modifica importo preventivato',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: 170,
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          child: FloatingActionButton(
+                            heroTag: "TagImporto",
+                            onPressed: () {
+                              if (importoMerceController.text.isNotEmpty) {
+                                modificaImportoMerce();
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Non è possibile salvare un importo nullo!'),
+                                  ),
+                                );
+                              }
+                            },
+                            backgroundColor: Colors.red,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    'Modifica importo preventivato'.toUpperCase(),
+                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                    softWrap: true,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 Row(
                   children: [
                     SizedBox(
@@ -3266,6 +3352,150 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         setState(() {
           widget.intervento.merce?.diagnosi = diagnosiController.text;
         });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaImportoMerce() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : double.tryParse(importoMerceController.text.toString()),
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Importo preventivato modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.importo_preventivato =
+              double.tryParse(importoMerceController.text.toString());
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void showPreventivoDialog(BuildContext context) {
+    // Variabile per gestire il valore locale del checkbox
+    bool? isPreventivo = widget.intervento.merce?.preventivo ?? false;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text("È richiesto un preventivo?"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isPreventivo == true,
+                        onChanged: (bool? value) {
+                          setDialogState(() {
+                            isPreventivo = value == true;
+                          });
+                          setState(() {
+                            widget.intervento.merce?.preventivo = value == true;
+                          });
+                        },
+                      ),
+                      Text("Sì"),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isPreventivo == false,
+                        onChanged: (bool? value) {
+                          setDialogState(() {
+                            isPreventivo = value == false;
+                          });
+                          setState(() {
+                            widget.intervento.merce?.preventivo = value == false;
+                          });
+                        },
+                      ),
+                      Text("No"),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: (){
+                    modificaRichiestaPreventivo(intervento.merce!.preventivo!);
+                  },
+                  child: Text("Conferma"),
+                ),
+                SizedBox(width: 5),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Chiudi"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void modificaRichiestaPreventivo(bool preventivo) async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Richiesta preventivo modificata con successo!'),
+          ),
+        );
       }
     } catch(e){
       print('Qualcosa non va: $e');
