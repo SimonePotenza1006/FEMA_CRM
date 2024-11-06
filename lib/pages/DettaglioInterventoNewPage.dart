@@ -1067,7 +1067,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           ),
           SizedBox(height: 12),
           Container(
-            width: 600,
+            width: 1000,
             child: FutureBuilder<List<Uint8List>>(
               future: _futureImages,
               builder: (context, snapshot) {
@@ -1113,6 +1113,15 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             ),
           ),
           _buildImagePreview(),
+          SizedBox(height: 20),
+          pickedImages.isNotEmpty ? ElevatedButton(
+            onPressed: pickedImages.isNotEmpty ? savePics : null, // Attiva solo se ci sono immagini
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red,
+              onPrimary: Colors.white,
+            ),
+            child: Text('Salva Foto', style: TextStyle(fontSize: 18.0)),
+          ) : Container(),
         ],
       ),
     );
@@ -3925,7 +3934,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Widget _buildImagePreview() {
-    return SizedBox(width: 600,
+    return SizedBox(width: 1200,
       height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
