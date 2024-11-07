@@ -1716,6 +1716,32 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                   value: widget.intervento.utente_apertura?.nomeCompleto() ?? 'N/A',
                   context: context
               ),
+              SizedBox(height : 20),
+              Container(
+                width: 170,
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                child: FloatingActionButton(
+                  onPressed: () {
+                    _selectDate(context);
+                  },
+                  heroTag: "TagAnnullamento",
+                  backgroundColor: Colors.red,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible( // Permette al testo di adattarsi alla dimensione
+                        child: Text(
+                          'Annulla intervento'.toUpperCase(),
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                          textAlign: TextAlign.center, // Centra il testo
+                          softWrap: true, // Permette al testo di andare a capo
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
           SizedBox(width: 50),
@@ -4280,6 +4306,65 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     } catch (e) {
       Navigator.pop(context); // Chiudi il dialog di caricamento in caso di errore
       print('Errore durante l\'invio del file: $e');
+    }
+  }
+
+  void annullaIntervento() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
+          'titolo' : widget.intervento.titolo,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : true,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento annullato con successo!'),
+          ),
+        );
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
     }
   }
 
