@@ -447,7 +447,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               style: TextStyle(
                                   fontSize: 30.0, fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(width: 15),
+                            /*SizedBox(width: 15),
                             IconButton(
                               icon: Icon(Icons.calendar_today),
                               onPressed: () async {
@@ -463,7 +463,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                   });
                                 }
                               },
-                            ),
+                            ),*/
                           ],
                         ),
                       ),
@@ -480,10 +480,11 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                             List<InterventoModel> interventi = snapshot.data!;
                             interventi = interventi.where((intervento) => intervento.merce == null).toList();
                             interventi = interventi.where((intervento) {
-                              return intervento.data == null || intervento.data!.isSameDay(selectedDate);//isBefore(selectedDate.add(Duration(days: 1)));//
+                              return intervento.data == null || intervento.data!.isBefore(selectedDate.add(Duration(days: 1)));//isSameDay(selectedDate);
                             }).toList();
                             if (interventi.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
 
                             return ListView.builder(
@@ -724,7 +725,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                 return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                               }).toList();
                               if (interventi.isEmpty) {
-                                return Center(child: Text(''));
+                                return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                    fontSize: 15.0)));
                               }
 
                               return ListView.builder(
@@ -844,7 +846,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                             }).toList();
                             if (interventi.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
                             return ListView.builder(
                               shrinkWrap: true,
@@ -957,7 +960,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                             merce = merce.where((item) => item.merce != null).toList();
 
                             if (merce.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
                             return ListView.builder(
                               shrinkWrap: true,
@@ -1038,7 +1042,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               },
                             );
                           } else {
-                            return Center(child: Text('Nessuna merce trovata'));
+                            return Center(child: Text(''));
                           }
                         },
                       ),
@@ -1056,7 +1060,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                             relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce != null).toList();
 
                             if (relazioni.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
 
                             return ListView.builder(
@@ -1106,13 +1111,13 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                     trailing: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.black)),
+                                        Text('Data arrivo merce:', style: TextStyle(fontSize: 13, color: Colors.black)),
                                         SizedBox(height: 3),
                                         Text(
                                           relazione.intervento?.data_apertura_intervento != null
                                               ? DateFormat("dd/MM/yyyy").format(relazione.intervento!.data_apertura_intervento!)
                                               : 'Data non disponibile',
-                                          style: TextStyle(fontSize: 10, color: Colors.black),
+                                          style: TextStyle(fontSize: 13, color: Colors.black),
                                         ),
                                       ],
                                     ),
@@ -1301,7 +1306,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                 style: TextStyle(
                                     fontSize: 30.0, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(width: 15),
+                              /*SizedBox(width: 15),
                               IconButton(
                                 icon: Icon(Icons.calendar_today),
                                 onPressed: () async {
@@ -1317,7 +1322,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                     });
                                   }
                                 },
-                              ),
+                              ),*/
                             ],
                           ),
                         ),
@@ -1333,10 +1338,11 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                           List<InterventoModel> interventi = snapshot.data!;
                           interventi = interventi.where((intervento) => intervento.merce == null).toList();
                           interventi = interventi.where((intervento) {
-                            return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                            return intervento.data == null || intervento.data!.isBefore(selectedDate.add(Duration(days: 1)));//isSameDay(selectedDate);
                           }).toList();
                           if (interventi.isEmpty) {
-                            return Center(child: Text(''));
+                            return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                fontSize: 15.0)));
                           }
 
                           return ListView.builder(
@@ -1389,13 +1395,13 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                         intervento.data!= null
                                             ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                             : 'Nessun appuntamento stabilito',
-                                        style: TextStyle(fontSize: 10, color: Colors.black),
+                                        style: TextStyle(fontSize: 13, color: Colors.black),
                                       ),
                                       Text(
                                         intervento.orario_appuntamento!= null
                                             ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                             : 'Nessun orario stabilito',
-                                        style: TextStyle(fontSize: 10, color: Colors.black),
+                                        style: TextStyle(fontSize: 13, color: Colors.black),
                                       ),
                                     ],
                                   ),
@@ -1550,7 +1556,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                   return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                                 }).toList();
                                 if (interventi.isEmpty) {
-                                  return Center(child: Text(''));
+                                  return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  )));
                                 }
 
                                 return ListView.builder(
@@ -1602,13 +1609,13 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                               intervento.data!= null
                                                   ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                                   : 'Nessun appuntamento stabilito',
-                                              style: TextStyle(fontSize: 10, color: Colors.black),
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
                                             ),
                                             Text(
                                               intervento.orario_appuntamento!= null
                                                   ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                                   : 'Nessun orario stabilito',
-                                              style: TextStyle(fontSize: 10, color: Colors.black),
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
                                             ),
                                           ],
                                         ),
@@ -1661,7 +1668,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                 return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                               }).toList();
                               if (interventi.isEmpty) {
-                                return Center(child: Text(''));
+                                return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                    fontSize: 15.0)));
                               }
                               return ListView.builder(
                                 shrinkWrap: true,
@@ -1714,13 +1722,13 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                             intervento.data != null
                                                 ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                                 : 'Nessun appuntamento stabilito',
-                                            style: TextStyle(fontSize: 10, color: Colors.black),
+                                            style: TextStyle(fontSize: 13, color: Colors.black),
                                           ),
                                           Text(
                                             intervento.orario_appuntamento != null
                                                 ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                                 : 'Nessun orario stabilito',
-                                            style: TextStyle(fontSize: 10, color: Colors.black),
+                                            style: TextStyle(fontSize: 13, color: Colors.black),
                                           ),
                                         ],
                                       ),
@@ -1757,7 +1765,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                 fontSize: 30.0, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 10.0),
                         FutureBuilder<List<InterventoModel>>(
                           future: getMerce(widget.userData!.id.toString()),
                           builder: (context, snapshot) {
@@ -1771,7 +1779,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               // Filtra i dati della lista per mostrare solo quelli con merce presente
                               merce = merce.where((item) => item.merce != null).toList();
                               if (merce.isEmpty) {
-                                return Center(child: Text(''));
+                                return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                    fontSize: 15.0)));
                               }
                               return ListView.builder(
                                 shrinkWrap: true,
@@ -1820,13 +1829,13 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                       trailing: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.black)),
+                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 13, color: Colors.black)),
                                           SizedBox(height: 3),
                                           Text(
                                             singolaMerce.data_apertura_intervento != null
                                                 ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
                                                 : 'Data non disponibile',
-                                            style: TextStyle(fontSize: 10, color: Colors.black),
+                                            style: TextStyle(fontSize: 13, color: Colors.black),
                                           ),
                                         ],
                                       ),
@@ -1852,7 +1861,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                 },
                               );
                             } else {
-                              return Center(child: Text('Nessuna merce trovata'));
+                              return Center(child: Text(''));
                             }
                           },
                         ),
@@ -1870,7 +1879,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce != null).toList();
 
                               if (relazioni.isEmpty) {
-                                return Center(child: Text(''));
+                                return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                    fontSize: 15.0)));
                               }
 
                               return ListView.builder(
@@ -1920,13 +1930,13 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                       trailing: Column(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 10, color: Colors.black)),
+                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 13, color: Colors.black)),
                                           SizedBox(height: 3),
                                           Text(
                                             relazione.intervento?.data_apertura_intervento != null
                                                 ? DateFormat("dd/MM/yyyy").format(relazione.intervento!.data_apertura_intervento!)
                                                 : 'Data non disponibile',
-                                            style: TextStyle(fontSize: 10, color: Colors.black),
+                                            style: TextStyle(fontSize: 13, color: Colors.black),
                                           ),
                                         ],
                                       ),

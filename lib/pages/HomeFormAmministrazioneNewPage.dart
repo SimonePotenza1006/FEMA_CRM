@@ -1561,7 +1561,8 @@ class _HomeFormAmministrazioneNewPageState
                                     return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                                   }).toList();
                                   if (interventi.isEmpty) {
-                                    return Center(child: Text(''));
+                                    return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                        fontSize: 15.0)));
                                   }
 
                                   return ListView.builder(
@@ -1776,7 +1777,8 @@ class _HomeFormAmministrazioneNewPageState
                                     return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                                   }).toList();
                                   if (interventi.isEmpty) {
-                                    return Center(child: Text(''));
+                                    return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                        fontSize: 15.0)));
                                   }
                                   return ListView.builder(
                                     shrinkWrap: true,
@@ -2459,7 +2461,8 @@ class _HomeFormAmministrazioneNewPageState
                               return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                             }).toList();
                             if (interventi.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
 
                             return ListView.builder(
@@ -2635,7 +2638,8 @@ class _HomeFormAmministrazioneNewPageState
                               return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                             }).toList();
                             if (interventi.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
                             return ListView.builder(
                               shrinkWrap: true,
@@ -2745,7 +2749,8 @@ class _HomeFormAmministrazioneNewPageState
                             // Filtra i dati della lista per mostrare solo quelli con merce presente
                             merce = merce.where((item) => item.merce != null).toList();
                             if (merce.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
                             return ListView.builder(
                               shrinkWrap: true,
@@ -2844,7 +2849,8 @@ class _HomeFormAmministrazioneNewPageState
                             relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce != null).toList();
 
                             if (relazioni.isEmpty) {
-                              return Center(child: Text(''));
+                              return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                  fontSize: 15.0)));
                             }
 
                             return ListView.builder(
