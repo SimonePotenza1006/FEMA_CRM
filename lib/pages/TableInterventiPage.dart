@@ -70,7 +70,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -91,7 +91,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -112,7 +112,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -133,7 +133,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -166,7 +166,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -211,7 +211,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -248,7 +248,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -1400,7 +1400,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/gruppi'),
+          Uri.parse('$ipaddressProva/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1432,7 +1432,7 @@ class InterventoDataSource extends DataGridSource {
   TextEditingController importoController = TextEditingController();
   TextEditingController codiceDaneaController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   GruppoInterventiModel? _selectedGruppo;
   List<GruppoInterventiModel> filteredGruppi = [];
   List<GruppoInterventiModel> allGruppiConclusi = [];
@@ -1567,12 +1567,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    saveCodice(intervento).then((_) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => TableInterventiPage()),
-                                      );
-                                    });
+                                    saveCodice(intervento);
+                                    //     .then((_) {
+                                    //   Navigator.pushReplacement(
+                                    //     context,
+                                    //     MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                                    //   );
+                                    // });
                                   },
                                   child: Text('Salva codice'.toUpperCase()),
                                 ),
@@ -1743,12 +1744,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             TextButton(
                               onPressed: () {
                                 print('IVA passata: $selectedIva'); // Stampa l'IVA prima di chiamare saveImporto
-                                saveImporto(intervento, hasIva, selectedIva).then((_) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => TableInterventiPage()),
-                                  );
-                                });
+                                saveImporto(intervento, hasIva, selectedIva);
+                                // .then((_) {
+                                //   Navigator.pushReplacement(
+                                //     context,
+                                //     MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                                //   );
+                                // });
                               },
                               child: Text('Salva importo'),
                             ),
@@ -1948,7 +1950,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2001,7 +2003,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2009,6 +2011,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'visualizzato' : intervento.visualizzato,
           'titolo' : intervento.titolo,
           'numerazione_danea' : intervento.numerazione_danea,
+          'priorita' : intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
@@ -2043,10 +2046,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         }),
       );
       if (response.statusCode == 201) {
+        intervento.importo_intervento = double.parse(importoController.text);
+        intervento.prezzo_ivato = prezzoIvato;
+        intervento.iva = iva;
         print(response.body.toString());
         print('EVVAIIIIIIII');
         Navigator.of(context).pop();
         prezzoIvato = false;
+        updateData(interventiFiltrati, _interventoUtentiMap, filteredGruppi);
       }
     } catch (e) {
       print('Errore durante il salvataggio del intervento: $e');
@@ -2056,7 +2063,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2064,6 +2071,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'visualizzato' : intervento.visualizzato,
           'titolo' : intervento.titolo,
           'numerazione_danea' : codiceDaneaController.text.isNotEmpty ? codiceDaneaController.text : "N/A",
+          'priorita' : intervento.priorita.toString().split('.').last,
           'data_apertura_intervento' : intervento.data_apertura_intervento?.toIso8601String(),
           'data': intervento.data?.toIso8601String(),
           'orario_appuntamento' : intervento.orario_appuntamento?.toIso8601String(),
@@ -2098,9 +2106,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         }),
       );
       if (response.statusCode == 201) {
+        intervento.numerazione_danea = codiceDaneaController.text;
         codiceDaneaController.clear();
         print('EVVAIIIIIIII');
         Navigator.of(context).pop();
+        updateData(interventiFiltrati, _interventoUtentiMap, filteredGruppi);
       }
     } catch (e) {
       print('Errore durante il salvataggio del intervento: $e');
@@ -2247,6 +2257,7 @@ void mostraRicercaInterventiDialog({
   TipologiaInterventoModel? selectedTipologia;
   List<ClienteModel> clientiFiltrati = [];
   TextEditingController _clienteController = TextEditingController();
+  String? selectedStato;
 
   List<InterventoModel> filtraPerUtente(List<InterventoModel> interventi, UtenteModel utente) {
     return interventi.where((intervento) => intervento.utente?.id == utente.id).toList();
@@ -2262,6 +2273,60 @@ void mostraRicercaInterventiDialog({
 
   List<InterventoModel> filtraPerData(List<InterventoModel> interventi, DateTime data) {
     return interventi.where((intervento) => intervento.data?.isAtSameMomentAs(data) ?? false).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteTipologiaStatoEIntervalloDate(
+      List<InterventoModel> interventi,
+      UtenteModel? utente,
+      ClienteModel? cliente,
+      TipologiaInterventoModel? tipologia,
+      DateTime? startDate,
+      DateTime? endDate,
+      String? stato,
+      ) {
+    return interventi.where((intervento) {
+      bool corrisponde = true;
+
+      if (utente != null) {
+        corrisponde = corrisponde && intervento.utente?.id == utente.id;
+      }
+      if (cliente != null) {
+        corrisponde = corrisponde && intervento.cliente?.id == cliente.id;
+      }
+      if (tipologia != null) {
+        corrisponde = corrisponde && intervento.tipologia?.id == tipologia.id;
+      }
+      if (startDate != null && endDate != null) {
+        corrisponde = corrisponde && intervento.data != null &&
+            intervento.data!.isAfter(startDate) &&
+            intervento.data!.isBefore(endDate);
+      }
+      if (stato != null) {
+        String statoIntervento = (intervento.orario_inizio == null && intervento.orario_fine == null)
+            ? "Assegnato"
+            : (intervento.orario_inizio != null && intervento.orario_fine == null)
+            ? "In lavorazione"
+            : (intervento.orario_inizio != null && intervento.orario_fine != null)
+            ? "Concluso"
+            : "///";
+        corrisponde = corrisponde && statoIntervento == stato;
+      }
+
+      return corrisponde;
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerStato(List<InterventoModel> interventi, String stato) {
+    return interventi.where((intervento) {
+      String? statoIntervento = (intervento.orario_inizio == null && intervento.orario_fine == null)
+          ? "Assegnato"
+          : (intervento.orario_inizio != null && intervento.orario_fine == null)
+          ? "In lavorazione"
+          : (intervento.orario_inizio != null && intervento.orario_fine != null)
+          ? "Concluso"
+          : "///";
+      return statoIntervento == stato;
+    }).toList();
   }
 
   List<InterventoModel> filtraPerUtenteEIntervalloDate(List<InterventoModel> interventi, UtenteModel utente, DateTime startDate, DateTime endDate) {
@@ -2290,6 +2355,88 @@ void mostraRicercaInterventiDialog({
           intervento.data!.isBefore(endDate);
     }).toList();
   }
+
+  String calcolaStatoIntervento(InterventoModel intervento) {
+    return (intervento.orario_inizio == null && intervento.orario_fine == null)
+        ? "Assegnato"
+        : (intervento.orario_inizio != null && intervento.orario_fine == null)
+        ? "In lavorazione"
+        : (intervento.orario_inizio != null && intervento.orario_fine != null)
+        ? "Concluso"
+        : "///";
+  }
+
+  List<InterventoModel> filtraPerUtenteEStato(List<InterventoModel> interventi, UtenteModel utente, String stato) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          calcolaStatoIntervento(intervento) == stato;
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteEStato(List<InterventoModel> interventi, UtenteModel utente, ClienteModel cliente, String stato) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          calcolaStatoIntervento(intervento) == stato;
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteTipologiaEStato(List<InterventoModel> interventi, UtenteModel utente, ClienteModel cliente, TipologiaInterventoModel tipologia, String stato) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          intervento.tipologia?.id == tipologia.id &&
+          calcolaStatoIntervento(intervento) == stato;
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteTipologiaIntervalloDateEStato(
+      List<InterventoModel> interventi,
+      UtenteModel utente,
+      ClienteModel cliente,
+      TipologiaInterventoModel tipologia,
+      DateTime startDate,
+      DateTime endDate,
+      String stato) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          intervento.tipologia?.id == tipologia.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate) &&
+          calcolaStatoIntervento(intervento) == stato;
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteIntervalloDateEStato(List<InterventoModel> interventi, UtenteModel utente, DateTime startDate, DateTime endDate, String stato) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate) &&
+          calcolaStatoIntervento(intervento) == stato;
+    }).toList();
+  }
+
+  List<InterventoModel> filtraPerUtenteClienteIntervalloDateEStato(
+      List<InterventoModel> interventi,
+      UtenteModel utente,
+      ClienteModel cliente,
+      DateTime startDate,
+      DateTime endDate,
+      String stato) {
+    return interventi.where((intervento) {
+      return intervento.utente?.id == utente.id &&
+          intervento.cliente?.id == cliente.id &&
+          intervento.data != null &&
+          intervento.data!.isAfter(startDate) &&
+          intervento.data!.isBefore(endDate) &&
+          calcolaStatoIntervento(intervento) == stato;
+    }).toList();
+  }
+
+// Funzione helper per calcolare lo stato dell'intervent
 
   List<InterventoModel> filtraPerUtenteClienteTipologiaEIntervalloDate(
       List<InterventoModel> interventi,
@@ -2444,6 +2591,21 @@ void mostraRicercaInterventiDialog({
                       });
                     },
                   ),
+                  SizedBox(height : 10),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(labelText: 'Seleziona Stato'),
+                    value: selectedStato,
+                    items: [
+                      DropdownMenuItem(value: 'Assegnato', child: Text('Assegnato')),
+                      DropdownMenuItem(value: 'In lavorazione', child: Text('In lavorazione')),
+                      DropdownMenuItem(value: 'Concluso', child: Text('Concluso')),
+                    ],
+                    onChanged: (val) {
+                      setState(() {
+                        selectedStato = val;
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -2457,6 +2619,8 @@ void mostraRicercaInterventiDialog({
               ElevatedButton(
                 onPressed: () {
                   List<InterventoModel> interventiFiltrati = interventi;
+
+                  // Filtri singoli
                   if (selectedUtente != null) {
                     interventiFiltrati = filtraPerUtente(interventiFiltrati, selectedUtente!);
                   }
@@ -2466,8 +2630,23 @@ void mostraRicercaInterventiDialog({
                   if (selectedTipologia != null) {
                     interventiFiltrati = filtraPerTipologia(interventiFiltrati, selectedTipologia!);
                   }
+                  if (selectedStato != null) {
+                    interventiFiltrati = filtraPerStato(interventiFiltrati, selectedStato!);
+                  }
+
+                  // Filtri con date
                   if (startDate != null && endDate != null) {
-                    if (selectedUtente != null && selectedCliente != null && selectedTipologia != null) {
+                    if (selectedUtente != null && selectedCliente != null && selectedTipologia != null && selectedStato != null) {
+                      interventiFiltrati = filtraPerUtenteClienteTipologiaIntervalloDateEStato(
+                          interventiFiltrati,
+                          selectedUtente!,
+                          selectedCliente!,
+                          selectedTipologia!,
+                          startDate!,
+                          endDate!,
+                          selectedStato!
+                      );
+                    } else if (selectedUtente != null && selectedCliente != null && selectedTipologia != null) {
                       interventiFiltrati = filtraPerUtenteClienteTipologiaEIntervalloDate(
                           interventiFiltrati,
                           selectedUtente!,
@@ -2476,6 +2655,15 @@ void mostraRicercaInterventiDialog({
                           startDate!,
                           endDate!
                       );
+                    } else if (selectedUtente != null && selectedCliente != null && selectedStato != null) {
+                      interventiFiltrati = filtraPerUtenteClienteIntervalloDateEStato(
+                          interventiFiltrati,
+                          selectedUtente!,
+                          selectedCliente!,
+                          startDate!,
+                          endDate!,
+                          selectedStato!
+                      );
                     } else if (selectedUtente != null && selectedCliente != null) {
                       interventiFiltrati = filtraPerUtenteClienteEIntervalloDate(
                           interventiFiltrati,
@@ -2483,6 +2671,14 @@ void mostraRicercaInterventiDialog({
                           selectedCliente!,
                           startDate!,
                           endDate!
+                      );
+                    } else if (selectedUtente != null && selectedStato != null) {
+                      interventiFiltrati = filtraPerUtenteIntervalloDateEStato(
+                          interventiFiltrati,
+                          selectedUtente!,
+                          startDate!,
+                          endDate!,
+                          selectedStato!
                       );
                     } else if (selectedUtente != null) {
                       interventiFiltrati = filtraPerUtenteEIntervalloDate(
@@ -2503,6 +2699,18 @@ void mostraRicercaInterventiDialog({
                   } else if (endDate != null) {
                     interventiFiltrati = filtraPerData(interventiFiltrati, endDate!);
                   }
+
+                  // Applicazione del filtro "Conclusi" solo per intervallo di date e utente
+                  if (selectedStato == "Concluso" && selectedUtente != null && startDate != null && endDate != null) {
+                    interventiFiltrati = filtraConclusiPerUtenteEIntervalloDate(
+                        interventiFiltrati,
+                        selectedUtente!,
+                        startDate!,
+                        endDate!
+                    );
+                  }
+
+                  // Restituzione dei risultati filtrati
                   onFiltrati(interventiFiltrati);
                   Navigator.of(context).pop();
                 },
