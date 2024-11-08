@@ -290,7 +290,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllCommissioniByUtente() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/commissione/utente/${widget.utente!.id}');
+      var apiUrl = Uri.parse('$ipaddressProva/api/commissione/utente/${widget.utente!.id}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -313,7 +313,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   // Future<void> getAllInterventiByUtente() async {
   //   try {
   //     print('getAllInterventiByUtente chiamato');
-  //     var apiUrl = Uri.parse('$ipaddress/api/intervento/utente/${int.parse(widget.utente!.id.toString())}');
+  //     var apiUrl = Uri.parse('$ipaddressProva/api/intervento/utente/${int.parse(widget.utente!.id.toString())}');
   //     var response = await http.get(apiUrl);
   //     if (response.statusCode == 200) {
   //       print('getAllInterventiByUtente: successo, status code: ${response.statusCode}');
@@ -337,7 +337,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.utente!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.utente!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         print('getAllInterventiByUtente: successo, status code: ${response.statusCode}');

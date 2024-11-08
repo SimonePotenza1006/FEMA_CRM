@@ -236,7 +236,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       print("Body inviato: ${json.encode(bodyData)}"); // Debug del body
       // Invia la richiesta POST per aggiornare il cliente
       response = await http.post(
-        Uri.parse('$ipaddress/api/cliente'),
+        Uri.parse('$ipaddressProva/api/cliente'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -269,7 +269,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       // Crea una richiesta multipart per l'upload del file
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/certificazioni/clienti'),
+        Uri.parse('$ipaddressProva/pdfu/certificazioni/clienti'),
       );
 
       // Aggiungi il nome del cliente come parametro
