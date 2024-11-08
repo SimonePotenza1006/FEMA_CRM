@@ -555,12 +555,12 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            /*Text(
+                            Text(
                               'Nuovi Interventi',
                               style: TextStyle(
                                   fontSize: 30.0, fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(width: 15),
+                            /*SizedBox(width: 15),
                             IconButton(
                               icon: Icon(Icons.calendar_today),
                               onPressed: () async {
@@ -580,7 +580,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           ],
                         ),
                       ),
-                        /*const SizedBox(height: 10.0),
+                        const SizedBox(height: 10.0),
                       FutureBuilder<List<InterventoModel>>(
                         future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
                         builder: (context, snapshot) {
@@ -726,7 +726,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           }
                         },
                       ),
-                      FutureBuilder<List<RelazioneUtentiInterventiModel>>(
+                      /*FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                         future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
