@@ -31,6 +31,7 @@ class _CreazioneClientePageState extends State<CreazioneClientePage> {
   final _emailController = TextEditingController();
   final _pecController = TextEditingController();
   final _noteController = TextEditingController();
+  final _daneaController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
@@ -62,6 +63,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 crossAxisAlignment: CrossAxisAlignment.center,
                 //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  _buildTextFormField(_daneaController, 'Codice Danea',
+                      'Inserisci il codice Danea'),
+                  SizedBox(height: 15,),
                   _buildTextFormField(_codiceFiscaleController, 'Codice Fiscale',
                       'Inserisci un codice fiscale'),
                   SizedBox(height: 15,),
@@ -172,6 +176,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     final url = Uri.parse('$ipaddress/api/cliente');
     final body = jsonEncode({
       'codice_fiscale': _codiceFiscaleController.text,
+      'cod_danea' : _daneaController.text,
       'partita_iva': _partitaIvaController.text,
       'denominazione': _denominazioneController.text,
       'indirizzo': _indirizzoController.text,

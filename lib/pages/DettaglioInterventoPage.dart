@@ -3150,8 +3150,6 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
           'gruppo': widget.intervento.gruppo?.toMap(),
         }),
       );
-
-      // Handle response success/failure
       if (response.statusCode == 201) {
         print('Modifica effettuata');
         ScaffoldMessenger.of(context).showSnackBar(

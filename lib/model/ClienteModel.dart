@@ -2,6 +2,7 @@ import 'TipologiaInterventoModel.dart';
 
 class ClienteModel {
   String? id;
+  String? cod_danea;
   String? codice_fiscale;
   String? partita_iva;
   String? denominazione;
@@ -23,6 +24,7 @@ class ClienteModel {
 
   ClienteModel(
       this.id,
+      this.cod_danea,
       this.codice_fiscale,
       this.partita_iva,
       this.denominazione,
@@ -47,6 +49,7 @@ class ClienteModel {
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'id': id,
+      'cod_danea' : cod_danea,
       'codice_fiscale': codice_fiscale,
       'partita_iva': partita_iva,
       'denominazione': denominazione,
@@ -71,6 +74,7 @@ class ClienteModel {
 
   ClienteModel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
+    cod_danea = map['cod_danea'];
     codice_fiscale = map['codice_fiscale'];
     partita_iva = map['partita_iva'];
     denominazione = map['denominazione'];
@@ -93,6 +97,7 @@ class ClienteModel {
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    'cod_danea' : cod_danea,
     'codice_fiscale': codice_fiscale,
     'partita_iva': partita_iva,
     'denominazione': denominazione,
@@ -116,6 +121,7 @@ class ClienteModel {
   factory ClienteModel.fromJson(Map<String, dynamic> json) {
     return ClienteModel(
       json['id'].toString(),
+      json['cod_danea'],
       json['codice_fiscale'],
       json['partita_iva'],
       json['denominazione'],

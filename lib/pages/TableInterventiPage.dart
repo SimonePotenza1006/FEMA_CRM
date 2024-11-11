@@ -1515,13 +1515,20 @@ class InterventoDataSource extends DataGridSource {
       double? importo = intervento.importo_intervento != null ? intervento.importo_intervento : 0;
       double? acconto = intervento.acconto != null ? intervento.acconto : 0;
       double? restante_da_pagare = importo! - acconto!;
-      String? stato = (intervento.orario_inizio == null && intervento.orario_fine == null)
-          ? "Assegnato".toUpperCase()
-          : (intervento.orario_inizio != null && intervento.orario_fine == null)
-          ? "In lavorazione".toUpperCase()
-          : (intervento.orario_inizio != null && intervento.orario_fine != null)
-          ? "Concluso".toUpperCase()
+      String? stato = (intervento.annullato == true)
+          ? "ANNULLATO"
+          : (intervento.assegnato == false)
+          ? "NON ASSEGNATO"
+          : (intervento.assegnato == true && intervento.concluso == false && intervento.orario_inizio == null && intervento.orario_fine == null)
+          ? "ASSEGNATO"
+          : (intervento.assegnato == true && intervento.concluso == false && intervento.orario_inizio != null && intervento.orario_fine == null)
+          ? "IN LAVORAZIONE"
+          : (intervento.assegnato == true && intervento.concluso == false && intervento.orario_inizio != null && intervento.orario_fine != null)
+          ? "INTERVENTO TERMINATO"
+          : (intervento.assegnato == true && intervento.concluso == true)
+          ? "CONCLUSO"
           : "///";
+
 
 
 

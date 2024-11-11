@@ -1195,7 +1195,7 @@ class _HomeFormAmministrazioneNewPageState
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => MenuSopralluoghiPage(utente: widget.userData)),
+                                        MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData)),
                                       );
                                     },
                                   ),
@@ -2304,7 +2304,7 @@ class _HomeFormAmministrazioneNewPageState
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => MenuSopralluoghiPage(utente: widget.userData)),
+                                          MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData)),
                                         );
                                       },
                                     ),

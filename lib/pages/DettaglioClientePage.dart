@@ -67,6 +67,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildInfoText(title: 'Codice Danea', value: widget.cliente.cod_danea != null ? widget.cliente.cod_danea! : "Non inserito"),
                 _buildInfoText(title:'Indirizzo', value: widget.cliente.indirizzo != null ? widget.cliente.indirizzo! : "Non inserito"),
                 _buildInfoText(title:'Partita Iva', value:widget.cliente.partita_iva != null ? widget.cliente.partita_iva! : "Non inserito"),
                 _buildInfoText(title:'Cap', value:widget.cliente.cap != null ? widget.cliente.cap!: "Non inserito"),
