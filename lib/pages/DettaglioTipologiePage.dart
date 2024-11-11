@@ -82,7 +82,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllCategorieForTipologia() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddressProva/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
+          '$ipaddress/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
