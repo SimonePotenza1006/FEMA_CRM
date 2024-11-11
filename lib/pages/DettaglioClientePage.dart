@@ -34,7 +34,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getPosizioni() async{
     try{
       final response = await http.get(
-        Uri.parse('$ipaddress/api/posizioni/cliente/${widget.cliente.id}'));
+        Uri.parse('$ipaddressProva/api/posizioni/cliente/${widget.cliente.id}'));
         var responseData = json.decode(response.body);
         if(response.statusCode == 200){
           List<PosizioneGPSModel> posizioni = [];
@@ -67,6 +67,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildInfoText(title: 'Codice Danea', value: widget.cliente.cod_danea != null ? widget.cliente.cod_danea! : "Non inserito"),
                 _buildInfoText(title:'Indirizzo', value: widget.cliente.indirizzo != null ? widget.cliente.indirizzo! : "Non inserito"),
                 _buildInfoText(title:'Partita Iva', value:widget.cliente.partita_iva != null ? widget.cliente.partita_iva! : "Non inserito"),
                 _buildInfoText(title:'Cap', value:widget.cliente.cap != null ? widget.cliente.cap!: "Non inserito"),
@@ -262,7 +263,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deleteCliente(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/cliente/$id'),
+        Uri.parse('$ipaddressProva/api/cliente/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

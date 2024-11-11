@@ -20,6 +20,7 @@ import '../model/ClienteModel.dart';
 import '../model/CommissioneModel.dart';
 import '../model/FaseRiparazioneModel.dart';
 import '../model/InterventoModel.dart';
+import '../model/TipologiaInterventoModel.dart';
 import '../model/TipologiaPagamento.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
@@ -39,6 +40,8 @@ class DettaglioInterventoNewPage extends StatefulWidget {
 class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage> {
   late InterventoModel intervento;
   late Future<List<UtenteModel>> _utentiFuture;
+  List<TipologiaInterventoModel> tipologieIntervento =[];
+  TipologiaInterventoModel? selectedTipologiaIntervento;
   List<TipologiaPagamentoModel> tipologiePagamento = [];
   TipologiaPagamentoModel? selectedTipologia;
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
@@ -136,6 +139,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       });
     }
     getCommissioni();
+    getAllTipologieIntervento();
     getProdottiByIntervento();
     getRelazioni();
     getAllVeicoli();
@@ -1733,36 +1737,83 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                     )
                 ),
               SizedBox(height : 10),
+              Row(
+                children: [
+                  buildInfoRow(
+                      title: "tipologia",
+                      value: intervento.tipologia!.descrizione!
+                  ),
+                  IconButton(
+                    icon : Icon(Icons.edit),
+                    onPressed: (){
+                        showTipologiaDialog(context, tipologieIntervento, selectedTipologiaIntervento);
+                      },
+                  )
+                ],
+              ),
+              SizedBox(height : 10),
               buildInfoRow(
                   title: 'Apertura',
                   value: widget.intervento.utente_apertura?.nomeCompleto() ?? 'N/A',
                   context: context
               ),
               SizedBox(height : 20),
-              Container(
-                width: 170,
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                child: FloatingActionButton(
-                  onPressed: () {
-                    _selectDate(context);
-                  },
-                  heroTag: "TagAnnullamento",
-                  backgroundColor: Colors.red,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible( // Permette al testo di adattarsi alla dimensione
-                        child: Text(
-                          'Annulla intervento'.toUpperCase(),
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                          textAlign: TextAlign.center, // Centra il testo
-                          softWrap: true, // Permette al testo di andare a capo
+              Row(
+                children: [
+                  if(intervento.annullato == false)
+                    Container(
+                      width: 170,
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          annullaIntervento();
+                        },
+                        heroTag: "TagAnnullamento",
+                        backgroundColor: Colors.red,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible( // Permette al testo di adattarsi alla dimensione
+                              child: Text(
+                                'Annulla intervento'.toUpperCase(),
+                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                textAlign: TextAlign.center, // Centra il testo
+                                softWrap: true, // Permette al testo di andare a capo
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  SizedBox(width: 10),
+                  if(intervento.annullato == true)
+                    Container(
+                      width: 170,
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          riabilitaIntervento();
+                        },
+                        heroTag: "TagRiabilita",
+                        backgroundColor: Colors.red,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible( // Permette al testo di adattarsi alla dimensione
+                              child: Text(
+                                'Riabilita intervento'.toUpperCase(),
+                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                textAlign: TextAlign.center, // Centra il testo
+                                softWrap: true, // Permette al testo di andare a capo
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -1773,6 +1824,22 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 48),
+                SizedBox(
+                  width: 500,
+                  child: buildInfoRow(
+                      title: 'Cliente',
+                      value: widget.intervento.cliente?.denominazione ?? 'N/A',
+                      context: context
+                  ),
+                ),
+                SizedBox(
+                  width: 500,
+                  child: buildInfoRow(
+                      title: 'ID Danea cliente',
+                      value: widget.intervento.cliente?.cod_danea ?? 'N/A',
+                      context: context
+                  ),
+                ),
                 SizedBox(
                   width: 500,
                   child: buildInfoRow(
@@ -2609,7 +2676,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -2635,7 +2702,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         return response;
@@ -2657,7 +2724,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       } else {
         final ddt = DDTModel.fromJson(jsonDecode(data.body));
         try{
-          final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+          final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}'));
           var responseData = json.decode(response.body);
           if(response.statusCode == 200){
             List<RelazioneDdtProdottoModel> prodotti = [];
@@ -2679,7 +2746,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getMetodiPagamento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiapagamento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiapagamento'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<TipologiaPagamentoModel> tipologie = [];
@@ -2695,9 +2762,27 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     }
   }
 
+  Future<void> getAllTipologieIntervento() async{
+    try{
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
+      var responseData = json.decode(response.body);
+      if(response.statusCode == 200){
+        List<TipologiaInterventoModel> tipologie = [];
+        for(var item in responseData){
+          tipologie.add(TipologiaInterventoModel.fromJson(item));
+        }
+        setState(() {
+          tipologieIntervento = tipologie;
+        });
+      }
+    } catch(e){
+      print('Error fetching tipologie: $e');
+    }
+  }
+
   Future<void> getAllVeicoli() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/veicolo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/veicolo'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<VeicoloModel> veicoli = [];
@@ -2715,7 +2800,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getCommissioni()async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/commissione/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/commissione/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<CommissioneModel> commissioni = [];
@@ -2733,7 +2818,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getProdottiByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<RelazioneProdottiInterventoModel> prodotti = [];
@@ -2762,7 +2847,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getNoteByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<NotaTecnicoModel> note =[];
@@ -2782,7 +2867,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -2802,7 +2887,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -2823,7 +2908,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaTitolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -2885,7 +2970,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -3165,7 +3250,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
     String? formattedData = data != null ? data.toIso8601String() : null;
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'data': formattedData, // Usa la stringa ISO solo se 'data' non è null
       'descrizione': descrizione,
@@ -3208,7 +3293,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaArticolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3246,7 +3331,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaAccessori() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3284,7 +3369,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDifetto() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3322,7 +3407,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaPassword() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3360,7 +3445,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDati() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3398,7 +3483,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDiagnosi() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3436,7 +3521,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaImportoMerce() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3545,7 +3630,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaRichiestaPreventivo(bool preventivo) async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3580,7 +3665,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaRisoluzione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3616,90 +3701,96 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Future<void> assegna() async {
-    print('rrees '+_responsabileSelezionato!.toMap().toString());
+    print('rrees ' + _responsabileSelezionato!.toMap().toString());
     print(_selectedUtenti.toString());
     print(_finalSelectedUtenti.toString());
     try {
-      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'id': widget.intervento.id,
-            'attivo' : widget.intervento.attivo,
-            'titolo' : widget.intervento.titolo,
-            'visualizzato' : widget.intervento.visualizzato,
-            'numerazione_danea' : widget.intervento.numerazione_danea,
-            'priorita' : widget.intervento.priorita.toString().split('.').last,
-            'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
-            'data': widget.intervento.data?.toIso8601String(),
-            'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
-            'posizione_gps' : widget.intervento.posizione_gps,
-            'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
-            'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
-            'descrizione': widget.intervento.descrizione,
-            'importo_intervento': widget.intervento.importo_intervento,
-            'saldo_tecnico' : widget.intervento.saldo_tecnico,
-            'prezzo_ivato' : widget.intervento.prezzo_ivato,
-            'iva' : widget.intervento.iva,
-            'acconto' : widget.intervento.acconto,
-            'assegnato': true,
-            'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
-            'annullato' : widget.intervento.annullato,
-            'conclusione_parziale' : widget.intervento.conclusione_parziale,
-            'concluso': widget.intervento.concluso,
-            'saldato': widget.intervento.saldato,
-            'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
-            'note': widget.intervento.note,
-            'relazione_tecnico' : widget.intervento.relazione_tecnico,
-            'firma_cliente': widget.intervento.firma_cliente,
-            'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
-            'utente': _responsabileSelezionato != null ? _responsabileSelezionato?.toMap() : null,//.toMap(),
-            'cliente': widget.intervento.cliente?.toMap(),
-            'veicolo': widget.intervento.veicolo?.toMap(),
-            'merce' : widget.intervento.merce?.toMap(),
-            'tipologia': widget.intervento.tipologia?.toMap(),
-            'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
-            'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-            'destinazione': widget.intervento.destinazione?.toMap(),
-            'gruppo': widget.intervento.gruppo?.toMap()
-          }));
+      // Eliminazione preventiva delle vecchie relazioni
+      if (otherUtenti.isNotEmpty) {
+        for (var relaz in otherUtenti) {
+          try {
+            print('Eliminazione vecchie relazioni');
+            final response = await http.delete(
+              Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/' + relaz.id.toString()),
+              headers: {'Content-Type': 'application/json'},
+            );
+            print(response.body.toString());
+            print(response.statusCode);
+          } catch (e) {
+            print('Errore durante l\'eliminazione della relazione: $e');
+          }
+        }
+      }
+      // Richiesta per assegnare il responsabile all'intervento
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id,
+          'attivo': widget.intervento.attivo,
+          'titolo': widget.intervento.titolo,
+          'visualizzato': widget.intervento.visualizzato,
+          'numerazione_danea': widget.intervento.numerazione_danea,
+          'priorita': widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento': widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps': widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico': widget.intervento.saldo_tecnico,
+          'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'iva': widget.intervento.iva,
+          'acconto': widget.intervento.acconto,
+          'assegnato': true,
+          'accettato_da_tecnico': widget.intervento.accettato_da_tecnico,
+          'annullato': widget.intervento.annullato,
+          'conclusione_parziale': widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico': widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico': widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura': widget.intervento.utente_apertura?.toMap(),
+          'utente': _responsabileSelezionato?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce': widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo': widget.intervento.gruppo?.toMap()
+        }),
+      );
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Intervento assegnato!'),
-            duration: Duration(seconds: 3), // Durata dello Snackbar
+            duration: Duration(seconds: 3),
           ),
         );
         print('EVVAIIIIIIII');
-        if(_selectedUtenti.isNotEmpty){
-
-          for(var relaz in otherUtenti){
-            try{
-              print('eliminazione vecchie relazioni');
-              final response = await http.delete(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi/'+relaz.id.toString()),
-                headers: {'Content-Type': 'application/json'},
-              );
-              print(response.body.toString());
-              print(response.statusCode);
-            } catch(e) {
-              print('Errore durante l\'eliminazione della relazione: $e');
-            }
-          }
-          for(var utente in _selectedUtenti){
-            try{
-              print('sono quiiiiii');
+        // Salvataggio delle nuove relazioni per gli utenti selezionati
+        if (_selectedUtenti.isNotEmpty) {
+          for (var utente in _selectedUtenti) {
+            try {
+              print('Sono quiiiiii');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
-                  'utente' : utente?.toMap(),
-                  'intervento' : widget.intervento.toMap(),
+                  'utente': utente?.toMap(),
+                  'intervento': widget.intervento.toMap(),
                 }),
               );
               relazioniNuove.add(RelazioneUtentiInterventiModel.fromJson(json.decode(response.body.toString())));
               print(response.body.toString());
               print(response.statusCode);
-            } catch(e) {
+            } catch (e) {
               print('Errore durante il salvataggio della relazione: $e');
             }
           }
@@ -3708,17 +3799,18 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Intervento assegnato!'),
-            duration: Duration(seconds: 3), // Durata dello Snackbar
+            duration: Duration(seconds: 3),
           ),
         );
-        setState((){otherUtenti = relazioniNuove; });
-      } else {
-
+        setState(() {
+          otherUtenti = relazioniNuove;
+        });
       }
     } catch (e) {
       print('Errore durante il salvataggio del preventivo: $e');
     }
   }
+
 
   Future<void> _selectTimeAppuntamento(BuildContext context) async {
     // Convert DateTime.now() to TimeOfDay
@@ -3740,7 +3832,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaSaldo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -3935,7 +4027,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -4101,7 +4193,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -4195,7 +4287,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void eliminaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -4301,7 +4393,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -4345,6 +4437,56 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       Navigator.pop(context); // Chiudi il dialog di caricamento in caso di errore
       print('Errore durante l\'invio del file: $e');
     }
+  }
+
+  Future<void> showTipologiaDialog(BuildContext context, List<TipologiaInterventoModel> allTipologieInt, TipologiaInterventoModel? selectedTipologia) async{
+    TipologiaInterventoModel? tempSelectedTipologia = selectedTipologia;
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState){
+              return AlertDialog(
+                title: Text('Selezionare la tipologia di intervento'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: allTipologieInt.map((tipologia){
+                      return CheckboxListTile(
+                        title: Text(tipologia.descrizione!),
+                        value: tempSelectedTipologia == tipologia,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            tempSelectedTipologia = value! ? tipologia : null;
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Annulla'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState((){
+                        selectedTipologia = tempSelectedTipologia;
+                        intervento.tipologia = selectedTipologia;
+                      });
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Conferma'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+    );
   }
 
   Future<void> showVeicoloDialog(BuildContext context, List<VeicoloModel> allVeicoli, VeicoloModel? selectedVeicolo) async {
@@ -4400,7 +4542,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void annullaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -4424,6 +4566,65 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'assegnato': widget.intervento.assegnato,
           'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
           'annullato' : true,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento annullato con successo!'),
+          ),
+        );
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void riabilitaIntervento() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
+          'titolo' : widget.intervento.titolo,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : false,
           'conclusione_parziale' : widget.intervento.conclusione_parziale,
           'concluso': widget.intervento.concluso,
           'saldato': widget.intervento.saldato,

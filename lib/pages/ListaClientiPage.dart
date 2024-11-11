@@ -33,7 +33,7 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -200,7 +200,7 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
             child: Icon(Icons.account_circle_rounded, color: Colors.white, size: 30), // Icona più grande e bianca
           ),
           trailing: Text(
-            'Id. ${cliente.id}'.toUpperCase(),
+            'Id. ${cliente.id}, Codice Danea : ${cliente.cod_danea != null ? cliente.cod_danea : "N/A"}'.toUpperCase(),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black, // Colore più discreto per l'id

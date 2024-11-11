@@ -101,11 +101,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-
     // Verifica se sei su Android
     if (Platform.isAndroid) {
       final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
-
       if (pickedFile != null) {
         setState(() {
           pickedImages.add(pickedFile);
@@ -115,7 +113,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     // Verifica se sei su Windows
     else if (Platform.isWindows) {
       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-
       if (pickedFiles != null && pickedFiles.isNotEmpty) {
         setState(() {
           pickedImages.addAll(pickedFiles);
@@ -190,6 +187,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             },
           ),
           actions: [
+            IconButton(
+              icon: Icon(
+                Icons.attach_file,
+                color: Colors.white,
+              ),
+              onPressed: (){
+                takePicture();
+              },
+            ),
             IconButton(
               icon: Icon(
                 Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -576,16 +582,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
                                                   const SizedBox(height: 20),
                                                   SizedBox(height: 15,),
-                                                  ElevatedButton(
-                                                    onPressed: takePicture,
-                                                    style: ElevatedButton.styleFrom(
-                                                      primary: Colors.red,
-                                                      onPrimary: Colors.white,
-                                                    ),
-                                                    child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                                                  ),
-                                                  SizedBox(height: 15,),
-                                                  _buildImagePreview(),
+                                                  // ElevatedButton(
+                                                  //   onPressed: takePicture,
+                                                  //   style: ElevatedButton.styleFrom(
+                                                  //     primary: Colors.red,
+                                                  //     onPrimary: Colors.white,
+                                                  //   ),
+                                                  //   child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                                  // ),
                                                 ]
                                             ),
                                           ),
@@ -594,6 +598,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   ),
                                 ),
                               const SizedBox(height: 20),
+                              SizedBox(height: 15,),
+                              _buildImagePreview(),
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 20.0),
                                 child: ElevatedButton(
@@ -1075,7 +1081,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             actions: <Widget>[
               TextButton(
                   onPressed: (){
-                    if(_selectedTipologia?.id == '6'){
+                    if(pickedImages.length >= 1){
                       savePics().then((value) => Navigator.pop(dialogContext));
                       Navigator.pop(context);
                       //saveInterventoPlusMerce();
@@ -1124,7 +1130,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+              Uri.parse('$ipaddressProva/api/immagine/${intervento.id}')
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -1146,7 +1152,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         }
         pickedImages.clear();
         print('fine salv');
-        Navigator.pop(context);
       } catch(e){
         print('Errore durante l\'invio del file: $e');
       }
@@ -1156,54 +1161,59 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     return null;
   }
 
-
-
-  Future<http.Response?> saveInterventoPlusMerce() async{
-    final data = await saveMerce();
-    try{
-      if (data == null) {
+  Future<http.Response?> saveInterventoPlusMerce() async {
+    // Variabile per i dati di 'saveMerce'
+    var data;
+    // Controllo per eseguire 'saveMerce' solo se selectedTipologia?.id == "6"
+    if (_selectedTipologia?.id == "6") {
+      data = await saveMerce();
+    }
+    try {
+      if (_selectedTipologia?.id == "6" && data == null) {
         // Gestisci il caso in cui il salvataggio dell'intervento non restituisca dati validi
         throw Exception('Dati dell\'intervento non disponibili.');
       }
-      final merce = MerceInRiparazioneModel.fromJson(jsonDecode(data.body));
+      // Controllo che imposta 'merce' solo se saveMerce è stato chiamato
+      final merce = data != null ? MerceInRiparazioneModel.fromJson(jsonDecode(data.body)) : null;
       bool assigned = responsabile != null ? true : false;
-      try{
+
+      try {
         String prioritaString = _selectedPriorita.toString().split('.').last;
         final response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
-            'attivo' : true,
-            'visualizzato' : false,
-            'numerazione_danea' : null,
-            'titolo' : _titoloController.text,
-            'priorita' : prioritaString,
-            'data': selectedDate != null ? selectedDate?.toIso8601String() : null,//_dataOdierna.toIso8601String(),
-            'data_apertura_intervento' : DateTime.now().toIso8601String(),
-            'orario_appuntamento' : null,
-            'posizione_gps' : null,
+            'attivo': true,
+            'visualizzato': false,
+            'numerazione_danea': null,
+            'titolo': _titoloController.text,
+            'priorita': prioritaString,
+            'data': selectedDate != null ? selectedDate?.toIso8601String() : null,
+            'data_apertura_intervento': DateTime.now().toIso8601String(),
+            'orario_appuntamento': null,
+            'posizione_gps': null,
             'orario_inizio': null,
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
             'importo_intervento': null,
-            'saldo_tecnico' : null,
-            'prezzo_ivato' : null,
-            'iva' : null,
+            'saldo_tecnico': null,
+            'prezzo_ivato': null,
+            'iva': null,
             'assegnato': assigned,
-            'accettato_da_tecnico' : false,
-            'annullato' : false,
-            'conclusione_parziale' : false,
+            'accettato_da_tecnico': false,
+            'annullato': false,
+            'conclusione_parziale': false,
             'concluso': false,
             'saldato': false,
-            'saldato_da_tecnico' : false,
+            'saldato_da_tecnico': false,
             'note': _notaController.text.isNotEmpty ? _notaController.text : null,
-            'relazione_tecnico' : null,
+            'relazione_tecnico': null,
             'firma_cliente': null,
-            'utente_apertura' : widget.utente.toMap(),
+            'utente_apertura': widget.utente.toMap(),
             'utente': responsabile?.toMap(),
             'cliente': selectedCliente?.toMap(),
             'veicolo': null,
-            'merce' : merce.toMap(),
+            'merce': merce?.toMap(),  // Aggiunge 'merce' solo se è stato creato
             'tipologia': _selectedTipologia?.toMap(),
             'categoria_intervento_specifico': selectedCategoria?.toMap(),
             'tipologia_pagamento': null,
@@ -1211,19 +1221,18 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           }),
         );
         return response;
-      } catch(e){
+      } catch (e) {
         print('Errore durante il salvataggio dell\'intervento con merce: $e');
         return null;
       }
-    }
-    catch(e){
+    } catch (e) {
       print('ERRORE: $e');
       return null;
     }
   }
 
   Future<void> saveRelations() async {
-    final data = _selectedTipologia?.id == '6' ? await savePics() : await saveIntervento();
+    final data = await saveInterventoPlusMerce();
     if (_selectedUtenti == null || _selectedUtenti!.isEmpty) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1247,7 +1256,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print("PROVA TECNICO ${tecnico?.nome}");
             print("INTERVENTO: ${intervento.id}");
             final response = await http.post(
-              Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+              Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': tecnico?.toMap(),
@@ -1265,13 +1274,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             _showErrorDialog();
           }
         }
-        if (_selectedTipologia?.id == '6') try{
+        if (pickedImages.length >= 1) try{
           for(var image in pickedImages){
             if(image.path != null && image.path.isNotEmpty){
               print('Percorso del file: ${image.path}');
               var request = http.MultipartRequest(
                   'POST',
-                  Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+                  Uri.parse('$ipaddressProva/api/immagine/${intervento.id}')
               );
               request.files.add(
                 await http.MultipartFile.fromPath(
@@ -1292,7 +1301,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             }
           }
           pickedImages.clear();
-          Navigator.pop(context);
         } catch(e){
           print('Errore durante l\'invio del file: $e');
         }
@@ -1319,7 +1327,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
@@ -1351,7 +1359,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         print('$prioritaString');
         final orario = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, _selectedTime.hour, _selectedTime.minute);
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1402,7 +1410,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       try {
         String prioritaString = _selectedPriorita.toString().split('.').last;
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1740,7 +1748,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -1762,8 +1770,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
-
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -1785,7 +1792,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -1806,7 +1813,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

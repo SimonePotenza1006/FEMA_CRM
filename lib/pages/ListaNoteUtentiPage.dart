@@ -60,7 +60,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllNoteByUtente(int utenteId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/utente/$utenteId');
+      var apiUrl = Uri.parse('$ipaddressProva/api/noteTecnico/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> noteByUtente = [];
@@ -80,7 +80,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -101,7 +101,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllNote() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/noteTecnico/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> note = [];

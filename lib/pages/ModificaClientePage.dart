@@ -34,6 +34,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
   late TextEditingController _emailController;
   late TextEditingController _pecController;
   late TextEditingController _noteController;
+  late TextEditingController _daneaController;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   io.File? selectedFile;
@@ -43,6 +44,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     super.initState();
     _codiceFiscaleController =
         TextEditingController(text: widget.cliente.codice_fiscale);
+    _daneaController =
+        TextEditingController(text: widget.cliente.cod_danea);
     _partitaIvaController =
         TextEditingController(text: widget.cliente.partita_iva);
     _denominazioneController =
@@ -88,6 +91,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     _emailController.dispose();
     _pecController.dispose();
     _noteController.dispose();
+    _daneaController.dispose();
     super.dispose();
   }
 
@@ -105,6 +109,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              _buildTextField('Codice Danea', _daneaController),
               _buildTextField('Codice Fiscale', _codiceFiscaleController),
               _buildTextField('Partita IVA', _partitaIvaController),
               _buildTextField('Denominazione', _denominazioneController),
@@ -214,6 +219,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     // Crea il body da inviare con i dati aggiornati
     final Map<String, dynamic> bodyData = {
       'id': widget.cliente.id,
+      'cod_danea' : _daneaController.text.toString(),
       'codice_fiscale': _codiceFiscaleController.text.toString(),
       'partita_iva': _partitaIvaController.text.toString(),
       'denominazione': _denominazioneController.text.toString(),
@@ -233,10 +239,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       'note': _noteController.text.toString(),
     };
     try {
-      print("Body inviato: ${json.encode(bodyData)}"); // Debug del body
-      // Invia la richiesta POST per aggiornare il cliente
+      print("Body inviato: ${json.encode(bodyData)}");
       response = await http.post(
-        Uri.parse('$ipaddress/api/cliente'),
+        Uri.parse('$ipaddressProva/api/cliente'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -269,7 +274,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       // Crea una richiesta multipart per l'upload del file
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/certificazioni/clienti'),
+        Uri.parse('$ipaddressProva/pdfu/certificazioni/clienti'),
       );
 
       // Aggiungi il nome del cliente come parametro

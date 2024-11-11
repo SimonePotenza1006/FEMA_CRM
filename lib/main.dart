@@ -278,13 +278,9 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                     ),
                     TextButton(
-
                       onPressed: resetLicenza, //<-- SEE HERE
                       child: new Text('RESET', style: TextStyle(fontWeight: FontWeight.w600),),
-
-
                     ),
-
                     TextButton(
                       onPressed: () async =>
                       { if (_formKeyLice.currentState!.validate()) {
@@ -293,19 +289,15 @@ class _LoginFormState extends State<LoginForm> {
                           setState(() {
                             licenzaerrata = false;
                           }),
-
                           await dbHelper.saveDevice(DeviceModel('', idd)),
                           await dbHelper.saveLicenzaNo(_conLicenza.text),
                           Navigator.pop(context)
                           //print('okok')
                         } else {
-
                           setState(() {
                             licenzaerrata = true;
                           })
-
                         },
-
                       } },//Navigator.of(context).pop(true), // <-- SEE HERE
                       child: new Text('OK', style: TextStyle(
                           fontSize: 22.0,
