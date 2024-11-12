@@ -92,7 +92,7 @@ class _DettaglioCommissioneAmministrazionePageState
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -219,11 +219,12 @@ class _DettaglioCommissioneAmministrazionePageState
   }
 
   Future<void> elimina() async{
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
       'data': widget.commissione.data?.toIso8601String(),
+      'priorita' : widget.commissione.priorita.toString().split('.').last,
       'descrizione': widget.commissione.descrizione,
       'concluso': widget.commissione.concluso,
       'note': widget.commissione.note,
@@ -260,11 +261,12 @@ class _DettaglioCommissioneAmministrazionePageState
   }
 
   Future<void> assegna(UtenteModel utente) async{
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
       'data': widget.commissione.data?.toIso8601String(),
+      'priorita' : widget.commissione.priorita.toString().split('.').last,
       'descrizione': widget.commissione.descrizione,
       'concluso': widget.commissione.concluso,
       'note': widget.commissione.note,
@@ -300,11 +302,12 @@ class _DettaglioCommissioneAmministrazionePageState
 
 
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),
       'data': widget.commissione.data?.toIso8601String(),
+      'priorita' : widget.commissione.priorita.toString().split('.').last,
       'descrizione': widget.commissione.descrizione,
       'concluso': true,
       'note': widget.commissione.note,

@@ -30,10 +30,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<InterventoModel> _filteredInterventi = [];
   List<ClienteModel> clientiList = [];
   List<TipologiaInterventoModel> tipologieList = [];
+  TipologiaInterventoModel? selectedTipologia;
   List<UtenteModel> utentiList = [];
   TextEditingController importoController = TextEditingController();
   bool isSearching = false;
-  int _currentSheet = 0;
+  int _currentSheet = 1;
   TextEditingController searchController = TextEditingController();
   List<GruppoInterventiModel> allGruppiNonConclusi = [];
   List<GruppoInterventiModel> filteredGruppi = [];
@@ -70,7 +71,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -91,7 +92,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -112,7 +113,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -133,7 +134,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -166,7 +167,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -175,10 +176,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             .take(21) // Limita a 20 elementi
             .map((item) => InterventoModel.fromJson(item))
             .toList();
-        /*for (var item in jsonData) {
-          interventi.add(InterventoModel.fromJson(item));
-        }*/
-        // Recuperare tutte le relazioni utenti-interventi
         Map<int, List<UtenteModel>> interventoUtentiMap = {};
         for (var intervento in interventi) {
           var relazioni = await getRelazioni(int.parse(intervento.id.toString()));
@@ -211,7 +208,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -241,14 +238,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       );
     } finally {
       setState(() {
-        isLoading = false; // Fine del caricamento
+        isLoading = false;
       });
     }
   }
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -288,6 +285,42 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         case 5:
           _filteredInterventi = _allInterventi.where((intervento) => (intervento.annullato ?? false)).toList();
       }
+      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap, filteredGruppi);
+    });
+  }
+
+  List<InterventoModel> _getInterventiPerSheet(int sheetIndex) {
+    switch (sheetIndex) {
+      case 0:
+        return _allInterventi.toList();
+      case 1:
+        return _allInterventi.where((intervento) => intervento.concluso != true && intervento.orario_fine == null).toList();
+      case 2:
+        return _allInterventi.where((intervento) => (intervento.concluso ?? false) && !(intervento.saldato ?? false)).toList();
+      case 3:
+        return _allInterventi.where((intervento) => (intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
+      case 4:
+        return _allInterventi.where((intervento) => !(intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
+      case 5:
+        return _allInterventi.where((intervento) => (intervento.annullato ?? false)).toList();
+      default:
+        return _allInterventi.toList();
+    }
+  }
+
+  void filterInterventiByTipologia(String tipologia) {
+    final lowerCaseQuery = tipologia.toLowerCase();
+    setState(() {
+      // Prima applichiamo il filtro dello sheet corrente
+      List<InterventoModel> interventiFiltratiPerSheet = _getInterventiPerSheet(_currentSheet);
+
+      // Poi applichiamo il filtro per tipologia
+      _filteredInterventi = interventiFiltratiPerSheet.where((intervento) {
+        final tipoInt = intervento.tipologia?.descrizione?.toLowerCase() ?? "";
+        return tipoInt.contains(lowerCaseQuery);
+      }).toList();
+
+      // Aggiornamento dei dati nella data source
       _dataSource.updateData(_filteredInterventi, _interventoUtentiMap, filteredGruppi);
     });
   }
@@ -420,6 +453,31 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
+          Row(
+            children: [
+              PopupMenuButton<TipologiaInterventoModel>(
+                icon: Icon(Icons.filter_alt_outlined, color: Colors.white), // Icona della casa
+                onSelected: (TipologiaInterventoModel tipologia) {
+                  setState(() {
+                    selectedTipologia = tipologia;
+                  });
+                  filterInterventiByTipologia(tipologia.descrizione!);
+                },
+                itemBuilder: (BuildContext context) {
+                  return tipologieList.map((TipologiaInterventoModel tipologia) {
+                    return PopupMenuItem<TipologiaInterventoModel>(
+                      value: tipologia,
+                      child: Text(tipologia.descrizione!.toUpperCase()),
+                    );
+                  }).toList();
+                },
+              ),
+              SizedBox(width: 2),
+              Text('${selectedTipologia != null ? "${selectedTipologia?.descrizione!.toUpperCase()}" : "TUTTI"}', style: TextStyle(color: Colors.white)),
+              SizedBox(width: 6)
+            ],
+          ),
+          SizedBox(width: 10),
           MouseRegion(
             onEnter: (event) {
               showModalBottomSheet(
@@ -1400,7 +1458,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/gruppi'),
+          Uri.parse('$ipaddressProva/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1957,7 +2015,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2010,7 +2068,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2070,7 +2128,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

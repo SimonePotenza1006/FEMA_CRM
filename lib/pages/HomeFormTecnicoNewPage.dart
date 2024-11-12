@@ -80,7 +80,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<void> saveIngresso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ingresso'),
+        Uri.parse('$ipaddressProva/api/ingresso'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'orario': formattedDate,
@@ -97,7 +97,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -121,7 +121,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -144,7 +144,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getMerce(String userId) async{
     try{
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce/$userId'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -168,7 +168,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -182,7 +182,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
 
         //getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate);
         http.Response response2 = await http
-            .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+            .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
         if (response2.statusCode == 200) {
           var responseData2 = json.decode(response2.body);
           //print('rrdd2 '+responseData2.toString());
@@ -312,7 +312,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -336,7 +336,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getAllInterventi() async {
     try {
       print('getAllInterventi chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -363,7 +363,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       if (intervento.utente != null && intervento.utente!.id == widget.userData!.id) {
         print('è interv ');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id?.toString(),
@@ -422,7 +422,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           print('è relaz ');
           RelazioneUtentiInterventiModel? relazioneiu = null;
           http.Response response2 = await http
-              .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/interventoutente/'+intervento.id.toString()+'/'+widget.userData!.id.toString()));
+              .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/interventoutente/'+intervento.id.toString()+'/'+widget.userData!.id.toString()));
           if (response2.statusCode == 200) {
             print('res st 200 ');
             var responseData2 = json.decode(response2.body);
@@ -439,7 +439,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           }//else {return [];}
           print('res st 200 '+relazioneiu!.id.toString());
           final response = await http.post(
-            Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+            Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': relazioneiu!.id,
@@ -653,20 +653,19 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         Text(
                                           intervento.data != null
                                               ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
-                                              : 'Data N.D.',//'Nessun appuntamento stabilito',
+                                              : 'Data N.D.',
                                           style: TextStyle(fontSize: 13, color: Colors.black),
                                         ),
                                         Text(
                                           intervento.orario_appuntamento != null
                                               ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                              : 'Orario N.D.',//'Nessun orario stabilito',
+                                              : 'Orario N.D.',
                                           style: TextStyle(fontSize: 13, color: Colors.black),
                                         ),
                                       ],
                                     ),
                                     onTap: () {
                                       showDialog(
-                                      //barrierDismissible: false,
                                       context: context,
                                       builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                                         title: new Text(''+intervento.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
@@ -839,23 +838,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 style: TextStyle(
                                     fontSize: 30.0, fontWeight: FontWeight.bold),
                               ),
-                              /*SizedBox(width: 15),
-                              IconButton(
-                                icon: Icon(Icons.calendar_today),
-                                onPressed: () async {
-                                  final DateTime? pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: selectedDate,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2100),
-                                  );
-                                  if (pickedDate != null && pickedDate != selectedDate) {
-                                    setState(() {
-                                      selectedDate = pickedDate;
-                                    });
-                                  }
-                                },
-                              ),*/
                             ],
                           ),
                         ),
@@ -943,13 +925,32 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         ],
                                       ),
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData!,
-                                              intervento: intervento,
-                                            ),
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                            title: new Text(''+intervento.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                                            content: new Text('Cliente: '+intervento.cliente!.denominazione!+' - '+intervento!.destinazione!.indirizzo!+'\n'
+                                                +'\nData: '+
+                                                (intervento.data != null
+                                                    ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
+                                                    : 'N.D.')+
+                                                '\nOrario appuntamento: '+ (intervento.orario_appuntamento != null
+                                                ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                                : 'N.D.'), style: TextStyle(fontSize: 14)),
+                                            actions: <Widget>[
+                                              Form(
+                                                  child:
+                                                  Column(
+                                                      children: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            interventoVisualizzato(intervento);},
+                                                          child: new Text('PRESA VISIONE', style: TextStyle(
+                                                              fontSize: 22.0,
+                                                              fontWeight: FontWeight.w600),),
+                                                        ),
+                                                      ]))
+                                            ],
                                           ),
                                         );
                                       },
@@ -957,7 +958,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       shape: RoundedRectangleBorder(
                                         side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
                                         borderRadius: BorderRadius.circular(12),
-
                                       ),
                                     ),
                                   );
@@ -1131,10 +1131,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                       return Colors.blueGrey[200]!;
                                   }
                                 }
-
-                                // Determina il colore in base alla priorità della merce
                                 Color backgroundColor = getPriorityColor(singolaMerce.priorita ?? Priorita.BASSA);
-
                                 TextStyle textStyle = singolaMerce.concluso ?? false
                                     ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
                                     : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
@@ -1185,16 +1182,9 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                           ),
                                           actions: <Widget>[
                                             Form(
-                                              //key: _formKeyLice,
-                                              //autovalidateMode: AutovalidateMode.onUserInteraction,
                                                 child:
                                                 Column(
-                                                  //scrollDirection: Axis.vertical,
-                                                  //direction: Axis.vertical,
                                                     children: [
-
-
-
                                                       TextButton(
                                                         onPressed: () {
                                                           interventoVisualizzato(singolaMerce);},
@@ -1207,16 +1197,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                           ],
                                         ),
                                       );
-                                      /*Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
-                                            intervento: singolaMerce,
-                                            merce: singolaMerce.merce!,
-                                            utente: widget.userData!,
-                                          ),
-                                        ),
-                                      );*/
                                     },
                                     tileColor: Colors.white60,
                                     shape: RoundedRectangleBorder(
@@ -1342,8 +1322,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                       ),
                       const SizedBox(height: 20.0),
                       FutureBuilder<List<CommissioneModel>>(
-                        future: getAllCommissioniByUtente(
-                            widget.userData!.id.toString()),
+                        future: getAllCommissioniByUtente(widget.userData!.id.toString()),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(child: CircularProgressIndicator());
@@ -1357,32 +1336,73 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               itemCount: commissioni.length,
                               itemBuilder: (context, index) {
                                 CommissioneModel commissione = commissioni[index];
-                                return ListTile(
-                                  title: Text(
-                                      '${commissione.descrizione.toString()}', style: TextStyle(color: Colors.black)),
-                                  subtitle: Text(commissione.note?? '', style: TextStyle(color: Colors.black)),
-                                  trailing: Text(
-                                    commissione.data!= null
-                                        ? '${commissione.data!.day.toString().padLeft(2, '0')}/${commissione.data!.month.toString().padLeft(2, '0')}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
-                                        : 'Data non disponibile',
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
+                                Color getPriorityColor(Priorita priorita) {
+                                  switch (priorita) {
+                                    case Priorita.BASSA:
+                                      return Colors.lightGreen;
+                                    case Priorita.MEDIA:
+                                      return Colors.yellow;
+                                    case Priorita.ALTA:
+                                      return Colors.orange;
+                                    case Priorita.URGENTE:
+                                      return Colors.red;
+                                    default:
+                                      return Colors.blueGrey[200]!;
+                                  }
+                                }
+
+                                // Determina il colore di sfondo in base alla priorità
+                                Color backgroundColor = getPriorityColor(commissione.priorita ?? Priorita.BASSA);
+
+                                TextStyle textStyle = commissione.concluso ?? false
+                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+                                return Card(
+                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                    title: Text(
+                                      '${commissione.descrizione}',
+                                      style: textStyle,
+                                    ),
+                                    subtitle: Text(
+                                      '${commissione.note}',
+                                      style: textStyle,
+                                    ),
+                                    trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          commissione.data != null
+                                              ? DateFormat("dd/MM/yyyy").format(commissione.data!)
+                                              : 'Data N.D.',
+                                          style: TextStyle(fontSize: 13, color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DettaglioCommissioneTecnicoPage(
+                                              commissione: commissione
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    tileColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(color: getPriorityColor(commissione.priorita!), width: 8),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DettaglioCommissioneTecnicoPage(
-                                                commissione: commissione),
-                                      ),
-                                    );
-                                  },
                                 );
                               },
                             );
                           } else {
-                            return Center(child: Text(''));
+                            return Center(child: Text('Nessuna commissione trovata'));
                           }
                         },
                       ),
@@ -1513,145 +1533,145 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           ),
                         ),
                         const SizedBox(height: 10.0),
-                    FutureBuilder<List<InterventoModel>>(
-                      future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Errore: ${snapshot.error}'));
-                        } else if (snapshot.hasData) {
-                          List<InterventoModel> interventi = snapshot.data!;
-                          interventi = interventi.where((intervento) => intervento.merce == null).toList();
-                          interventi = interventi.where((intervento) {
-                            return intervento.data == null || intervento.data!.isBefore(selectedDate.add(Duration(days: 1)));//isSameDay(selectedDate);
-                          }).toList();
-                          if (interventi.isEmpty) {
-                            return Center(child: Text(''));
-                          }
-
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: interventi.length,
-                            itemBuilder: (context, index) {
-                              InterventoModel intervento = interventi[index];
-
-                              // Metodo per mappare la priorità al colore corrispondente
-                              Color getPriorityColor(Priorita priorita) {
-                                switch (priorita) {
-                                  case Priorita.BASSA:
-                                    return Colors.lightGreen;
-                                  case Priorita.MEDIA:
-                                    return Colors.yellow; // grigio chiaro
-                                  case Priorita.ALTA:
-                                    return Colors.orange; // giallo chiaro
-                                  case Priorita.URGENTE:
-                                    return Colors.red; // azzurro chiaro
-                                  default:
-                                    return Colors.blueGrey[200]!;
+                          FutureBuilder<List<InterventoModel>>(
+                            future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
+                            builder: (context, snapshot) {
+                              //print('length '+snapshot.data!.length.toString());
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Errore: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                List<InterventoModel> interventi = snapshot.data!;
+                                interventi = interventi.where((intervento) => intervento.merce == null).toList();
+                                interventi = interventi.where((intervento) {
+                                  return intervento.data == null || intervento.data!.isBefore(selectedDate.add(Duration(days: 1)));//isSameDay(selectedDate);
+                                }).toList();
+                                if (interventi.isEmpty) {
+                                  return Center(child: Text(''));
                                 }
-                              }
-                              Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
-                              TextStyle textStyle = intervento.concluso ?? false
-                                  ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
-                                  : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: interventi.length,
+                                  itemBuilder: (context, index) {
+                                    InterventoModel intervento = interventi[index];
 
-                              return Card(
-                                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                  title: Text(
-                                    '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
-                                    style: textStyle,
-                                  ),
-                                  subtitle: Text(
-                                    '${intervento.titolo}',
-                                    style: textStyle,
-                                  ),
-                                  trailing: Column(
-                                    children: [
+                                    // Metodo per mappare la priorità al colore corrispondente
+                                    Color getPriorityColor(Priorita priorita) {
+                                      switch (priorita) {
+                                        case Priorita.BASSA:
+                                          return Colors.lightGreen;
+                                        case Priorita.MEDIA:
+                                          return Colors.yellow; // grigio chiaro
+                                        case Priorita.ALTA:
+                                          return Colors.orange; // giallo chiaro
+                                        case Priorita.URGENTE:
+                                          return Colors.red; // azzurro chiaro
+                                        default:
+                                          return Colors.blueGrey[200]!;
+                                      }
+                                    }
 
-                                      Text(
-                                        // Formatta la data secondo il tuo formato desiderato
-                                        intervento.data!= null
-                                            ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
-                                            : 'Data N.D.',//'Nessun appuntamento stabilito',
-                                        style: TextStyle(fontSize: 13, color: Colors.black),
-                                      ),
-                                      Text(
-                                        intervento.orario_appuntamento!= null
-                                            ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                            : 'Orario N.D.',//'Nessun appuntamento stabilito',
-                                        style: TextStyle(fontSize: 13, color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    showDialog(
-                                      //barrierDismissible: false,
-                                      context: context,
-                                      builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                                        title: new Text(''+intervento.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                                        content: new Text('Cliente: '+intervento.cliente!.denominazione!+' - '+intervento!.destinazione!.indirizzo!+'\n'
-                                            +'\nData: '+
-                                            (intervento.data != null
-                                                ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
-                                                : 'N.D.')+
-                                            '\nOrario appuntamento: '+ (intervento.orario_appuntamento != null
-                                            ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                            : 'N.D.'), style: TextStyle(fontSize: 14)),
-                                        actions: <Widget>[
-                                          Form(
-                                            //key: _formKeyLice,
-                                            //autovalidateMode: AutovalidateMode.onUserInteraction,
-                                              child:
-                                              Column(
-                                                //scrollDirection: Axis.vertical,
-                                                //direction: Axis.vertical,
-                                                  children: [
+                                    // Determina il colore in base alla priorità
+                                    Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
+                                    TextStyle textStyle = intervento.concluso ?? false
+                                        ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                        : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
 
+                                    return Card(
+                                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
 
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        interventoVisualizzato(intervento);},
-                                                      //Navigator.of(context).pop(true), // <-- SEE HERE
-                                                      child: new Text('PRESA VISIONE', style: TextStyle(
-                                                          fontSize: 22.0,
-                                                          fontWeight: FontWeight.w600),),
-                                                    ),
-                                                  ]))
-                                        ],
-                                      ),
-                                    );
-                                    /*Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => DettaglioInterventoByTecnicoPage(
-                                          utente: widget.userData!,
-                                          intervento: intervento,
+                                        title: Text(
+                                          '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
+                                          style: textStyle,
+                                        ),
+                                        subtitle: Text(
+                                          '${intervento.titolo}',
+                                          style: textStyle,
+                                        ),
+                                        trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                            if (intervento.concluso ?? false)
+                                              Icon(Icons.check, color: Colors.black, size: 18), // Check icon
+                                            Text(
+                                              intervento.data != null
+                                                  ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
+                                                  : 'Data N.D.',
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
+                                            ),
+                                            Text(
+                                              intervento.orario_appuntamento != null
+                                                  ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                                  : 'Orario N.D.',
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                              title: new Text(''+intervento.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                                              content: new Text('Cliente: '+intervento.cliente!.denominazione!+' - '+intervento!.destinazione!.indirizzo!+'\n'
+                                                  +'\nData: '+
+                                                  (intervento.data != null
+                                                      ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
+                                                      : 'N.D.')+
+                                                  '\nOrario appuntamento: '+ (intervento.orario_appuntamento != null
+                                                  ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                                  : 'N.D.'), style: TextStyle(fontSize: 14)),
+                                              actions: <Widget>[
+                                                Form(
+                                                  //key: _formKeyLice,
+                                                  //autovalidateMode: AutovalidateMode.onUserInteraction,
+                                                    child:
+                                                    Column(
+                                                        children: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              interventoVisualizzato(intervento);},
+                                                            //Navigator.of(context).pop(true), // <-- SEE HERE
+                                                            child: new Text('PRESA VISIONE', style: TextStyle(
+                                                                fontSize: 22.0,
+                                                                fontWeight: FontWeight.w600),),
+                                                          ),
+                                                        ]))
+                                              ],
+                                            ),
+                                          );
+                                          /*Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DettaglioInterventoByTecnicoPage(
+                                            utente: widget.userData!,
+                                            intervento: intervento,
+                                          ),
+                                        ),
+                                      );*/
+                                        },
+                                        tileColor: Colors.white60,
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
                                       ),
-                                    );*/
+                                    );
                                   },
-                                  tileColor: backgroundColor,
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              );
+                                );
+                              } else {
+                                return Center(child: Text(''));
+                              }
                             },
-                          );
-                        } else {
-                          return Center(child: Text(''));
-                        }
-                      },
-                    ),
+                          ),
                     /*FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                           future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                           builder: (context, snapshot) {
@@ -1998,6 +2018,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
 
                               // Filtra i dati della lista per mostrare solo quelli con merce presente
                               merce = merce.where((item) => item.merce != null).toList();
+
                               if (merce.isEmpty) {
                                 return Center(child: Text(''));
                               }
@@ -2023,10 +2044,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         return Colors.blueGrey[200]!;
                                     }
                                   }
-
-                                  // Determina il colore in base alla priorità della merce
                                   Color backgroundColor = getPriorityColor(singolaMerce.priorita ?? Priorita.BASSA);
-
                                   TextStyle textStyle = singolaMerce.concluso ?? false
                                       ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
                                       : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
@@ -2036,7 +2054,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     elevation: 4,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                     child: ListTile(
-                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                       title: Text(
                                         '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
                                         style: textStyle,
@@ -2053,7 +2071,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                           Text(
                                             singolaMerce.data_apertura_intervento != null
                                                 ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
-                                                : 'Data N.D.',
+                                                : 'Data non disponibile',
                                             style: TextStyle(fontSize: 13, color: Colors.black),
                                           ),
                                         ],
@@ -2077,16 +2095,9 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                             ),
                                             actions: <Widget>[
                                               Form(
-                                                //key: _formKeyLice,
-                                                //autovalidateMode: AutovalidateMode.onUserInteraction,
                                                   child:
                                                   Column(
-                                                    //scrollDirection: Axis.vertical,
-                                                    //direction: Axis.vertical,
                                                       children: [
-
-
-
                                                         TextButton(
                                                           onPressed: () {
                                                             interventoVisualizzato(singolaMerce);},
@@ -2099,20 +2110,10 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                             ],
                                           ),
                                         );
-                                        /*Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => DettaglioMerceInRiparazioneByTecnicoPage(
-                                              intervento: singolaMerce,
-                                              merce: singolaMerce.merce!,
-                                              utente: widget.userData!,
-                                            ),
-                                          ),
-                                        );*/
                                       },
-                                      tileColor: backgroundColor,
+                                      tileColor: Colors.white60,
                                       shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        side: BorderSide(color: getPriorityColor(singolaMerce!.priorita!), width: 8),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
@@ -2245,27 +2246,68 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 itemCount: commissioni.length,
                                 itemBuilder: (context, index) {
                                   CommissioneModel commissione = commissioni[index];
-                                  return ListTile(
-                                    title: Text('${commissione.descrizione.toString()}', style: TextStyle(color: Colors.black)),
-                                    subtitle: Text(commissione.note ?? '', style: TextStyle(color: Colors.black)),
-                                    trailing: Text(
-                                      // Formatta la data secondo il tuo formato desiderato
-                                      commissione.data != null
-                                          ? '${commissione.data!.day.toString().padLeft(2, '0')}/${commissione.data!.month.toString().padLeft(2, '0')}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
-                                          : 'Data non disponibile',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black), // Stile opzionale per la data
+                                  Color getPriorityColor(Priorita priorita) {
+                                    switch (priorita) {
+                                      case Priorita.BASSA:
+                                        return Colors.lightGreen;
+                                      case Priorita.MEDIA:
+                                        return Colors.yellow;
+                                      case Priorita.ALTA:
+                                        return Colors.orange;
+                                      case Priorita.URGENTE:
+                                        return Colors.red;
+                                      default:
+                                        return Colors.blueGrey[200]!;
+                                    }
+                                  }
+
+                                  // Determina il colore di sfondo in base alla priorità
+                                  Color backgroundColor = getPriorityColor(commissione.priorita ?? Priorita.BASSA);
+
+                                  TextStyle textStyle = commissione.concluso ?? false
+                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                      title: Text(
+                                        '${commissione.descrizione}',
+                                        style: textStyle,
+                                      ),
+                                      subtitle: Text(
+                                        '${commissione.note}',
+                                        style: textStyle,
+                                      ),
+                                      trailing: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            commissione.data != null
+                                                ? DateFormat("dd/MM/yyyy").format(commissione.data!)
+                                                : 'Data N.D.',
+                                            style: TextStyle(fontSize: 13, color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => DettaglioCommissioneTecnicoPage(
+                                              commissione: commissione
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      tileColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: getPriorityColor(commissione.priorita!), width: 8),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
                                     ),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              DettaglioCommissioneTecnicoPage(
-                                                  commissione: commissione),
-                                        ),
-                                      );
-                                    },
                                   );
                                 },
                               );

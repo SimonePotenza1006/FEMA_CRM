@@ -1130,7 +1130,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+              Uri.parse('$ipaddressProva/api/immagine/${intervento.id}')
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -1164,6 +1164,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<http.Response?> saveInterventoPlusMerce() async {
     // Variabile per i dati di 'saveMerce'
     var data;
+    var image;
     // Controllo per eseguire 'saveMerce' solo se selectedTipologia?.id == "6"
     if (_selectedTipologia?.id == "6") {
       data = await saveMerce();
@@ -1180,7 +1181,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       try {
         String prioritaString = _selectedPriorita.toString().split('.').last;
         final response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo': true,
@@ -1232,7 +1233,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> saveRelations() async {
-    final data = await saveInterventoPlusMerce();
+    final data = await savePics();
     if (_selectedUtenti == null || _selectedUtenti!.isEmpty) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1256,7 +1257,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print("PROVA TECNICO ${tecnico?.nome}");
             print("INTERVENTO: ${intervento.id}");
             final response = await http.post(
-              Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+              Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': tecnico?.toMap(),
@@ -1280,7 +1281,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               print('Percorso del file: ${image.path}');
               var request = http.MultipartRequest(
                   'POST',
-                  Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+                  Uri.parse('$ipaddressProva/api/immagine/${intervento.id}')
               );
               request.files.add(
                 await http.MultipartFile.fromPath(
@@ -1326,7 +1327,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
@@ -1358,7 +1359,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         print('$prioritaString');
         final orario = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, _selectedTime.hour, _selectedTime.minute);
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1409,7 +1410,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       try {
         String prioritaString = _selectedPriorita.toString().split('.').last;
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1747,7 +1748,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -1769,7 +1770,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -1791,7 +1792,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -1812,7 +1813,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
