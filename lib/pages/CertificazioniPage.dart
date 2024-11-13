@@ -37,7 +37,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> fetchFiles() async {
     print("Fetching files...");
-    final response = await http.get(Uri.parse('$ipaddressProva/pdfu/filesnameCertificazioni'));
+    final response = await http.get(Uri.parse('$ipaddress/pdfu/filesnameCertificazioni'));
     if (response.statusCode == 200) {
       print("Files fetched successfully");
       print(response.body);
@@ -125,7 +125,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> _openFile(BuildContext context, FileModel file) async {
     String path = file.path;
-    final pdfUrl = '$ipaddressProva/pdfu/certificazioni/$path/${file.name}';
+    final pdfUrl = '$ipaddress/pdfu/certificazioni/$path/${file.name}';
     print('PDF URL: $pdfUrl');
     try {
       final response = await http.get(Uri.parse(pdfUrl));
