@@ -211,7 +211,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deleteDestinazione(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddressProva/api/destinazione/$id'),
+        Uri.parse('$ipaddress/api/destinazione/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
