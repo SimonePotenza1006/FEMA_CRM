@@ -1164,6 +1164,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<http.Response?> saveInterventoPlusMerce() async {
     // Variabile per i dati di 'saveMerce'
     var data;
+    var image;
     // Controllo per eseguire 'saveMerce' solo se selectedTipologia?.id == "6"
     if (_selectedTipologia?.id == "6") {
       data = await saveMerce();
@@ -1232,7 +1233,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> saveRelations() async {
-    final data = await saveInterventoPlusMerce();
+    final data = await savePics();
     if (_selectedUtenti == null || _selectedUtenti!.isEmpty) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
