@@ -1172,12 +1172,24 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                   children: [
                     SizedBox(
                       width: 500,
-                      child: buildInfoRow(
+                      child: buildInfoRowUtente(
                           title: 'Utente incaricato',
                           value: '${widget.intervento.utente?.nomeCompleto() ?? 'Non assegnato'}',
+                          visualizzato: widget.intervento!.visualizzato!,
                           context: context
                       ),
                     ),
+                    /*(widget.intervento!.visualizzato! == true) ? IconButton(
+                      icon: Icon(Icons.check_circle, color: Colors.green,),
+                      onPressed: (){
+                        _showUtentiDialog();
+                      },
+                    ) : IconButton(
+                      icon: Icon(Icons.check_circle_outline, color: Colors.grey,),
+                      onPressed: (){
+                        _showUtentiDialog();
+                      },
+                    ),*/
                     IconButton(
                       icon: Icon(Icons.edit),
                       onPressed: (){
@@ -1196,9 +1208,10 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                           'Altri utenti:',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        ...otherUtenti.map((relazione) => buildInfoRow(
+                        ...otherUtenti.map((relazione) => buildInfoRowUtente(
                             title: 'Utente',
                             value: '${relazione.utente?.nomeCompleto() ?? 'N/A'}',
+                            visualizzato: relazione.visualizzato!,//widget.intervento!.visualizzato!,
                             context: context
                         )),
                       ],
@@ -2642,6 +2655,94 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     );
   }
 
+  Widget buildInfoRowUtente({required String title, required String value, required bool visualizzato, BuildContext? context}) {
+    bool isValueTooLong = value.length > 20;
+    String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
+    return SizedBox(
+      width: 287,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 4, // Linea di accento colorata
+                      height: 24,
+                      color: Colors.redAccent, // Colore di accento per un tocco di vivacità
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      title.toUpperCase() + ": ",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87, // Colore contrastante per il testo
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        displayedValue.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold, // Un colore secondario per differenziare il valore
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (isValueTooLong && context != null)
+                        IconButton(
+                          icon: Icon(Icons.info_outline),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("${title.toUpperCase()}"),
+                                  content: Text(value), // Mostra il valore completo qui
+                                  actions: [
+                                    TextButton(
+                                      child: Text("Chiudi"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      value != 'Non assegnato' ? visualizzato ? Tooltip(
+                                      message: 'L\'UTENTE HA PRESO VISIONE',
+                                      child: Icon(Icons.check_circle, color: Colors.green, size: 20, ))
+                          : Tooltip(
+                              message: 'L\'UTENTE NON HA ANCORA PRESO VISIONE',
+                              child: Icon(Icons.check_circle_outline, color: Colors.grey, size: 20))
+                      : Text('')],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            Divider( // Linea di separazione tra i widget
+              color: Colors.grey[400],
+              thickness: 1,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void showCodiceDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -2676,7 +2777,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -2702,7 +2803,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         return response;
@@ -2724,7 +2825,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       } else {
         final ddt = DDTModel.fromJson(jsonDecode(data.body));
         try{
-          final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+          final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}'));
           var responseData = json.decode(response.body);
           if(response.statusCode == 200){
             List<RelazioneDdtProdottoModel> prodotti = [];
@@ -2746,7 +2847,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getMetodiPagamento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiapagamento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiapagamento'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<TipologiaPagamentoModel> tipologie = [];
@@ -2764,7 +2865,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getAllTipologieIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<TipologiaInterventoModel> tipologie = [];
@@ -2782,7 +2883,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getAllVeicoli() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/veicolo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/veicolo'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<VeicoloModel> veicoli = [];
@@ -2800,7 +2901,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getCommissioni()async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/commissione/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/commissione/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<CommissioneModel> commissioni = [];
@@ -2818,7 +2919,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getProdottiByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<RelazioneProdottiInterventoModel> prodotti = [];
@@ -2847,7 +2948,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getNoteByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<NotaTecnicoModel> note =[];
@@ -2867,7 +2968,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -2887,7 +2988,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -2908,7 +3009,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaTitolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -2970,7 +3071,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -3250,7 +3351,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
 
   Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
     String? formattedData = data != null ? data.toIso8601String() : null;
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'data': formattedData, // Usa la stringa ISO solo se 'data' non è null
       'descrizione': descrizione,
@@ -3293,7 +3394,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaArticolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3331,7 +3432,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaAccessori() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3369,7 +3470,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDifetto() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3407,7 +3508,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaPassword() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3445,7 +3546,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDati() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3483,7 +3584,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaDiagnosi() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3521,7 +3622,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaImportoMerce() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3630,7 +3731,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaRichiestaPreventivo(bool preventivo) async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3665,7 +3766,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaRisoluzione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.merce?.id,
@@ -3711,7 +3812,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           try {
             print('Eliminazione vecchie relazioni');
             final response = await http.delete(
-              Uri.parse('$ipaddress/api/relazioneUtentiInterventi/' + relaz.id.toString()),
+              Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/' + relaz.id.toString()),
               headers: {'Content-Type': 'application/json'},
             );
             print(response.body.toString());
@@ -3723,13 +3824,13 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       }
       // Richiesta per assegnare il responsabile all'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
           'attivo': widget.intervento.attivo,
           'titolo': widget.intervento.titolo,
-          'visualizzato': widget.intervento.visualizzato,
+          'visualizzato': false,//widget.intervento.visualizzato,
           'numerazione_danea': widget.intervento.numerazione_danea,
           'priorita': widget.intervento.priorita.toString().split('.').last,
           'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
@@ -3780,11 +3881,12 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             try {
               print('Sono quiiiiii');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'utente': utente?.toMap(),
                   'intervento': widget.intervento.toMap(),
+                  'visualizzato': false,
                 }),
               );
               relazioniNuove.add(RelazioneUtentiInterventiModel.fromJson(json.decode(response.body.toString())));
@@ -3832,7 +3934,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void modificaSaldo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -4027,7 +4129,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -4193,7 +4295,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -4287,7 +4389,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void eliminaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -4393,7 +4495,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -4542,7 +4644,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void annullaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -4592,7 +4694,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             try {
               print('Eliminazione vecchie relazioni');
               final response = await http.delete(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi/' + relaz.id.toString()),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/' + relaz.id.toString()),
                 headers: {'Content-Type': 'application/json'},
               );
               print(response.body.toString());
@@ -4616,7 +4718,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   void riabilitaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
