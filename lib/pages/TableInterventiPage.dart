@@ -71,7 +71,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -92,7 +92,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -113,7 +113,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -134,7 +134,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -167,7 +167,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -208,7 +208,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -245,7 +245,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -438,7 +438,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     getAllTipologie().whenComplete(() => print('Tipologie ok'));
     getAllUtenti().whenComplete(() => print('Utenti ok'));
     _filteredInterventi = _allInterventi.toList();
-    _changeSheet(1);
+    setState((){
+      _currentSheet = 1;
+    });
     getAllInterventiTot();
   }
 
@@ -478,8 +480,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             ],
           ),
           SizedBox(width: 10),
-          MouseRegion(
-            onEnter: (event) {
+          IconButton(
+            icon: Icon(Icons.info),
+            color: Colors.white,
+            onPressed: () {
               showModalBottomSheet(
                 context: context,
                 builder: (BuildContext context) {
@@ -568,7 +572,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ),
                             SizedBox(width: 3),
                             Text('VENDITA FRONT OFFICE'),
-
                           ],
                         ),
                         SizedBox(height: 3),
@@ -647,178 +650,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 },
               );
             },
-            child: IconButton(
-              icon: Icon(Icons.info),
-              color: Colors.white, onPressed: () {
-                if(Platform.isAndroid)
-              showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Legenda colori:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.grey[200],
-                            ),
-                            SizedBox(width: 3),
-                            Text('INFORMATICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.yellow[200],
-                            ),
-                            SizedBox(width: 3),
-                            Text('ELETTRICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.lightBlue[200],
-                            ),
-                            SizedBox(width: 3),
-                            Text('IDRICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.pink[50],
-                            ),
-                            SizedBox(width: 3),
-                            Text('ELETTRONICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.green[100],
-                            ),
-                            SizedBox(width: 3),
-                            Text('RIPARAZIONE MERCE'),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 3),
-                            Text('VENDITA FRONT OFFICE'),
-
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          'Priorità:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ NULLA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.lightGreen,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ BASSA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.yellow,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ MEDIA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.orange,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ ALTA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.red,
-                            ),
-                            SizedBox(width: 3),
-                            Text('URGENTE'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-                },
-            ),
           ),
           IconButton(
             icon: Icon(
@@ -1458,7 +1289,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/gruppi'),
+          Uri.parse('$ipaddressProva/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -2015,7 +1846,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2068,7 +1899,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2128,7 +1959,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
