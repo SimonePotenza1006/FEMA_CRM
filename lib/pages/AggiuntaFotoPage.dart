@@ -98,7 +98,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           print('Errore: Il percorso del file non è valido');
         }
       }
-
       pickedImages.clear();
       Navigator.pop(context); // Chiudi il dialog di caricamento
 
