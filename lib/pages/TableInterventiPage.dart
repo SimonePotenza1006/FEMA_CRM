@@ -678,6 +678,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                   : SfDataGrid(
                 allowPullToRefresh: true,
                 allowSorting: true,
+                allowMultiColumnSorting: true,
                 source: _dataSource,
                 columnWidthMode: ColumnWidthMode.auto,
                 allowColumnsResizing: true,
