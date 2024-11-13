@@ -25,7 +25,7 @@ class TableInterventiPage extends StatefulWidget {
 
 class _TableInterventiPageState extends State<TableInterventiPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<InterventoModel> _allInterventi = [];
   List<InterventoModel> _filteredInterventi = [];
   List<ClienteModel> clientiList = [];
@@ -162,7 +162,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> getAllInterventi() async {
-
     setState(() {
       isLoading = true; // Inizio del caricamento
     });
@@ -184,7 +183,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         setState(() {
           _isLoading = false;
           _allInterventi = interventi;
-          _filteredInterventi = interventi.toList();
+          _filteredInterventi = _allInterventi
+              .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
+              .toList();
           _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
         });
       } else {
@@ -203,7 +204,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> getAllInterventiTot() async {
-
     setState(() {
       isLoading = true; // Inizio del caricamento
     });
@@ -225,7 +225,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         setState(() {
           _isLoading = false;
           _allInterventi = interventi;
-          _filteredInterventi = interventi.toList();
+          _filteredInterventi = _allInterventi
+              .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
+              .toList();
           _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
         });
       } else {
@@ -676,6 +678,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   : SfDataGrid(
                 allowPullToRefresh: true,
                 allowSorting: true,
+                allowMultiColumnSorting: true,
                 source: _dataSource,
                 columnWidthMode: ColumnWidthMode.auto,
                 allowColumnsResizing: true,

@@ -31,9 +31,7 @@ import 'ScannerBarCodePage.dart';
 import 'ScannerQrCodePage.dart';
 import 'CompilazioneRapportinoPage.dart'; // Importa il pacchetto per il formato delle date
 import 'package:fema_crm/model/RelazioneDdtProdottiModel.dart';
-
 import 'ScannerQrCodeTecnicoPage.dart';
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'VerificaMaterialeNewPage.dart';
