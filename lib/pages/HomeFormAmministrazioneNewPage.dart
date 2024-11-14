@@ -2379,7 +2379,7 @@ class _HomeFormAmministrazioneNewPageState
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
+                              /*SizedBox(height: 10),
                               Row(
                                 children: [
                                   SizedBox(
@@ -2399,7 +2399,7 @@ class _HomeFormAmministrazioneNewPageState
                                     //child:
                                   ),
                                 ],
-                              ),
+                              ),*/
                             ],
                           )
                           // GestureDetector(
