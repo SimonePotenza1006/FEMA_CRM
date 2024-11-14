@@ -2379,6 +2379,27 @@ class _HomeFormAmministrazioneNewPageState
                                   ),
                                 ],
                               ),
+                              /*SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 350,
+                                    child: buildMenuButton(icon: Icons.edit_note, text: 'APPUNTI',
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => LogisticaPreventiviHomepage(userData: widget.userData)),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(width: 20),
+                                  SizedBox(
+                                    width: 350,
+                                    //child:
+                                  ),
+                                ],
+                              ),*/
                             ],
                           )
                           // GestureDetector(

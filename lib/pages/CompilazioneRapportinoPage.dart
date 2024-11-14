@@ -323,16 +323,37 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 ),
               ),
               SizedBox(height: 10),
-              Center(
+              Platform.isWindows ? Center(
+                child: ElevatedButton(
+                  onPressed: pickImagesFromGallery,
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    onPrimary: Colors.white,
+                  ),
+                  child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                ),
+              ) : Row(children: [Center(
                 child: ElevatedButton(
                   onPressed: takePicture,
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
                     onPrimary: Colors.white,
                   ),
-                  child: Text(Platform.isWindows ? 'Allega Foto' : 'Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                 ),
               ),
+              SizedBox(width: 16,),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: pickImagesFromGallery,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      onPrimary: Colors.white,
+                    ),
+                    child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                  ),
+                ),
+              ],),
 
               SizedBox(height: 10),
               /*Center(
@@ -527,7 +548,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     final ImagePicker _picker = ImagePicker();
 
     // Verifica se sei su Android
-    if (Platform.isAndroid) {
+    //if (Platform.isAndroid) {
       final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
       if (pickedFile != null) {
@@ -535,9 +556,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           pickedImages.add(pickedFile);
         });
       }
-    }
+    //}
     // Verifica se sei su Windows
-    else if (Platform.isWindows) {
+    /*else if (Platform.isWindows) {
       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
 
       if (pickedFiles != null && pickedFiles.isNotEmpty) {
@@ -545,6 +566,16 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           pickedImages.addAll(pickedFiles);
         });
       }
+    }*/
+  }
+
+  Future<void> pickImagesFromGallery() async {
+    final ImagePicker _picker = ImagePicker();
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        pickedImages.addAll(pickedFiles);
+      });
     }
   }
 

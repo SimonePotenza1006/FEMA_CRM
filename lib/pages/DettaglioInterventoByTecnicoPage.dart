@@ -124,6 +124,24 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     return null;
   }
 
+  Future<InterventoModel?> getInterventoById() async{
+    late http.Response response;
+    try{
+      response = await http.get(
+          Uri.parse('$ipaddressProva/api/intervento/${widget.intervento.id}'));
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        InterventoModel intervento = InterventoModel.fromJson(jsonData);
+
+        return intervento;
+      };
+    } catch(e){
+      print('Errore durante il recupero dell intervento: $e');
+      return null;
+    }
+    return null;
+  }
+
   Widget buildProdottoItem(int index){
     final prodotto = prodotti[index];
     final double? costo = prodotti[index].prodotto!.prezzo_fornitore! * double.parse(prodotti[index].quantita.toString());
@@ -776,15 +794,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               if(widget.utente.id!.toString() == "9" || widget.utente.id!.toString() == "4" || widget.utente.id!.toString() == "5")
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PDFInterventoPage(
-                          intervento: widget.intervento,
-                          note: allNote,
+                    getInterventoById().then((value) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PDFInterventoPage(
+                            intervento: value!,//widget.intervento,
+                            note: allNote,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    });
                   },
                   icon: Icon(Icons.picture_as_pdf, color: Colors.white),
                   label: Text('Genera PDF', style: TextStyle(color: Colors.white)),
