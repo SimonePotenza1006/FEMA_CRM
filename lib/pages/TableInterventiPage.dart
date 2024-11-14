@@ -71,7 +71,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -92,7 +92,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -113,7 +113,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -134,7 +134,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -166,13 +166,13 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<InterventoModel> interventi = [];
         interventi = (jsonData as List)
-            .take(21) // Limita a 20 elementi
+            .take(30) // Limita a 20 elementi
             .map((item) => InterventoModel.fromJson(item))
             .toList();
         Map<int, List<UtenteModel>> interventoUtentiMap = {};
@@ -188,6 +188,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
               .toList();
           _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Attendi qualche istante per il caricamento di tutti gli interventi...')),
+        );
       } else {
         _isLoading = false;
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -208,7 +211,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -247,7 +250,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -1292,7 +1295,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddressProva/api/gruppi'),
+          Uri.parse('$ipaddress/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1849,7 +1852,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1902,7 +1905,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1962,7 +1965,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
