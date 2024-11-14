@@ -5,22 +5,23 @@ import 'DestinazioneModel.dart';
 import 'InterventoModel.dart';
 import 'UtenteModel.dart';
 
-class ToDoModel {
+class TaskModel {
   String? id;
   String? descrizione;
   DateTime? data_creazione;
   bool? concluso;
   UtenteModel? utente;
   Tipologia? tipologia;
+  bool? condiviso;
 
-
-  ToDoModel(
+  TaskModel(
       this.id,
       this.descrizione,
       this.data_creazione,
       this.concluso,
       this.utente,
-      this.tipologia
+      this.tipologia,
+      this.condiviso
       );
 
   Map<String, dynamic> toMap(){
@@ -31,11 +32,12 @@ class ToDoModel {
       'concluso' : concluso,
       'utente' : utente?.toMap(),
       'tipologia' : tipologia.toString().split('.').last,
+      'condiviso' : condiviso,
     };
     return map;
   }
 
-  ToDoModel.fromMap(Map<String, dynamic> map){
+  TaskModel.fromMap(Map<String, dynamic> map){
     id = map['id'];
     descrizione = map['descrizione'];
     map['data_creazione'] != null ? DateTime.parse(map['data_creazione']) : null;
@@ -43,6 +45,7 @@ class ToDoModel {
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
     tipologia = Tipologia.values.firstWhere(
             (type) => type.toString() == 'tipologia.${map['tipologia']}');
+    condiviso = map['condiviso'];
   }
 
   Map<String, dynamic> toJson() =>{
@@ -52,17 +55,18 @@ class ToDoModel {
     'concluso' : concluso,
     'utente' : utente?.toMap(),
     'tipologia' : tipologia.toString().split('.').last,
+    'condiviso' : condiviso,
   };
 
-  factory ToDoModel.fromJson(Map<String, dynamic> json){
-    return ToDoModel(
+  factory TaskModel.fromJson(Map<String, dynamic> json){
+    return TaskModel(
       json['id']?.toString(),
       json['descrizione'],
       json['data_creazione'] != null ? DateTime.parse(json['data_creazione']) : null,
       json['concluso'],
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
       _getTipologiaFromString(json['tipologia']),
-
+      json['condiviso'],
     );
   }
 

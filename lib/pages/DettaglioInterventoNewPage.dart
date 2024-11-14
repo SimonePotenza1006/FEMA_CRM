@@ -3792,7 +3792,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       if(response.statusCode == 201){
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Diagnosi modificata con successo!'),
+            content: Text('Risoluzione modificata con successo!'),
           ),
         );
         setState(() {
