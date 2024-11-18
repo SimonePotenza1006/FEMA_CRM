@@ -41,9 +41,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
     _columnWidths ={
     'task' : 0,
     'data_creazione' : 150,
-    'data_conclusione' : 170,
+    //'data_conclusione' : 170,
     'titolo' : 300,
-    'tipologia' : 200,
+    //'tipologia' : 200,
     'utente' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 200 : 0,
     'accettato' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
     'accettatoicon' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
@@ -191,7 +191,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       width: _columnWidths['data_creazione']?? double.nan,
                       minimumWidth: 150,
                     ),
-                    GridColumn(
+                    /*GridColumn(
                       columnName: 'data_conclusione',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -211,7 +211,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       ),
                       width: _columnWidths['data_conclusione']?? double.nan,
                       minimumWidth: 150,
-                    ),
+                    ),*/
                     GridColumn(
                       columnName: 'titolo',
                       label: Container(
@@ -233,7 +233,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       width: _columnWidths['titolo']?? double.nan,
                       minimumWidth: 300,
                     ),
-                    GridColumn(
+                    /*GridColumn(
                       columnName: 'tipologia',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -253,7 +253,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       ),
                       width: _columnWidths['tipologia']?? double.nan,
                       minimumWidth: 300,
-                    ),
+                    ),*/
                     GridColumn(
                       columnName: 'utente',
                       label: Container(
@@ -414,9 +414,9 @@ class TaskDataSource extends DataGridSource{
         cells: [
           DataGridCell<TaskModel>(columnName: 'task', value: task),
           DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
-          DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
+          //DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
           DataGridCell<String>(columnName: 'titolo', value: task.titolo),
-          DataGridCell<String>(columnName: 'tipologia', value: task.tipologia.toString().split('.').last),
+          //DataGridCell<String>(columnName: 'tipologia', value: task.tipologia.toString().split('.').last),
           //DataGridCell<String>(columnName: 'concluso', value: concluso),
           DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
           DataGridCell<String>(columnName: 'accettato', value: accettato),
