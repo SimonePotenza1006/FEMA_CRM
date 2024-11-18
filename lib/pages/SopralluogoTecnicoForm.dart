@@ -52,7 +52,6 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
     // Verifica se sei su Windows
     else if (Platform.isWindows) {
       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-
       if (pickedFiles != null && pickedFiles.isNotEmpty) {
         setState(() {
           pickedImages.addAll(pickedFiles);

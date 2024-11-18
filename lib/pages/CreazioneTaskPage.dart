@@ -34,6 +34,7 @@ class _CreazioneTaskPageState
   bool _condiviso = false;
   final TextEditingController _condivisoController = TextEditingController();
   List<XFile> pickedImages =  [];
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -82,7 +83,6 @@ class _CreazioneTaskPageState
   }
 
   Future<void> pickImagesFromGallery() async {
-    final ImagePicker _picker = ImagePicker();
     final List<XFile>? pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null && pickedFiles.isNotEmpty) {
       setState(() {
@@ -150,17 +150,6 @@ class _CreazioneTaskPageState
           child:  Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              /*SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                  onPressed: _selezionaData,
-                  style: ElevatedButton.styleFrom(primary: Colors.red),
-                  child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              if(selectedDate != null)
-                Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
-              const SizedBox(height: 20.0),*/
               SizedBox(height: 20),
               // Description Field
               SizedBox(
@@ -301,8 +290,7 @@ class _CreazioneTaskPageState
                   ),
                 ),
                 SizedBox(height: 30),
-                if (pickedImages.isNotEmpty)
-                  _buildImagePreview(),
+                _buildImagePreview(),
                 SizedBox(height: 20),
 
               ],),

@@ -124,9 +124,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
               color: Colors.white,
             ),
             onPressed: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.utente,)));
+              // Navigator.pushReplacement(
+              //     context,
+              //     MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.utente,)));
+              getAllTask();
             },
           ),
         ],
@@ -450,7 +451,7 @@ class TaskDataSource extends DataGridSource{
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => TableTaskPage(utente: utente),
@@ -489,12 +490,13 @@ class TaskDataSource extends DataGridSource{
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => TableTaskPage(utente: utente),
         ),
       );
+
       //Navigator.of(context).pop();//Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -516,7 +518,7 @@ class TaskDataSource extends DataGridSource{
           const SnackBar(content: Text('Task eliminato con successo')),
         );
 
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => TableTaskPage(utente: utente),
