@@ -12,8 +12,6 @@ import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/TaskModel.dart';
 import '../model/UtenteModel.dart';
-import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 import 'ModificaTaskPage.dart';
 
 class TableTaskPage extends StatefulWidget{
@@ -559,7 +557,6 @@ class _TableTaskPageState extends State<TableTaskPage>{
 }
 
 class TaskDataSource extends DataGridSource{
-  //UtenteMode;
   List<TaskModel> _commissioni = [];
   List<TaskModel> commissioniFiltrate = [];
   BuildContext context;
@@ -638,8 +635,8 @@ class TaskDataSource extends DataGridSource{
       // );
       //Navigator.of(context).pop();//Navigator.pop(context);
       if(response.statusCode == 201){
-        task.concluso == true;
-        updateData(_commissioni);
+        //task.concluso == true;
+        //updateData(commissioniFiltrate);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Stato Task aggiornato con successo!'),
@@ -674,20 +671,14 @@ class TaskDataSource extends DataGridSource{
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => TableTaskPage(utente: utente),
-      //   ),
-      // );
       if(response.statusCode == 201){
+        //getAllTask();
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Stato Task aggiornato con successo!'),
           ),
         );
-        updateData(commissioniFiltrate);
       }
       //Navigator.of(context).pop();//Navigator.pop(context);
     } catch (e) {
@@ -721,33 +712,33 @@ class TaskDataSource extends DataGridSource{
     }
   }
 
-  // Future<void> getAllTask() async{
-  //   try{
-  //     var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
-  //         : Uri.parse('$ipaddressProva/api/task/utente/'+widget.utente!.id!);
-  //     var response = await http.get(apiUrl);
-  //     if(response.statusCode == 200){
-  //       var jsonData = jsonDecode(response.body);
-  //       List<TaskModel> commissioni = [];
-  //       for(var item in jsonData){
-  //         commissioni.add(TaskModel.fromJson(item));
-  //       }
-  //       if(response.statusCode == 200){
-  //         _isLoading = false;
-  //         _allCommissioni = commissioni;
-  //         _filteredCommissioni = commissioni;
-  //         _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente);
-  //       }
-  //     } else {
-  //       //_isLoading = false;
-  //       throw Exception('Failed to load data from API: ${response.statusCode}');
-  //     }
-  //   } catch(e){
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Error during API call: $e')),
-  //     );
-  //   }
-  // }
+  Future<void> getAllTask() async{
+    try{
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
+          : Uri.parse('$ipaddressProva/api/task/utente/'+utente.id!);
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TaskModel> commissioni = [];
+        for(var item in jsonData){
+          commissioni.add(TaskModel.fromJson(item));
+        }
+        if(response.statusCode == 200){
+          _commissioni = commissioni;
+          commissioniFiltrate = commissioni;
+        }
+      } else {
+        //_isLoading = false;
+        throw Exception('Failed to load data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error during API call: $e')),
+      );
+    } finally{
+      updateData(_commissioni);
+    }
+  }
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {

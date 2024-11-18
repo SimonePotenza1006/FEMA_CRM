@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:fema_crm/databaseHandler/DbHelper.dart';
+import 'package:fema_crm/model/TaskModel.dart';
 import 'package:fema_crm/pages/CalendarioUtentePage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneTecnicoPage.dart';
 import 'package:fema_crm/pages/DettaglioMerceInRiparazioneByTecnicoPage.dart';
@@ -57,6 +58,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       };
     }
     saveIngresso();
+    getAllTasks();
   }
 
   final List<MenuItem> _menuItems = [
@@ -93,6 +95,45 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       print('Errore durante il salvataggio dell\'intervento: $e');
     }
   }
+
+  Future<void> getAllTasks() async {
+    try {
+      String userId = widget.userData!.id.toString();
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/task/utente/$userId'));
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        List<TaskModel> tasks = [];
+        for (var item in responseData) {
+          TaskModel task = TaskModel.fromJson(item);
+          if (task.accettato == false) {
+            tasks.add(task);
+          }
+        }
+        if (tasks.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Attenzione"),
+                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Chiude l'alert
+                    },
+                    child: Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      print('Error fetching commissioni: $e');
+    }
+  }
+
 
   Future<List<CommissioneModel>> getAllCommissioniByUtente(
       String userId) async {
