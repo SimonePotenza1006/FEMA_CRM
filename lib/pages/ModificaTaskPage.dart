@@ -342,12 +342,13 @@ class _ModificaTaskPageState
                     child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                   ),
                 ),
-                SizedBox(height: 30),
-                if (pickedImages.isNotEmpty)
-                  _buildImagePreview(),
-                SizedBox(height: 20),
+
 
               ],),
+              SizedBox(height: 30),
+              if (pickedImages.isNotEmpty)
+                _buildImagePreview(),
+              SizedBox(height: 20),
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {

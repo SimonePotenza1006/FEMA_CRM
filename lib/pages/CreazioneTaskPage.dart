@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:fema_crm/pages/TableTaskPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import '../model/UtenteModel.dart';
@@ -96,6 +97,7 @@ class _CreazioneTaskPageState
     print('hjgfddfg');
     return SizedBox(
       height: 200,
+      //width: 300,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: pickedImages.length,
@@ -300,16 +302,17 @@ class _CreazioneTaskPageState
                     child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                   ),
                 ),
-                SizedBox(height: 30),
-                if (pickedImages.isNotEmpty)
-                  _buildImagePreview(),
-                SizedBox(height: 20),
+
 
               ],),
+              SizedBox(height: 30),
+              if (pickedImages.isNotEmpty)
+                _buildImagePreview(),
+              SizedBox(height: 20),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  createTask();
+                  saveTaskPlusPics();//createTask();
                 },
                 child: Text('SALVA'),
                 style: ElevatedButton.styleFrom(
@@ -345,7 +348,56 @@ class _CreazioneTaskPageState
     );
   }
 
-  Future<void> createTask() async {
+  Future<void> saveTaskPlusPics() async {
+    final data = await createTask();
+    try {
+      if(data == null){
+        throw Exception('Dati del task non disponibili.');
+      }
+      final task = TaskModel.fromJson(jsonDecode(data.body));
+      try{
+        for (var image in pickedImages) {
+          if (image.path != null && image.path.isNotEmpty) {
+            print('Percorso del file: ${image.path}');
+            var request = http.MultipartRequest(
+              'POST',
+              Uri.parse('$ipaddressProva/api/immagine/task/${int.parse(task.id!.toString())}'),
+            );
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'task', // Field name
+                image.path, // File path
+                contentType: MediaType('image', 'jpeg'),
+              ),
+            );
+            var response = await request.send();
+            if (response.statusCode == 200) {
+              print('File inviato con successo');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Foto salvata!'),
+                ),
+              );
+            } else {
+              print('Errore durante l\'invio del file: ${response.statusCode}');
+            }
+            Navigator.pop(context);
+          } else {
+            // Gestisci il caso in cui il percorso del file non è valido
+            print('Errore: Il percorso del file non è valido');
+          }
+        }
+        pickedImages.clear();
+        Navigator.pop(context);
+      } catch (e) {
+        print('Errore durante l\'invio del file: $e');
+      }
+    } catch (e) {
+      print('Errore durante l\'invio del file: $e');
+    }
+  }
+
+  Future<http.Response?> createTask() async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     //var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
@@ -366,15 +418,17 @@ class _CreazioneTaskPageState
           'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
-      Navigator.of(context).pop();//Navigator.pop(context);
+      //Navigator.of(context).pop();//Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Task registrato con successo!'),
         ),
       );
+      return response;
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
+    return null;
   }
 
   Future<void> getAllUtenti() async {
