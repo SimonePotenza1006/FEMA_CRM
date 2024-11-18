@@ -30,7 +30,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   List<TaskModel> _allCommissioni = [];
   List<TaskModel> _filteredCommissioni = [];
   Map<String, double> _columnWidths ={};
-
+  int? _currentSheet =1;
   bool isLoading = true;
   bool _isLoading = true;
   late TaskDataSource _dataSource;
@@ -369,11 +369,163 @@ class _TableTaskPageState extends State<TableTaskPage>{
                     });
                     return true;
                   },
-                ))
+                )),
+            if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti")
+              Flex(
+                // height: 60,
+                  direction: Axis.horizontal,
+                  children: [
+                    Expanded(
+                      child:
+                      Container(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(1),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                                    onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('PERSONALE', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(2),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                                    onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('PREVENTIVI FEMA SHOP', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(3),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                    onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('PREVENTIVI IMPIANTO', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(4),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                    onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('PREVENTIVO SERVIZI ELETTRONICA', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width : 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(5),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                    onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('SPESE', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(0),
+                                  style: ElevatedButton.styleFrom(
+                                    primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                                    onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('AZIENDALI', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          )
+                      ),
+                    )
+                  ]
+              )
           ],
         ),
       ),
     );
+  }
+
+  List<TaskModel> _getTasksPerSheet(int sheetIndex) {
+    switch (sheetIndex) {
+      case 0:
+        return _allCommissioni.where((task) => task.tipologia == Tipologia.AZIENDALE).toList();
+      case 1:
+        return _allCommissioni.where((task) => task.tipologia == Tipologia.PERSONALE).toList();
+      case 2:
+        return _allCommissioni.where((task) => task.tipologia == Tipologia.PREVENTIVO_FEMA_SHOP).toList();
+      case 3:
+        return _allCommissioni.where((task) => task.tipologia == Tipologia.PREVENTIVO_IMPIANTO).toList();
+      case 4:
+        return _allCommissioni.where((task) => task.tipologia == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA).toList();
+      case 5:
+        return _allCommissioni.where((task) => task.tipologia == Tipologia.SPESE).toList();
+      default:
+        return _allCommissioni.toList();
+    }
+  }
+
+  void _changeSheet(int index) {
+    setState(() {
+      _currentSheet = index;
+      switch (index) {
+        case 0:
+          _filteredCommissioni= _allCommissioni.where((task) => task.tipologia == Tipologia.AZIENDALE).toList();
+          break;
+        case 1:
+          _filteredCommissioni= _allCommissioni
+              .where((task) => task.tipologia == Tipologia.PERSONALE)
+              .toList();
+          break;
+        case 2:
+          _filteredCommissioni= _allCommissioni
+              .where((task) => task.tipologia == Tipologia.PREVENTIVO_FEMA_SHOP)
+              .toList();
+          break;
+        case 3:
+          _filteredCommissioni= _allCommissioni
+              .where((task) => task.tipologia == Tipologia.PREVENTIVO_IMPIANTO)
+              .toList();
+          break;
+        case 4:
+          _filteredCommissioni= _allCommissioni
+              .where((task) => task.tipologia == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA).toList();
+          break;
+        case 5:
+          _filteredCommissioni= _allCommissioni
+              .where((task) => task.tipologia == Tipologia.SPESE)
+              .toList();
+      }
+      _dataSource.updateData(_filteredCommissioni);
+    });
   }
 }
 
