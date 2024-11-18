@@ -93,11 +93,11 @@ class TaskModel {
       return Tipologia.AZIENDALE;
     } else if(tipologia == "PERSONALE"){
       return Tipologia.PERSONALE;
-    } else if(tipologia == "PREVENTIVO FEMA SHOP"){
+    } else if(tipologia == "PREVENTIVO_FEMA_SHOP"){
       return Tipologia.PREVENTIVO_FEMA_SHOP;
-    } else if(tipologia == "PREVENTIVO SERVIZI ELETTRONICA") {
+    } else if(tipologia == "PREVENTIVO_SERVIZI_ELETTRONICA") {
       return Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA;
-    } else if(tipologia == "PREVENTIVO IMPIANTO"){
+    } else if(tipologia == "PREVENTIVO_IMPIANTO"){
       return Tipologia.PREVENTIVO_IMPIANTO;
     } else if(tipologia == "SPESE"){
       return Tipologia.SPESE;
@@ -108,7 +108,7 @@ class TaskModel {
 
 }
 
-enum Tipologia{
+enum Tipologia {
   AZIENDALE,
   PERSONALE,
   PREVENTIVO_FEMA_SHOP,

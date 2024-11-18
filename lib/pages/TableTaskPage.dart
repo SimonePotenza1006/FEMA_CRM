@@ -4,6 +4,7 @@ import 'package:fema_crm/pages/CreazioneTaskPage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneAmministrazionePage.dart';
 import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -30,14 +31,28 @@ class _TableTaskPageState extends State<TableTaskPage>{
   List<TaskModel> _allCommissioni = [];
   List<TaskModel> _filteredCommissioni = [];
   Map<String, double> _columnWidths ={};
-  int? _currentSheet =1;
+  int? _currentSheet;
   bool isLoading = true;
   bool _isLoading = true;
   late TaskDataSource _dataSource;
 
   @override
+  void dispose() {
+    // Ripristina l'orientamento quando si esce
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      //DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     _columnWidths ={
     'task' : 0,
     'data_creazione' : 150,
@@ -92,9 +107,18 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   @override
   Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        /*leading: BackButton(
+    return WillPopScope(
+        onWillPop: () async {
+          // Ripristina l'orientamento predefinito quando si lascia la pagina
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]);
+          return true;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            /*leading: BackButton(
           onPressed: (){Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -103,95 +127,165 @@ class _TableTaskPageState extends State<TableTaskPage>{
           );},
           color: Colors.black, // <-- SEE HERE
         ),*/
-        title: Text('LISTA TASK', style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: Colors.red,
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.add, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CreazioneTaskPage(utente: widget.utente,)));
-            },
+            title: Text('LISTA TASK', style: TextStyle(color: Colors.white)),
+            centerTitle: true,
+            backgroundColor: Colors.red,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.add, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  SystemChrome.setPreferredOrientations([
+                    DeviceOrientation.portraitUp,
+                    DeviceOrientation.portraitDown,
+                  ]);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CreazioneTaskPage(utente: widget.utente,)));
+                },
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  // Navigator.pushReplacement(
+                  //     context,
+                  //     MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.utente,)));
+                  getAllTask();
+                },
+              ),
+            ],
           ),
-          IconButton(
-            icon: Icon(
-              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
-              color: Colors.white,
-            ),
-            onPressed: () {
-              // Navigator.pushReplacement(
-              //     context,
-              //     MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.utente,)));
-              getAllTask();
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            Expanded(
-                child: isLoading ? Center(child: CircularProgressIndicator()) : SfDataGrid(
-                  allowPullToRefresh: true,
-                  allowSorting: true,
-                  source: _dataSource,
-                  columnWidthMode: ColumnWidthMode.auto,
-                  allowColumnsResizing: true,
-                  isScrollbarAlwaysShown: true,
-                  rowHeight: 40,
-                  gridLinesVisibility: GridLinesVisibility.both,
-                  headerGridLinesVisibility: GridLinesVisibility.both,
-                  columns: [
-                    GridColumn(
-                      columnName: 'task',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
+          body: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                Expanded(
+                    child: isLoading ? Center(child: CircularProgressIndicator()) : SfDataGrid(
+                      allowPullToRefresh: true,
+                      allowSorting: true,
+                      source: _dataSource,
+                      columnWidthMode: ColumnWidthMode.auto,
+                      allowColumnsResizing: true,
+                      isScrollbarAlwaysShown: true,
+                      rowHeight: 40,
+                      gridLinesVisibility: GridLinesVisibility.both,
+                      headerGridLinesVisibility: GridLinesVisibility.both,
+                      columns: [
+                        GridColumn(
+                          columnName: 'task',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'task',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
+                          width: _columnWidths['task']?? double.nan,
+                          minimumWidth: 0,
                         ),
-                        child: Text(
-                          'task',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['task']?? double.nan,
-                      minimumWidth: 0,
-                    ),
-                    GridColumn(
-                      columnName: 'data_creazione',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
+                        GridColumn(
+                          allowSorting: false,
+                          columnName: 'accettatoicon',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 0,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              '',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
+                          width: _columnWidths['accettatoicon']?? double.nan,
+                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
                         ),
-                        child: Text(
-                          'Data creazione',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        GridColumn(
+                          allowSorting: false,
+                          columnName: 'completed',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 0,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              '',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          ),
+                          width: 60,//_columnWidths['task']?? double.nan,
+                          minimumWidth: 60,
                         ),
-                      ),
-                      width: _columnWidths['data_creazione']?? double.nan,
-                      minimumWidth: 150,
-                    ),
-                    /*GridColumn(
+                        GridColumn(
+                          allowSorting: false,
+                          columnName: 'delete',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 0,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              '',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          ),
+                          width: 60,//_columnWidths['task']?? double.nan,
+                          minimumWidth: 60,
+                        ),
+                        GridColumn(
+                          columnName: 'data_creazione',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Data creazione',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          ),
+                          width: _columnWidths['data_creazione']?? double.nan,
+                          minimumWidth: 150,
+                        ),
+                        /*GridColumn(
                       columnName: 'data_conclusione',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -212,28 +306,28 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       width: _columnWidths['data_conclusione']?? double.nan,
                       minimumWidth: 150,
                     ),*/
-                    GridColumn(
-                      columnName: 'titolo',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
+                        GridColumn(
+                          columnName: 'titolo',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Titolo',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
+                          width: _columnWidths['titolo']?? double.nan,
+                          minimumWidth: 300,
                         ),
-                        child: Text(
-                          'Titolo',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['titolo']?? double.nan,
-                      minimumWidth: 300,
-                    ),
-                    /*GridColumn(
+                        /*GridColumn(
                       columnName: 'tipologia',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -254,224 +348,159 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       width: _columnWidths['tipologia']?? double.nan,
                       minimumWidth: 300,
                     ),*/
-                    GridColumn(
-                      columnName: 'utente',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
+                        GridColumn(
+                          columnName: 'utente',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Utente',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
+                          width: _columnWidths['utente']?? double.nan,
+                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 300 : 0,
                         ),
-                        child: Text(
-                          'Utente',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['utente']?? double.nan,
-                      minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 300 : 0,
-                    ),
-                    GridColumn(
-                      columnName: 'accettato',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
+                        GridColumn(
+                          columnName: 'accettato',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Accettato',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
+                          width: _columnWidths['accettato']?? double.nan,
+                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
                         ),
-                        child: Text(
-                          'Accettato',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['accettato']?? double.nan,
-                      minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
-                    ),
-                    GridColumn(
-                      allowSorting: false,
-                      columnName: 'accettatoicon',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 0,
-                            ),
+                      ],
+                      onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
+                        setState(() {
+                          _columnWidths[details.column.columnName] = details.width;
+                        });
+                        return true;
+                      },
+                    )),
+                if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti")
+                  Flex(
+                    // height: 60,
+                      direction: Axis.horizontal,
+                      children: [
+                        Expanded(
+                          child:
+                          Container(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(width: 5),
+                                    ElevatedButton(
+                                      onPressed: () => _changeSheet(1),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                                        onPrimary: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        elevation: 2.0,
+                                      ),
+                                      child: Text('PERSONALE', style: TextStyle(color: Colors.white)),
+                                    ),
+                                    SizedBox(width: 5),
+                                    ElevatedButton(
+                                      onPressed: () => _changeSheet(2),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                                        onPrimary: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        elevation: 2.0,
+                                      ),
+                                      child: Text('PREVENTIVI FEMA SHOP', style: TextStyle(color: Colors.white)),
+                                    ),
+                                    SizedBox(width: 5),
+                                    ElevatedButton(
+                                      onPressed: () => _changeSheet(3),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                        onPrimary: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        elevation: 2.0,
+                                      ),
+                                      child: Text('PREVENTIVI IMPIANTO', style: TextStyle(color: Colors.white)),
+                                    ),
+                                    SizedBox(width: 5),
+                                    ElevatedButton(
+                                      onPressed: () => _changeSheet(4),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                        onPrimary: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        elevation: 2.0,
+                                      ),
+                                      child: Text('PREVENTIVO SERVIZI ELETTRONICA', style: TextStyle(color: Colors.white)),
+                                    ),
+                                    SizedBox(width : 5),
+                                    ElevatedButton(
+                                      onPressed: () => _changeSheet(5),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                        onPrimary: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        elevation: 2.0,
+                                      ),
+                                      child: Text('SPESE', style: TextStyle(color: Colors.white)),
+                                    ),
+                                    SizedBox(width: 5),
+                                    ElevatedButton(
+                                      onPressed: () => _changeSheet(0),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                                        onPrimary: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0),
+                                        ),
+                                        elevation: 2.0,
+                                      ),
+                                      child: Text('AZIENDALI', style: TextStyle(color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
+                              )
                           ),
-                        ),
-                        child: Text(
-                          '',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['accettatoicon']?? double.nan,
-                      minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
-                    ),
-                    GridColumn(
-                      allowSorting: false,
-                      columnName: 'completed',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 0,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          '',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: 60,//_columnWidths['task']?? double.nan,
-                      minimumWidth: 60,
-                    ),
-                    GridColumn(
-                      allowSorting: false,
-                      columnName: 'delete',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 0,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          '',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: 60,//_columnWidths['task']?? double.nan,
-                      minimumWidth: 60,
-                    ),
-                  ],
-                  onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
-                    setState(() {
-                      _columnWidths[details.column.columnName] = details.width;
-                    });
-                    return true;
-                  },
-                )),
-            if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti")
-              Flex(
-                // height: 60,
-                  direction: Axis.horizontal,
-                  children: [
-                    Expanded(
-                      child:
-                      Container(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 5),
-                                ElevatedButton(
-                                  onPressed: () => _changeSheet(1),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                                    onPrimary: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    elevation: 2.0,
-                                  ),
-                                  child: Text('PERSONALE', style: TextStyle(color: Colors.white)),
-                                ),
-                                SizedBox(width: 5),
-                                ElevatedButton(
-                                  onPressed: () => _changeSheet(2),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
-                                    onPrimary: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    elevation: 2.0,
-                                  ),
-                                  child: Text('PREVENTIVI FEMA SHOP', style: TextStyle(color: Colors.white)),
-                                ),
-                                SizedBox(width: 5),
-                                ElevatedButton(
-                                  onPressed: () => _changeSheet(3),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                                    onPrimary: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    elevation: 2.0,
-                                  ),
-                                  child: Text('PREVENTIVI IMPIANTO', style: TextStyle(color: Colors.white)),
-                                ),
-                                SizedBox(width: 5),
-                                ElevatedButton(
-                                  onPressed: () => _changeSheet(4),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                                    onPrimary: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    elevation: 2.0,
-                                  ),
-                                  child: Text('PREVENTIVO SERVIZI ELETTRONICA', style: TextStyle(color: Colors.white)),
-                                ),
-                                SizedBox(width : 5),
-                                ElevatedButton(
-                                  onPressed: () => _changeSheet(5),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
-                                    onPrimary: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    elevation: 2.0,
-                                  ),
-                                  child: Text('SPESE', style: TextStyle(color: Colors.white)),
-                                ),
-                                SizedBox(width: 5),
-                                ElevatedButton(
-                                  onPressed: () => _changeSheet(0),
-                                  style: ElevatedButton.styleFrom(
-                                    primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                                    onPrimary: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    elevation: 2.0,
-                                  ),
-                                  child: Text('AZIENDALI', style: TextStyle(color: Colors.white)),
-                                ),
-                              ],
-                            ),
-                          )
-                      ),
-                    )
-                  ]
-              )
-          ],
-        ),
-      ),
-    );
+                        )
+                      ]
+                  )
+              ],
+            ),
+          ),
+        )
+        );
   }
 
   List<TaskModel> _getTasksPerSheet(int sheetIndex) {
@@ -530,6 +559,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 }
 
 class TaskDataSource extends DataGridSource{
+  //UtenteMode;
   List<TaskModel> _commissioni = [];
   List<TaskModel> commissioniFiltrate = [];
   BuildContext context;
@@ -565,16 +595,13 @@ class TaskDataSource extends DataGridSource{
       rows.add(DataGridRow(
         cells: [
           DataGridCell<TaskModel>(columnName: 'task', value: task),
-          DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
-          //DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
-          DataGridCell<String>(columnName: 'titolo', value: task.titolo),
-          //DataGridCell<String>(columnName: 'tipologia', value: task.tipologia.toString().split('.').last),
-          //DataGridCell<String>(columnName: 'concluso', value: concluso),
-          DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
-          DataGridCell<String>(columnName: 'accettato', value: accettato),
           DataGridCell<TaskModel>(columnName: 'accettatoicon', value: task),
           DataGridCell<TaskModel>(columnName: 'completed', value: task),
           DataGridCell<TaskModel>(columnName: 'delete', value: task),
+          DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
+          DataGridCell<String>(columnName: 'titolo', value: task.titolo),
+          DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
+          DataGridCell<String>(columnName: 'accettato', value: accettato),
         ]
       ));
     }
@@ -603,18 +630,23 @@ class TaskDataSource extends DataGridSource{
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TableTaskPage(utente: utente),
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => TableTaskPage(utente: utente),
+      //   ),
+      // );
       //Navigator.of(context).pop();//Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Stato Task aggiornato con successo!'),
-        ),
-      );
+      if(response.statusCode == 201){
+        task.concluso == true;
+        updateData(_commissioni);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Stato Task aggiornato con successo!'),
+          ),
+        );
+      }
+
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
@@ -642,19 +674,22 @@ class TaskDataSource extends DataGridSource{
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TableTaskPage(utente: utente),
-        ),
-      );
-
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => TableTaskPage(utente: utente),
+      //   ),
+      // );
+      if(response.statusCode == 201){
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Stato Task aggiornato con successo!'),
+          ),
+        );
+        updateData(commissioniFiltrate);
+      }
       //Navigator.of(context).pop();//Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Stato Task aggiornato con successo!'),
-        ),
-      );
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
@@ -685,6 +720,34 @@ class TaskDataSource extends DataGridSource{
       print('Errore durante l\'eliminazione del task: $e');
     }
   }
+
+  // Future<void> getAllTask() async{
+  //   try{
+  //     var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
+  //         : Uri.parse('$ipaddressProva/api/task/utente/'+widget.utente!.id!);
+  //     var response = await http.get(apiUrl);
+  //     if(response.statusCode == 200){
+  //       var jsonData = jsonDecode(response.body);
+  //       List<TaskModel> commissioni = [];
+  //       for(var item in jsonData){
+  //         commissioni.add(TaskModel.fromJson(item));
+  //       }
+  //       if(response.statusCode == 200){
+  //         _isLoading = false;
+  //         _allCommissioni = commissioni;
+  //         _filteredCommissioni = commissioni;
+  //         _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente);
+  //       }
+  //     } else {
+  //       //_isLoading = false;
+  //       throw Exception('Failed to load data from API: ${response.statusCode}');
+  //     }
+  //   } catch(e){
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error during API call: $e')),
+  //     );
+  //   }
+  // }
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {

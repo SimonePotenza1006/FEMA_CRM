@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fema_crm/pages/TableTaskPage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
@@ -40,6 +41,10 @@ class _CreazioneTaskPageState
   void initState() {
     super.initState();
     getAllUtenti();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   Future<void> _selezionaData() async {
@@ -95,7 +100,8 @@ class _CreazioneTaskPageState
   Widget _buildImagePreview() {
     print('hjgfddfg');
     return SizedBox(
-      height: 200,
+      width: 200,
+      height: 150,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: pickedImages.length,
@@ -126,160 +132,131 @@ class _CreazioneTaskPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        /*leading: BackButton(
-          onPressed: (){Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>  TableTaskPage(utente: widget.utente),
-            ),
-          );},
-          color: Colors.black, // <-- SEE HERE
-        ),*/
         title: const Text('CREAZIONE TASK',
             style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
       ),
-      body: SingleChildScrollView(
-    child: LayoutBuilder(
-    builder: (context, constraints){
+      body: LayoutBuilder(
+      builder: (context, constraints){
 
-    return Padding(
+      return Padding(
         padding: EdgeInsets.all(20.0),
-        child: Center(
-          child:  Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 20),
-              // Description Field
-              SizedBox(
-                width: 450,
-                child: TextFormField(
-                  controller: _titoloController,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    labelText: 'Titolo',
-                    border: OutlineInputBorder(),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Center(
+            child:  Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 20),
+                // Description Field
+                SizedBox(
+                  width: 450,
+                  child: TextFormField(
+                    controller: _titoloController,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      labelText: 'Titolo',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              // Description Field
-              SizedBox(
-                width: 450,
-                child: TextFormField(minLines: 4,
-                  controller: _descrizioneController,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    labelText: 'Descrizione',
-                    border: OutlineInputBorder(),
+                SizedBox(height: 20),
+                // Description Field
+                SizedBox(
+                  width: 450,
+                  child: TextFormField(minLines: 4,
+                    controller: _descrizioneController,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      labelText: 'Descrizione',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 400,
-                child: DropdownButtonFormField<Tipologia>(
-                  value: _selectedTipo,
-                  onChanged: (Tipologia? newValue) {
-                    setState(() {
-                      _selectedTipo = newValue;
-                    });
-                  },
+                SizedBox(height: 20),
+                SizedBox(
+                  width: 400,
+                  child: DropdownButtonFormField<Tipologia>(
+                    value: _selectedTipo,
+                    onChanged: (Tipologia? newValue) {
+                      setState(() {
+                        _selectedTipo = newValue;
+                      });
+                    },
 
-                  items: [Tipologia.PERSONALE, Tipologia.AZIENDALE, Tipologia.PREVENTIVO_FEMA_SHOP, Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA,
-                    Tipologia.PREVENTIVO_IMPIANTO, Tipologia.SPESE]
-                      .map<DropdownMenuItem<Tipologia>>((Tipologia value) {
-                    String label = "";
-                    if (value == Tipologia.PERSONALE) {
-                      label = 'PERSONALE';
-                    } else if (value == Tipologia.AZIENDALE) {
-                      label = 'AZIENDALE';
-                    } else if (value == Tipologia.PREVENTIVO_FEMA_SHOP) {
-                      label = 'PREVENTIVO FEMA SHOP';
-                    } else if (value == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA) {
-                      label = 'PREVENTIVO SERVIZI ELETTRONICA';
-                    } else if (value == Tipologia.PREVENTIVO_IMPIANTO) {
-                      label = 'PREVENTIVO IMPIANTO';
-                    } else if (value == Tipologia.SPESE) {
-                      label = 'SPESE';
-                    }
-                    return DropdownMenuItem<Tipologia>(
-                      value: value,
-                      child: Text(label),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'TIPOLOGIA',
-                  ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Selezionare la tipologia';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-
-              SizedBox(height: 20),
-              SizedBox(
-                width: 200,
-                child: CheckboxListTile(
-                  title: Text('Condiviso'),
-                  value: _condiviso,
-                  onChanged: (value) {
-                    setState(() {
-                      _condiviso = value!;
-                      if (_condiviso) {
-                        _condivisoController.clear();
+                    items: [Tipologia.PERSONALE, Tipologia.AZIENDALE, Tipologia.PREVENTIVO_FEMA_SHOP, Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA,
+                      Tipologia.PREVENTIVO_IMPIANTO, Tipologia.SPESE]
+                        .map<DropdownMenuItem<Tipologia>>((Tipologia value) {
+                      String label = "";
+                      if (value == Tipologia.PERSONALE) {
+                        label = 'PERSONALE';
+                      } else if (value == Tipologia.AZIENDALE) {
+                        label = 'AZIENDALE';
+                      } else if (value == Tipologia.PREVENTIVO_FEMA_SHOP) {
+                        label = 'PREVENTIVO FEMA SHOP';
+                      } else if (value == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA) {
+                        label = 'PREVENTIVO SERVIZI ELETTRONICA';
+                      } else if (value == Tipologia.PREVENTIVO_IMPIANTO) {
+                        label = 'PREVENTIVO IMPIANTO';
+                      } else if (value == Tipologia.SPESE) {
+                        label = 'SPESE';
                       }
-                    });
-                  },
-                ),
-              ),
-              SizedBox(height: 20),// Button
-              if (_condiviso) SizedBox(
-                width: 450,
-                child: DropdownButtonFormField<UtenteModel>(
-                  value: selectedUtente,
-                  onChanged: (UtenteModel? newValue){
-                    setState(() {
-                      selectedUtente = newValue;
-                    });
-                  },
-                  items: allUtenti.map((UtenteModel utente){
-                    return DropdownMenuItem<UtenteModel>(
-                      value: utente,
-                      child: Text(utente.nomeCompleto()!),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                      labelText: 'Seleziona tecnico'.toUpperCase()
+                      return DropdownMenuItem<Tipologia>(
+                        value: value,
+                        child: Text(label),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'TIPOLOGIA',
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Selezionare la tipologia';
+                      }
+                      return null;
+                    },
                   ),
                 ),
-              ),
-              SizedBox(height: 40),
-              Platform.isWindows ? Center(
-                child: ElevatedButton(
-                  onPressed: pickImagesFromGallery,
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    onPrimary: Colors.white,
+                SizedBox(height: 20),
+                SizedBox(
+                  width: 200,
+                  child: CheckboxListTile(
+                    title: Text('Condiviso'),
+                    value: _condiviso,
+                    onChanged: (value) {
+                      setState(() {
+                        _condiviso = value!;
+                        if (_condiviso) {
+                          _condivisoController.clear();
+                        }
+                      });
+                    },
                   ),
-                  child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                 ),
-              ) : Row(children: [Center(
-                child: ElevatedButton(
-                  onPressed: takePicture,
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    onPrimary: Colors.white,
+                SizedBox(height: 20),// Button
+                if (_condiviso) SizedBox(
+                  width: 450,
+                  child: DropdownButtonFormField<UtenteModel>(
+                    value: selectedUtente,
+                    onChanged: (UtenteModel? newValue){
+                      setState(() {
+                        selectedUtente = newValue;
+                      });
+                    },
+                    items: allUtenti.map((UtenteModel utente){
+                      return DropdownMenuItem<UtenteModel>(
+                        value: utente,
+                        child: Text(utente.nomeCompleto()!),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                        labelText: 'Seleziona tecnico'.toUpperCase()
+                    ),
                   ),
-                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                 ),
-              ),
-                SizedBox(width: 16,),
-                Center(
+                SizedBox(height: 40),
+                Platform.isWindows ? Center(
                   child: ElevatedButton(
                     onPressed: pickImagesFromGallery,
                     style: ElevatedButton.styleFrom(
@@ -288,31 +265,65 @@ class _CreazioneTaskPageState
                     ),
                     child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                   ),
-                ),
-                SizedBox(height: 30),
-                _buildImagePreview(),
-                SizedBox(height: 20),
-
-              ],),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  createTask();
-                },
-                child: Text('SALVA'),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                ) : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: ElevatedButton(
+                      onPressed: takePicture,
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        onPrimary: Colors.white,
+                      ),
+                      child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                    ),
                   ),
-                ),
-              ),
-
-            ],
+                  SizedBox(width: 16,),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: pickImagesFromGallery,
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red,
+                        onPrimary: Colors.white,
+                      ),
+                      child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                    ),
+                  ),
+                ],),
+                SizedBox(height: 10),
+                _buildImagePreview(),
+                SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
-      );})),
+      );
+      }
+      ), floatingActionButton: Padding(
+      padding: EdgeInsets.all(10.0),
+    child: ElevatedButton(
+    onPressed: () {
+    createTask();
+    },
+    child: SizedBox(
+      width: 90,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check, weight: 10,),
+          SizedBox(width: 4),
+          Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+        ],
+      ),
+    ),
+    style: ElevatedButton.styleFrom(
+    primary: Colors.red,
+    onPrimary: Colors.white,
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(10),
+    ),
+    ),
+    ),
       /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Padding(
         padding: EdgeInsets.all(22.0),
@@ -330,7 +341,7 @@ class _CreazioneTaskPageState
           ),
         ),
       ),*/
-    );
+    ));
   }
 
   Future<void> createTask() async {

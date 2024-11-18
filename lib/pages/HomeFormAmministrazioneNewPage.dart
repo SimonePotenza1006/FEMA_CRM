@@ -11,6 +11,7 @@ import 'package:fema_crm/pages/TableMerceInRiparazionePage.dart';
 import 'package:fema_crm/pages/TableTaskPage.dart';
 import 'package:fema_crm/pages/TableVeicoliPage.dart';
 import 'package:fema_crm/pages/TimbratureEdit.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/pages/CalendarioPage.dart';
 import 'package:fema_crm/pages/ListaClientiPage.dart';
@@ -1267,6 +1268,24 @@ class _HomeFormAmministrazioneNewPageState
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) => ScannerQrCodeAmministrazionePage()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.checklist, text: 'TASK',
+                                    onPressed: () {
+                                      SystemChrome.setPreferredOrientations([
+                                        //DeviceOrientation.landscapeLeft,
+                                        DeviceOrientation.landscapeRight,
+                                      ]);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData)),
                                       );
                                     },
                                   ),
