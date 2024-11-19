@@ -11,6 +11,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/TaskModel.dart';
+import '../model/TipoTaskModel.dart';
 import '../model/UtenteModel.dart';
 import 'ModificaTaskPage.dart';
 
@@ -33,6 +34,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
   bool isLoading = true;
   bool _isLoading = true;
   late TaskDataSource _dataSource;
+  List<TipoTaskModel> allTipi = [];
+  List<UtenteModel> allUtenti = [];
+  UtenteModel? selectedUtente;
+  TextEditingController _descrizioneController = TextEditingController();
 
   @override
   void dispose() {
@@ -62,15 +67,99 @@ class _TableTaskPageState extends State<TableTaskPage>{
     'accettatoicon' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
     'completed' : 60,
     'delete' : 60,
+    'data_conclusione' : 150,
+    'condividi' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 200 : 0,
   };
-    _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente);
+    getAllTipi();
+    getAllUtenti();
+    _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, allUtenti);
     getAllTask();
     _filteredCommissioni = _allCommissioni.toList();
   }
 
+  Future<void> getAllUtenti() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for (var item in jsonData) {
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        throw Exception(
+            'Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching agenti data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> getAllTipi() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipoTaskModel> tipi = [];
+        for(var item in jsonData){
+          tipi.add(TipoTaskModel.fromJson(item));
+        }
+        setState(() {
+          allTipi = tipi;
+        });
+      } else {
+        throw Exception(
+            'Failed to load tipi task data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Error fetching tipi task data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   Future<void> getAllTask() async{
     setState(() {
-      isLoading = true; // Inizio del caricamento
+      isLoading = true;
     });
     try{
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
@@ -86,7 +175,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
           _isLoading = false;
           _allCommissioni = commissioni;
           _filteredCommissioni = commissioni;
-          _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente);
+          _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, allUtenti);
         });
       } else {
         _isLoading = false;
@@ -116,19 +205,35 @@ class _TableTaskPageState extends State<TableTaskPage>{
         },
         child: Scaffold(
           appBar: AppBar(
-            /*leading: BackButton(
-          onPressed: (){Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>  HomeFormAmministrazioneNewPage(userData: widget.utente),
-            ),
-          );},
-          color: Colors.black, // <-- SEE HERE
-        ),*/
             title: Text('LISTA TASK', style: TextStyle(color: Colors.white)),
             centerTitle: true,
             backgroundColor: Colors.red,
             actions: [
+              if(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
+                Row(
+                  children: [
+                    PopupMenuButton<UtenteModel>(
+                      icon: Icon(Icons.person, color: Colors.white), // Icona della casa
+                      onSelected: (UtenteModel utente) {
+                        setState(() {
+                          selectedUtente = utente;
+                        });
+                        filterTasksByUtente(selectedUtente!);
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return allUtenti.map((UtenteModel singleUtente) {
+                          return PopupMenuItem<UtenteModel>(
+                            value: singleUtente,
+                            child: Text(singleUtente.nomeCompleto()!.toUpperCase()),
+                          );
+                        }).toList();
+                      },
+                    ),
+                    SizedBox(width: 2),
+                    Text('${selectedUtente != null ? "${selectedUtente?.nomeCompleto()!.toUpperCase()}" : "TUTTI"}', style: TextStyle(color: Colors.white)),
+                    SizedBox(width: 6)
+                  ],
+                ),
               IconButton(
                 icon: Icon(
                   Icons.add, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -154,6 +259,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   //     context,
                   //     MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.utente,)));
                   getAllTask();
+                  getAllTipi();
+                  getAllUtenti();
                 },
               ),
             ],
@@ -242,6 +349,28 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         ),
                         GridColumn(
                           allowSorting: false,
+                          columnName: 'condividi',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 0,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              '',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          ),
+                          width: _columnWidths['condividi']?? double.nan,
+                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
+                        ),
+                        GridColumn(
+                          allowSorting: false,
                           columnName: 'delete',
                           label: Container(
                             padding: EdgeInsets.all(8.0),
@@ -262,6 +391,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           width: 60,//_columnWidths['task']?? double.nan,
                           minimumWidth: 60,
                         ),
+
                         GridColumn(
                           columnName: 'data_creazione',
                           label: Container(
@@ -388,6 +518,27 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           width: _columnWidths['accettato']?? double.nan,
                           minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
                         ),
+                        GridColumn(
+                          columnName: 'data_conclusione',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Data conclusione',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          ),
+                          width: _columnWidths['data_conclusione']?? double.nan,
+                          minimumWidth: 150,
+                        ),
                       ],
                       onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
                         setState(() {
@@ -398,162 +549,180 @@ class _TableTaskPageState extends State<TableTaskPage>{
                     )),
                 if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti")
                   Flex(
-                    // height: 60,
-                      direction: Axis.horizontal,
-                      children: [
-                        Expanded(
-                          child:
-                          Container(
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    SizedBox(width: 5),
-                                    ElevatedButton(
-                                      onPressed: () => _changeSheet(1),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                                        onPrimary: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                        ),
-                                        elevation: 2.0,
+                    direction: Axis.horizontal,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: allTipi.map((tipo) {
+                                final isSelected = _currentSheet == int.parse(tipo.id!);
+                                print('Rendering button: ${tipo.descrizione} - isSelected: $isSelected'); // Debug
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      print('Button pressed: ${tipo.descrizione}'); // Debug
+                                      _changeSheet(int.parse(tipo.id!));
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isSelected
+                                          ? Colors.red // Colore rosso per il pulsante selezionato
+                                          : Colors.grey[300], // Colore grigio chiaro per i non selezionati
+                                      foregroundColor: isSelected
+                                          ? Colors.white // Testo bianco per il pulsante selezionato
+                                          : Colors.black, // Testo nero per i non selezionati
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0),
+                                        side: isSelected
+                                            ? BorderSide(color: Colors.red, width: 2.0) // Bordo rosso
+                                            : BorderSide.none, // Nessun bordo
                                       ),
-                                      child: Text('PERSONALE', style: TextStyle(color: Colors.white)),
+                                      elevation: isSelected ? 6.0 : 2.0, // Più elevazione se selezionato
                                     ),
-                                    SizedBox(width: 5),
-                                    ElevatedButton(
-                                      onPressed: () => _changeSheet(2),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
-                                        onPrimary: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                        ),
-                                        elevation: 2.0,
-                                      ),
-                                      child: Text('PREVENTIVI FEMA SHOP', style: TextStyle(color: Colors.white)),
+                                    child: Text(
+                                      tipo.descrizione!, // Mostra la descrizione
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
-                                    SizedBox(width: 5),
-                                    ElevatedButton(
-                                      onPressed: () => _changeSheet(3),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                                        onPrimary: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                        ),
-                                        elevation: 2.0,
-                                      ),
-                                      child: Text('PREVENTIVI IMPIANTO', style: TextStyle(color: Colors.white)),
-                                    ),
-                                    SizedBox(width: 5),
-                                    ElevatedButton(
-                                      onPressed: () => _changeSheet(4),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                                        onPrimary: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                        ),
-                                        elevation: 2.0,
-                                      ),
-                                      child: Text('PREVENTIVO SERVIZI ELETTRONICA', style: TextStyle(color: Colors.white)),
-                                    ),
-                                    SizedBox(width : 5),
-                                    ElevatedButton(
-                                      onPressed: () => _changeSheet(5),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
-                                        onPrimary: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                        ),
-                                        elevation: 2.0,
-                                      ),
-                                      child: Text('SPESE', style: TextStyle(color: Colors.white)),
-                                    ),
-                                    SizedBox(width: 5),
-                                    ElevatedButton(
-                                      onPressed: () => _changeSheet(0),
-                                      style: ElevatedButton.styleFrom(
-                                        primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                                        onPrimary: Colors.black,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0),
-                                        ),
-                                        elevation: 2.0,
-                                      ),
-                                      child: Text('AZIENDALI', style: TextStyle(color: Colors.white)),
-                                    ),
-                                  ],
-                                ),
-                              )
+                                  ),
+                                );
+                              }).toList(),
+                            ),
                           ),
-                        )
-                      ]
+                        ),
+                      ),
+                    ],
                   )
               ],
             ),
           ),
+            floatingActionButton: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children : [
+                FloatingActionButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return StatefulBuilder(
+                          builder: (BuildContext context, StateSetter setState) {
+                            return AlertDialog(
+                              title: Text(
+                                'Crea una nuova Tipologia',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextFormField(
+                                    controller: _descrizioneController,
+                                    onChanged: (value) {
+                                      // Aggiorna lo stato del dialogo
+                                      setState(() {});
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Nome della nuova tipologia',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                  ),
+                                  SizedBox(height: 12),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: _descrizioneController.text.isNotEmpty
+                                      ? () {
+                                    saveTipologia();
+                                  }
+                                      : null, // Disabilita il pulsante se il testo è vuoto
+                                  child: Text('Salva Tipologia'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                  backgroundColor: Colors.red,
+                  child: Icon(Icons.create_new_folder, color: Colors.white),
+                  heroTag: "Tag2",
+                ),
+              ]
+            ),
         )
         );
   }
 
-  List<TaskModel> _getTasksPerSheet(int sheetIndex) {
-    switch (sheetIndex) {
-      case 0:
-        return _allCommissioni.where((task) => task.tipologia == Tipologia.AZIENDALE).toList();
-      case 1:
-        return _allCommissioni.where((task) => task.tipologia == Tipologia.PERSONALE).toList();
-      case 2:
-        return _allCommissioni.where((task) => task.tipologia == Tipologia.PREVENTIVO_FEMA_SHOP).toList();
-      case 3:
-        return _allCommissioni.where((task) => task.tipologia == Tipologia.PREVENTIVO_IMPIANTO).toList();
-      case 4:
-        return _allCommissioni.where((task) => task.tipologia == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA).toList();
-      case 5:
-        return _allCommissioni.where((task) => task.tipologia == Tipologia.SPESE).toList();
-      default:
-        return _allCommissioni.toList();
+  Future<void> saveTipologia() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/tipoTask'),
+        headers: {'Content-Type' : 'application/json'},
+        body: jsonEncode({
+          'descrizione' : _descrizioneController.text
+        })
+      );
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Nuova tipologia registrata con successo!'),
+        ),
+      );
+      getAllTipi();
+    } catch(e){
+      print('Errore: $e');
     }
   }
 
-  void _changeSheet(int index) {
+  void _changeSheet(int? tipoId) {
+    print('Selected Sheet ID: $tipoId'); // Debug
     setState(() {
-      _currentSheet = index;
-      switch (index) {
-        case 0:
-          _filteredCommissioni= _allCommissioni.where((task) => task.tipologia == Tipologia.AZIENDALE).toList();
-          break;
-        case 1:
-          _filteredCommissioni= _allCommissioni
-              .where((task) => task.tipologia == Tipologia.PERSONALE)
-              .toList();
-          break;
-        case 2:
-          _filteredCommissioni= _allCommissioni
-              .where((task) => task.tipologia == Tipologia.PREVENTIVO_FEMA_SHOP)
-              .toList();
-          break;
-        case 3:
-          _filteredCommissioni= _allCommissioni
-              .where((task) => task.tipologia == Tipologia.PREVENTIVO_IMPIANTO)
-              .toList();
-          break;
-        case 4:
-          _filteredCommissioni= _allCommissioni
-              .where((task) => task.tipologia == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA).toList();
-          break;
-        case 5:
-          _filteredCommissioni= _allCommissioni
-              .where((task) => task.tipologia == Tipologia.SPESE)
-              .toList();
+      _currentSheet = tipoId; // Aggiorna il tipo corrente
+      print('Updated _currentSheet: $_currentSheet'); // Debug
+
+      // Filtra la lista dei dati
+      if (tipoId != null) {
+        _filteredCommissioni = _allCommissioni
+            .where((task) {
+          final taskId = task.tipologia?.id?.toString(); // Converte l'ID del task in stringa
+          final tipoIdStr = tipoId.toString(); // Converte il tipo selezionato in stringa
+          final matches = taskId == tipoIdStr; // Confronta come stringhe
+          print('Filtering task: $taskId matches: $matches'); // Debug
+          return matches;
+        })
+            .toList();
+      } else {
+        _filteredCommissioni = _allCommissioni; // Mostra tutti i dati se nullo
       }
+
+      print('Filtered _filteredCommissioni count: ${_filteredCommissioni.length}'); // Debug
+
+      // Aggiorna la tabella
       _dataSource.updateData(_filteredCommissioni);
     });
   }
+
+  void filterTasksByUtente(UtenteModel utente) {
+    setState(() {
+      // Filtra le commissioni in base all'ID dell'utente
+      _filteredCommissioni = _allCommissioni.where((commissione) {
+        final taskUserId = commissione.utente?.id; // ID dell'utente nella commissione
+        final selectedUserId = utente.id; // ID dell'utente selezionato
+        final matches = taskUserId == selectedUserId; // Confronta gli ID
+        print('Filtering task by user: $taskUserId matches: $matches'); // Debug
+        return matches;
+      }).toList();
+      // Aggiorna i dati nella data source
+      _dataSource.updateData(_filteredCommissioni);
+      print('Filtered _filteredCommissioni count: ${_filteredCommissioni.length}'); // Debug
+    });
+  }
+
+
 }
 
 class TaskDataSource extends DataGridSource{
@@ -561,13 +730,16 @@ class TaskDataSource extends DataGridSource{
   List<TaskModel> commissioniFiltrate = [];
   BuildContext context;
   UtenteModel utente;
+  List<UtenteModel> _allUtenti;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  UtenteModel? selectedUtenteCondivisione;
 
   TaskDataSource(
       this.context,
       List<TaskModel> commissioni,
       this.utente,
+      this._allUtenti
       ){
     _commissioni = List.from(commissioni);
     commissioniFiltrate = List.from(commissioni);
@@ -595,10 +767,12 @@ class TaskDataSource extends DataGridSource{
           DataGridCell<TaskModel>(columnName: 'accettatoicon', value: task),
           DataGridCell<TaskModel>(columnName: 'completed', value: task),
           DataGridCell<TaskModel>(columnName: 'delete', value: task),
+          DataGridCell<TaskModel>(columnName: 'condividi', value: task),
           DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
           DataGridCell<String>(columnName: 'titolo', value: task.titolo),
           DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
           DataGridCell<String>(columnName: 'accettato', value: accettato),
+          DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
         ]
       ));
     }
@@ -623,20 +797,11 @@ class TaskDataSource extends DataGridSource{
           'concluso': true,
           'condiviso': task.condiviso,//_condiviso,
           'accettato': task.accettato,//false,
-          'tipologia': task.tipologia.toString().split('.').last,//_selectedTipo.toString().split('.').last,
+          'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => TableTaskPage(utente: utente),
-      //   ),
-      // );
-      //Navigator.of(context).pop();//Navigator.pop(context);
       if(response.statusCode == 201){
-        //task.concluso == true;
-        //updateData(commissioniFiltrate);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Stato Task aggiornato con successo!'),
@@ -649,11 +814,43 @@ class TaskDataSource extends DataGridSource{
     }
   }
 
+  Future<void> assegnaTask(TaskModel task, UtenteModel utente) async {
+    final formatter = DateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/task'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': task.id,
+          'data_creazione': task.data_creazione!.toIso8601String(),//DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
+          'data_conclusione': null,//task.data_conclusione!.toIso8601String(),//task.data_conclusione,//null,
+          'titolo' : task.titolo,//_titoloController.text,
+          'descrizione': task.descrizione,//_descrizioneController.text,
+          'concluso': task.concluso,
+          'condiviso': true,//_condiviso,
+          'accettato': false,//task.accettato,//false,
+          'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
+          'utente': utente.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
+        }),
+      );
+      if(response.statusCode == 201){
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Stato Task aggiornato con successo!'),
+          ),
+        );
+      }
+      //Navigator.of(context).pop();//Navigator.pop(context);
+    } catch (e) {
+      print('Errore durante il salvataggio del task $e');
+    }
+  }
+
   Future<void> accettaTask(TaskModel task) async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
-    //var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
-    //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/task'),
@@ -667,16 +864,15 @@ class TaskDataSource extends DataGridSource{
           'concluso': task.concluso,
           'condiviso': task.condiviso,//_condiviso,
           'accettato': true,//task.accettato,//false,
-          'tipologia': task.tipologia.toString().split('.').last,//_selectedTipo.toString().split('.').last,
+          'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
       if(response.statusCode == 201){
-        //getAllTask();
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Stato Task aggiornato con successo!'),
+            content: Text('Stato Task assegnata con successo!'),
           ),
         );
       }
@@ -745,53 +941,8 @@ class TaskDataSource extends DataGridSource{
     final TaskModel task = row.getCells().firstWhere(
           (cell) => cell.columnName == "task",
     ).value as TaskModel;
-    /*final InterventoModel? intervento = row.getCells().firstWhere(
-          (cell) => cell.columnName == "intervento",
-    ).value as InterventoModel?;*/
-
     return DataGridRowAdapter(
       cells: row.getCells().map<Widget>((dataGridCell) {
-        /*if (dataGridCell.columnName == 'intervento') {
-          return Center(
-              child:GestureDetector(
-                onTap: () {
-                  //if (intervento != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
-                      ),
-                    );
-                  //}
-                },
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 1.0),
-                      child: Text(
-                        intervento != null ? (intervento.titolo ?? '//') : '///',
-                        style: TextStyle(
-                          color: intervento != null ? Colors.blue : Colors.black,
-                        ),
-                      ),
-                    ),
-                    if (intervento != null)
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          height: 1,
-                          color: Colors.blue,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-          );
-        } else if (dataGridCell.columnName == 'commissione') {
-          return SizedBox.shrink();
-        } else {*/
       if (dataGridCell.columnName == 'completed') {
         return IconButton(tooltip: task.concluso! ? 'TASK CONCLUSO' : 'CLICCA QUI PER CONCLUDERE IL TASK',
           icon: Icon(size: 27,
@@ -882,6 +1033,73 @@ class TaskDataSource extends DataGridSource{
                       child: Text('OK'),
                     ),
                   ],
+                );
+              },
+            );
+          },
+        );
+      } else if (dataGridCell.columnName == 'condividi') {
+        return IconButton(
+          tooltip: 'CONDIVIDI TASK',
+          icon: Icon(Icons.send, color: Colors.grey, size: 22),
+          onPressed: () {
+            // Variabile locale per tracciare l'utente selezionato
+            UtenteModel? localSelectedUtente = selectedUtenteCondivisione;
+
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
+                  builder: (BuildContext context, StateSetter setState) {
+                    return AlertDialog(
+                      title: Text('Condividi Task'),
+                      content: SingleChildScrollView(
+                        child: Container(
+                          width: double.maxFinite,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: _allUtenti.length,
+                                itemBuilder: (context, index) {
+                                  return RadioListTile<UtenteModel>(
+                                    value: _allUtenti[index],
+                                    groupValue: localSelectedUtente,
+                                    onChanged: (UtenteModel? newValue) {
+                                      setState(() {
+                                        localSelectedUtente = newValue; // Aggiorna lo stato locale
+                                      });
+                                    },
+                                    title: Text(_allUtenti[index].nomeCompleto()!),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Annulla'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (localSelectedUtente != null) {
+                              // Salva l'utente selezionato
+                              assegnaTask(task, localSelectedUtente!);
+                              print('Utente selezionato: ${localSelectedUtente!.nomeCompleto()}');
+                            }
+                          },
+                          child: Text('Condividi'),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             );

@@ -1,12 +1,16 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:fema_crm/pages/TableTaskPage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
+import '../model/TipoTaskModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/TaskModel.dart';
 import 'package:intl/intl.dart';
+
+import 'GalleriaFotoInterventoPage.dart';
 
 class ModificaTaskPage extends StatefulWidget {
   final UtenteModel utente;
@@ -25,48 +29,107 @@ class _ModificaTaskPageState
   // Controller for the text fields
   TextEditingController _descrizioneController = TextEditingController();
   TextEditingController _titoloController = TextEditingController();
-
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   UtenteModel? selectedUtente;
+  List<TipoTaskModel> allTipi = [];
   DateTime _dataOdierna = DateTime.now();
   DateTime? selectedDate = null;
-  Tipologia? _selectedTipo;
+  TipoTaskModel? _selectedTipo;
   bool _condiviso = false;
   bool _concluso = false;
   bool _accettato = false;
   TextEditingController _condivisoController = TextEditingController();
   TextEditingController _accettatoController = TextEditingController();
   TextEditingController _conclusoController = TextEditingController();
+  Future<List<Uint8List>>? _futureImages;
   List<XFile> pickedImages =  [];
 
   @override
   void initState() {
-
     super.initState();
     _descrizioneController = TextEditingController(text: widget.task.descrizione);
     _titoloController = TextEditingController(text: widget.task.titolo);
-    _selectedTipo = widget.task.tipologia;
+    //_selectedTipo = widget.task.tipologia;
     _condiviso = widget.task.condiviso!;
     _concluso = widget.task.concluso!;
     _accettato = widget.task.accettato!;
     getAllUtenti();
+    getAllTipi();
+    _fetchImages();
   }
 
-  Future<void> _selezionaData() async {
-    final DateTime? dataSelezionata = await showDatePicker(
-      locale: const Locale('it', 'IT'),
-      context: context,
-      initialDate: _dataOdierna,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
-      setState(() {
-        selectedDate = dataSelezionata;
-      });
+  void _fetchImages() {
+    setState(() {
+      _futureImages = fetchImages();
+    });
+  }
+
+  Future<List<Uint8List>> fetchImages() async {
+    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
+    http.Response? response;
+    try {
+      response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final images = jsonData.map<Uint8List>((imageData) {
+          final base64String = imageData['imageData'];
+          final bytes = base64Decode(base64String);
+          return bytes.buffer.asUint8List();
+        }).toList();
+        return images; // no need to wrap with Future
+      } else {
+        throw Exception('Errore durante la chiamata al server: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata al server: $e');
+      if (response!= null) {
+        //print('Risposta del server: ${response.body}');
+      }
+      throw e; // rethrow the exception
     }
   }
+
+  Future<void> getAllTipi() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipoTaskModel> tipi = [];
+        for(var item in jsonData){
+          tipi.add(TipoTaskModel.fromJson(item));
+        }
+        setState(() {
+          allTipi = tipi;
+        });
+      } else {
+        throw Exception(
+            'Failed to load tipi task data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Error fetching tipi task data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
@@ -155,7 +218,6 @@ class _ModificaTaskPageState
       body: SingleChildScrollView(
     child: LayoutBuilder(
     builder: (context, constraints){
-
     return Padding(
         padding: EdgeInsets.all(20.0),
         child: Center(
@@ -202,48 +264,24 @@ class _ModificaTaskPageState
               SizedBox(height: 20),
               SizedBox(
                 width: 400,
-                child: DropdownButtonFormField<Tipologia>(
+                child: DropdownButtonFormField<TipoTaskModel>(
                   value: _selectedTipo,
-                  onChanged: (Tipologia? newValue) {
+                  onChanged: (TipoTaskModel? newValue){
                     setState(() {
                       _selectedTipo = newValue;
                     });
                   },
-
-                  items: [Tipologia.PERSONALE, Tipologia.AZIENDALE, Tipologia.PREVENTIVO_FEMA_SHOP, Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA,
-                    Tipologia.PREVENTIVO_IMPIANTO, Tipologia.SPESE]
-                      .map<DropdownMenuItem<Tipologia>>((Tipologia value) {
-                    String label = "";
-                    if (value == Tipologia.PERSONALE) {
-                      label = 'PERSONALE';
-                    } else if (value == Tipologia.AZIENDALE) {
-                      label = 'AZIENDALE';
-                    } else if (value == Tipologia.PREVENTIVO_FEMA_SHOP) {
-                      label = 'PREVENTIVO FEMA SHOP';
-                    } else if (value == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA) {
-                      label = 'PREVENTIVO SERVIZI ELETTRONICA';
-                    } else if (value == Tipologia.PREVENTIVO_IMPIANTO) {
-                      label = 'PREVENTIVO IMPIANTO';
-                    } else if (value == Tipologia.SPESE) {
-                      label = 'SPESE';
-                    }
-                    return DropdownMenuItem<Tipologia>(
-                      value: value,
-                      child: Text(label),
+                  items: allTipi.map((TipoTaskModel tipo){
+                    return DropdownMenuItem<TipoTaskModel>(
+                      value: tipo,
+                      child: Text(tipo.descrizione!),
                     );
                   }).toList(),
                   decoration: InputDecoration(
-                    labelText: 'TIPOLOGIA',
+                      labelText: 'Seleziona tipologia'.toUpperCase()
                   ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Selezionare la tipologia';
-                    }
-                    return null;
-                  },
                 ),
               ),
-
               SizedBox(height: 20),
               (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
                 width: 200,
@@ -311,6 +349,49 @@ class _ModificaTaskPageState
                   },
                 ),
               ),
+              FutureBuilder<List<Uint8List>>(
+                future: _futureImages,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal, // Imposta lo scroll orizzontale
+                      child: Row(
+                        children: snapshot.data!.map((imageData) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PhotoViewPage(
+                                    images: snapshot.data!,
+                                    initialIndex: snapshot.data!.indexOf(imageData),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 150, // aumenta la larghezza del container
+                              height: 170, // aumenta l'altezza del container
+                              margin: EdgeInsets.symmetric(horizontal: 8.0), // Margine tra le immagini
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 1), // Aggiungi un bordo al container
+                              ),
+                              child: Image.memory(
+                                imageData,
+                                fit: BoxFit.cover, // Copri l'intero spazio del container
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('Nessuna foto presente nel database!');
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
               SizedBox(height: 40),
               Platform.isWindows ? Center(
                 child: ElevatedButton(
@@ -351,19 +432,18 @@ class _ModificaTaskPageState
               SizedBox(height: 20),
               SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
+                onPressed: _selectedTipo != null ? () {
                   salvaTask();
-                },
+                } : null,
                 child: Text('SALVA'),
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
+                  primary: _selectedTipo != null ? Colors.red : Colors.grey, // Cambia colore quando disabilitato
                   onPrimary: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
-
             ],
           ),
         ),
@@ -423,7 +503,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

@@ -3,8 +3,10 @@ import 'package:fema_crm/pages/TableTaskPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
+import '../model/TipoTaskModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/TaskModel.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +24,7 @@ class CreazioneTaskPage extends StatefulWidget {
 class _CreazioneTaskPageState
     extends State<CreazioneTaskPage> {
   List<UtenteModel> allUtenti = [];
+  List<TipoTaskModel> allTipi = [];
   // Controller for the text fields
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _titoloController = TextEditingController();
@@ -31,7 +34,7 @@ class _CreazioneTaskPageState
   UtenteModel? selectedUtente;
   DateTime _dataOdierna = DateTime.now();
   DateTime? selectedDate = null;
-  Tipologia? _selectedTipo;
+  TipoTaskModel? _selectedTipo;
   bool _condiviso = false;
   final TextEditingController _condivisoController = TextEditingController();
   List<XFile> pickedImages =  [];
@@ -41,6 +44,7 @@ class _CreazioneTaskPageState
   void initState() {
     super.initState();
     getAllUtenti();
+    getAllTipi();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -64,27 +68,12 @@ class _CreazioneTaskPageState
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
-
-    // Verifica se sei su Android
-    //if (Platform.isAndroid) {
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
-
     if (pickedFile != null) {
       setState(() {
         pickedImages.add(pickedFile);
       });
     }
-    //}
-    // Verifica se sei su Windows
-    /*else if (Platform.isWindows) {
-      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-
-      if (pickedFiles != null && pickedFiles.isNotEmpty) {
-        setState(() {
-          pickedImages.addAll(pickedFiles);
-        });
-      }
-    }*/
   }
 
   Future<void> pickImagesFromGallery() async {
@@ -177,45 +166,22 @@ class _CreazioneTaskPageState
                 SizedBox(height: 20),
                 SizedBox(
                   width: 400,
-                  child: DropdownButtonFormField<Tipologia>(
+                  child: DropdownButtonFormField<TipoTaskModel>(
                     value: _selectedTipo,
-                    onChanged: (Tipologia? newValue) {
+                    onChanged: (TipoTaskModel? newValue){
                       setState(() {
                         _selectedTipo = newValue;
                       });
                     },
-
-                    items: [Tipologia.PERSONALE, Tipologia.AZIENDALE, Tipologia.PREVENTIVO_FEMA_SHOP, Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA,
-                      Tipologia.PREVENTIVO_IMPIANTO, Tipologia.SPESE]
-                        .map<DropdownMenuItem<Tipologia>>((Tipologia value) {
-                      String label = "";
-                      if (value == Tipologia.PERSONALE) {
-                        label = 'PERSONALE';
-                      } else if (value == Tipologia.AZIENDALE) {
-                        label = 'AZIENDALE';
-                      } else if (value == Tipologia.PREVENTIVO_FEMA_SHOP) {
-                        label = 'PREVENTIVO FEMA SHOP';
-                      } else if (value == Tipologia.PREVENTIVO_SERVIZI_ELETTRONICA) {
-                        label = 'PREVENTIVO SERVIZI ELETTRONICA';
-                      } else if (value == Tipologia.PREVENTIVO_IMPIANTO) {
-                        label = 'PREVENTIVO IMPIANTO';
-                      } else if (value == Tipologia.SPESE) {
-                        label = 'SPESE';
-                      }
-                      return DropdownMenuItem<Tipologia>(
-                        value: value,
-                        child: Text(label),
+                    items: allTipi.map((TipoTaskModel tipo){
+                      return DropdownMenuItem<TipoTaskModel>(
+                        value: tipo,
+                        child: Text(tipo.descrizione!),
                       );
                     }).toList(),
                     decoration: InputDecoration(
-                      labelText: 'TIPOLOGIA',
+                        labelText: 'Seleziona tipologia'.toUpperCase()
                     ),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Selezionare la tipologia';
-                      }
-                      return null;
-                    },
                   ),
                 ),
                 SizedBox(height: 20),
@@ -301,67 +267,42 @@ class _CreazioneTaskPageState
       }
       ), floatingActionButton: Padding(
       padding: EdgeInsets.all(10.0),
-    child: ElevatedButton(
-    onPressed: () {
-    createTask();
-    },
-    child: SizedBox(
-      width: 90,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.check, weight: 10,),
-          SizedBox(width: 4),
-          Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-        ],
-      ),
-    ),
-    style: ElevatedButton.styleFrom(
-    primary: Colors.red,
-    onPrimary: Colors.white,
-    shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(10),
-    ),
-    ),
-    ),
-      /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Padding(
-        padding: EdgeInsets.all(22.0),
-        child: ElevatedButton(
-          onPressed: () {
-            createTask();
-          },
-          child: Text('SALVA'),
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red,
-            onPrimary: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+      child: ElevatedButton(
+        onPressed: _selectedTipo != null ? () {
+          saveTaskPlusPics();
+        } : null,
+        child: Text('SALVA'),
+        style: ElevatedButton.styleFrom(
+          primary: _selectedTipo != null ? Colors.red : Colors.grey, // Cambia colore quando disabilitato
+          onPrimary: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
-      ),*/
+      ),
     ));
   }
 
-  Future<void> createTask() async {
+  Future<http.Response?> createTask() async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     //var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
+    var titolo = _titoloController.text.isNotEmpty ? _titoloController.text : "TASK DEL ${DateTime.now().day}/${DateTime.now().month} ORE ${DateTime.now().hour}:${DateTime.now().minute}";
+    late http.Response response;
     try {
-      final response = await http.post(
+      response = await http.post(
         Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data_creazione': DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
           'data_conclusione': null,
-          'titolo' : _titoloController.text,
+          'titolo' : titolo,
           'descrizione': _descrizioneController.text,
           'concluso': false,
           'condiviso': _condiviso,
           'accettato': false,
-          'tipologia': _selectedTipo.toString().split('.').last,
+          'tipologia': _selectedTipo?.toMap(),
           'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
@@ -371,14 +312,103 @@ class _CreazioneTaskPageState
           content: Text('Task registrato con successo!'),
         ),
       );
+      return response;
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
+    }
+    return null;
+  }
+
+  Future<void> saveTaskPlusPics() async {
+    final data = await createTask();
+    try {
+      if(data == null){
+        throw Exception('Dati del sopralluogo non disponibili.');
+      }
+      final task = TaskModel.fromJson(jsonDecode(data.body));
+      try{
+        for (var image in pickedImages) {
+          if (image.path != null && image.path.isNotEmpty) {
+            print('Percorso del file: ${image.path}');
+            var request = http.MultipartRequest(
+              'POST',
+              Uri.parse('$ipaddressProva/api/immagine/task/${int.parse(task.id!.toString())}'),
+            );
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'task', // Field name
+                image.path, // File path
+                contentType: MediaType('image', 'jpeg'),
+              ),
+            );
+            var response = await request.send();
+            if (response.statusCode == 200) {
+              print('File inviato con successo');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Foto salvata!'),
+                ),
+              );
+            } else {
+              print('Errore durante l\'invio del file: ${response.statusCode}');
+            }
+          } else {
+            // Gestisci il caso in cui il percorso del file non è valido
+            print('Errore: Il percorso del file non è valido');
+          }
+        }
+        pickedImages.clear();
+      } catch (e) {
+        print('Errore durante l\'invio del file: $e');
+      }
+    } catch (e) {
+      print('Errore durante l\'invio del file: $e');
+    }
+  }
+
+  Future<void> getAllTipi() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipoTaskModel> tipi = [];
+        for(var item in jsonData){
+          tipi.add(TipoTaskModel.fromJson(item));
+        }
+        setState(() {
+          allTipi = tipi;
+        });
+      } else {
+        throw Exception(
+            'Failed to load tipi task data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Error fetching tipi task data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
