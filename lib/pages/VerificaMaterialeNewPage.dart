@@ -55,7 +55,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         setState(() {
@@ -80,7 +80,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       } else {
         final ddt = DDTModel.fromJson(jsonDecode(data.body));
         try{
-          final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+          final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}'));
           var responseData = json.decode(response.body);
           if(response.statusCode == 200){
             List<RelazioneDdtProdottoModel> prodotti = [];
@@ -216,7 +216,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         bool presenzaStorico = prodottiStoricoUtente.any((rel) => rel.prodotto?.id == prodotto.id) ? true : false;
         var DDT = prodottiDDT.any((rel) => rel.prodotto?.id == prodotto.id) ? ddt?.toMap() : null;
         final response = await http.post(
-          Uri.parse('$ipaddress/api/relazioneProdottoIntervento'),
+          Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'prodotto': prodotto.toMap(),
@@ -396,7 +396,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deleteRelazioneUtentiProdotti(int? relazioneId) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/relazioneUtentiProdotti/$relazioneId'),
+        Uri.parse('$ipaddressProva/api/relazioneUtentiProdotti/$relazioneId'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode != 200) {
@@ -411,7 +411,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/prodotto');
+      var apiUrl = Uri.parse('$ipaddressProva/api/prodotto');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -433,7 +433,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getProdottiStoricoUtente() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/relazioneUtentiProdotti/utente/${widget.utente.id}');
+      var apiUrl = Uri.parse('$ipaddressProva/api/relazioneUtentiProdotti/utente/${widget.utente.id}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -533,7 +533,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     for (var relazione in remainingProducts) {
       try {
         final response = await http.post(
-          Uri.parse('$ipaddress/api/relazioneUtentiProdotti'),
+          Uri.parse('$ipaddressProva/api/relazioneUtentiProdotti'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data_creazione': DateTime.now().toIso8601String(),

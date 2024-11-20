@@ -30,6 +30,12 @@ class RegistroCassaPage extends StatefulWidget {
 class _RegistroCassaPageState extends State<RegistroCassaPage> {
   List<MovimentiModel> movimentiList = [];
   List<MovimentiModel> movimentiList2 = [];
+  List<DateTime> dateChiusure = [];
+
+  List<MovimentiModel> movimentiListPreviousWeek = [];
+  List<MovimentiModel> movimentiListPreviousWeek2 = [];
+  List<MovimentiModel> movimentiListPreviousWeek3 = [];
+
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   double? fondoCassaSettimana1;
@@ -360,7 +366,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> deletePics(MovimentiModel movimento) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
+        Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
         headers: {'Content-Type': 'application/json'},
       );
       if(response.statusCode == 204){
@@ -377,7 +383,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> deleteMovimentazione(MovimentiModel movimento) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/movimenti/${movimento.id}'),
+        Uri.parse('$ipaddressProva/api/movimenti/${movimento.id}'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 204) {
@@ -542,9 +548,27 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     return fondoCassa;
   }
 
+  void calcolaFondiCassaSettimanePrecedenti() {
+    setState(() {
+      fondoCassaSettimana1 = _arrotondaA2Decimali(calcolaFondoCassa(movimentiListPreviousWeek));
+      fondoCassaSettimana2 = _arrotondaA2Decimali(calcolaFondoCassa(movimentiListPreviousWeek2));
+      fondoCassaSettimana3 = _arrotondaA2Decimali(calcolaFondoCassa(movimentiListPreviousWeek3));
+    });
+
+    // Debug: stampa dei valori calcolati
+    print('Fondo cassa settimana 1 (ultima chiusura - penultima): $fondoCassaSettimana1');
+    print('Fondo cassa settimana 2 (penultima - terzultima): $fondoCassaSettimana2');
+    print('Fondo cassa settimana 3 (terzultima - quartultima): $fondoCassaSettimana3');
+  }
+
+// Funzione di arrotondamento
+  double _arrotondaA2Decimali(double valore) {
+    return double.parse(valore.toStringAsFixed(2));
+  }
+
   Future<void> getAllMovimentazioniExcel() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -578,50 +602,69 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     }
   }
 
-
   Future<void> getAllMovimentazioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/movimenti/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti/ordered');
       var response = await http.get(apiUrl);
+
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<MovimentiModel> movimenti = [];
-        List<DateTime> dateChiusure = [];
-        // Prima iterazione per individuare tutte le date di "Chiusura"
+        dateChiusure.clear(); // Usa la lista globale e svuotala prima di aggiungere nuovi valori
+
+        // Individua tutte le date di "Chiusura"
         for (var item in jsonData) {
           MovimentiModel movimento = MovimentiModel.fromJson(item);
-          // Memorizza le date di "Chiusura" e aggiungi solo i movimenti non di chiusura
           if (movimento.tipo_movimentazione == TipoMovimentazione.Chiusura) {
             dateChiusure.add(movimento.dataCreazione!);
           } else {
             movimenti.add(movimento); // Aggiungi solo movimenti non di chiusura
           }
         }
-        // Stampa tutte le date di chiusura individuate
-        print('Date di chiusura trovate: $dateChiusure');
-        // Ordina le date di chiusura in ordine decrescente per trovare l'ultima chiusura
+
+        // Ordina le date di chiusura in ordine decrescente
         dateChiusure.sort((a, b) => b.compareTo(a));
-        DateTime? ultimaDataChiusura = dateChiusure.isNotEmpty ? dateChiusure.first : null;
-        // Stampa l'ultima data di chiusura
-        print('Ultima data di chiusura: $ultimaDataChiusura');
-        // Filtra ulteriormente i movimenti per includere solo quelli successivi all'ultima "Chiusura"
-        List<MovimentiModel> movimentiFiltrati = [];
-        if (ultimaDataChiusura != null) {
-          movimentiFiltrati = movimenti.where((movimento) =>
-          movimento.dataCreazione != null &&
-              movimento.dataCreazione!.isAfter(ultimaDataChiusura)
-          ).toList();
-        } else {
-          movimentiFiltrati = movimenti; // Se non ci sono chiusure, mostra tutti i movimenti
+
+        // Identifica le ultime 4 date di chiusura
+        DateTime? ultimaChiusura = dateChiusure.isNotEmpty ? dateChiusure[0] : null;
+        DateTime? penultimaChiusura = dateChiusure.length > 1 ? dateChiusure[1] : null;
+        DateTime? terzultimaChiusura = dateChiusure.length > 2 ? dateChiusure[2] : null;
+        DateTime? quartultimaChiusura = dateChiusure.length > 3 ? dateChiusure[3] : null;
+
+        // Filtra i movimenti per le varie liste
+        List<MovimentiModel> movimentiDopoUltimaChiusura = [];
+        List<MovimentiModel> movimentiTraUltimaESeconda = [];
+        List<MovimentiModel> movimentiTraSecondaETerza = [];
+        List<MovimentiModel> movimentiTraTerzaEQuarta = [];
+
+        for (var movimento in movimenti) {
+          if (ultimaChiusura != null && movimento.dataCreazione!.isAfter(ultimaChiusura)) {
+            movimentiDopoUltimaChiusura.add(movimento);
+          } else if (penultimaChiusura != null &&
+              movimento.dataCreazione!.isAfter(penultimaChiusura) &&
+              movimento.dataCreazione!.isBefore(ultimaChiusura!)) {
+            movimentiTraUltimaESeconda.add(movimento);
+          } else if (terzultimaChiusura != null &&
+              movimento.dataCreazione!.isAfter(terzultimaChiusura) &&
+              movimento.dataCreazione!.isBefore(penultimaChiusura!)) {
+            movimentiTraSecondaETerza.add(movimento);
+          } else if (quartultimaChiusura != null &&
+              movimento.dataCreazione!.isAfter(quartultimaChiusura) &&
+              movimento.dataCreazione!.isBefore(terzultimaChiusura!)) {
+            movimentiTraTerzaEQuarta.add(movimento);
+          }
         }
-        // Stampa i movimenti che saranno mostrati a schermo
-        print('Movimenti dopo l\'ultima chiusura (da mostrare a schermo): $movimentiFiltrati');
-        // Calcola il fondo cassa basato sui movimenti filtrati
+
+        // Aggiorna lo stato con le liste calcolate
         setState(() {
-          fondoCassa = calcolaFondoCassa(movimentiFiltrati);
-          movimentiList = movimentiFiltrati; // Mostra solo i movimenti filtrati
+          fondoCassa = calcolaFondoCassa(movimentiDopoUltimaChiusura);
+          movimentiList = movimentiDopoUltimaChiusura;
+          movimentiListPreviousWeek = movimentiTraUltimaESeconda;
+          movimentiListPreviousWeek2 = movimentiTraSecondaETerza;
+          movimentiListPreviousWeek3 = movimentiTraTerzaEQuarta;
         });
 
+        calcolaFondiCassaSettimanePrecedenti();
       } else {
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
@@ -647,7 +690,6 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       );
     }
   }
-
 
 
   void _showConfirmationDialog() {
@@ -910,7 +952,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     );
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -936,7 +978,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> saveFondocassaAfterChiusura() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -960,7 +1002,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addUscita() async{
     try{
        final response = await http.post(
-         Uri.parse('$ipaddress/api/movimenti'),
+         Uri.parse('$ipaddressProva/api/movimenti'),
          headers: {'Content-Type': 'application/json'},
          body: jsonEncode({
            'data': DateTime.now().toIso8601String(),
@@ -998,7 +1040,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addPrelievo(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
@@ -1035,7 +1077,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addVersamento(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
@@ -1076,30 +1118,124 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         return AlertDialog(
           title: Text('Fondo cassa settimane precedenti'),
           content: Container(
-            height: 200, // Personalizza l'altezza del dialog
+            height: 250, // Aumenta l'altezza per ospitare i pulsanti
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Fondo cassa ${DateFormat('dd/MM').format(getStartOfPreviousWeek(1))}: ${fondoCassaSettimana1 ?? 'N/A'}'), // Aggiungi il fondo cassa della prima settimana
-                SizedBox(height: 8),
-                Text('Fondo cassa ${DateFormat('dd/MM').format(getStartOfPreviousWeek(2))}: ${fondoCassaSettimana2 ?? 'N/A'}'), // Aggiungi il fondo cassa della seconda settimana
-                SizedBox(height: 8),
-                Text('Fondo cassa ${DateFormat('dd/MM').format(getStartOfPreviousWeek(3))}: ${fondoCassaSettimana3 ?? 'N/A'}'), // Aggiungi il fondo cassa della terza settimana
+                // Settimana 1
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Fondo cassa ${DateFormat('dd/MM/yyyy').format(dateChiusure.length > 1 ? dateChiusure[1] : DateTime.now())}: '
+                            '${fondoCassaSettimana1?.toStringAsFixed(2) ?? 'N/A'}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          movimentiList = movimentiListPreviousWeek;
+                          fondoCassa = fondoCassaSettimana1!;
+                        });
+                        Navigator.pop(context); // Chiude il dialog
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Sfondo rosso
+                        foregroundColor: Colors.white, // Testo bianco
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Arrotondamento
+                        ),
+                      ),
+                      child: Text('Visualizza'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 15),
+                // Settimana 2
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Fondo cassa ${DateFormat('dd/MM/yyyy').format(dateChiusure.length > 2 ? dateChiusure[2] : DateTime.now())}: '
+                            '${fondoCassaSettimana2?.toStringAsFixed(2) ?? 'N/A'}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          movimentiList = movimentiListPreviousWeek2;
+                          fondoCassa = fondoCassaSettimana2!;
+                        });
+                        Navigator.pop(context); // Chiude il dialog
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Sfondo rosso
+                        foregroundColor: Colors.white, // Testo bianco
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Arrotondamento
+                        ),
+                      ),
+                      child: Text('Visualizza'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 15),
+                // Settimana 3
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Fondo cassa ${DateFormat('dd/MM/yyyy').format(dateChiusure.length > 3 ? dateChiusure[3] : DateTime.now())}: '
+                            '${fondoCassaSettimana3?.toStringAsFixed(2) ?? 'N/A'}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          movimentiList = movimentiListPreviousWeek3;
+                          fondoCassa = fondoCassaSettimana3!;
+                        });
+                        Navigator.pop(context); // Chiude il dialog
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red, // Sfondo rosso
+                        foregroundColor: Colors.white, // Testo bianco
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Arrotondamento
+                        ),
+                      ),
+                      child: Text('Visualizza'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Chiude il dialog senza cambiare lista
               },
-              child: Text('OK'),
+              child: Text('Chiudi'),
             ),
           ],
         );
       },
     );
   }
+
 
   DateTime getStartOfPreviousWeek(int weekNumber) {
     DateTime now = DateTime.now();
