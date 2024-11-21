@@ -23,6 +23,7 @@ import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
 import 'CalendarioPage.dart';
+import 'CreazioneTicketTecnicoPage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
 import 'InterventoTecnicoForm.dart';
 import 'MenuSopralluoghiTecnicoPage.dart';
@@ -69,17 +70,16 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     MenuItem(icon: Icons.calendar_month_sharp, label: 'CALENDARIO'),
     MenuItem(icon: Icons.build, label: 'INTERVENTI'),
     MenuItem(icon: Icons.edit_note, label: 'TASK'),
+    MenuItem(icon: Icons.sticky_note_2_outlined, label: 'TICKET')
   ];
 
   int _calculateHoveredIndex(Offset position) {
     final center = Offset(650 / 2, 650 / 2); // Use the same size as in CustomPaint
     final angle = (math.atan2(position.dy - center.dy, position.dx - center.dx) + math.pi * 2) % (math.pi * 2);
-    final sectorAngle = (2 * math.pi) / 14; // 14 menu items
-    final hoveredIndex = (angle ~/ sectorAngle) % 14;
+    final sectorAngle = (2 * math.pi) / 8; // 14 menu items
+    final hoveredIndex = (angle ~/ sectorAngle) % 8;
     return hoveredIndex;
   }
-
-
 
   Future<void> saveIngresso() async{
     try{
@@ -354,6 +354,11 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
             MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData!)),//InterventoTecnicoForm(userData: widget.userData!)),
           );
           break;
+        case 7:
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreazioneTicketTecnicoPage(utente: widget.userData!)),
+          );
       }
     }
   }
@@ -562,6 +567,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                     children: [
                       Column(
                         children: [
+                          SizedBox(height: 31),
                           GestureDetector(
                             onTapUp: (details) {
                               if (_hoveredIndex != -1) {
@@ -2452,6 +2458,7 @@ class MenuPainter extends CustomPainter {
     MenuItem(icon: Icons.calendar_month_sharp, label: 'CALENDARIO'),
     MenuItem(icon: Icons.build, label: 'INTERVENTI'),
     MenuItem(icon: Icons.edit_note, label: 'TASK'),
+    MenuItem(icon: Icons.sticky_note_2_outlined, label: 'TICKET')
   ];
 
   TextPainter labelPainter = TextPainter(
