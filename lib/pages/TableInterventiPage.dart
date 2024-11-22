@@ -1424,9 +1424,6 @@ class InterventoDataSource extends DataGridSource {
           ? "CONCLUSO"
           : "///";
 
-
-
-
       List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
       String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
       String utentiNomi = '';

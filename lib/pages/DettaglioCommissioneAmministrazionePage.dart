@@ -6,7 +6,6 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fema_crm/model/CommissioneModel.dart';
-
 import '../model/UtenteModel.dart';
 
 class DettaglioCommissioneAmministrazionePage extends StatefulWidget {

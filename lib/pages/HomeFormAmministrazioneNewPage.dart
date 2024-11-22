@@ -54,6 +54,7 @@ import 'ParentFolderPage.dart';
 import 'RegistroCassaPage.dart';
 import 'StoricoMerciUtentiPage.dart';
 import 'TableRMAPage.dart';
+import 'TableTicketPage.dart';
 
 class HomeFormAmministrazioneNewPage extends StatefulWidget {
   final UtenteModel userData;
@@ -717,124 +718,124 @@ class _HomeFormAmministrazioneNewPageState
 
   int _lastClickedIndex = 0;
 
-  void _navigateToPage(int index) {
-    if(Platform.isAndroid){
-      if (_lastClickedIndex != index) {
-        _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
-        _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
-      }
-    }
-
-    if(Platform.isAndroid){
-      if (_menuItemClickCount.containsKey(index)) {
-        _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
-      } else {
-        _menuItemClickCount[index] = 1;
-      }
-    }
-
-
-    //if (_menuItemClickCount[index] % 2 == 0 && _hoveredIndex != -1) {
-    if ((_menuItemClickCount[index] ?? 0) % 2 == 0 && _hoveredIndex != -1) {
-      switch (index) {
-        case 0:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CalendarioPage()),
-          );
-          break;
-        case 1:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>
-                MenuOrdiniFornitorePage(utente: widget.userData)),
-          );
-          break;
-        case 2:
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => (widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti") ?
-                TimbratureEdit(utente: widget.userData) : TimbraturaPage(utente: widget.userData)
-            ),
-          );
-          break;
-        case 3:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>
-                MenuInterventiPage(utente: widget.userData)), //ListaInterventiFinalPage()),
-          );
-          break;
-        case 4:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>
-                TableMerceInRiparazionePage()),
-          );
-          break;
-        case 5:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>
-                MenuSopralluoghiPage(utente: widget.userData)),
-          );
-          break;
-        case 6:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
-          );
-          break;
-        case 7:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>
-                SpesaSuVeicoloPage(utente: widget.userData)),
-          );
-          break;
-        case 8:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ListaCredenzialiPage()),
-          );
-          break;
-        case 9:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ListaClientiPage()),
-          );
-          break;
-        case 10:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TableMagazzinoPage()),
-          );
-          break;
-        case 11:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>
-                RegistroCassaPage(userData: widget.userData)),
-          );
-          break;
-        case 12:
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>
-                LogisticaPreventiviHomepage(userData: widget.userData)),
-          );
-          break;
-        case 13:
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ScannerQrCodeAmministrazionePage()),
-          );
-          break;
-      }
-    }
-  }
+  // void _navigateToPage(int index) {
+  //   if(Platform.isAndroid){
+  //     if (_lastClickedIndex != index) {
+  //       _menuItemClickCount.clear(); // azzerare tutti i contatori quando si clicca su un bottone diverso
+  //       _lastClickedIndex = index; // aggiornare l'indice dell'ultimo bottone cliccato
+  //     }
+  //   }
+  //
+  //   if(Platform.isAndroid){
+  //     if (_menuItemClickCount.containsKey(index)) {
+  //       _menuItemClickCount[index] = (_menuItemClickCount[index] ?? 0) + 1;
+  //     } else {
+  //       _menuItemClickCount[index] = 1;
+  //     }
+  //   }
+  //
+  //
+  //   //if (_menuItemClickCount[index] % 2 == 0 && _hoveredIndex != -1) {
+  //   if ((_menuItemClickCount[index] ?? 0) % 2 == 0 && _hoveredIndex != -1) {
+  //     switch (index) {
+  //       case 0:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => CalendarioPage()),
+  //         );
+  //         break;
+  //       case 1:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               MenuOrdiniFornitorePage(utente: widget.userData)),
+  //         );
+  //         break;
+  //       case 2:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) => (widget.userData.cognome! == "Mazzei" || widget.userData.cognome! == "Chiriatti") ?
+  //               TimbratureEdit(utente: widget.userData) : TimbraturaPage(utente: widget.userData)
+  //           ),
+  //         );
+  //         break;
+  //       case 3:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               MenuInterventiPage(utente: widget.userData)), //ListaInterventiFinalPage()),
+  //         );
+  //         break;
+  //       case 4:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               TableMerceInRiparazionePage()),
+  //         );
+  //         break;
+  //       case 5:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               MenuSopralluoghiPage(utente: widget.userData)),
+  //         );
+  //         break;
+  //       case 6:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
+  //         );
+  //         break;
+  //       case 7:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               SpesaSuVeicoloPage(utente: widget.userData)),
+  //         );
+  //         break;
+  //       case 8:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => ListaCredenzialiPage()),
+  //         );
+  //         break;
+  //       case 9:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => ListaClientiPage()),
+  //         );
+  //         break;
+  //       case 10:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => TableMagazzinoPage()),
+  //         );
+  //         break;
+  //       case 11:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               RegistroCassaPage(userData: widget.userData)),
+  //         );
+  //         break;
+  //       case 12:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) =>
+  //               LogisticaPreventiviHomepage(userData: widget.userData)),
+  //         );
+  //         break;
+  //       case 13:
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) => ScannerQrCodeAmministrazionePage()),
+  //         );
+  //         break;
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -1290,7 +1291,17 @@ class _HomeFormAmministrazioneNewPageState
                                     },
                                   ),
                                 ),
-
+                                SizedBox(
+                                  width: 350,
+                                  child: buildMenuButton(icon: Icons.sticky_note_2_outlined, text: 'TICKET',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => ScannerQrCodeAmministrazionePage()),
+                                      );
+                                    },
+                                  ),
+                                ),
                               ],
                             ),
                             SizedBox(height: 80),
@@ -2416,7 +2427,14 @@ class _HomeFormAmministrazioneNewPageState
                                   SizedBox(width: 20),
                                   SizedBox(
                                     width: 350,
-                                    //child:
+                                    child: buildMenuButton(icon: Icons.sticky_note_2_outlined, text: 'TICKET',
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => TableTicketPage()),//LogisticaPreventiviHomepage(userData: widget.userData)),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),

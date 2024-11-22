@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,6 +17,7 @@ import 'dart:io';
 import '../model/ClienteModel.dart';
 import '../model/DestinazioneModel.dart';
 import '../model/InterventoModel.dart';
+import '../model/TicketModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 
@@ -46,7 +48,8 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
   List<DestinazioneModel> allDestinazioniByCliente = [];
   DateTime _dataOdierna = DateTime.now();
   DateTime? selectedDate = null;
-  TimeOfDay _selectedTime = TimeOfDay.now();
+  TimeOfDay _initialTime = TimeOfDay.now();
+  TimeOfDay? selectedTime;
   bool _orarioDisponibile = false;
 
   @override
@@ -169,11 +172,11 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
   Future<void> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: _selectedTime,
+      initialTime: _initialTime,
     );
-    if (picked != null && picked != _selectedTime) {
+    if (picked != null && picked != _initialTime) {
       setState(() {
-        _selectedTime = picked;
+        selectedTime = picked;
       });
     }
   }
@@ -241,7 +244,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                       backgroundColor: Colors.red,
                       label: 'Salva ticket'.toUpperCase(),
                       onTap: (){
-                        takePicture();
+                        savePics();
                       }
                   ),
                 ]
@@ -306,7 +309,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                             child: Text('Seleziona Orario'.toUpperCase()),
                                           ),
                                           SizedBox(height: 12),
-                                          Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}'.toUpperCase())
+                                          Text('Orario selezionato : ${(selectedTime?.hour)}.${(selectedTime?.minute)}'.toUpperCase())
                                         ],
                                       ),
                                     ),
@@ -515,7 +518,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                             child: Text('Seleziona Orario'.toUpperCase()),
                                           ),
                                           SizedBox(height: 12),
-                                          Text('Orario selezionato : ${(_selectedTime.hour)}.${(_selectedTime.minute)}'.toUpperCase())
+                                          Text('Orario selezionato : ${(selectedTime?.hour)}.${(selectedTime?.minute)}'.toUpperCase())
                                         ],
                                       ),
                                     ),
@@ -662,7 +665,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 40),
                                   // Aggiungi questo sotto il pulsante per la selezione degli utenti
                                   const SizedBox(height: 20),
                                     Center(
@@ -683,7 +685,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                           ]
                                       ),
                                     ),
-                                  const SizedBox(height: 20),
                                 ],
                               ),
                             ),
@@ -698,6 +699,113 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
       ),
     );
   }
+
+  Future<http.Response?> saveTicket() async{
+    late http.Response response;
+    var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
+    var orario = selectedTime != null ? DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, selectedTime!.hour, selectedTime!.minute).toIso8601String() : null;
+    var note = _notaController.text.isNotEmpty ? _notaController.text : null;
+    var titolo = _titoloController.text.isNotEmpty ? _titoloController.text : null;
+    var descrizione = _descrizioneController.text.isNotEmpty ? _descrizioneController.text : null;
+    String prioritaString = _selectedPriorita.toString().split('.').last;
+    try{
+      response = await http.post(
+        Uri.parse('$ipaddressProva/api/ticket'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data' : data,
+          'orario_appuntamento' : orario,
+          'titolo' : titolo,
+          'priorita' : prioritaString,
+          'descrizione' : descrizione,
+          'note' : note,
+          'convertito' : false,
+          'cliente' : selectedCliente?.toMap(),
+          'destinazione' : selectedDestinazione?.toMap(),
+          'tipologia' : _selectedTipologia?.toMap(),
+          'utente' : widget.utente.toMap(),
+        }),
+      );
+      print('Ticket salvato!');
+      return response;
+    } catch(e){
+      print('Errore durante il salvataggio del ticket: $e');
+    }
+    return null;
+  }
+
+  Future<void> savePics() async {
+    // Mostra il dialog con il CircularProgressIndicator
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Impedisce di chiudere il dialog premendo fuori
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Expanded(
+                child: Text(
+                  'Attendere...',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    // Inizia il salvataggio
+    try {
+      final data = await saveTicket();
+      if (data == null) {
+        print('Errore: Dati del ticket non disponibili.');
+        Navigator.pop(context); // Chiude il dialog
+        Navigator.pop(context); // Torna indietro nella navigazione
+        return;
+      }
+      final ticket = TicketModel.fromJson(jsonDecode(data.body));
+      for (var image in pickedImages) {
+        if (image.path.isNotEmpty) {
+          print('Percorso del file: ${image.path}');
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddressProva/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'ticket',
+              image.path,
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Foto salvata!'),
+              ),
+            );
+          } else {
+            print('Errore durante l\'invio del file: ${response.statusCode}');
+          }
+        } else {
+          print('Errore: Il percorso del file non è valido');
+        }
+      }
+    } catch (e) {
+      print('Errore durante l\'invio del file: $e');
+    } finally {
+      // Chiude il dialog e torna indietro nella navigazione
+      Navigator.pop(context); // Chiude il dialog
+      Navigator.pop(context); // Torna indietro nella navigazione
+    }
+  }
+
+
 
   void _showClientiDialog() async {
     // Mostra il dialogo con un indicatore di caricamento
