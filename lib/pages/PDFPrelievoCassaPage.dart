@@ -54,7 +54,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllPrelievi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -185,7 +185,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       final Uint8List pdfBytes = await _generatePDF();
       final tempDir = await getTemporaryDirectory();
-      final tempFilePath = '${tempDir.path}/${widget.tipoMovimentazione.toString().substring(19)}.pdf';
+      final tempFilePath =
+          '${tempDir.path}/${widget.tipoMovimentazione.toString().substring(19)}.pdf';
       final tempFile = File(tempFilePath);
 
       await tempFile.writeAsBytes(pdfBytes);
@@ -216,17 +217,41 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         ..text = body
         ..attachments.add(FileAttachment(
           tempFile,
-          fileName: 'Movimento ${widget.tipoMovimentazione.toString().substring(19)} ${DateFormat('dd-MM-yyyy').format(widget.data!)}.pdf',
+          fileName:
+          'Movimento ${widget.tipoMovimentazione.toString().substring(19)} ${DateFormat('dd-MM-yyyy').format(widget.data!)}.pdf',
         ));
 
       final sendReport = await send(message, smtpServer);
       print('Email inviata con successo: $sendReport');
 
       await tempFile.delete();
+
+      // Mostra un AlertDialog qui
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Email inviata'),
+              content: const Text(
+                  'Email inviata correttamente a info@femasistemi.it'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     } catch (e) {
       print('Errore durante l\'invio dell\'email: $e');
     }
   }
+
 
   Future<Uint8List> _generatePDF() async {
     try {

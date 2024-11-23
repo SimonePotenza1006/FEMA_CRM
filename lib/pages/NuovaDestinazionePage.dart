@@ -160,7 +160,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       String cellulare,
       ClienteModel cliente) async {
     print('${widget.cliente}');
-    final url = Uri.parse('$ipaddressProva/api/destinazione');
+    final url = Uri.parse('$ipaddress/api/destinazione');
     final body = jsonEncode({
       'denominazione': denominazione,
       'indirizzo': indirizzo,

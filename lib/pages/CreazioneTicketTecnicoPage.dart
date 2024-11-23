@@ -61,7 +61,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
 
   Future<void> getAllClienti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -83,7 +83,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -99,7 +99,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -710,7 +710,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     String prioritaString = _selectedPriorita.toString().split('.').last;
     try{
       response = await http.post(
-        Uri.parse('$ipaddressProva/api/ticket'),
+        Uri.parse('$ipaddress/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : data,
@@ -772,7 +772,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
