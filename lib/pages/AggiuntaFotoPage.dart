@@ -1,3 +1,5 @@
+import 'package:file_picker/file_picker.dart';
+
 import '../model/InterventoModel.dart';
 import '../model/UtenteModel.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,8 @@ import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'dart:io' as io;
+import 'package:path/path.dart' as basename;
 
 class AggiuntaFotoPage extends StatefulWidget {
   final UtenteModel utente;
@@ -20,8 +24,9 @@ class AggiuntaFotoPage extends StatefulWidget {
 class _AggiuntaFotoPageState extends State<AggiuntaFotoPage> {
   List<XFile> pickedImages = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   final ImagePicker _picker = ImagePicker();
+  io.File? imageFile;
 
   Future<void> takePicture() async {
     final ImagePicker _picker = ImagePicker();
@@ -54,6 +59,33 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         pickedImages.addAll(pickedFiles);
       });
     }
+  }
+
+  Future<void> pickPdfsFromGallery() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+      /*androidExtra: {
+        'android.intent.extra.ALLOW_MULTIPLE': 'false',
+        'android.intent.extra.FILTER_TYPES': ['application/pdf'],
+      },*/
+    );
+    if (result != null) {
+      setState(() {
+
+        imageFile = io.File(result.files.first.path!);
+        print('mkjhplm '+imageFile.toString());
+        //_scannedDocumentFile = null;
+        //_scannedDocumentFile=imageFile;
+      });
+    }
+    /*final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        pickedImages.addAll(pickedFiles);
+      });
+    }*/
   }
 
   Future<void> savePics() async {
@@ -164,7 +196,19 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                     child: Text('Allega foto da galleria', style: TextStyle(fontSize: 18.0)),
                   ),
+                  /*SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: pickPdfsFromGallery,
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      onPrimary: Colors.white,
+                    ),
+                    child: Text('Allega pdf da galleria', style: TextStyle(fontSize: 18.0)),
+                  ),
                   _buildImagePreview(),
+                  if (imageFile != null) Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child: Text(basename.basename(imageFile!.uri.path ))),*/
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: pickedImages.isNotEmpty ? savePics : null, // Attiva solo se ci sono immagini

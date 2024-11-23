@@ -1280,16 +1280,19 @@ class _HomeFormAmministrazioneNewPageState
                                   width: 350,
                                   child: buildMenuButton(icon: Icons.checklist, text: 'TASK',
                                     onPressed: () {
-                                      SystemChrome.setPreferredOrientations([
+                                      /*SystemChrome.setPreferredOrientations([
                                         //DeviceOrientation.landscapeLeft,
                                         DeviceOrientation.landscapeRight,
-                                      ]);
+                                      ]);*/
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData)),
                                       );
                                     },
                                   ),
+                                ),
+                                SizedBox(
+                                  height: 10,
                                 ),
                                 SizedBox(
                                   width: 350,

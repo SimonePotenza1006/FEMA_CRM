@@ -49,83 +49,6 @@ class _TableTaskPageState extends State<TableTaskPage>{
     super.dispose();
   }
 
-  Future<bool> deleteTasksByTipo(String? selectedTipo) async {
-    if (selectedTipo == null) {
-      print('Nessuna tipologia selezionata, nessuna operazione effettuata.');
-      return false;
-    }
-
-    // Filtra i task con tipologia corrispondente
-    List<TaskModel> tasksToDelete = _allCommissioni.where((task) => task.tipologia == selectedTipo).toList();
-    bool allDeleted = true;
-
-    for (var task in tasksToDelete) {
-      final String url = '$ipaddress/api/task/${task.id}';
-      try {
-        final response = await http.delete(Uri.parse(url));
-        if (response.statusCode == 200 || response.statusCode == 204) {
-          print('Eliminato task con id ${task.id}');
-          // Aggiorna lista locale solo se il task è stato eliminato con successo
-          _allCommissioni.remove(task);
-          _filteredCommissioni.remove(task);
-        } else {
-          print('Errore nell\'eliminazione del task con id ${task.id}: ${response.statusCode} - ${response.body}');
-          allDeleted = false;
-        }
-      } catch (e) {
-        print('Eccezione durante l\'eliminazione del task con id ${task.id}: $e');
-        allDeleted = false;
-      }
-    }
-
-    if (allDeleted) {
-      print('Tutti i task con tipologia "$selectedTipo" sono stati eliminati con successo.');
-    } else {
-      print('Alcuni task non sono stati eliminati. Operazione incompleta.');
-    }
-
-    return allDeleted;
-  }
-
-
-  Future<void> deleteTipologia(TipoTaskModel? selectedTipoToDelete) async {
-    if (selectedTipoToDelete == null) {
-      print('Nessuna tipologia selezionata. Operazione annullata.');
-      return;
-    }
-
-    try {
-      // Step 1: Elimina tutti i task associati
-      print('Inizio eliminazione task associati...');
-      bool tasksDeleted = await deleteTasksByTipo(selectedTipoToDelete.id!);
-
-      if (!tasksDeleted) {
-        print('Non è stato possibile eliminare tutti i task. Annullo l\'eliminazione della tipologia.');
-        return; // Interrompi il processo se i task non sono stati eliminati con successo
-      }
-
-      // Step 2: Elimina la tipologia
-      print('Task eliminati. Procedo con l\'eliminazione della tipologia.');
-      final String url = '$ipaddress/api/tipoTask/${selectedTipoToDelete.id}';
-      final response = await http.delete(Uri.parse(url));
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        print('Tipologia "${selectedTipoToDelete.descrizione}" eliminata con successo.');
-        allTipi.remove(selectedTipoToDelete);
-        getAllTipi();
-        getAllTask();
-      } else {
-        print('Errore nell\'eliminazione della tipologia "${selectedTipoToDelete.descrizione}": '
-            '${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      print('Eccezione durante l\'eliminazione della tipologia "${selectedTipoToDelete.descrizione}": $e');
-    }
-  }
-
-
-
-
   @override
   void initState() {
     super.initState();
@@ -160,7 +83,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -200,7 +123,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -243,8 +166,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
       isLoading = true;
     });
     try{
-      var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/all')
-      : Uri.parse('$ipaddress/api/task/utente/'+widget.utente!.id!);
+      var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
+      : Uri.parse('$ipaddressProva/api/task/utente/'+widget.utente!.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -648,7 +571,6 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                       _changeSheet(int.parse(tipo.id!));
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(horizontal: 35, vertical: 25),
                                       backgroundColor: isSelected
                                           ? Colors.red // Colore rosso per il pulsante selezionato
                                           : Colors.grey[300], // Colore grigio chiaro per i non selezionati
@@ -665,7 +587,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                     ),
                                     child: Text(
                                       tipo.descrizione!, // Mostra la descrizione
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 );
@@ -683,89 +605,6 @@ class _TableTaskPageState extends State<TableTaskPage>{
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children : [
-                FloatingActionButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        TipoTaskModel? selectedTipoToDelete;
-                        return StatefulBuilder(
-                          builder: (BuildContext context, StateSetter setState) {
-                            return AlertDialog(
-                              title: Text(
-                                'Scegliere una tipologia da eliminare',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: allTipi.map((tipo) {
-                                  return RadioListTile<TipoTaskModel>(
-                                    title: Text(tipo.descrizione!),
-                                    value: tipo,
-                                    groupValue: selectedTipoToDelete,
-                                    onChanged: (TipoTaskModel? value) {
-                                      setState(() {
-                                        selectedTipoToDelete = value;
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: selectedTipoToDelete == null
-                                      ? null
-                                      : () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Conferma Eliminazione'),
-                                          content: Text(
-                                            'Questa operazione cancellerà la tipologia "${selectedTipoToDelete?.descrizione}" '
-                                                'e tutte le task con la tipologia scelta. Sei sicuro di voler procedere all\'eliminazione?',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                // Conferma eliminazione
-                                                deleteTipologia(selectedTipoToDelete);
-                                                Navigator.of(context).pop(); // Chiudi il dialog di conferma
-                                                Navigator.of(context).pop(); // Chiudi il dialog principale
-                                              },
-                                              child: Text('Sì'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(); // Chiudi il dialog di conferma
-                                              },
-                                              child: Text('No'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Text('Elimina'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(); // Chiudi il dialog principale
-                                  },
-                                  child: Text('Annulla'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                  backgroundColor: Colors.red,
-                  child: Icon(Icons.delete, color: Colors.white),
-                  heroTag: "Tag3",
-                ),
-                SizedBox(height: 10),
                 FloatingActionButton(
                   onPressed: () {
                     showDialog(
@@ -824,7 +663,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/tipoTask'),
+        Uri.parse('$ipaddressProva/api/tipoTask'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text
@@ -950,7 +789,7 @@ class TaskDataSource extends DataGridSource{
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -983,7 +822,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1017,7 +856,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1049,7 +888,7 @@ class TaskDataSource extends DataGridSource{
   Future<void> deleteTask(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/task/$id'),
+        Uri.parse('$ipaddressProva/api/task/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1074,8 +913,8 @@ class TaskDataSource extends DataGridSource{
 
   Future<void> getAllTask() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/all')
-          : Uri.parse('$ipaddress/api/task/utente/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
+          : Uri.parse('$ipaddressProva/api/task/utente/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
