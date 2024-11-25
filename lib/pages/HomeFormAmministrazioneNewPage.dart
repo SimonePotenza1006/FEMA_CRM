@@ -1292,6 +1292,9 @@ class _HomeFormAmministrazioneNewPageState
                                   ),
                                 ),
                                 SizedBox(
+                                  height: 10,
+                                ),
+                                SizedBox(
                                   width: 350,
                                   child: buildMenuButton(icon: Icons.sticky_note_2_outlined, text: 'TICKET',
                                     onPressed: () {

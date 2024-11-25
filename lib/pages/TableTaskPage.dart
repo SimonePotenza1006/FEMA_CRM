@@ -44,9 +44,26 @@ class _TableTaskPageState extends State<TableTaskPage>{
     // Ripristina l'orientamento quando si esce
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
+      //DeviceOrientation.portraitDown,
     ]);
     super.dispose();
+  }
+
+  void _setPreferredOrientation() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final size = MediaQuery.of(context).size;
+      const double thresholdWidth = 450.0;
+
+      if (size.width < thresholdWidth) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeRight,
+        ]);
+      } else {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+        ]);
+      }
+    });
   }
 
   Future<bool> deleteTasksByTipo(String? selectedTipo) async {
@@ -129,10 +146,11 @@ class _TableTaskPageState extends State<TableTaskPage>{
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      //DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    _setPreferredOrientation();
+    // SystemChrome.setPreferredOrientations([
+    //   //DeviceOrientation.landscapeLeft,
+    //   DeviceOrientation.landscapeRight,
+    // ]);
     _columnWidths ={
     'task' : 0,
     'accettatoicon' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
@@ -145,11 +163,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     //'tipologia' : 200,
     'utente' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 200 : 0,
     'accettato' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
-
-
-
     'data_conclusione' : 150,
-
   };
     getAllTipi();
     getAllUtenti();
