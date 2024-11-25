@@ -508,7 +508,6 @@ class _LoginFormState extends State<LoginForm> {
             decoration: BoxDecoration(
 
               image: DecorationImage(
-
                   image: ExactAssetImage("assets/images/background_login_1_1.jpg"),
                   fit: BoxFit.cover,
                   opacity: 0.8
@@ -530,7 +529,7 @@ class _LoginFormState extends State<LoginForm> {
                   // Responsive logo image
                   Image.asset(
                     'assets/images/logo fema trasparente bianco.png',
-                    width: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
+                    width: MediaQuery.of(context).size.width * 0.4, // 30% of screen width
                     //height: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
                     fit: BoxFit.contain,
                   ),

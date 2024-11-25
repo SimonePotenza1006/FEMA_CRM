@@ -136,12 +136,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         return ListTile(
                           leading: const Icon(Icons.settings),
                           title: Text(
-                            '${intervento.descrizione!}, importo: ${importoIvato != null ? importoIvato.toStringAsFixed(2) + "€" : "Importo non inserito"}',
+                            '${intervento.numerazione_danea != null ? intervento.numerazione_danea.toString() : "Nessun codice disponibile"}, importo: ${importoIvato != null ? importoIvato.toStringAsFixed(2) + "€" : "Importo non inserito"}',
                           ),
                           subtitle: Text(intervento.saldato! ? 'Saldato' : 'Non saldato'),
                           onTap: () {
                             setState(() {
                               selectedIntervento = intervento;
+                              _descrizioneController.text = "${_selectedTipoMovimentazione.toString().split('.').last} INTERVENTO ${selectedIntervento?.numerazione_danea != null ? selectedIntervento?.numerazione_danea! : selectedIntervento?.titolo!}";
                             });
                             Navigator.of(context).pop();
                           },

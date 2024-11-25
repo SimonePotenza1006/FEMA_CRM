@@ -40,62 +40,23 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
   List<TipologiaInterventoModel> allTipologie = [];
   TipologiaInterventoModel? _selectedTipologia;
   List<XFile> pickedImages =  [];
-  ClienteModel? selectedCliente;
-  DestinazioneModel? selectedDestinazione;
-  Priorita? _selectedPriorita;
-  List<ClienteModel> clientiList = [];
-  List<ClienteModel> filteredClientiList = [];
-  List<DestinazioneModel> allDestinazioniByCliente = [];
-  DateTime _dataOdierna = DateTime.now();
-  DateTime? selectedDate = null;
-  TimeOfDay _initialTime = TimeOfDay.now();
-  TimeOfDay? selectedTime;
-  bool _orarioDisponibile = false;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    getAllClienti();
     getAllTipologie();
   }
 
-  Future<void> getAllClienti() async{
-    try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
-      if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
-        List<ClienteModel> clienti = [];
-        for(var item in jsonData){
-          clienti.add(ClienteModel.fromJson(item));
-        }
-        setState(() {
-          clientiList = clienti;
-          filteredClientiList = clienti;
-        });
-      } else {
-        throw Exception('Failed to load data from API: ${response.statusCode}');
-      }
-    } catch(e){
-      print('Errore durante la chiamata all\'API: $e');
-      _showErrorDialog(e.toString());
+  Future<void> pickImagesFromGallery() async {
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        pickedImages.addAll(pickedFiles);
+      });
     }
   }
 
-  Future<void> getAllDestinazioniByCliente(String clientId) async {
-    try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
-      if (response.statusCode == 200) {
-        final List<dynamic> responseData = json.decode(response.body);
-        setState(() {
-          allDestinazioniByCliente = responseData.map((data) => DestinazioneModel.fromJson(data)).toList();
-        });
-      } else {
-        throw Exception('Failed to load Destinazioni per cliente');
-      }
-    } catch (e) {
-      print('Errore durante la richiesta HTTP: $e');
-    }
-  }
 
   Future<void> getAllTipologie() async {
     try {
@@ -169,33 +130,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     );
   }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _initialTime,
-    );
-    if (picked != null && picked != _initialTime) {
-      setState(() {
-        selectedTime = picked;
-      });
-    }
-  }
-
-  Future<void> _selezionaData() async {
-    final DateTime? dataSelezionata = await showDatePicker(
-      locale: const Locale('it', 'IT'),
-      context: context,
-      initialDate: _dataOdierna,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (dataSelezionata != null && dataSelezionata != _dataOdierna) {
-      setState(() {
-        selectedDate = dataSelezionata;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -232,6 +166,14 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                 foregroundColor: Colors.white,
                 children:[
                   SpeedDialChild(
+                      child: Icon(Icons.attach_file, color: Colors.white),
+                      backgroundColor: Colors.red,
+                      label: 'Allega da galleria'.toUpperCase(),
+                      onTap: (){
+                        pickImagesFromGallery();
+                      }
+                  ),
+                  SpeedDialChild(
                     child: Icon(Icons.camera_alt_outlined, color: Colors.white),
                     backgroundColor: Colors.red,
                     label: 'Scatta foto'.toUpperCase(),
@@ -267,85 +209,39 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(
-                                    width: 200,
-                                    child: ElevatedButton(
-                                      onPressed: _selezionaData,
-                                      style: ElevatedButton.styleFrom(primary: Colors.red),
-                                      child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
-                                    ),
-                                  ),
-                                  if(selectedDate != null)
-                                    Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
-                                  const SizedBox(height: 20.0),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Checkbox(
-                                        value: _orarioDisponibile,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _orarioDisponibile = value ?? false;
-                                          });
-                                        },
-                                      ),
-                                      Text("è disponibile un orario per l'appuntamento".toUpperCase()),
-                                    ],
-                                  ),
-                                  if (_orarioDisponibile)
-                                    Container(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(height: 12),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              _selectTime(context);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              primary: Colors.red, // Colore di sfondo rosso
-                                              onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
-                                            ),
-                                            child: Text('Seleziona Orario'.toUpperCase()),
-                                          ),
-                                          SizedBox(height: 12),
-                                          Text('Orario selezionato : ${(selectedTime?.hour)}.${(selectedTime?.minute)}'.toUpperCase())
-                                        ],
-                                      ),
-                                    ),
-                                  SizedBox(height: 15),
-                                  DropdownButton<TipologiaInterventoModel>(
-                                    value: _selectedTipologia,
-                                    hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
-                                    onChanged: (TipologiaInterventoModel? newValue) {
-                                      setState(() {
-                                        _selectedTipologia = newValue;
-                                      });
-                                    },
-                                    items: allTipologie
-                                        .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                                          (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                                        value: value,
-                                        child: Text(value.descrizione!),
-                                      ),
-                                    ).toList(),
-                                  ),
-                                  const SizedBox(height: 20.0),
-                                  SizedBox(
-                                    width: 600,
-                                    child: TextFormField(
-                                      controller: _titoloController,
-                                      maxLines: null,
-                                      decoration:  InputDecoration(labelText: 'Titolo'.toUpperCase()),
-                                    ),
-                                  ),
                                   const SizedBox(height: 20.0),
                                   SizedBox(
                                     width: 600,
                                     child: TextFormField(
                                       controller: _descrizioneController,
-                                      maxLines: null,
-                                      decoration:  InputDecoration(labelText: 'Descrizione'.toUpperCase()),
+                                      maxLines: 6, // Imposta l'altezza in termini di righe di testo
+                                      decoration: InputDecoration(
+                                        labelText: 'Descrizione'.toUpperCase(),
+                                        alignLabelWithHint: true, // Allinea il label in alto quando ci sono più righe
+                                        filled: true,
+                                        fillColor: Colors.grey[200], // Sfondo grigio chiaro
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo per lo stato attivo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.blue, // Colore del bordo quando il campo è attivo
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 20),
@@ -353,109 +249,56 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                     width: 600,
                                     child: TextFormField(
                                       controller: _notaController,
-                                      maxLines: null,
-                                      decoration:  InputDecoration(labelText: 'Nota'.toUpperCase()),
+                                      maxLines: 6, // Imposta l'altezza in termini di righe di testo
+                                      decoration: InputDecoration(
+                                        labelText: 'Nota'.toUpperCase(),
+                                        alignLabelWithHint: true, // Allinea il label in alto quando ci sono più righe
+                                        filled: true,
+                                        fillColor: Colors.grey[100], // Sfondo grigio chiaro
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo per lo stato attivo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.red, // Colore del bordo quando il campo è attivo
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 20),
                                   SizedBox(
-                                    width: 400,
-                                    child: DropdownButtonFormField<Priorita>(
-                                      value: _selectedPriorita,
-                                      onChanged: (Priorita? newValue) {
+                                    width: 316,
+                                    child: DropdownButton<TipologiaInterventoModel>(
+                                      value: _selectedTipologia,
+                                      hint:  Text('Tipologia di intervento'.toUpperCase()),
+                                      onChanged: (TipologiaInterventoModel? newValue) {
                                         setState(() {
-                                          _selectedPriorita = newValue;
+                                          _selectedTipologia = newValue;
                                         });
                                       },
-                                      // Filtra solo i valori desiderati: Acconto e Pagamento
-                                      items: [Priorita.BASSA, Priorita.MEDIA, Priorita.ALTA, Priorita.URGENTE]
-                                          .map<DropdownMenuItem<Priorita>>((Priorita value) {
-                                        String label = "";
-                                        if (value == Priorita.BASSA) {
-                                          label = 'BASSA';
-                                        } else if (value == Priorita.MEDIA) {
-                                          label = 'MEDIA';
-                                        } else if (value == Priorita.ALTA) {
-                                          label = 'ALTA';
-                                        } else if (value == Priorita.URGENTE) {
-                                          label = 'URGENTE';
-                                        }
-                                        return DropdownMenuItem<Priorita>(
+                                      items: allTipologie
+                                          .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                                            (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
                                           value: value,
-                                          child: Text(label),
-                                        );
-                                      }).toList(),
-                                      decoration: InputDecoration(
-                                        labelText: 'PRIORITÀ',
-                                      ),
-                                      validator: (value) {
-                                        if (value == null) {
-                                          return 'Selezionare la priorità';
-                                        }
-                                        return null;
-                                      },
+                                          child: Text(value.descrizione!),
+                                        ),
+                                      ).toList(),
                                     ),
                                   ),
-                                  SizedBox(height : 20),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 200,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _showClientiDialog();
-                                          },
-                                          child: SizedBox(
-                                            height: 50,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  (selectedCliente?.denominazione != null && selectedCliente!.denominazione!.length > 15)
-                                                      ? '${selectedCliente!.denominazione?.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                                                      : (selectedCliente?.denominazione ?? 'Seleziona Cliente').toUpperCase(),  // Testo di fallback
-                                                  style: const TextStyle(fontSize: 16),
-                                                ),
-                                                const Icon(Icons.arrow_drop_down),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 250,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _showDestinazioniDialog();
-                                          },
-                                          child: SizedBox(
-                                            height: 50,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  (selectedDestinazione?.denominazione != null && selectedDestinazione!.denominazione!.length > 15)
-                                                      ? '${selectedDestinazione!.denominazione!.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                                                      : (selectedDestinazione?.denominazione ?? 'Seleziona Destinazione').toUpperCase(),  // Testo di fallback
-                                                  style: const TextStyle(fontSize: 16),
-                                                ),
-                                                const Icon(Icons.arrow_drop_down),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20),
-                                  SizedBox(height: 15,),
                                   _buildImagePreview(),
                                 ],
                               ),
@@ -476,88 +319,39 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(
-                                    width: 200,
-                                    child: ElevatedButton(
-                                      onPressed: _selezionaData,
-                                      style: ElevatedButton.styleFrom(primary: Colors.red),
-                                      child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
-                                    ),
-                                  ),
-                                  if(selectedDate != null)
-                                    Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
-                                  const SizedBox(height: 20.0),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Checkbox(
-                                        value: _orarioDisponibile,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _orarioDisponibile = value ?? false;
-                                          });
-                                        },
-                                      ),
-                                      Text("disponibilità appuntamento".toUpperCase()),
-                                    ],
-                                  ),
-                                  if (_orarioDisponibile)
-                                    Container(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          SizedBox(height: 12),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              _selectTime(context);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              primary: Colors.red, // Colore di sfondo rosso
-                                              onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
-                                            ),
-                                            child: Text('Seleziona Orario'.toUpperCase()),
-                                          ),
-                                          SizedBox(height: 12),
-                                          Text('Orario selezionato : ${(selectedTime?.hour)}.${(selectedTime?.minute)}'.toUpperCase())
-                                        ],
-                                      ),
-                                    ),
-                                  SizedBox(height: 15),
-                                  SizedBox(
-                                    width: 580,
-                                    child: DropdownButton<TipologiaInterventoModel>(
-                                      value: _selectedTipologia,
-                                      hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
-                                      onChanged: (TipologiaInterventoModel? newValue) {
-                                        setState(() {
-                                          _selectedTipologia = newValue;
-                                        });
-                                      },
-                                      items: allTipologie
-                                          .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                                            (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                                          value: value,
-                                          child: Text(value.descrizione!),
-                                        ),
-                                      ).toList(),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20.0),
-                                  SizedBox(
-                                    width: 600,
-                                    child: TextFormField(
-                                      controller: _titoloController,
-                                      maxLines: null,
-                                      decoration:  InputDecoration(labelText: 'Titolo'.toUpperCase()),
-                                    ),
-                                  ),
                                   const SizedBox(height: 20.0),
                                   SizedBox(
                                     width: 600,
                                     child: TextFormField(
                                       controller: _descrizioneController,
-                                      maxLines: null,
-                                      decoration:  InputDecoration(labelText: 'Descrizione'.toUpperCase()),
+                                      maxLines: 6, // Imposta l'altezza in termini di righe di testo
+                                      decoration: InputDecoration(
+                                        labelText: 'Descrizione'.toUpperCase(),
+                                        alignLabelWithHint: true, // Allinea il label in alto quando ci sono più righe
+                                        filled: true,
+                                        fillColor: Colors.grey[100], // Sfondo grigio chiaro
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo per lo stato attivo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.red, // Colore del bordo quando il campo è attivo
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 20),
@@ -565,107 +359,36 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                     width: 600,
                                     child: TextFormField(
                                       controller: _notaController,
-                                      maxLines: null,
-                                      decoration:  InputDecoration(labelText: 'Nota'.toUpperCase()),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  SizedBox(
-                                    width: 400,
-                                    child: DropdownButtonFormField<Priorita>(
-                                      value: _selectedPriorita,
-                                      onChanged: (Priorita? newValue) {
-                                        setState(() {
-                                          _selectedPriorita = newValue;
-                                        });
-                                      },
-                                      // Filtra solo i valori desiderati: Acconto e Pagamento
-                                      items: [Priorita.BASSA, Priorita.MEDIA, Priorita.ALTA, Priorita.URGENTE]
-                                          .map<DropdownMenuItem<Priorita>>((Priorita value) {
-                                        String label = "";
-                                        if (value == Priorita.BASSA) {
-                                          label = 'BASSA';
-                                        } else if (value == Priorita.MEDIA) {
-                                          label = 'MEDIA';
-                                        } else if (value == Priorita.ALTA) {
-                                          label = 'ALTA';
-                                        } else if (value == Priorita.URGENTE) {
-                                          label = 'URGENTE';
-                                        }
-                                        return DropdownMenuItem<Priorita>(
-                                          value: value,
-                                          child: Text(label),
-                                        );
-                                      }).toList(),
+                                      maxLines: 6, // Imposta l'altezza in termini di righe di testo
                                       decoration: InputDecoration(
-                                        labelText: 'PRIORITÀ',
-                                      ),
-                                      validator: (value) {
-                                        if (value == null) {
-                                          return 'Selezionare la priorità';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(height : 20),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 200,
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _showClientiDialog();
-                                          },
-                                          child: SizedBox(
-                                            height: 50,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  (selectedCliente?.denominazione != null && selectedCliente!.denominazione!.length > 15)
-                                                      ? '${selectedCliente!.denominazione?.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                                                      : (selectedCliente?.denominazione ?? 'Seleziona Cliente').toUpperCase(),  // Testo di fallback
-                                                  style: const TextStyle(fontSize: 16),
-                                                ),
-                                                const Icon(Icons.arrow_drop_down),
-                                              ],
-                                            ),
+                                        labelText: 'Nota'.toUpperCase(),
+                                        alignLabelWithHint: true, // Allinea il label in alto quando ci sono più righe
+                                        filled: true,
+                                        fillColor: Colors.grey[100], // Sfondo grigio chiaro
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.grey, // Colore del bordo per lo stato attivo
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: Colors.red, // Colore del bordo quando il campo è attivo
+                                            width: 2.0,
                                           ),
                                         ),
                                       ),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: 250,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                _showDestinazioniDialog();
-                                              },
-                                              child: SizedBox(
-                                                height: 50,
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      (selectedDestinazione?.denominazione != null && selectedDestinazione!.denominazione!.length > 15)
-                                                          ? '${selectedDestinazione!.denominazione!.substring(0, 15)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                                                          : (selectedDestinazione?.denominazione ?? 'Seleziona Destinazione').toUpperCase(),  // Testo di fallback
-                                                      style: const TextStyle(fontSize: 16),
-                                                    ),
-                                                    const Icon(Icons.arrow_drop_down),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                  // Aggiungi questo sotto il pulsante per la selezione degli utenti
                                   const SizedBox(height: 20),
                                     Center(
                                       child: Column(
@@ -676,6 +399,25 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                                 child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: [
+                                                      SizedBox(
+                                                        width: 316,
+                                                        child: DropdownButton<TipologiaInterventoModel>(
+                                                          value: _selectedTipologia,
+                                                          hint:  Text('Tipologia di intervento'.toUpperCase()),
+                                                          onChanged: (TipologiaInterventoModel? newValue) {
+                                                            setState(() {
+                                                              _selectedTipologia = newValue;
+                                                            });
+                                                          },
+                                                          items: allTipologie
+                                                              .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                                                                (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
+                                                              value: value,
+                                                              child: Text(value.descrizione!),
+                                                            ),
+                                                          ).toList(),
+                                                        ),
+                                                      ),
                                                       SizedBox(height: 15,),
                                                       _buildImagePreview(),
                                                     ]
@@ -702,26 +444,18 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
 
   Future<http.Response?> saveTicket() async{
     late http.Response response;
-    var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
-    var orario = selectedTime != null ? DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, selectedTime!.hour, selectedTime!.minute).toIso8601String() : null;
     var note = _notaController.text.isNotEmpty ? _notaController.text : null;
     var titolo = _titoloController.text.isNotEmpty ? _titoloController.text : null;
     var descrizione = _descrizioneController.text.isNotEmpty ? _descrizioneController.text : null;
-    String prioritaString = _selectedPriorita.toString().split('.').last;
     try{
       response = await http.post(
         Uri.parse('$ipaddressProva/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'data' : data,
-          'orario_appuntamento' : orario,
           'titolo' : titolo,
-          'priorita' : prioritaString,
           'descrizione' : descrizione,
           'note' : note,
           'convertito' : false,
-          'cliente' : selectedCliente?.toMap(),
-          'destinazione' : selectedDestinazione?.toMap(),
           'tipologia' : _selectedTipologia?.toMap(),
           'utente' : widget.utente.toMap(),
         }),
@@ -803,156 +537,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
       Navigator.pop(context); // Chiude il dialog
       Navigator.pop(context); // Torna indietro nella navigazione
     }
-  }
-
-
-
-  void _showClientiDialog() async {
-    // Mostra il dialogo con un indicatore di caricamento
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'SELEZIONA CLIENTE',
-            textAlign: TextAlign.center,
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Attendi, caricamento clienti in corso...'), // Messaggio di caricamento
-              SizedBox(height: 16),
-              Center(child: CircularProgressIndicator()), // Indicatore di caricamento
-            ],
-          ),
-        );
-      },
-    );
-    // Carica i clienti in background
-    await getAllClienti();
-    // Chiudi il dialogo e mostra i clienti
-    Navigator.of(context).pop(); // Chiudi il dialogo
-    // Mostra il dialogo con la lista dei clienti
-    _showClientiListDialog();
-  }
-
-  void _showClientiListDialog() {
-    TextEditingController searchController = TextEditingController();
-    List<ClienteModel> filteredClientiList = clientiList; // Inizializzazione della lista filtrata
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) { // Usa StatefulBuilder per gestire lo stato nel dialog
-            return AlertDialog(
-              title: Text(
-                'SELEZIONA CLIENTE',
-                textAlign: TextAlign.center,
-              ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              content: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: searchController,
-                      onChanged: (value) {
-                        // Aggiorna lo stato del dialogo, non del widget genitore
-                        setState(() {
-                          filteredClientiList = clientiList.where((cliente) {
-                            final denominazione = cliente.denominazione?.toLowerCase() ?? '';
-                            final codice_fiscale = cliente.codice_fiscale?.toLowerCase() ?? '';
-                            final partita_iva = cliente.partita_iva?.toLowerCase() ?? '';
-                            final telefono = cliente.telefono?.toLowerCase() ?? '';
-                            final cellulare = cliente.cellulare?.toLowerCase() ?? '';
-                            final citta = cliente.citta?.toLowerCase() ?? '';
-                            final email = cliente.email?.toLowerCase() ?? '';
-                            final cap = cliente.cap?.toLowerCase() ?? '';
-
-                            return denominazione.contains(value.toLowerCase()) ||
-                                codice_fiscale.contains(value.toLowerCase()) ||
-                                partita_iva.contains(value.toLowerCase()) ||
-                                telefono.contains(value.toLowerCase()) ||
-                                cellulare.contains(value.toLowerCase()) ||
-                                citta.contains(value.toLowerCase()) ||
-                                email.contains(value.toLowerCase()) ||
-                                cap.contains(value.toLowerCase());
-                          }).toList();
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'CERCA CLIENTE',
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: filteredClientiList.map((cliente) {
-                            return ListTile(
-                              leading: Icon(Icons.contact_page_outlined),
-                              title: Text(cliente.denominazione!),
-                              onTap: () {
-                                setState(() {
-                                  selectedCliente = cliente;
-                                  getAllDestinazioniByCliente(cliente.id!);
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showDestinazioniDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Seleziona Destinazione', textAlign: TextAlign.center),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: allDestinazioniByCliente.map((destinazione) {
-                        return ListTile(
-                          leading: const Icon(Icons.home_work_outlined),
-                          title: Text(destinazione.denominazione!),
-                          onTap: () {
-                            setState(() {
-                              selectedDestinazione = destinazione;
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   Widget _buildTextFormField(

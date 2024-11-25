@@ -1532,15 +1532,18 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 },
                               ),
                               SizedBox(height: 20),
-                              buildMenuButton(
-                                icon: Icons.remove_red_eye_outlined,
-                                text: 'SOPRALLUOGHI',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => MenuSopralluoghiTecnicoPage(utente: widget.userData!)),
-                                  );
-                                },
+                              SizedBox(
+                                width: 600,
+                                child: buildMenuButton(
+                                  icon: Icons.remove_red_eye_outlined,
+                                  text: 'SOPRALLUOGHI',
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => MenuSopralluoghiTecnicoPage(utente: widget.userData!)),
+                                    );
+                                  },
+                                ),
                               ),
                               SizedBox(height: 20),
                               buildMenuButton(
@@ -1561,6 +1564,17 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData!)),//InterventoTecnicoForm(userData: widget.userData!)),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 20),
+                              buildMenuButton(
+                                icon: Icons.sticky_note_2_outlined,
+                                text: 'TICKET',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => CreazioneTicketTecnicoPage(utente: widget.userData!)),//InterventoTecnicoForm(userData: widget.userData!)),
                                   );
                                 },
                               ),
