@@ -243,6 +243,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                   width: 200, // Larghezza desiderata
                   height: 50, // Altezza desiderata
                   child: FloatingActionButton(
+                    heroTag: "iniziaConversione",
                     onPressed: () {
                       setState(() {
                         conversione = !conversione;
@@ -587,6 +588,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                     width: 200, // Larghezza desiderata
                     height: 50, // Altezza desiderata
                     child: FloatingActionButton(
+                      heroTag: "Conversione",
                       onPressed: () {
                         creaIntervento();
                       },
@@ -632,54 +634,82 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     );
   }
 
-  Future<void> creaIntervento() async{
-    try{
+  Future<void> creaIntervento() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Impedisce la chiusura del dialog premendo fuori
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Caricamento in corso..."),
+              ],
+            ),
+          );
+        },
+      );
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'attivo' : true,
-          'visualizzato' : false,
-          'titolo' : _titoloController.text,
-          'priorita' : _selectedPriorita.toString().split('.').last,
-          'descrizione' : _descrizioneController.text,
-          'note' : "CONVERSIONE TICKET ${widget.ticket.id} " + _notaController.text,
-          'utente_apertura' : widget.utente.toMap(),
-          'cliente' : selectedCliente?.toMap(),
-          'destinazione' : selectedDestinazione?.toMap(),
-          'tipologia' : widget.ticket.tipologia?.toMap()
-        })
+          'attivo': true,
+          'visualizzato': false,
+          'titolo': "TICKET ${widget.ticket.id} " + _titoloController.text,
+          'priorita': _selectedPriorita.toString().split('.').last,
+          'data_apertura_intervento' : DateTime.now().toIso8601String(),
+          'descrizione': _descrizioneController.text,
+          'note': _notaController.text,
+          'utente_apertura': widget.utente.toMap(),
+          'cliente': selectedCliente?.toMap(),
+          'destinazione': selectedDestinazione?.toMap(),
+          'tipologia': widget.ticket.tipologia?.toMap()
+        }),
       );
-      if(response.statusCode == 201){
+      if (response.statusCode == 201) {
         print('Ticket convertito in intervento con successo');
-              final interventoId = jsonDecode(response.body)['id'];
-              final images = await fetchImages();
-              await savePics(images, interventoId);
+        final interventoId = jsonDecode(response.body)['id'];
+        final images = await fetchImages();
+        await savePics(images, interventoId);
       } else {
-          throw Exception('Errore durante la creazione dell\'intervento: ${response.statusCode}');
+        throw Exception(
+            'Errore durante la creazione dell\'intervento: ${response.statusCode}');
       }
-          final response2 = await http.post(
-            Uri.parse('$ipaddressProva/api/ticket'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'id': widget.ticket.id,
-              'data_creazione': widget.ticket.data_creazione?.toIso8601String(),
-              'descrizione': widget.ticket.descrizione,
-              'note': widget.ticket.note,
-              'convertito': true,
-              'tipologia': widget.ticket.tipologia?.toMap(),
-              'utente': widget.ticket.utente?.toMap(),
-            }),
-          );
-          if (response2.statusCode == 201) {
-            Navigator.pop(context);
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Ticket convertito correttamente!')),
-            );
-          }
-    } catch(e){
+
+      final response2 = await http.post(
+        Uri.parse('$ipaddressProva/api/ticket'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.ticket.id,
+          'data_creazione': widget.ticket.data_creazione?.toIso8601String(),
+          'descrizione': widget.ticket.descrizione,
+          'note': widget.ticket.note,
+          'convertito': true,
+          'tipologia': widget.ticket.tipologia?.toMap(),
+          'utente': widget.ticket.utente?.toMap(),
+        }),
+      );
+
+      if (response2.statusCode == 201) {
+        Navigator.pop(context); // Chiudi il dialog del caricamento
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ticket convertito correttamente!')),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // Chiudi il dialog del caricamento in caso di errore
       print('Qualcosa non va $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore: $e')),
+      );
+    } finally {
+      // Assicurati che il dialogo venga chiuso in ogni caso
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      }
     }
   }
 
