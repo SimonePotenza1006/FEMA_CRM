@@ -269,7 +269,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -371,7 +371,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         return response;
@@ -393,7 +393,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
        } else {
          final ddt = DDTModel.fromJson(jsonDecode(data.body));
          try{
-           final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+           final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}'));
            var responseData = json.decode(response.body);
            if(response.statusCode == 200){
              List<RelazioneDdtProdottoModel> prodotti = [];
@@ -415,7 +415,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> getMetodiPagamento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiapagamento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiapagamento'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<TipologiaPagamentoModel> tipologie = [];
@@ -433,7 +433,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> getCommissioni()async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/commissione/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/commissione/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<CommissioneModel> commissioni = [];
@@ -451,7 +451,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> getProdottiByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<RelazioneProdottiInterventoModel> prodotti = [];
@@ -480,7 +480,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> getNoteByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<NotaTecnicoModel> note =[];
@@ -634,7 +634,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -693,7 +693,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -713,7 +713,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -734,7 +734,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   void eliminaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -797,7 +797,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   void modificaTitolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -859,7 +859,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   void annullaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -918,7 +918,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -1113,7 +1113,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -2691,7 +2691,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
   void modificaSaldo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -2760,7 +2760,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
 
   Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
     String? formattedData = data != null ? data.toIso8601String() : null;
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'data': formattedData, // Usa la stringa ISO solo se 'data' non è null
       'descrizione': descrizione,
@@ -3107,7 +3107,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -3181,7 +3181,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
     print(_selectedUtenti.toString());
     print(_finalSelectedUtenti.toString());
     try {
-      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
+      final response = await http.post(Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': widget.intervento.id,
@@ -3235,7 +3235,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             try{
               print('eliminazione vecchie relazioni');
               final response = await http.delete(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi/'+relaz.id.toString()),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/'+relaz.id.toString()),
                 headers: {'Content-Type': 'application/json'},
                 /*body: jsonEncode({
                   'utente' : relaz?.toMap(),
@@ -3253,7 +3253,7 @@ class _DettaglioInterventoPageState extends State<DettaglioInterventoPage> {
             try{
               print('sono quiiiiii');
               final response = await http.post(
-                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+                Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'utente' : utente?.toMap(),
