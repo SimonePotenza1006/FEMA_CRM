@@ -16,6 +16,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fema_crm/model/CommissioneModel.dart';
 
+import '../model/TipoTaskModel.dart';
+import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneClientePage.dart';
 import 'GalleriaFotoInterventoPage.dart';
@@ -35,7 +37,8 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
-  bool conversione = false;
+  bool conversioneIntervento = false;
+  bool conversioneTask = false;
   List<ClienteModel> clientiList = [];
   List<ClienteModel> filteredClientiList = [];
   ClienteModel? selectedCliente;
@@ -44,7 +47,78 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   TextEditingController _titoloController = TextEditingController();
   TextEditingController _descrizioneController = TextEditingController();
   TextEditingController _notaController = TextEditingController();
+  TextEditingController _titoloTaskController = TextEditingController();
+  TextEditingController _descrizioneTaskController = TextEditingController();
   Priorita? _selectedPriorita;
+  List<TipologiaInterventoModel> tipologieList = [];
+  TipologiaInterventoModel? selectedTipologia;
+  List<TipoTaskModel> tipiTask = [];
+  TipoTaskModel? selectedTipoTask;
+  List<UtenteModel> allUtenti = [];
+  UtenteModel? selectedUtente;
+
+  Future<void> getAllTipiTask() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipoTaskModel> tipologie = [];
+        for(var item in jsonData){
+          tipologie.add(TipoTaskModel.fromJson(item));
+        }
+        setState(() {
+          tipiTask = tipologie;
+        });
+      } else {
+        throw Exception('Failed to load tipi task data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Qualcosa non va tipologie Task: $e');
+    }
+  }
+
+  Future<void> getAllUtenti() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var response =await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for(var item in jsonData){
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        throw Exception('Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Qualcosa non va getAllUtenti: $e');
+    }
+  }
+
+  Future<void> getAllTipologie() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipologiaInterventoModel> tipologie = [];
+        for(var item in jsonData){
+          tipologie.add(TipologiaInterventoModel.fromJson(item));
+        }
+        setState(() {
+          tipologieList = tipologie;
+        });
+      } else {
+        throw Exception('Failed to load tipologie data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Qualcosa non va tipologie : $e');
+    }
+  }
 
   Future<void> getAllClienti() async {
     try {
@@ -73,9 +147,13 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   void initState(){
     super.initState();
     getAllClienti();
+    getAllTipologie();
+    getAllUtenti();
+    getAllTipiTask();
     _futureImages = fetchImages();
     _descrizioneController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione!.toString() : null)!;
     _notaController.text = (widget.ticket.note != null ? widget.ticket.note! : null)!;
+    _descrizioneTaskController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione! : null)!;
   }
 
   Future<List<Uint8List>> fetchImages() async {
@@ -100,6 +178,66 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
       }
       throw e; // rethrow the exception
+    }
+  }
+
+  Future<void> savePicsTask(List<Uint8List> images, int taskId) async{
+    try{
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Impedisce la chiusura del dialog premendo fuori
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Caricamento in corso..."),
+              ],
+            ),
+          );
+        },
+      );
+      for(var imageBytes in images){
+        var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('$ipaddressProva/api/immagine/task/$taskId'),
+        );
+        request.files.add(http.MultipartFile.fromBytes(
+          'task', // Nome del campo nel form
+          imageBytes,
+          filename: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ));
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          print('File inviato con successo');
+        } else {
+          print('Errore durante l\'invio del file: ${response.statusCode}');
+        }
+      }
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Successo"),
+            content: Text("Caricamento completato!"),
+            actions: [
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.pop(context); // Chiudi l'alert di successo
+                  Navigator.pop(context); // Torna alla pagina precedente
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch(e){
+      Navigator.pop(context); // Chiudi il dialog di caricamento in caso di errore
+      print('Errore durante l\'invio del file: $e');
     }
   }
 
@@ -175,6 +313,14 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         ),
         centerTitle: true,
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
+            onPressed: (){
+              getAllClienti();
+            },
+          )
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -243,10 +389,13 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                   width: 200, // Larghezza desiderata
                   height: 50, // Altezza desiderata
                   child: FloatingActionButton(
-                    heroTag: "iniziaConversione",
+                    heroTag: "iniziaConversione1",
                     onPressed: () {
                       setState(() {
-                        conversione = !conversione;
+                        conversioneIntervento = !conversioneIntervento;
+                        if(conversioneTask == true){
+                          conversioneTask = false;
+                        }
                       });
                     },
                     backgroundColor: Colors.red, // Colore di sfondo rosso
@@ -254,7 +403,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                       borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
                     ),
                     child: Text(
-                      'AVVIA CONVERSIONE',
+                      'CREA INTERVENTO',
                       style: TextStyle(
                         color: Colors.white, // Colore della scritta bianco
                         fontWeight: FontWeight.bold,
@@ -263,10 +412,61 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                     ),
                   ),
                 ),
+                SizedBox(height: 15),
+                SizedBox(
+                  width: 200, // Larghezza desiderata
+                  height: 50, // Altezza desiderata
+                  child: FloatingActionButton(
+                    heroTag: "iniziaConversione",
+                    onPressed: () {
+                      setState(() {
+                        conversioneTask = !conversioneTask;
+                        if(conversioneIntervento == true){
+                          conversioneIntervento = false;
+                        }
+                      });
+                    },
+                    backgroundColor: Colors.red, // Colore di sfondo rosso
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
+                    ),
+                    child: Text(
+                      'CREA TASK',
+                      style: TextStyle(
+                        color: Colors.white, // Colore della scritta bianco
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                SizedBox(
+                  width: 200, // Larghezza desiderata
+                  height: 50, // Altezza desiderata
+                  child: FloatingActionButton(
+                    heroTag: "Elimina",
+                    onPressed: () {
+                      showDeleteConfirmationDialog(context);
+                    },
+                    backgroundColor: Colors.red, // Colore di sfondo rosso
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
+                    ),
+                    child: Text(
+                      'ELIMINA TICKET',
+                      style: TextStyle(
+                        color: Colors.white, // Colore della scritta bianco
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
             SizedBox(width: 150),
-            if(conversione)
+            if(conversioneIntervento)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -408,6 +608,62 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                         ),
                         contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 400,
+                    child: DropdownButtonFormField<TipologiaInterventoModel>(
+                      value: selectedTipologia,
+                      onChanged: (TipologiaInterventoModel? newValue) {
+                        setState(() {
+                          selectedTipologia = newValue;
+                        });
+                      },
+                      items: tipologieList.map<DropdownMenuItem<TipologiaInterventoModel>>((TipologiaInterventoModel tipologia) {
+                        return DropdownMenuItem<TipologiaInterventoModel>(
+                          value: tipologia,
+                          child: Text(
+                            tipologia.descrizione!, // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
+                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'TIPOLOGIA INTERVENTO',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Selezionare una tipologia di intervento';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(height: 10),
@@ -589,10 +845,26 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                     height: 50, // Altezza desiderata
                     child: FloatingActionButton(
                       heroTag: "Conversione",
-                      onPressed: () {
+                      onPressed: (_titoloController.text.isNotEmpty &&
+                          _descrizioneController.text.isNotEmpty &&
+                          _notaController.text.isNotEmpty &&
+                          _selectedPriorita != null &&
+                          selectedTipologia != null &&
+                          selectedCliente != null &&
+                          selectedDestinazione != null)
+                          ? () {
                         creaIntervento();
-                      },
-                      backgroundColor: Colors.red, // Colore di sfondo rosso
+                      }
+                          : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
+                      backgroundColor: (_titoloController.text.isNotEmpty &&
+                          _descrizioneController.text.isNotEmpty &&
+                          _notaController.text.isNotEmpty &&
+                          _selectedPriorita != null &&
+                          selectedTipologia != null &&
+                          selectedCliente != null &&
+                          selectedDestinazione != null)
+                          ? Colors.red
+                          : Colors.grey, // Cambia colore in base alle condizioni
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
                       ),
@@ -608,10 +880,303 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                   ),
                 ],
               ),
+            if(conversioneTask)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text('Compilazione Task', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 15),
+                  SizedBox(
+                    width: 600,
+                    child: TextFormField(
+                      controller: _titoloTaskController,
+                      maxLines: null,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: 'Titolo'.toUpperCase(),
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none, // Rimuove il bordo standard
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        hintText: "Inserisci il titolo",
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 600,
+                    child: TextFormField(
+                      controller: _descrizioneTaskController,
+                      maxLines: 5,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: 'Descrizione'.toUpperCase(),
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        hintText: "Inserisci la descrizione",
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 400,
+                    child: DropdownButtonFormField<TipoTaskModel>(
+                      value: selectedTipoTask,
+                      onChanged: (TipoTaskModel? newValue) {
+                        setState(() {
+                          selectedTipoTask = newValue;
+                        });
+                      },
+                      items: tipiTask.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
+                        return DropdownMenuItem<TipoTaskModel>(
+                          value: tipologia,
+                          child: Text(
+                            tipologia.descrizione!, // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
+                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'TIPOLOGIA TASK',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Selezionare una tipologia di intervento';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: 400,
+                    child: DropdownButtonFormField<UtenteModel>(
+                      value: selectedUtente,
+                      onChanged: (UtenteModel? newValue) {
+                        setState(() {
+                          selectedUtente = newValue;
+                        });
+                      },
+                      items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
+                        return DropdownMenuItem<UtenteModel>(
+                          value: utente,
+                          child: Text(
+                            utente.nomeCompleto()!,
+                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'UTENTE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Selezionare un utente';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: 200, // Larghezza desiderata
+                    height: 50, // Altezza desiderata
+                    child: FloatingActionButton(
+                      heroTag: "Conversione",
+                      onPressed: (_descrizioneTaskController.text.isNotEmpty &&
+                          _titoloTaskController.text.isNotEmpty &&
+                          selectedTipoTask != null &&
+                          selectedUtente != null)
+                          ? () {
+                        creaTask();
+                      }
+                          : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
+                      backgroundColor: (_descrizioneTaskController.text.isNotEmpty &&
+                          _titoloTaskController.text.isNotEmpty &&
+                          selectedTipoTask != null &&
+                          selectedUtente != null)
+                          ? Colors.red
+                          : Colors.grey, // Cambia colore in base alle condizioni
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12), // Bordi leggermente arrotondati
+                      ),
+                      child: Text(
+                        'CREA TASK',
+                        style: TextStyle(
+                          color: Colors.white, // Colore della scritta bianco
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
           ],
         )
       ),
     );
+  }
+
+  void showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Conferma Eliminazione'),
+          content: Text('Procedere all\'eliminazione del ticket con ID ${widget.ticket.id}? La procedura sarà irreversibile'
+              'e comporterà l\'eliminazione delle foto collegate al ticket.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteTicket(int.parse(widget.ticket.id!));
+              },
+              child: Text('Sì'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> deleteTicket(int ticketId) async{
+    try{
+      final response = await http.delete(
+        Uri.parse('$ipaddressProva/api/ticket/$ticketId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      print(response.statusCode);
+      if(response.statusCode == 200){
+        print('Daje');
+        Navigator.pop(context);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Ticket eliminato con successo!')));
+      } else {
+        print('Errore durante l\'eliminazione del ticket');
+      }
+    } catch(e){
+      print('Errore durante la richiesta HTTP: $e');
+    }
   }
 
   void _showNoClienteDialog() {
@@ -632,6 +1197,82 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         );
       },
     );
+  }
+
+  Future<void> creaTask() async{
+    try{
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Impedisce la chiusura del dialog premendo fuori
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Caricamento in corso..."),
+              ],
+            ),
+          );
+        },
+      );
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/task'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'utente' : selectedUtente?.toMap(),
+          'data_creazione' : DateTime.now().toIso8601String(),
+          'tipologia' : selectedTipoTask?.toMap(),
+          'titolo' : _titoloTaskController.text,
+          'descrizione' : _descrizioneTaskController.text,
+          'concluso' : false,
+          'condiviso' : true,
+          'accettato' : false,
+          'data_conclusione' : null,
+          'data_accettazione' : null,
+        }),
+      );
+      if (response.statusCode == 201) {
+        print('Ticket convertito in intervento con successo');
+        final taskId = jsonDecode(response.body)['id'];
+        final images = await fetchImages();
+        await savePicsTask(images, taskId);
+      } else {
+        throw Exception(
+            'Errore durante la creazione dell\'intervento: ${response.statusCode}');
+      }
+      final response2 = await http.post(
+        Uri.parse('$ipaddressProva/api/ticket'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.ticket.id,
+          'data_creazione': widget.ticket.data_creazione?.toIso8601String(),
+          'descrizione': widget.ticket.descrizione,
+          'note': widget.ticket.note,
+          'convertito': true,
+          'tipologia': widget.ticket.tipologia?.toMap(),
+          'utente': widget.ticket.utente?.toMap(),
+        }),
+      );
+
+      if (response2.statusCode == 201) {
+        Navigator.pop(context); // Chiudi il dialog del caricamento
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ticket convertito correttamente!')),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context); // Chiudi il dialog del caricamento in caso di errore
+      print('Qualcosa non va $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore: $e')),
+      );
+    } finally {
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      }
+    }
   }
 
   Future<void> creaIntervento() async {
@@ -665,7 +1306,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
           'utente_apertura': widget.utente.toMap(),
           'cliente': selectedCliente?.toMap(),
           'destinazione': selectedDestinazione?.toMap(),
-          'tipologia': widget.ticket.tipologia?.toMap()
+          'tipologia': selectedTipologia?.toMap()
         }),
       );
       if (response.statusCode == 201) {
@@ -691,7 +1332,6 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
           'utente': widget.ticket.utente?.toMap(),
         }),
       );
-
       if (response2.statusCode == 201) {
         Navigator.pop(context); // Chiudi il dialog del caricamento
         ScaffoldMessenger.of(context).showSnackBar(
@@ -714,7 +1354,6 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   }
 
   void _showClientiDialog() async {
-    // Mostra il dialogo con un indicatore di caricamento
     showDialog(
       context: context,
       builder: (BuildContext context) {

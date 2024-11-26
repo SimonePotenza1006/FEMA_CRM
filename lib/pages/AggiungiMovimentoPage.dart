@@ -65,7 +65,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     // Verifica se sei su Windows
     else if (Platform.isWindows) {
       final List<XFile>? pickedFiles = await _picker.pickMultiImage();
-
       if (pickedFiles != null && pickedFiles.isNotEmpty) {
         setState(() {
           pickedImages.addAll(pickedFiles);
@@ -132,7 +131,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         double? importoIvato = (intervento.importo_intervento != null && intervento.iva != null)
                             ? intervento.importo_intervento! * (1 + (intervento.iva! / 100))
                             : null;
-
                         return ListTile(
                           leading: const Icon(Icons.settings),
                           title: Text(
@@ -143,6 +141,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             setState(() {
                               selectedIntervento = intervento;
                               _descrizioneController.text = "${_selectedTipoMovimentazione.toString().split('.').last} INTERVENTO ${selectedIntervento?.numerazione_danea != null ? selectedIntervento?.numerazione_danea! : selectedIntervento?.titolo!}";
+                              _importoController.text = importoIvato != null ? importoIvato.toStringAsFixed(2) : '';
                             });
                             Navigator.of(context).pop();
                           },
@@ -158,7 +157,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       },
     );
   }
-
 
   void _showClientiDialog() {
     TextEditingController searchController = TextEditingController(); // Aggiungi un controller
@@ -241,7 +239,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllClienti() async {
     try {
       final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
-
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -283,7 +280,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         _selectedTipoMovimentazione = newValue;
                       });
                     },
-                    // Filtra solo i valori desiderati: Acconto e Pagamento
                     items: [TipoMovimentazione.Acconto, TipoMovimentazione.Pagamento]
                         .map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
                       String label = "";

@@ -233,24 +233,6 @@ class _TableTicketPageState extends State<TableTicketPage>{
                       width: _columnWidths['utente']?? double.nan,
                       minimumWidth: 100,
                     ),
-                    GridColumn(
-                      columnName: 'tipologia',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('TIPOLOGIA'),
-                      ),
-                      width: _columnWidths['tipologia']?? double.nan,
-                      minimumWidth: 100,
-                    ),
                   ],
                 onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
                   setState(() {
@@ -393,10 +375,6 @@ class TicketDataSource extends DataGridSource{
               columnName: 'utente',
               value: ticket.utente!.nomeCompleto()
           ),
-          DataGridCell<String>(
-            columnName: 'tipologia',
-            value: ticket.tipologia?.descrizione ?? '',//int.parse(intervento.tipologia!.id.toString()),
-          ),
         ]
       ));
     }
@@ -404,66 +382,57 @@ class TicketDataSource extends DataGridSource{
   }
 
   @override
-  DataGridRowAdapter buildRow(DataGridRow row){
+  DataGridRowAdapter buildRow(DataGridRow row) {
+    // Ottieni il modello del ticket
     final TicketModel ticket = row.getCells().firstWhere(
             (cell) => cell.columnName == 'ticket').value as TicketModel;
-    Color? prioritaColor;
-    Color? backgroundColor;
-    switch (ticket.tipologia?.descrizione) {
-      case 'Informatico':
-        backgroundColor = Colors.grey[200]; // grigio chiaro
-        break;
-      case 'Elettrico':
-        backgroundColor = Colors.yellow[200]; // giallo chiaro
-        break;
-      case 'Idrico':
-        backgroundColor = Colors.lightBlue[200]; // azzurro chiaro
-        break;
-      case 'Elettronico':
-        backgroundColor = Colors.pink[50]; // rosa chiarissimo
-        break;
-      case 'Riparazione Merce':
-        backgroundColor = Colors.green[100]; // verde chiarissimo
-        break;
-      default:
-        backgroundColor = Colors.white;
-    }
 
+    // Colori per righe pari e dispari
+    Color backgroundColor = Colors.white;
+    Color backgroundColor2 = Colors.grey.shade200;
+
+    // Calcolo del colore
+    final rowColor = (int.parse(ticket.id!) % 2 == 0) ? backgroundColor : backgroundColor2;
+
+    // Debug temporaneo
+    print('ID del ticket: ${ticket.id}, Colore assegnato: $rowColor');
+
+    // Ritorna il DataGridRowAdapter
     return DataGridRowAdapter(
-        color: backgroundColor,
-        cells: row.getCells().map<Widget>((dataGridCell) {
-          if (dataGridCell.columnName == 'ticket') {
-            return SizedBox.shrink(); // La cella sarà invisibile ma presente
-          } else{
-            return GestureDetector(
-              onTap: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DettaglioTicketPage(ticket: ticket, utente: utente),
-                  ),
-                );
-              },
-              child: Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.grey[600]!,
-                      width: 1,
-                    ),
-                  ),
+      color: rowColor,
+      cells: row.getCells().map<Widget>((dataGridCell) {
+        if (dataGridCell.columnName == 'ticket') {
+          return SizedBox.shrink(); // La cella è invisibile
+        } else {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      DettaglioTicketPage(ticket: ticket, utente: utente),
                 ),
-                child: Text(
-                  dataGridCell.value.toString(),
-                  overflow: TextOverflow.ellipsis,
+              );
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: Colors.grey[600]!,
+                    width: 1,
+                  ),
                 ),
               ),
-            );
-          }
-      }
-    ).toList(),
+              child: Text(
+                dataGridCell.value.toString(),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          );
+        }
+      }).toList(),
     );
   }
 }

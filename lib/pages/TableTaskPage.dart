@@ -1069,7 +1069,6 @@ class TaskDataSource extends DataGridSource{
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Task eliminato con successo')),
         );
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

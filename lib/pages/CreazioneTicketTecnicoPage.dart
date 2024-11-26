@@ -37,15 +37,12 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
   TextEditingController _descrizioneController = TextEditingController();
   TextEditingController _notaController = TextEditingController();
   TextEditingController _titoloController = TextEditingController();
-  List<TipologiaInterventoModel> allTipologie = [];
-  TipologiaInterventoModel? _selectedTipologia;
   List<XFile> pickedImages =  [];
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    getAllTipologie();
   }
 
   Future<void> pickImagesFromGallery() async {
@@ -54,28 +51,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
       setState(() {
         pickedImages.addAll(pickedFiles);
       });
-    }
-  }
-
-
-  Future<void> getAllTipologie() async {
-    try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        List<TipologiaInterventoModel> tipologie = [];
-        for (var item in jsonData) {
-          tipologie.add(TipologiaInterventoModel.fromJson(item));
-        }
-        setState(() {
-          allTipologie = tipologie;
-        });
-      } else {
-        throw Exception('Failed to load data from API: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Errore durante la chiamata all\'API: $e');
-      _showErrorDialog(e.toString());
     }
   }
 
@@ -280,25 +255,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  SizedBox(
-                                    width: 316,
-                                    child: DropdownButton<TipologiaInterventoModel>(
-                                      value: _selectedTipologia,
-                                      hint:  Text('Tipologia di intervento'.toUpperCase()),
-                                      onChanged: (TipologiaInterventoModel? newValue) {
-                                        setState(() {
-                                          _selectedTipologia = newValue;
-                                        });
-                                      },
-                                      items: allTipologie
-                                          .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                                            (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                                          value: value,
-                                          child: Text(value.descrizione!),
-                                        ),
-                                      ).toList(),
-                                    ),
-                                  ),
                                   _buildImagePreview(),
                                 ],
                               ),
@@ -399,25 +355,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                                 child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: [
-                                                      SizedBox(
-                                                        width: 316,
-                                                        child: DropdownButton<TipologiaInterventoModel>(
-                                                          value: _selectedTipologia,
-                                                          hint:  Text('Tipologia di intervento'.toUpperCase()),
-                                                          onChanged: (TipologiaInterventoModel? newValue) {
-                                                            setState(() {
-                                                              _selectedTipologia = newValue;
-                                                            });
-                                                          },
-                                                          items: allTipologie
-                                                              .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                                                                (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                                                              value: value,
-                                                              child: Text(value.descrizione!),
-                                                            ),
-                                                          ).toList(),
-                                                        ),
-                                                      ),
                                                       SizedBox(height: 15,),
                                                       _buildImagePreview(),
                                                     ]
@@ -456,7 +393,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
           'descrizione' : descrizione,
           'note' : note,
           'convertito' : false,
-          'tipologia' : _selectedTipologia?.toMap(),
           'utente' : widget.utente.toMap(),
         }),
       );
