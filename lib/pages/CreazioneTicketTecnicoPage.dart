@@ -386,7 +386,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     var descrizione = _descrizioneController.text.isNotEmpty ? _descrizioneController.text : null;
     try{
       response = await http.post(
-        Uri.parse('$ipaddressProva/api/ticket'),
+        Uri.parse('$ipaddress/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'titolo' : titolo,
@@ -442,7 +442,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
