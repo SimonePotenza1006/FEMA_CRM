@@ -29,6 +29,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<TaskModel> _allCommissioni = [];
   List<TaskModel> _filteredCommissioni = [];
+  List<TaskModel> _taskFede =[];
   Map<String, double> _columnWidths ={};
   int? _currentSheet;
   bool isLoading = true;
@@ -140,36 +141,60 @@ class _TableTaskPageState extends State<TableTaskPage>{
     }
   }
 
-
-
-
   @override
   void initState() {
     super.initState();
     _setPreferredOrientation();
-    // SystemChrome.setPreferredOrientations([
-    //   //DeviceOrientation.landscapeLeft,
-    //   DeviceOrientation.landscapeRight,
-    // ]);
-    _columnWidths ={
-    'task' : 0,
-    'accettatoicon' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
-    'completed' : 60,
-    'delete' : 60,
-    'condividi' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
-    'data_creazione' : 150,
-    //'data_conclusione' : 170,
-    'titolo' : 300,
-    //'tipologia' : 200,
-    'utente' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 200 : 0,
-    'accettato' : (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
-    'data_conclusione' : 150,
-  };
-    getAllTipi();
-    getAllUtenti();
-    _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, allUtenti);
-    getAllTask();
-    _filteredCommissioni = _allCommissioni.toList();
+    _columnWidths = {
+      'task': 0,
+      'accettatoicon': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
+      'completed': 60,
+      'delete': 60,
+      'condividi': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
+      'data_creazione': 150,
+      'titolo': 300,
+      'utente': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 200 : 0,
+      'accettato': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
+      'data_conclusione': 150,
+    };
+    initializeData();
+    setState(() {
+      if(widget.utente.cognome == "Mazzei"){
+        _currentSheet = 9;
+      }
+    });
+  }
+
+  Future<void> initializeData() async {
+    print('Inizio inizializzazione dei dati...');
+    await getAllTipi();
+    print('Tipologie caricate con successo.');
+
+    await getAllUtenti();
+    print('Utenti caricati con successo.');
+
+    await getAllTask();
+    print('Task caricati con successo.');
+
+    setState(() {
+      print('Inizio filtraggio delle commissioni...');
+      if (widget.utente.cognome! == "Mazzei") {
+        print('Utente Mazzei rilevato. Applicazione del filtro per tipologia id = 9 e cognome Mazzei...');
+        _filteredCommissioni = _allCommissioni.where((task) {
+          print(
+              'Task: ${task.titolo}, Tipologia ID: ${task.tipologia?.id}, Utente Cognome: ${task.utente?.cognome}');
+          return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
+        }).toList();
+        print('Numero di task filtrati: ${_filteredCommissioni.length}');
+      } else {
+        _filteredCommissioni = _allCommissioni.toList();
+        print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
+      }
+
+      _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, List.from(allUtenti));
+      print('Datasource inizializzato con ${_filteredCommissioni.length} task.');
+    });
+    print('Inizializzazione completata.');
   }
 
   Future<void> getAllUtenti() async {
@@ -252,37 +277,62 @@ class _TableTaskPageState extends State<TableTaskPage>{
     }
   }
 
-  Future<void> getAllTask() async{
+  Future<void> getAllTask() async {
     setState(() {
       isLoading = true;
+      print('Caricamento iniziato...');
     });
-    try{
-      var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/all')
-      : Uri.parse('$ipaddress/api/task/utente/'+widget.utente!.id!);
+    try {
+      // Decidi l'endpoint in base al cognome dell'utente
+      var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
+          ? Uri.parse('$ipaddress/api/task/all')
+          : Uri.parse('$ipaddress/api/task/utente/' + widget.utente!.id!);
+      print('Chiamata API verso: $apiUrl');
       var response = await http.get(apiUrl);
-      if(response.statusCode == 200){
+      print('Risposta ricevuta con status code: ${response.statusCode}');
+      if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
+        print('Dati ricevuti: ${jsonData.length} elementi trovati.');
         List<TaskModel> commissioni = [];
-        for(var item in jsonData){
+        for (var item in jsonData) {
           commissioni.add(TaskModel.fromJson(item));
         }
+        print('Numero di task convertiti: ${commissioni.length}');
         setState(() {
           _isLoading = false;
           _allCommissioni = commissioni;
-          _filteredCommissioni = commissioni;
+          print('Tutte le commissioni assegnate a _allCommissioni: ${_allCommissioni.length} task.');
+          // Applica il filtro iniziale per filteredCommissioni se l'utente è Mazzei
+          if (widget.utente.cognome! == "Mazzei") {
+            print('Filtraggio per utente Mazzei con tipologia id = 9...');
+            _filteredCommissioni = commissioni.where((task) {
+              print('Task: ${task.titolo}, Tipologia: ${task.tipologia?.id}, Utente: ${task.utente?.cognome}');
+              return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
+            }).toList();
+            print('Numero di task filtrati: ${_filteredCommissioni.length}');
+          } else {
+            _filteredCommissioni = commissioni;
+            print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
+          }
           _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, allUtenti);
+          print('Datasource aggiornato.');
         });
       } else {
-        _isLoading = false;
+        setState(() {
+          _isLoading = false;
+        });
+        print('Errore nella chiamata API, status code: ${response.statusCode}');
         throw Exception('Failed to load data from API: ${response.statusCode}');
       }
-    } catch(e){
+    } catch (e) {
+      print('Errore durante la chiamata API: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error during API call: $e')),
       );
     } finally {
       setState(() {
         isLoading = false; // Fine del caricamento
+        print('Caricamento terminato.');
       });
     }
   }
@@ -653,12 +703,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: allTipi.map((tipo) {
                                 final isSelected = _currentSheet == int.parse(tipo.id!);
-                                print('Rendering button: ${tipo.descrizione} - isSelected: $isSelected'); // Debug
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      print('Button pressed: ${tipo.descrizione}'); // Debug
                                       _changeSheet(int.parse(tipo.id!));
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -693,7 +741,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
               ],
             ),
           ),
-            floatingActionButton: Column(
+            floatingActionButton: widget.utente.cognome == "Mazzei" ||
+                widget.utente.cognome == "Chiriatti" ?
+            Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children : [
@@ -830,7 +880,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   heroTag: "Tag2",
                 ),
               ]
-            ),
+            ) : Container(),
         )
         );
   }
@@ -1054,7 +1104,6 @@ class TaskDataSource extends DataGridSource{
           ),
         );
       }
-      //Navigator.of(context).pop();//Navigator.pop(context);
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
@@ -1234,7 +1283,7 @@ class TaskDataSource extends DataGridSource{
                         child: Container(
                           width: double.maxFinite,
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
+                            //mainAxisSize: MainAxisSize.min,
                             children: [
                               ListView.builder(
                                 shrinkWrap: true,

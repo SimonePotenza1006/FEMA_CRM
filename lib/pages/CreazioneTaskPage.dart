@@ -135,61 +135,47 @@ class _CreazioneTaskPageState
           scrollDirection: Axis.vertical,
           child: Center(
             child:  Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 20),
                 // Description Field
                 SizedBox(
-                  width: 450,
-                  child: TextFormField(
-                    controller: _titoloController,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      labelText: 'Titolo',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  width: 600,
+                  child: buildTFF(controller: _titoloController, label: "Titolo"),
                 ),
                 SizedBox(height: 20),
                 // Description Field
                 SizedBox(
-                  width: 450,
-                  child: TextFormField(minLines: 4,
-                    controller: _descrizioneController,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      labelText: 'Descrizione',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  width: 600,
+                  child: buildTFF(controller: _descrizioneController, label: "Descrizione", maxLines: 6),
                 ),
                 SizedBox(height: 20),
                 SizedBox(
-                  width: 400,
-                  child: DropdownButtonFormField<TipoTaskModel>(
-                    value: _selectedTipo,
-                    onChanged: (TipoTaskModel? newValue){
-                      setState(() {
-                        _selectedTipo = newValue;
-                      });
-                    },
-                    items: allTipi.map((TipoTaskModel tipo){
-                      return DropdownMenuItem<TipoTaskModel>(
-                        value: tipo,
-                        child: Text(tipo.descrizione!),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Seleziona tipologia'.toUpperCase()
-                    ),
+                  width: 600,
+                  child: buildCustomDropdown(
+                      selectedValue: _selectedTipo,
+                      items: allTipi,
+                      label: "Tipologia",
+                      itemLabelBuilder: (tipo) => tipo.descrizione!,
+                      validator: (value){
+                        if (value == null) {
+                          return 'Selezionare una tipologia';
+                        }
+                        return null;
+                      },
+                      onChanged: (TipoTaskModel? tipo){
+                        setState(() {
+                          _selectedTipo = tipo;
+                        });
+                      }
                   ),
                 ),
                 SizedBox(height: 20),
                 SizedBox(
                   width: 200,
-                  child: CheckboxListTile(
-                    title: Text('Condiviso'),
+                  child: buildCustomCheckbox(
                     value: _condiviso,
+                    label: 'Condiviso',
                     onChanged: (value) {
                       setState(() {
                         _condiviso = value!;
@@ -202,23 +188,17 @@ class _CreazioneTaskPageState
                 ),
                 SizedBox(height: 20),// Button
                 if (_condiviso) SizedBox(
-                  width: 450,
-                  child: DropdownButtonFormField<UtenteModel>(
-                    value: selectedUtente,
-                    onChanged: (UtenteModel? newValue){
-                      setState(() {
-                        selectedUtente = newValue;
-                      });
-                    },
-                    items: allUtenti.map((UtenteModel utente){
-                      return DropdownMenuItem<UtenteModel>(
-                        value: utente,
-                        child: Text(utente.nomeCompleto()!),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Seleziona tecnico'.toUpperCase()
-                    ),
+                  width: 600,
+                  child:  buildCustomDropdown(
+                      selectedValue: selectedUtente,
+                      items: allUtenti,
+                      label: "Utente condivisione",
+                      itemLabelBuilder: (utente) => utente.nomeCompleto()!,
+                      onChanged: (UtenteModel? utente){
+                        setState(() {
+                          selectedUtente = utente;
+                        });
+                      }
                   ),
                 ),
                 SizedBox(height: 40),
@@ -328,7 +308,7 @@ class _CreazioneTaskPageState
       final task = TaskModel.fromJson(jsonDecode(data.body));
       try{
         for (var image in pickedImages) {
-          if (image.path != null && image.path.isNotEmpty) {
+          if (image.path.isNotEmpty) {
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
@@ -444,5 +424,145 @@ class _CreazioneTaskPageState
         },
       );
     }
+  }
+
+
+  Widget buildCustomDropdown<T>({
+    required T? selectedValue,
+    required List<T> items,
+    required String label,
+    required void Function(T?) onChanged,
+    String Function(T)? itemLabelBuilder,
+    String? Function(T?)? validator,
+  }) {
+    return SizedBox(
+      width: 400,
+      child: DropdownButtonFormField<T>(
+        value: selectedValue,
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<T>>((T item) {
+          return DropdownMenuItem<T>(
+            value: item,
+            child: Text(
+              itemLabelBuilder != null ? itemLabelBuilder(item) : item.toString(),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          );
+        }).toList(),
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+              color: Colors.redAccent,
+              width: 2.0,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0,
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        ),
+        validator: validator ??
+                (value) {
+              if (value == null) {
+                return 'Selezionare un valore';
+              }
+              return null;
+            },
+      ),
+    );
+  }
+
+  Widget buildTFF({
+    required TextEditingController controller,
+    required String label,
+    int maxLines = 1, // Valore predefinito di 1
+  }) {
+    return SizedBox(
+      width: 600,
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          alignLabelWithHint: true,
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.red, width: 2.0),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCustomCheckbox({
+    required bool value,
+    required String label,
+    required void Function(bool?) onChanged,
+  }) {
+    return SizedBox(
+      width: 400, // Dimensione regolabile
+      child: InkWell(
+        onTap: () => onChanged(!value), // Gestione del toggle al clic
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: value ? Colors.redAccent : Colors.grey[300]!,
+              width: 1.5,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Checkbox(
+                value: value,
+                onChanged: onChanged,
+                activeColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
