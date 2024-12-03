@@ -29,7 +29,7 @@ class _CreazioneTaskPageState
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _titoloController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   UtenteModel? selectedUtente;
   DateTime _dataOdierna = DateTime.now();
@@ -50,6 +50,7 @@ class _CreazioneTaskPageState
       DeviceOrientation.portraitDown,
     ]);
   }
+
 
   Future<void> _selezionaData() async {
     final DateTime? dataSelezionata = await showDatePicker(
@@ -119,168 +120,160 @@ class _CreazioneTaskPageState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('CREAZIONE TASK',
-            style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: Colors.red,
-      ),
-      body: LayoutBuilder(
-      builder: (context, constraints){
+    return WillPopScope(
+      onWillPop: () async {
+        // Ottieni la larghezza dello schermo
+        final size = MediaQuery.of(context).size;
+        const double thresholdWidth = 450.0;
 
-      return Padding(
-        padding: EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Center(
-            child:  Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
-                // Description Field
-                SizedBox(
-                  width: 450,
-                  child: TextFormField(
-                    controller: _titoloController,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      labelText: 'Titolo',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Description Field
-                SizedBox(
-                  width: 450,
-                  child: TextFormField(minLines: 4,
-                    controller: _descrizioneController,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      labelText: 'Descrizione',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: 400,
-                  child: DropdownButtonFormField<TipoTaskModel>(
-                    value: _selectedTipo,
-                    onChanged: (TipoTaskModel? newValue){
-                      setState(() {
-                        _selectedTipo = newValue;
-                      });
-                    },
-                    items: allTipi.map((TipoTaskModel tipo){
-                      return DropdownMenuItem<TipoTaskModel>(
-                        value: tipo,
-                        child: Text(tipo.descrizione!),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Seleziona tipologia'.toUpperCase()
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: 200,
-                  child: CheckboxListTile(
-                    title: Text('Condiviso'),
-                    value: _condiviso,
-                    onChanged: (value) {
-                      setState(() {
-                        _condiviso = value!;
-                        if (_condiviso) {
-                          _condivisoController.clear();
-                        }
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(height: 20),// Button
-                if (_condiviso) SizedBox(
-                  width: 450,
-                  child: DropdownButtonFormField<UtenteModel>(
-                    value: selectedUtente,
-                    onChanged: (UtenteModel? newValue){
-                      setState(() {
-                        selectedUtente = newValue;
-                      });
-                    },
-                    items: allUtenti.map((UtenteModel utente){
-                      return DropdownMenuItem<UtenteModel>(
-                        value: utente,
-                        child: Text(utente.nomeCompleto()!),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Seleziona tecnico'.toUpperCase()
-                    ),
-                  ),
-                ),
-                SizedBox(height: 40),
-                Platform.isWindows ? Center(
-                  child: ElevatedButton(
-                    onPressed: pickImagesFromGallery,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
-                    ),
-                    child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                  ),
-                ) : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: ElevatedButton(
-                      onPressed: takePicture,
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        onPrimary: Colors.white,
+        // Cambia l'orientamento in base alla larghezza
+        if (size.width < thresholdWidth) {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.landscapeRight,
+          ]);
+        } else {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+          ]);
+        }
+        // Consenti la navigazione indietro
+        return true;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            title: const Text('CREAZIONE TASK',
+                style: TextStyle(color: Colors.white)),
+            centerTitle: true,
+            backgroundColor: Colors.red,
+          ),
+          body: LayoutBuilder(
+              builder: (context, constraints){
+                return Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Center(
+                      child:  Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 20),
+                          // Description Field
+                          buildTFF(controller: _titoloController, label: "Titolo"),
+                          SizedBox(height: 20),
+                          buildTFF(controller: _descrizioneController, label: "Descrizione", maxLines: 10),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            width: 600,
+                            child: buildCustomDropdown(
+                                selectedValue: _selectedTipo,
+                                items: allTipi,
+                                label: "Tipologia",
+                                itemLabelBuilder: (tipo) => tipo.descrizione!,
+                                validator: (value){
+                                  if (value == null) {
+                                    return 'Selezionare una tipologia';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (TipoTaskModel? tipo){
+                                  setState(() {
+                                    _selectedTipo = tipo;
+                                  });
+                                }
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            width: 200,
+                            child: buildCustomCheckbox(
+                              value: _condiviso,
+                              label: 'Condiviso',
+                              onChanged: (value) {
+                                setState(() {
+                                  _condiviso = value!;
+                                  if (_condiviso) {
+                                    _condivisoController.clear();
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 20),// Button
+                          if (_condiviso) SizedBox(
+                            width: 600,
+                            child:  buildCustomDropdown(
+                                selectedValue: selectedUtente,
+                                items: allUtenti,
+                                label: "Utente condivisione",
+                                itemLabelBuilder: (utente) => utente.nomeCompleto()!,
+                                onChanged: (UtenteModel? utente){
+                                  setState(() {
+                                    selectedUtente = utente;
+                                  });
+                                }
+                            ),
+                          ),
+                          SizedBox(height: 40),
+                          Platform.isWindows ? Center(
+                            child: ElevatedButton(
+                              onPressed: pickImagesFromGallery,
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.red,
+                                onPrimary: Colors.white,
+                              ),
+                              child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                            ),
+                          ) : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: takePicture,
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                ),
+                              ),
+                              SizedBox(width: 16,),
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: pickImagesFromGallery,
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                ),
+                              ),
+                            ],),
+                          SizedBox(height: 10),
+                          _buildImagePreview(),
+                          SizedBox(height: 10),
+                        ],
                       ),
-                      child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                     ),
                   ),
-                  SizedBox(width: 16,),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: pickImagesFromGallery,
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                        onPrimary: Colors.white,
-                      ),
-                      child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                    ),
-                  ),
-                ],),
-                SizedBox(height: 10),
-                _buildImagePreview(),
-                SizedBox(height: 10),
-              ],
+                );
+              }
+          ), floatingActionButton: Padding(
+        padding: EdgeInsets.all(10.0),
+        child: ElevatedButton(
+          onPressed: _selectedTipo != null ? () {
+            saveTaskPlusPics();
+          } : null,
+          child: Text('SALVA'),
+          style: ElevatedButton.styleFrom(
+            primary: _selectedTipo != null ? Colors.red : Colors.grey, // Cambia colore quando disabilitato
+            onPrimary: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),
-      );
-      }
-      ), floatingActionButton: Padding(
-      padding: EdgeInsets.all(10.0),
-      child: ElevatedButton(
-        onPressed: _selectedTipo != null ? () {
-          saveTaskPlusPics();
-        } : null,
-        child: Text('SALVA'),
-        style: ElevatedButton.styleFrom(
-          primary: _selectedTipo != null ? Colors.red : Colors.grey, // Cambia colore quando disabilitato
-          onPrimary: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
-    ));
+      ))
+    );
   }
 
   Future<http.Response?> createTask() async {
@@ -292,7 +285,7 @@ class _CreazioneTaskPageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data_creazione': DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
@@ -328,11 +321,11 @@ class _CreazioneTaskPageState
       final task = TaskModel.fromJson(jsonDecode(data.body));
       try{
         for (var image in pickedImages) {
-          if (image.path != null && image.path.isNotEmpty) {
+          if (image.path.isNotEmpty) {
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/task/${int.parse(task.id!.toString())}'),
+              Uri.parse('$ipaddressProva/api/immagine/task/${int.parse(task.id!.toString())}'),
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -368,7 +361,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -408,7 +401,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -444,5 +437,149 @@ class _CreazioneTaskPageState
         },
       );
     }
+  }
+
+
+  Widget buildCustomDropdown<T>({
+    required T? selectedValue,
+    required List<T> items,
+    required String label,
+    required void Function(T?) onChanged,
+    String Function(T)? itemLabelBuilder,
+    String? Function(T?)? validator,
+  }) {
+    return SizedBox(
+      width: 400,
+      child: DropdownButtonFormField<T>(
+        value: selectedValue,
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<T>>((T item) {
+          return DropdownMenuItem<T>(
+            value: item,
+            child: Text(
+              itemLabelBuilder != null ? itemLabelBuilder(item) : item.toString(),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          );
+        }).toList(),
+        decoration: InputDecoration(
+          labelText: label.toUpperCase(),
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(
+              color: Colors.redAccent,
+              width: 2.0,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0,
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+        ),
+        validator: validator ??
+                (value) {
+              if (value == null) {
+                return 'Selezionare un valore';
+              }
+              return null;
+            },
+      ),
+    );
+  }
+
+  Widget buildTFF({
+    required TextEditingController controller,
+    required String label,
+    int maxLines = 1,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
+          width: constraints.maxWidth, // Occupa tutto lo spazio disponibile
+          child: TextFormField(
+            controller: controller,
+            maxLines: maxLines,
+            decoration: InputDecoration(
+              labelText: label.toUpperCase(),
+              alignLabelWithHint: true,
+              filled: true,
+              fillColor: Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.red, width: 2.0),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildCustomCheckbox({
+    required bool value,
+    required String label,
+    required void Function(bool?) onChanged,
+  }) {
+    return SizedBox(
+      width: 400, // Dimensione regolabile
+      child: InkWell(
+        onTap: () => onChanged(!value), // Gestione del toggle al clic
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: value ? Colors.redAccent : Colors.grey[300]!,
+              width: 1.5,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Checkbox(
+                value: value,
+                onChanged: onChanged,
+                activeColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

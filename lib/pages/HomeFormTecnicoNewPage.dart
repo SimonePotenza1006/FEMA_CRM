@@ -84,7 +84,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<void> saveIngresso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ingresso'),
+        Uri.parse('$ipaddressProva/api/ingresso'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'orario': formattedDate,
@@ -99,7 +99,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<void> getAllTasks() async {
     try {
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddress/api/task/utente/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/task/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<TaskModel> tasks = [];
@@ -140,7 +140,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -164,7 +164,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -184,10 +184,32 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     }
   }
 
+  Future<List<InterventoModel>> getMerceNoUser() async{
+    try{
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce'));
+      if(response.statusCode == 200){
+        var responseData = json.decode(response.body);
+        List<InterventoModel> interventi = [];
+        for(var interventoJson in responseData){
+          InterventoModel intervento = InterventoModel.fromJson(interventoJson);
+          if(intervento.utente == null){
+            interventi.add(intervento);
+          }
+        }
+        return interventi;
+      } else {
+        return [];
+      }
+    } catch(e){
+      print('Errore fetch merce 2: $e');
+      return[];
+    }
+}
+
   Future<List<InterventoModel>> getMerce(String userId) async{
     try{
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce/$userId'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -211,7 +233,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -225,7 +247,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
 
         //getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate);
         http.Response response2 = await http
-            .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+            .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
         if (response2.statusCode == 200) {
           var responseData2 = json.decode(response2.body);
           //print('rrdd2 '+responseData2.toString());
@@ -366,7 +388,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -390,7 +412,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Future<List<InterventoModel>> getAllInterventi() async {
     try {
       print('getAllInterventi chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -417,7 +439,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       if (intervento.utente != null && intervento.utente!.id == widget.userData!.id) {
         print('è interv ');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id?.toString(),
@@ -449,7 +471,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           'relazione_tecnico' : intervento.relazione_tecnico,
           'firma_cliente': intervento.firma_cliente,
           'utente_apertura' : intervento.utente_apertura?.toMap(),
-          'utente': intervento.utente?.toMap(),
+          'utente': intervento.utente != null ? intervento.utente?.toMap() : null,
           'cliente': intervento.cliente?.toMap(),
           'veicolo': intervento.veicolo?.toMap(),
           'merce': intervento.merce?.toMap(),
@@ -476,7 +498,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           print('è relaz ');
           RelazioneUtentiInterventiModel? relazioneiu = null;
           http.Response response2 = await http
-              .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/interventoutente/'+intervento.id.toString()+'/'+widget.userData!.id.toString()));
+              .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/interventoutente/'+intervento.id.toString()+'/'+widget.userData!.id.toString()));
           if (response2.statusCode == 200) {
             print('res st 200 ');
             var responseData2 = json.decode(response2.body);
@@ -493,12 +515,12 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
           }//else {return [];}
           print('res st 200 '+relazioneiu!.id.toString());
           final response = await http.post(
-            Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+            Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': relazioneiu!.id,
               'intervento': relazioneiu!.intervento?.toMap(),
-              'utente': relazioneiu!.utente?.toMap(),
+              'utente': relazioneiu.utente != null ? relazioneiu!.utente?.toMap() : null,
               'visualizzato': true
             }),
           );
@@ -780,108 +802,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           }
                         },
                       ),
-                      /*FutureBuilder<List<RelazioneUtentiInterventiModel>>(
-                        future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Errore: ${snapshot.error}'));
-                          } else if (snapshot.hasData) {
-                            List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
-                            relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce == null).toList();
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: relazioni.length,
-                              itemBuilder: (context, index) {
-                                RelazioneUtentiInterventiModel relazione = relazioni[index];
-                                Color getPriorityColor(Priorita priorita) {
-                                  switch (priorita) {
-                                    case Priorita.BASSA:
-                                      return Colors.lightGreen;
-                                    case Priorita.MEDIA:
-                                      return Colors.yellow; // grigio chiaro
-                                    case Priorita.ALTA:
-                                      return Colors.orange; // giallo chiaro
-                                    case Priorita.URGENTE:
-                                      return Colors.red; // azzurro chiaro
-                                    default:
-                                      return Colors.blueGrey[200]!;
-                                  }
-                                }
-
-                                // Determina il colore in base alla priorità
-                                Color backgroundColor =  getPriorityColor(relazione.intervento!.priorita!);
-
-                                TextStyle textStyle = relazione.intervento?.concluso ?? false
-                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
-                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
-                                /*TextStyle textStyle = relazione.intervento!.concluso ?? false
-                                    ? TextStyle(color: Colors.white, fontSize: 15)
-                                    : TextStyle(color: Colors.black, fontSize: 15);*/
-                                return Card(
-                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                child:
-                                ListTile(
-                                  contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                                  title: Text(
-                                    '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
-                                    style: textStyle,
-                                  ),
-                                  subtitle: Text(
-                                    '${relazione.intervento?.titolo}',
-                                    style: textStyle,
-                                  ),
-                                  trailing: Column(
-                                    children: [
-                                      if (relazione.intervento!.concluso ?? false)
-                                        Icon(Icons.check, color: Colors.black, size: 18), // Check icon
-                                      Text(
-                                        // Formatta la data secondo il tuo formato desiderato
-                                        relazione.intervento?.data!= null
-                                            ? '${relazione.intervento?.data!.day.toString().padLeft(2, '0')}/${relazione.intervento?.data!.month.toString().padLeft(2, '0')}/${relazione.intervento?.data!.year}'
-                                            : 'Nessun appuntamento stabilito',
-                                        style: TextStyle(fontSize: 13, color: Colors.black),
-                                      ),
-                                      Text(
-                                        relazione.intervento?.orario_appuntamento!= null
-                                            ? '${relazione.intervento?.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${relazione.intervento?.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                            : 'Nessun orario stabilito',
-                                        style: TextStyle(fontSize: 13, color: Colors.black),
-                                      ),
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData!,
-                                              intervento: relazione.intervento!,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                  tileColor: Colors.white60,
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(color: getPriorityColor(relazione.intervento!.priorita!), width: 8),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                )
-                                );
-
-
-                              },
-                            );
-                          } else {
-                            return Center(child: Text(''));
-                          }
-                        },
-                      ),*/
                       ]) : Wrap(children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1025,120 +945,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                         ),
 
                       ]),
-
-                      /*const SizedBox(height: 50.0),
-                      Center(
-                        child: Text(
-                          'Interventi di settore',
-                          style: TextStyle(
-                              fontSize: 30.0, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      FutureBuilder<List<InterventoModel>>(
-                        future: getAllInterventiBySettore(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Errore: ${snapshot.error}'));
-                          } else if (snapshot.hasData) {
-                            List<InterventoModel> interventi = snapshot.data!;
-                            interventi = interventi.where((intervento) => intervento.merce == null).toList();
-                            interventi = interventi.where((intervento) {
-                              return intervento.data == null || intervento.data!.isSameDay(selectedDate);
-                            }).toList();
-                            if (interventi.isEmpty) {
-                              return Center(child: Text(''));
-                            }
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: interventi.length,
-                              itemBuilder: (context, index) {
-                                InterventoModel intervento = interventi[index];
-                                // Metodo per mappare la priorità al colore corrispondente
-                                Color getPriorityColor(Priorita priorita) {
-                                  switch (priorita) {
-                                    case Priorita.BASSA:
-                                      return Colors.lightGreen;
-                                    case Priorita.MEDIA:
-                                      return Colors.yellow; // grigio chiaro
-                                    case Priorita.ALTA:
-                                      return Colors.orange; // giallo chiaro
-                                    case Priorita.URGENTE:
-                                      return Colors.red; // azzurro chiaro
-                                    default:
-                                      return Colors.blueGrey[200]!;
-                                  }
-                                }
-
-                                // Determina il colore in base alla priorità
-                                Color backgroundColor =  getPriorityColor(intervento.priorita!);
-
-                                TextStyle textStyle = intervento.concluso ?? false
-                                    ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
-                                    : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
-
-                                return Card(
-                                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                                  elevation: 4,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                                    title: Text(
-                                      '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
-                                      style: textStyle,
-                                    ),
-                                    subtitle: Text(
-                                      '${intervento.titolo}',
-                                      style: textStyle,
-                                    ),
-                                    trailing: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        // Condizione per visualizzare l'icona di check se l'intervento è concluso
-                                        if (intervento.concluso ?? false)
-                                          Icon(Icons.check, color: Colors.black, size: 18), // Check icon
-                                        Text(
-                                          intervento.data != null
-                                              ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
-                                              : 'Nessun appuntamento stabilito',
-                                          style: TextStyle(fontSize: 13, color: Colors.black),
-                                        ),
-                                        Text(
-                                          intervento.orario_appuntamento != null
-                                              ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                              : 'Nessun orario stabilito',
-                                          style: TextStyle(fontSize: 13, color: Colors.black),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => DettaglioInterventoByTecnicoPage(
-                                            utente: widget.userData!,
-                                            intervento: intervento,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    tileColor: Colors.white60,
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          } else {
-                            return Center(child: Text(''));
-                          }
-                        },
-                      ),*/
                       const SizedBox(height: 50.0),
                       Center(
                         child: Text(
@@ -1267,6 +1073,129 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                           }
                         },
                       ),
+                      if(widget.userData?.id == "9" || widget.userData?.id == "5")
+                        FutureBuilder<List<InterventoModel>>(
+                          future: getMerceNoUser(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List<InterventoModel> interventi = snapshot.data!;
+                              // interventi = interventi.where((intervento) {
+                              //   return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                              // }).toList();
+                              if (interventi.isEmpty) {
+                                return Center(child: Text(''));
+                              }
+
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: interventi.length,
+                                itemBuilder: (context, index) {
+                                  InterventoModel singolaMerce = interventi[index];
+
+                                  // Metodo per mappare la priorità al colore corrispondente
+                                  Color getPriorityColor(Priorita priorita) {
+                                    switch (priorita) {
+                                      case Priorita.BASSA:
+                                        return Colors.lightGreen;
+                                      case Priorita.MEDIA:
+                                        return Colors.yellow; // grigio chiaro
+                                      case Priorita.ALTA:
+                                        return Colors.orange; // giallo chiaro
+                                      case Priorita.URGENTE:
+                                        return Colors.red; // azzurro chiaro
+                                      default:
+                                        return Colors.blueGrey[200]!;
+                                    }
+                                  }
+
+                                  // Determina il colore in base alla priorità
+                                  Color backgroundColor =  getPriorityColor(singolaMerce.priorita!);
+
+                                  TextStyle textStyle = singolaMerce.concluso ?? false
+                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                  return Card(
+                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                                      title: Text(
+                                        '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                        style: textStyle,
+                                      ),
+                                      subtitle: Text(
+                                        '${singolaMerce.merce?.difetto_riscontrato ?? "Difetto non specificato"}',
+                                        style: textStyle,
+                                      ),
+                                      trailing: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text('Data arrivo merce:', style: TextStyle(fontSize: 13, color: Colors.black)),
+                                          SizedBox(height: 3),
+                                          Text(
+                                            singolaMerce.data_apertura_intervento != null
+                                                ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
+                                                : 'Data non disponibile',
+                                            style: TextStyle(fontSize: 13, color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        showDialog(
+                                          //barrierDismissible: false,
+                                          context: context,
+                                          builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                            title: new Text(''+singolaMerce.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                                            content: new Text('Cliente: '+singolaMerce.cliente!.denominazione!+' - '+singolaMerce!.destinazione!.indirizzo!+'\n'
+                                                +'\n'+singolaMerce.merce!.articolo!+' - '+singolaMerce.merce!.difetto_riscontrato!+'\n\nData: '+
+                                                (singolaMerce.data != null
+                                                    ? '${singolaMerce.data!.day.toString().padLeft(2, '0')}/${singolaMerce.data!.month.toString().padLeft(2, '0')}/${singolaMerce.data!.year}'
+                                                    : 'N.D.')+
+                                                '\nOrario appuntamento: '+ (singolaMerce.orario_appuntamento != null
+                                                ? '${singolaMerce.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${singolaMerce.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                                : 'N.D.'),
+                                                style: TextStyle(fontSize: 14)
+
+                                            ),
+                                            actions: <Widget>[
+                                              Form(
+                                                  child:
+                                                  Column(
+                                                      children: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            interventoVisualizzato(singolaMerce);},
+                                                          //Navigator.of(context).pop(true), // <-- SEE HERE
+                                                          child: new Text('PRESA VISIONE', style: TextStyle(
+                                                              fontSize: 22.0,
+                                                              fontWeight: FontWeight.w600),),
+                                                        ),
+                                                      ]))
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      tileColor: Colors.white60,
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(color: getPriorityColor(singolaMerce!.priorita!), width: 8),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(child: Text(''));
+                            }
+                          },
+                        ),
                       FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                         future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                         builder: (context, snapshot) {
@@ -1592,23 +1521,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 style: TextStyle(
                                     fontSize: 30.0, fontWeight: FontWeight.bold),
                               ),
-                              /*SizedBox(width: 15),
-                              IconButton(
-                                icon: Icon(Icons.calendar_today),
-                                onPressed: () async {
-                                  final DateTime? pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: selectedDate,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2100),
-                                  );
-                                  if (pickedDate != null && pickedDate != selectedDate) {
-                                    setState(() {
-                                      selectedDate = pickedDate;
-                                    });
-                                  }
-                                },
-                              ),*/
                             ],
                           ),
                         ),
@@ -1728,15 +1640,6 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                               ],
                                             ),
                                           );
-                                          /*Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => DettaglioInterventoByTecnicoPage(
-                                            utente: widget.userData!,
-                                            intervento: intervento,
-                                          ),
-                                        ),
-                                      );*/
                                         },
                                         tileColor: Colors.white60,
                                         shape: RoundedRectangleBorder(
@@ -1752,88 +1655,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               }
                             },
                           ),
-                    /*FutureBuilder<List<RelazioneUtentiInterventiModel>>(
-                          future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
-                              relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce == null).toList();
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: relazioni.length,
-                                itemBuilder: (context, index) {
-                                  RelazioneUtentiInterventiModel relazione = relazioni[index];
-                                  Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
-                                  TextStyle textStyle = relazione.intervento?.concluso ?? false
-                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
-                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
-                                  return
-                                    Card(
-                                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                      child:
-                                    ListTile(
-                                    title: Text(
-                                      '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
-                                      style: textStyle,
-                                    ),
-                                    subtitle: Text(
-                                      '${relazione.intervento?.titolo}',
-                                      style: textStyle,
-                                    ),
-                                    trailing: Column(
-                                      children: [
-                                        if (relazione.intervento?.concluso ?? false)
-                                          Icon(Icons.check, color: Colors.white, size: 15),
-                                        Text(
-                                          // Formatta la data secondo il tuo formato desiderato
-                                          relazione.intervento?.data!= null
-                                              ? '${relazione.intervento?.data!.day.toString().padLeft(2, '0')}/${relazione.intervento?.data!.month.toString().padLeft(2, '0')}/${relazione.intervento?.data!.year}'
-                                              : 'Nessun appuntamento stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.black),
-                                        ),
-                                        Text(
-                                          relazione.intervento?.orario_appuntamento!= null
-                                              ? '${relazione.intervento?.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${relazione.intervento?.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                              : 'Nessun orario stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.black),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              DettaglioInterventoByTecnicoPage(
-                                                utente: widget.userData!,
-                                                intervento: relazione.intervento!,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                    tileColor: backgroundColor,
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                  )
-                                    );
-                                },
-                              );
-                            } else {
-                              return Center(child: Text(''));
-                            }
-                          },
-                        ),*/
                         ]) : Wrap(children: <Widget>[
-
                           Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -1965,118 +1787,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               }
                             },
                           ),
-
                           ]),
-                        /*Center(
-                          child: Text(
-                            'Interventi di settore'.toUpperCase(),
-                            style: TextStyle(
-                                fontSize: 30.0, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(height: 20.0),
-                        FutureBuilder<List<InterventoModel>>(
-                          future: getAllInterventiBySettore(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<InterventoModel> interventi = snapshot.data!;
-                              interventi = interventi.where((intervento) => intervento.merce == null).toList();
-                              interventi = interventi.where((intervento) {
-                                return intervento.data == null || intervento.data!.isSameDay(selectedDate);
-                              }).toList();
-                              if (interventi.isEmpty) {
-                                return Center(child: Text(''));
-                              }
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: interventi.length,
-                                itemBuilder: (context, index) {
-                                  InterventoModel intervento = interventi[index];
-                                  // Metodo per mappare la priorità al colore corrispondente
-                                  Color getPriorityColor(Priorita priorita) {
-                                    switch (priorita) {
-                                      case Priorita.BASSA:
-                                        return Colors.lightGreen;
-                                      case Priorita.MEDIA:
-                                        return Colors.yellow; // grigio chiaro
-                                      case Priorita.ALTA:
-                                        return Colors.orange; // giallo chiaro
-                                      case Priorita.URGENTE:
-                                        return Colors.red; // azzurro chiaro
-                                      default:
-                                        return Colors.blueGrey[200]!;
-                                    }
-                                  }
-                                  Color backgroundColor =  getPriorityColor(intervento.priorita!);
-
-                                  TextStyle textStyle = intervento.concluso ?? false
-                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
-                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
-
-                                  return Card(
-                                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                                    elevation: 4,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                                      title: Text(
-                                        '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
-                                        style: textStyle,
-                                      ),
-                                      subtitle: Text(
-                                        '${intervento.titolo}',
-                                        style: textStyle,
-                                      ),
-                                      trailing: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          // Condizione per visualizzare l'icona di check se l'intervento è concluso
-                                          if (intervento.concluso ?? false)
-                                            Icon(Icons.check, color: Colors.white, size: 15), // Check icon
-                                          Text(
-                                            intervento.data != null
-                                                ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
-                                                : 'Nessun appuntamento stabilito',
-                                            style: TextStyle(fontSize: 10, color: Colors.black),
-                                          ),
-                                          Text(
-                                            intervento.orario_appuntamento != null
-                                                ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                                : 'Nessun orario stabilito',
-                                            style: TextStyle(fontSize: 10, color: Colors.black),
-                                          ),
-                                        ],
-                                      ),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => DettaglioInterventoByTecnicoPage(
-                                              utente: widget.userData!,
-                                              intervento: intervento,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      tileColor: backgroundColor,
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            } else {
-                              return Center(child: Text(''));
-                            }
-                          },
-                        ),*/
                         const SizedBox(height: 50.0),
                         Center(
                           child: Text(
@@ -2205,6 +1916,130 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                             }
                           },
                         ),
+                        if(widget.userData?.id == "9" || widget.userData?.id == "5")
+                          FutureBuilder<List<InterventoModel>>(
+                            future: getMerceNoUser(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Errore: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                List<InterventoModel> interventi = snapshot.data!;
+                                //interventi = interventi.where((intervento) => intervento.merce != null && intervento.utente == null).toList();
+                                // interventi = interventi.where((intervento) {
+                                //   return intervento.data == null || intervento.data!.isSameDay(selectedDate);
+                                // }).toList();
+                                if (interventi.isEmpty) {
+                                  return Center(child: Text(''));
+                                }
+
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: interventi.length,
+                                  itemBuilder: (context, index) {
+                                    InterventoModel singolaMerce = interventi[index];
+
+                                    // Metodo per mappare la priorità al colore corrispondente
+                                    Color getPriorityColor(Priorita priorita) {
+                                      switch (priorita) {
+                                        case Priorita.BASSA:
+                                          return Colors.lightGreen;
+                                        case Priorita.MEDIA:
+                                          return Colors.yellow; // grigio chiaro
+                                        case Priorita.ALTA:
+                                          return Colors.orange; // giallo chiaro
+                                        case Priorita.URGENTE:
+                                          return Colors.red; // azzurro chiaro
+                                        default:
+                                          return Colors.blueGrey[200]!;
+                                      }
+                                    }
+
+                                    // Determina il colore in base alla priorità
+                                    Color backgroundColor =  getPriorityColor(singolaMerce.priorita!);
+
+                                    TextStyle textStyle = singolaMerce.concluso ?? false
+                                        ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                        : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                    return Card(
+                                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                                        title: Text(
+                                          '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                          style: textStyle,
+                                        ),
+                                        subtitle: Text(
+                                          '${singolaMerce.merce?.difetto_riscontrato ?? "Difetto non specificato"}',
+                                          style: textStyle,
+                                        ),
+                                        trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text('Data arrivo merce:', style: TextStyle(fontSize: 13, color: Colors.black)),
+                                            SizedBox(height: 3),
+                                            Text(
+                                              singolaMerce.data_apertura_intervento != null
+                                                  ? DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!)
+                                                  : 'Data non disponibile',
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          showDialog(
+                                            //barrierDismissible: false,
+                                            context: context,
+                                            builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                              title: new Text(''+singolaMerce.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                                              content: new Text('Cliente: '+singolaMerce.cliente!.denominazione!+' - '+singolaMerce!.destinazione!.indirizzo!+'\n'
+                                                  +'\n'+singolaMerce.merce!.articolo!+' - '+singolaMerce.merce!.difetto_riscontrato!+'\n\nData: '+
+                                                  (singolaMerce.data != null
+                                                      ? '${singolaMerce.data!.day.toString().padLeft(2, '0')}/${singolaMerce.data!.month.toString().padLeft(2, '0')}/${singolaMerce.data!.year}'
+                                                      : 'N.D.')+
+                                                  '\nOrario appuntamento: '+ (singolaMerce.orario_appuntamento != null
+                                                  ? '${singolaMerce.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${singolaMerce.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                                  : 'N.D.'),
+                                                  style: TextStyle(fontSize: 14)
+
+                                              ),
+                                              actions: <Widget>[
+                                                Form(
+                                                    child:
+                                                    Column(
+                                                        children: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              interventoVisualizzato(singolaMerce);},
+                                                            //Navigator.of(context).pop(true), // <-- SEE HERE
+                                                            child: new Text('PRESA VISIONE', style: TextStyle(
+                                                                fontSize: 22.0,
+                                                                fontWeight: FontWeight.w600),),
+                                                          ),
+                                                        ]))
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                        tileColor: Colors.white60,
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(color: getPriorityColor(singolaMerce!.priorita!), width: 8),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else {
+                                return Center(child: Text(''));
+                              }
+                            },
+                          ),
                         FutureBuilder<List<RelazioneUtentiInterventiModel>>(
                           future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
                           builder: (context, snapshot) {

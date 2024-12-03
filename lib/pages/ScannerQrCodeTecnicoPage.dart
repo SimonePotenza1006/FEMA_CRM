@@ -184,7 +184,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     print(codiceDanea);
 
     // Effettua la chiamata API con un timeout di 10 secondi
-    String apiUrl = '$ipaddress/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
+    String apiUrl = '$ipaddressProva/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
     final response =
     await http.get(Uri.parse(apiUrl)).timeout(Duration(seconds: 10));
 
@@ -227,7 +227,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       debugPrint('Body della richiesta: $body', wrapWidth: 1024);
 
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ddt'),
+        Uri.parse('$ipaddressProva/api/ddt'),
         body: jsonEncode(body),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
