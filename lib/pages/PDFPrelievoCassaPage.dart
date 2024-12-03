@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:path_provider/path_provider.dart';
@@ -54,7 +55,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllPrelievi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -254,6 +255,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
 
   Future<Uint8List> _generatePDF() async {
+    final logoImage = pw.MemoryImage(
+        (await rootBundle.load('assets/images/logo.png'))
+            .buffer
+            .asUint8List(),
+    );
     try {
       final pdf = pw.Document();
       pdf.addPage(
@@ -265,6 +271,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.center,
+                    children: [
+                      pw.Center(
+                        child: pw.Image(logoImage, height: 40)
+                      )
+                    ]
+                  ),
                   pw.SizedBox(height: 20),
                   pw.Text(
                     "Documento relativo alla movimentazione in ${widget.tipoMovimentazione.toString().substring(19)} in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}",
@@ -272,7 +286,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   ),
                   pw.SizedBox(height: 20),
                   pw.Text(
-                    "Si attesta che, in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, l'utente ${widget.utente?.cognome} ${widget.utente?.nome} ha effettuato un movimento di ${widget.tipoMovimentazione.toString().substring(19)} dal fondocassa aziendale un importo pari a ${widget.importo}. Tale movimentazione è dovuta a: \' ${widget.descrizione} \' ",
+                    "Si attesta che, in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, l'utente ${widget.utente?.cognome} ${widget.utente?.nome} ha effettuato un movimento di ${widget.tipoMovimentazione.toString().substring(19)} dal fondocassa aziendale un importo pari a ${widget.importo}${String.fromCharCode(128)}. Tale movimentazione è dovuta a: \' ${widget.descrizione} \' ",
                   ),
                   pw.SizedBox(height: 60),
                   pw.Row(
@@ -282,13 +296,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         children: [
                           pw.Text("Firma incaricato a ritiro"),
                           pw.SizedBox(height: 20),
-                          pw.SizedBox(
+                          widget.firmaIncaricato != null
+                              ? pw.SizedBox(
                             height: 100,
                             width: 130,
                             child: pw.Image(
                               pw.MemoryImage(widget.firmaIncaricato!),
                             ),
-                          ),
+                          )
+                              : pw.SizedBox.shrink(),
                         ],
                       ),
                     ],

@@ -17,6 +17,7 @@ import 'CreazioneInterventoByAmministrazionePage.dart';
 import 'DettaglioTicketPage.dart';
 import 'ListaClientiPage.dart';
 import 'DettaglioInterventoPage.dart';
+import 'CreazioneTicketTecnicoPage.dart';
 
 class TableTicketPage extends StatefulWidget{
   final UtenteModel utente;
@@ -40,14 +41,14 @@ class _TableTicketPageState extends State<TableTicketPage>{
     'descrizione' : 370,
     'utente' : 230,
     'convertito' : 140,
-    'tipologia' : 200,
+    //'tipologia' : 200,
   };
   bool isLoading = true;
   int _currentSheet = 0;
 
   Future<void> getAllTickets() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/ticket');
+      var apiUrl = Uri.parse('$ipaddress/api/ticket');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -93,6 +94,17 @@ class _TableTicketPageState extends State<TableTicketPage>{
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreazioneTicketTecnicoPage(utente: widget.utente,)));
+            },
+          ),
           IconButton(
             icon: Icon(
               Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -351,7 +363,7 @@ class TicketDataSource extends DataGridSource{
     for (int i = 0; i < _filteredTickets.length; i++) {
       TicketModel ticket = _filteredTickets[i];
       String? stato = ticket.convertito == true ? "SI" : "NO";
-      String? tipologia = ticket.tipologia?.descrizione.toString();
+      //String? tipologia = ticket.tipologia?.descrizione.toString();
       rows.add(DataGridRow(
         cells: [
           DataGridCell<TicketModel>(columnName: 'ticket', value: ticket),

@@ -218,7 +218,6 @@ class InterventoModel {
     'gruppo' : gruppo?.toJson()
   };
 
-
   factory InterventoModel.fromJson(Map<String, dynamic> json) {
     return InterventoModel(
       json['id']?.toString(),

@@ -240,7 +240,54 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                         DataCell(Text(DateFormat('yyyy-MM-dd HH:mm').format(movimento.dataCreazione!))),
                         DataCell(Text(DateFormat('yyyy-MM-dd').format(movimento.data!))),
                         DataCell(Text(movimento.descrizione ?? '')),
-                        DataCell(Text(_getTipoMovimentazioneString(movimento.tipo_movimentazione))),
+                        DataCell(
+                          movimento.tipo_movimentazione == TipoMovimentazione.Prelievo
+                              ? GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PDFPrelievoCassaPage(
+                                    descrizione: movimento.descrizione ?? '',
+                                    data: movimento.dataCreazione,
+                                    utente: movimento.utente,
+                                    tipoMovimentazione: TipoMovimentazione.Prelievo,
+                                    importo: movimento.importo?.toString() ?? '',
+                                    firmaIncaricato: null, // Passa la firma come Uint8List
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 1.0), // Aggiunge spazio tra testo e underline
+                                  child: Text(
+                                    'Prelievo',
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0, // Posiziona la linea esattamente sotto il testo
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    height: 1, // Altezza della linea di sottolineatura
+                                    color: Colors.blue, // Colore della linea di sottolineatura
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                              : Text(
+                            _getTipoMovimentazioneString(movimento.tipo_movimentazione),
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
                         DataCell(Text(movimento.importo != null ? movimento.importo!.toStringAsFixed(2) + '€' : '')),
                         DataCell(Text(movimento.cliente != null ? movimento.cliente!.denominazione! : '///')),
                         DataCell(
@@ -366,7 +413,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> deletePics(MovimentiModel movimento) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
+        Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
         headers: {'Content-Type': 'application/json'},
       );
       if(response.statusCode == 204){
@@ -383,7 +430,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> deleteMovimentazione(MovimentiModel movimento) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddressProva/api/movimenti/${movimento.id}'),
+        Uri.parse('$ipaddress/api/movimenti/${movimento.id}'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 204) {
@@ -568,7 +615,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   Future<void> getAllMovimentazioniExcel() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -604,7 +651,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   Future<void> getAllMovimentazioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti/ordered');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -852,7 +899,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                                 data: DateTime.now(),
                                 utente: widget.userData,
                                 tipoMovimentazione: TipoMovimentazione.Prelievo,
-                                importo: _prelievoController.text,
+                                importo: cleanedInput,
                                 firmaIncaricato: firmaIncaricato, // Passa la firma come Uint8List
                               ),
                             ),
@@ -952,7 +999,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     );
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -978,7 +1025,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> saveFondocassaAfterChiusura() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -1002,7 +1049,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addUscita() async{
     try{
        final response = await http.post(
-         Uri.parse('$ipaddressProva/api/movimenti'),
+         Uri.parse('$ipaddress/api/movimenti'),
          headers: {'Content-Type': 'application/json'},
          body: jsonEncode({
            'data': DateTime.now().toIso8601String(),
@@ -1040,7 +1087,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addPrelievo(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
@@ -1077,7 +1124,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addVersamento(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),

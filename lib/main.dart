@@ -206,7 +206,8 @@ class _LoginFormState extends State<LoginForm> {
       return (await showDialog(
           barrierDismissible: false,
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) =>
+              AlertDialog(
               title: new Text('Errore di rete', style: TextStyle(fontWeight: FontWeight.w600),),
               content: new Text("Siamo spiacenti ma al momento non è possibile utilizzare l\'applicazione in quanto sono presenti dei problemi di rete. "
                   "Riprova più tardi"),
@@ -225,7 +226,11 @@ class _LoginFormState extends State<LoginForm> {
     return (await showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) =>
+          WillPopScope(onWillPop: () async {
+            return false;
+          }, child:
+          AlertDialog(
         title: new Text('Numero di licenza', style: TextStyle(fontWeight: FontWeight.w600),),
         content: new Text('Dispositivo $idd non ancora registrato: Inserisci il numero di licenza per utilizzare l\'applicazione Fema'),
         actions: <Widget>[
@@ -305,7 +310,7 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                   ]))
         ],
-      ),
+      )),
     ));} //?? false;
   }
 
@@ -330,7 +335,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddressProva/api/utente/ulogin'),
+          Uri.parse('$ipaddress/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -579,7 +584,7 @@ class _LoginFormState extends State<LoginForm> {
                             ),
                             autofillHints: [AutofillHints.password],
                           ),
-                          SizedBox(height: 40),
+                          SizedBox(height: 30),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               primary: Colors.red,
@@ -593,10 +598,13 @@ class _LoginFormState extends State<LoginForm> {
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ),
-                          SizedBox(height: 30),
-                          Row(mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text('REL. 26.11.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),
+                          SizedBox(height: 25),
+                          Spacer(),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Text('REL. 02.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
+                          )
+
                         ],
                       ),
                     ),
