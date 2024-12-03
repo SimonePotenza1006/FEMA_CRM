@@ -18,7 +18,6 @@ import 'ModificaTaskPage.dart';
 class TableTaskPage extends StatefulWidget{
   final UtenteModel utente;
   const TableTaskPage({Key? key, required this.utente}) : super(key: key);
-  //TableTaskPage({Key? key}) : super(key : key);
 
   @override
   _TableTaskPageState createState() => _TableTaskPageState();
@@ -42,10 +41,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   @override
   void dispose() {
-    // Ripristina l'orientamento quando si esce
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
-      //DeviceOrientation.portraitDown,
     ]);
     super.dispose();
   }
@@ -54,7 +51,6 @@ class _TableTaskPageState extends State<TableTaskPage>{
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final size = MediaQuery.of(context).size;
       const double thresholdWidth = 450.0;
-
       if (size.width < thresholdWidth) {
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.landscapeRight,
@@ -1334,6 +1330,10 @@ class TaskDataSource extends DataGridSource{
       } else {
         return GestureDetector(
             onTap: () {
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.portraitUp,
+                DeviceOrientation.portraitDown,
+              ]);
               Navigator.push(
                 context,
                 MaterialPageRoute(

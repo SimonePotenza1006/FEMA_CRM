@@ -17,7 +17,7 @@ class TicketModel {
   bool? convertito;
   // ClienteModel? cliente;
   // DestinazioneModel? destinazione;
-  TipologiaInterventoModel? tipologia;
+  //TipologiaInterventoModel? tipologia;
   UtenteModel? utente;
 
   TicketModel(
@@ -32,7 +32,7 @@ class TicketModel {
       this.convertito,
       // this.cliente,
       // this.destinazione,
-      this.tipologia,
+      //this.tipologia,
       this.utente
       );
 
@@ -49,7 +49,7 @@ class TicketModel {
       'convertito' : convertito,
       // 'cliente' : cliente?.toMap(),
       // 'destinazione' : destinazione?.toMap(),
-      'tipologia' : tipologia?.toMap(),
+      //'tipologia' : tipologia?.toMap(),
       'utente' : utente?.toMap()
     };
     return map;
@@ -68,7 +68,7 @@ class TicketModel {
     convertito = map['convertito'];
     // cliente = map['cliente'] != null ? ClienteModel.fromMap(map['cliente']) : null;
     // destinazione = map['destinazione'] != null ? DestinazioneModel.fromMap(map['destinazione']) : null;
-    tipologia = map['tipologia'] != null ? TipologiaInterventoModel.fromMap(map['tipologia']) : null;
+    //tipologia = map['tipologia'] != null ? TipologiaInterventoModel.fromMap(map['tipologia']) : null;
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
   }
 
@@ -84,7 +84,7 @@ class TicketModel {
     'convertito' : convertito,
     // 'cliente' : cliente?.toMap(),
     // 'destinazione' : destinazione?.toMap(),
-    'tipologia' : tipologia?.toMap(),
+    //'tipologia' : tipologia?.toMap(),
     'utente' : utente?.toMap()
   };
 
@@ -101,7 +101,7 @@ class TicketModel {
       json['convertito'],
       // json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
       // json['destinazione'] != null ? DestinazioneModel.fromJson(json['destinazione']) : null,
-      json['tipologia'] != null ? TipologiaInterventoModel.fromJson(json['tipologia']) : null,
+      //json['tipologia'] != null ? TipologiaInterventoModel.fromJson(json['tipologia']) : null,
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
     );
   }

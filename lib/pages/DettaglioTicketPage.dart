@@ -151,9 +151,9 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     getAllUtenti();
     getAllTipiTask();
     _futureImages = fetchImages();
-    _descrizioneController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione!.toString() : null)!;
-    _notaController.text = (widget.ticket.note != null ? widget.ticket.note! : null)!;
-    _descrizioneTaskController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione! : null)!;
+    _descrizioneController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione!.toString() : '');
+    _notaController.text = (widget.ticket.note != null ? widget.ticket.note! : '');
+    _descrizioneTaskController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione! : '');
   }
 
   Future<List<Uint8List>> fetchImages() async {
@@ -331,7 +331,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 buildInfoRow(title: "Id", value: widget.ticket.id!),
-                buildInfoRow(title: "Tipologia", value: widget.ticket.tipologia?.descrizione ?? "N/A"),
+                //buildInfoRow(title: "Tipologia", value: widget.ticket.tipologia?.descrizione ?? "N/A"),
                 buildInfoRow(title: "Utente", value: widget.ticket.utente?.nomeCompleto() ?? "N/A"),
                 buildInfoRow(title: "Data creazione", value: DateFormat('dd/MM/yyyy HH:mm').format(widget.ticket.data_creazione!)),
                 buildInfoRow(title: "Descrizione", value: widget.ticket.descrizione ?? "N/A", showCopyIcon : true, context: context),
@@ -1250,7 +1250,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
           'descrizione': widget.ticket.descrizione,
           'note': widget.ticket.note,
           'convertito': true,
-          'tipologia': widget.ticket.tipologia?.toMap(),
+          //'tipologia': widget.ticket.tipologia?.toMap(),
           'utente': widget.ticket.utente?.toMap(),
         }),
       );
@@ -1328,7 +1328,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
           'descrizione': widget.ticket.descrizione,
           'note': widget.ticket.note,
           'convertito': true,
-          'tipologia': widget.ticket.tipologia?.toMap(),
+          //'tipologia': widget.ticket.tipologia?.toMap(),
           'utente': widget.ticket.utente?.toMap(),
         }),
       );
