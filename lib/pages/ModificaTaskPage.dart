@@ -242,72 +242,164 @@ class _ModificaTaskPageState
                     padding: EdgeInsets.all(20.0),
                     child: Center(
                       child:  Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /*SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                  onPressed: _selezionaData,
-                  style: ElevatedButton.styleFrom(primary: Colors.red),
-                  child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              if(selectedDate != null)
-                Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
-              const SizedBox(height: 20.0),*/
                           SizedBox(height: 20),
                           // Description Field
                           SizedBox(
-                            width: 450,
+                            width: 600,
                             child: TextFormField(
                               controller: _titoloController,
                               maxLines: null,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
                               decoration: InputDecoration(
-                                labelText: 'Titolo',
-                                border: OutlineInputBorder(),
+                                labelText: 'Titolo'.toUpperCase(),
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none, // Rimuove il bordo standard
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                hintText: "Inserisci il titolo",
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
                             ),
                           ),
                           SizedBox(height: 20),
                           // Description Field
                           SizedBox(
-                            width: 450,
-                            child: TextFormField(minLines: 4,
+                            width: 600,
+                            child: TextFormField(
                               controller: _descrizioneController,
-                              maxLines: null,
+                              maxLines: 5,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
                               decoration: InputDecoration(
-                                labelText: 'Descrizione',
-                                border: OutlineInputBorder(),
+                                labelText: 'Descrizione'.toUpperCase(),
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                hintText: "Inserisci la descrizione",
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
                             ),
                           ),
                           SizedBox(height: 20),
                           SizedBox(
-                            width: 400,
+                            width: 600,
                             child: DropdownButtonFormField<TipoTaskModel>(
                               value: _selectedTipo,
-                              onChanged: (TipoTaskModel? newValue){
+                              onChanged: (TipoTaskModel? newValue) {
                                 setState(() {
                                   _selectedTipo = newValue;
                                 });
                               },
-                              items: allTipi.map((TipoTaskModel tipo){
+                              items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
                                 return DropdownMenuItem<TipoTaskModel>(
-                                  value: tipo,
-                                  child: Text(tipo.descrizione!),
+                                  value: tipologia,
+                                  child: Text(
+                                    tipologia.descrizione!, // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
+                                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                                  ),
                                 );
                               }).toList(),
                               decoration: InputDecoration(
-                                  labelText: 'Seleziona tipologia'.toUpperCase()
+                                labelText: 'TIPOLOGIA',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Selezionare una tipologia di intervento';
+                                }
+                                return null;
+                              },
                             ),
                           ),
                           SizedBox(height: 20),
                           (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
                             width: 200,
-                            child: CheckboxListTile(
-                              title: Text('Condiviso'),
+                            child: buildCustomCheckbox(
                               value: _condiviso,
+                              label: 'Condiviso',
                               onChanged: (value) {
                                 setState(() {
                                   _condiviso = value!;
@@ -356,9 +448,9 @@ class _ModificaTaskPageState
                           ) : Container(),
                           SizedBox(
                             width: 200,
-                            child: CheckboxListTile(
-                              title: Text('Concluso'),
+                            child: buildCustomCheckbox(
                               value: _concluso,
+                              label: 'Condiviso',
                               onChanged: (value) {
                                 setState(() {
                                   _concluso = value!;
@@ -369,6 +461,7 @@ class _ModificaTaskPageState
                               },
                             ),
                           ),
+                          SizedBox(height: 10),
                           FutureBuilder<List<Uint8List>>(
                             future: _futureImages,
                             builder: (context, snapshot) {
@@ -413,7 +506,7 @@ class _ModificaTaskPageState
                             },
                           ),
                           SizedBox(height: 40),
-                          Platform.isWindows ? Center(
+                          Platform.isWindows ? SizedBox(
                             child: ElevatedButton(
                               onPressed: pickImagesFromGallery,
                               style: ElevatedButton.styleFrom(
@@ -423,7 +516,7 @@ class _ModificaTaskPageState
                               child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                             ),
                           ) : Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Center(
                                 child: ElevatedButton(
@@ -549,4 +642,50 @@ class _ModificaTaskPageState
       );
     }
   }
+
+  Widget buildCustomCheckbox({
+    required bool value,
+    required String label,
+    required void Function(bool?) onChanged,
+  }) {
+    return SizedBox(
+      width: 400, // Dimensione regolabile
+      child: InkWell(
+        onTap: () => onChanged(!value), // Gestione del toggle al clic
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: value ? Colors.redAccent : Colors.grey[300]!,
+              width: 1.5,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Checkbox(
+                value: value,
+                onChanged: onChanged,
+                activeColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }

@@ -2530,7 +2530,22 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           if(intervento.merce != null)
             buildInfoRow(title: 'Data conclusione', value: intervento.merce?.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_conclusione!) : 'N/A'),
           if(intervento.merce != null)
-            buildInfoRow(title: 'Data consegna', value: intervento.merce?.data_consegna != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_consegna!) : "N/A"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                buildInfoRow(
+                    title: 'Data consegna',
+                    value: formatDate(widget.intervento.merce?.data_consegna),
+                    context: context
+                ),
+                IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed:(){
+                      _selectDate3(context);
+                    }
+                )
+              ],
+            ),
         ],
       ),
     );
@@ -3614,6 +3629,22 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     if (picked != null && picked != selectedDate) {
       setState(() {
         widget.intervento.data_apertura_intervento = picked;
+        selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _selectDate3(BuildContext context) async {
+    DateTime selectedDate = DateTime.now();
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        widget.intervento.merce?.data_consegna = picked;
         selectedDate = picked;
       });
     }
