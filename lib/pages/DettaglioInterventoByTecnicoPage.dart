@@ -17,12 +17,15 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import '../model/InterventoModel.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'AggiuntaFotoPage.dart';
 import 'AggiuntaManualeProdottiDDTPage.dart';
 import 'AggiuntaNotaByTecnicoPage.dart';
+import 'AggiuntaPdfTecnicoPage.dart';
+import 'CertificazioniPage.dart';
 import 'CompilazionePreventivoMerceInRiparazionePage.dart';
 import 'InizioInterventoPage.dart';
 import 'ModificaRelazioneRapportinoPage.dart';
@@ -513,6 +516,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                   ),
                 ),
+                SpeedDialChild(
+                  child: Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Carica pdf'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AggiuntaPdfTecnicoPage(intervento: widget.intervento),
+                    ),
+                  ),
+                ),
                 // SpeedDialChild(
                 //   child: Icon(Icons.camera_alt_outlined, color: Colors.white),
                 //   backgroundColor: Colors.red,
@@ -836,6 +850,44 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     )),
                   ],
                 ),
+              Text(
+                'Allegati:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Container(
+                width: 400,
+                height: 150,
+                child: FutureBuilder<List<String>>(
+                  future: fetchPdfFiles(), // Chiama la funzione per recuperare i file
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Errore: ${snapshot.error}'));
+                    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                      return Center(child: Text('Nessun file PDF trovato.'));
+                    } else if (snapshot.hasData) {
+                      final pdfFiles = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: pdfFiles.length,
+                        itemBuilder: (context, index) {
+                          final fileName = pdfFiles[index]; // Nome del file PDF
+                          return ListTile(
+                            leading: Icon(Icons.picture_as_pdf, color: Colors.red), // Icona accanto al nome
+                            title: Text(fileName),
+                            onTap: () async {
+                              // Chiama la funzione per aprire il file
+                              await _openPdfFile(context, widget.intervento.id!, fileName);
+                            },
+                          );
+                        },
+                      );
+                    } else {
+                      return Center(child: Text('Nessun risultato.'));
+                    }
+                  },
+                ),
+              ),
               SizedBox(height: 25),
               if (widget.intervento.orario_inizio == null) ElevatedButton(
                 onPressed: () {
@@ -899,9 +951,44 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  Future<void> _openPdfFile(BuildContext context, String interventoId, String fileName) async {
+    // Costruisci l'URL dell'endpoint
+    final pdfUrl = '$ipaddressProva/pdfu/intervento/$interventoId/$fileName';
+    print('PDF URL: $pdfUrl'); // Debug
+
+    try {
+      final response = await http.get(Uri.parse(pdfUrl));
+
+      if (response.statusCode == 200) {
+        print('Download del PDF riuscito');
+        final dir = await getTemporaryDirectory();
+        final fileToSave = File('${dir.path}/$fileName');
+        await fileToSave.writeAsBytes(response.bodyBytes);
+
+        // Naviga alla schermata del visualizzatore PDF
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PDFViewer(filePath: fileToSave.path),
+          ),
+        );
+      } else {
+        print('Errore durante il download del PDF: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore durante il download del PDF: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      print('Errore durante il download: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore durante il download: $e')),
+      );
+    }
+  }
+
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
-    bool isValueTooLong = value.length > 15;
-    String displayedValue = isValueTooLong ? value.substring(0, 10) + "..." : value;
+    bool isValueTooLong = value.length > 13;
+    String displayedValue = isValueTooLong ? value.substring(0, 8) + "..." : value;
     return SizedBox(
       width: 450,
       child: Padding(
