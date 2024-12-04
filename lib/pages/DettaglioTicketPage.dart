@@ -35,7 +35,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -82,7 +82,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         // Converte Uint8List in MultipartFile
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddress/api/immagine/$interventoId'),
+          Uri.parse('$ipaddressProva/api/immagine/$interventoId'),
         );
 
         request.files.add(http.MultipartFile.fromBytes(
@@ -239,7 +239,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     try {
       // Passaggio 1: Converti il ticket in intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'attivo': true,
@@ -272,7 +272,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
       }
       // Passaggio 4: Aggiorna lo stato del ticket
       final response2 = await http.post(
-        Uri.parse('$ipaddress/api/ticket'),
+        Uri.parse('$ipaddressProva/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': ticket.id,

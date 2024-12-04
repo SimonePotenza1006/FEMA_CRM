@@ -403,8 +403,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   height: 50, // adjust the height as needed
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
+                      foregroundColor: Colors.white, backgroundColor: Colors.red,
                     ),
                     onPressed: () {
                       updateVeicolo();
@@ -424,7 +423,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/veicolo'),
+        Uri.parse('$ipaddressProva/api/veicolo'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
           'id' : widget.veicolo.id,

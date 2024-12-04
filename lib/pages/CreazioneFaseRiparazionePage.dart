@@ -60,7 +60,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 }
                     : null, // Se il testo è vuoto, disabilita il pulsante
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
+                  backgroundColor: Colors.red,
                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Set padding
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8), // Set border radius
@@ -83,7 +83,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/fasi'),
+        Uri.parse('$ipaddressProva/api/fasi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,

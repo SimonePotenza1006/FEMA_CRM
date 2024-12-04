@@ -13,6 +13,10 @@ pluginManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            // r8 maven
+            url = uri("https://storage.googleapis.com/r8-releases/raw")
+        }
         gradlePluginPortal()
     }
 
@@ -22,8 +26,9 @@ pluginManagement {
 }
 
 plugins {
+    id "com.android.application" version "7.4.2" apply false
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    id "com.android.application" version "7.3.0" apply false
+
 }
 
 include ":app"

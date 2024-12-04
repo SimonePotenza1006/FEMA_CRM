@@ -92,8 +92,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               ElevatedButton(
                 onPressed: updateDestinazione,
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red, // Colore di sfondo rosso
-                  onPrimary: Colors.white, // Colore del testo bianco
+                  foregroundColor: Colors.white, backgroundColor: Colors.red, // Colore del testo bianco
                 ),
                 child: const Text('Salva Modifiche'),
               )
@@ -126,7 +125,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try {
       print('${widget.destinazione.toJson()}');
-      response = await http.post(Uri.parse('$ipaddress/api/destinazione'),
+      response = await http.post(Uri.parse('$ipaddressProva/api/destinazione'),
           headers: {
             "Content-Type": "application/json"
           },

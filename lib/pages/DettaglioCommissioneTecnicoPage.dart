@@ -71,7 +71,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             concludiCommissione();
           },
           style: ElevatedButton.styleFrom(
-            primary: Colors.red, // Colore di sfondo rosso
+            backgroundColor: Colors.red, // Colore di sfondo rosso
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0), // Bordi arrotondati
             ),
@@ -92,7 +92,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> concludiCommissione() async {
-    final url = Uri.parse('$ipaddress/api/commissione');
+    final url = Uri.parse('$ipaddressProva/api/commissione');
     final body = jsonEncode({
       'id': widget.commissione.id,
       'data_creazione': widget.commissione.data_creazione?.toIso8601String(),

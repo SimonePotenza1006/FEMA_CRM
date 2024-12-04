@@ -64,7 +64,7 @@ class _AssegnazioneCommissionePageState
                 width: 200,
                 child: ElevatedButton(
                   onPressed: _selezionaData,
-                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -133,8 +133,7 @@ class _AssegnazioneCommissionePageState
           },
           child: Text('Assegna'),
           style: ElevatedButton.styleFrom(
-            primary: Colors.red,
-            onPrimary: Colors.white,
+            foregroundColor: Colors.white, backgroundColor: Colors.red,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -151,7 +150,7 @@ class _AssegnazioneCommissionePageState
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/commissione'),
+        Uri.parse('$ipaddressProva/api/commissione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': data, // Utilizza la data formattata
@@ -175,7 +174,7 @@ class _AssegnazioneCommissionePageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

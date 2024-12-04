@@ -76,8 +76,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             compilaPreventivo();
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.red, // Set the background color to red
-                            onPrimary: Colors.white, // Set the text color to white
+                            foregroundColor: Colors.white, backgroundColor: Colors.red, // Set the text color to white
                           ),
                           child: Text('Salva preventivo merce in riparazione'),
                         ),
@@ -95,7 +94,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> compilaPreventivo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,

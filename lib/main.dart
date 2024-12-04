@@ -19,7 +19,7 @@ import 'model/UtenteModel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_udid/flutter_udid.dart';
 import '../model/DeviceModel.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+//import 'package:device_info_plus/device_info_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -162,26 +162,26 @@ class _LoginFormState extends State<LoginForm> {
 
     getDev().whenComplete(() async {
 
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    //DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isWindows) {
       print('windows');
-      WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+      //WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
       //idd = windowsInfo.deviceId.toString();
       platform = 'windows';
-      print('Running on '
+      /*print('Running on '
       //  '${androidInfo.model.toString()} ${androidInfo.id.toString()} '
           '${windowsInfo.computerName.toString()} ${windowsInfo.deviceId
           .toString()}'
-      );
+      );*/
     } else if (Platform.isAndroid) {
       print('android');
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      //AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       //idd= androidInfo.id.toString();
       platform = 'android';
-      print('Running on '
+      /*print('Running on '
           '${androidInfo.model.toString()} ${androidInfo.serialNumber
           .toString()} '
-      );
+      );*/
     }
     /*if (dispositivi.contains(idd)) {
       print('okok');
@@ -306,7 +306,9 @@ class _LoginFormState extends State<LoginForm> {
                   ]))
         ],
       ),
-    ));} //?? false;
+    )
+    );
+    } //?? false;
   }
 
   resetLicenza(){
@@ -330,7 +332,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddress/api/utente/ulogin'),
+          Uri.parse('$ipaddressProva/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -580,10 +582,10 @@ class _LoginFormState extends State<LoginForm> {
                             ),
                             autofillHints: [AutofillHints.password],
                           ),
-                          SizedBox(height: 40),
+                          SizedBox(height: 30),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
+                              backgroundColor: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
@@ -594,10 +596,22 @@ class _LoginFormState extends State<LoginForm> {
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ),
-                          SizedBox(height: 30),
-                          Row(mainAxisAlignment: MainAxisAlignment.end,
+                          SizedBox(height: 25),
+                          Spacer(),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Text(
+                              'REL. 25.11.24',
+                              textAlign: TextAlign.end,
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          /*Row(mainAxisAlignment: MainAxisAlignment.end,
+                              verticalDirection: VerticalDirection.down,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('REL. 23.11.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),
+                                Text('REL. 25.11.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),*/
+                          //SizedBox(height: 15),
                         ],
                       ),
                     ),

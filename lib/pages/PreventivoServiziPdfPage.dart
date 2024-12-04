@@ -12,7 +12,7 @@ import '../model/AziendaModel.dart';
 import '../model/UtenteModel.dart';
 import 'PreventivoServiziPage.dart';
 import 'package:path/path.dart' as p;
-import 'package:fluttertoast/fluttertoast.dart';
+//import 'package:fluttertoast/fluttertoast.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io' show Platform;
 import 'package:overlay_support/overlay_support.dart' as over;

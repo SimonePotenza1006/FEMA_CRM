@@ -1,9 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+//import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -13,6 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:record/record.dart';
+import 'package:just_audio/just_audio.dart';
 import 'dart:io';
 import '../model/ClienteModel.dart';
 import '../model/DestinazioneModel.dart';
@@ -51,6 +54,18 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
   TimeOfDay _initialTime = TimeOfDay.now();
   TimeOfDay? selectedTime;
   bool _orarioDisponibile = false;
+  final record = AudioRecorder();
+  bool showPlayer = false;
+  String? audioPath;
+  bool isRecording = false;
+  final AudioRecorder _recorder = AudioRecorder();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isRecording = false;
+  String? _filePath;
+  double _currentPosition = 0;
+  double _totalDuration = 0;
+  Timer? _timer;
+  int _elapsedSeconds = 0;
 
   @override
   void initState() {
@@ -59,9 +74,64 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     getAllTipologie();
   }
 
+  Future<void> _startRecording() async {
+    final bool isPermissionGranted = await _recorder.hasPermission();
+    if (!isPermissionGranted) {
+      return;
+    }
+
+    final directory = await getApplicationDocumentsDirectory();
+    // Generate a unique file name using the current timestamp
+    String fileName = 'recording_${DateTime.now().millisecondsSinceEpoch}.mp3';
+    _filePath = '${directory.path}/$fileName';
+
+    // Define the configuration for the recording
+    const config = RecordConfig(
+      // Specify the format, encoder, sample rate, etc., as needed
+      encoder: AudioEncoder.aacLc, // For example, using AAC codec
+      sampleRate: 44100, // Sample rate
+      bitRate: 128000, // Bit rate
+    );
+
+    // Start recording to file with the specified configuration
+    await _recorder.start(config, path: _filePath!);
+    setState(() {
+      _isRecording = true;
+      _elapsedSeconds = 0;
+    });
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });
+  }
+
+  Future<void> _stopRecording() async {
+    final path = await _recorder.stop();
+    setState(() {
+      _isRecording = false;
+    });
+    _timer?.cancel();
+  }
+
+  Future<void> _playRecording() async {
+    if (_filePath != null) {
+      await _audioPlayer.setFilePath(_filePath!);
+      _totalDuration = _audioPlayer.duration?.inSeconds.toDouble() ?? 0;
+      _audioPlayer.play();
+
+      _audioPlayer.positionStream.listen((position) {
+        setState(() {
+          _currentPosition = position.inSeconds.toDouble();
+        });
+      });
+    }
+  }
+
   Future<void> getAllClienti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -83,7 +153,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -99,7 +169,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -271,7 +341,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                     width: 200,
                                     child: ElevatedButton(
                                       onPressed: _selezionaData,
-                                      style: ElevatedButton.styleFrom(primary: Colors.red),
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                       child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
                                     ),
                                   ),
@@ -303,8 +373,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                               _selectTime(context);
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              primary: Colors.red, // Colore di sfondo rosso
-                                              onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                                              foregroundColor: Colors.white, backgroundColor: Colors.red, // Colore del testo bianco quando il pulsante è premuto
                                             ),
                                             child: Text('Seleziona Orario'.toUpperCase()),
                                           ),
@@ -456,7 +525,68 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                   ),
                                   const SizedBox(height: 20),
                                   SizedBox(height: 15,),
-                                  _buildImagePreview(),
+                                  if (pickedImages.isNotEmpty) _buildImagePreview(),
+                                  SizedBox(height: 10),
+
+                                  const SizedBox(height: 20),
+                                  if (Platform.isAndroid)
+                                    Column(children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: _isRecording ? null : _startRecording,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 30, vertical: 15),
+                                            ),
+                                            child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Icon(
+                                            _isRecording ? Icons.mic : Icons.mic_none,
+                                            size: 95,
+                                            color: _isRecording ? Colors.red : Colors.blue,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          ElevatedButton(
+                                            onPressed: _isRecording ? _stopRecording : null,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 30, vertical: 15),
+                                            ),
+                                            child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 17),
+                                      ElevatedButton(
+                                        onPressed: !_isRecording ? _playRecording : null,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                          padding:
+                                          const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                        ),
+                                        child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                      Slider(
+                                        value: _currentPosition,
+                                        max: _totalDuration,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _currentPosition = value;
+                                          });
+                                          _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                        },
+                                      ),
+                                      SizedBox(height: 43,)
+                                    ],),
                                 ],
                               ),
                             ),
@@ -480,7 +610,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                     width: 200,
                                     child: ElevatedButton(
                                       onPressed: _selezionaData,
-                                      style: ElevatedButton.styleFrom(primary: Colors.red),
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                       child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
                                     ),
                                   ),
@@ -512,8 +642,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                               _selectTime(context);
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              primary: Colors.red, // Colore di sfondo rosso
-                                              onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                                              foregroundColor: Colors.white, backgroundColor: Colors.red, // Colore del testo bianco quando il pulsante è premuto
                                             ),
                                             child: Text('Seleziona Orario'.toUpperCase()),
                                           ),
@@ -677,7 +806,8 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: [
                                                       SizedBox(height: 15,),
-                                                      _buildImagePreview(),
+                                                      if (pickedImages.isNotEmpty) _buildImagePreview(),
+                                                      SizedBox(height: 10),
                                                     ]
                                                 ),
                                               ),
@@ -685,6 +815,66 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                           ]
                                       ),
                                     ),
+                                  const SizedBox(height: 20),
+                                  if (Platform.isAndroid)
+                                    Column(children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: _isRecording ? null : _startRecording,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 30, vertical: 15),
+                                            ),
+                                            child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Icon(
+                                            _isRecording ? Icons.mic : Icons.mic_none,
+                                            size: 95,
+                                            color: _isRecording ? Colors.red : Colors.blue,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          ElevatedButton(
+                                            onPressed: _isRecording ? _stopRecording : null,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 30, vertical: 15),
+                                            ),
+                                            child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 17),
+                                      ElevatedButton(
+                                        onPressed: !_isRecording ? _playRecording : null,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                          padding:
+                                          const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                        ),
+                                        child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                      Slider(
+                                        value: _currentPosition,
+                                        max: _totalDuration,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _currentPosition = value;
+                                          });
+                                          _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                        },
+                                      ),
+                                      SizedBox(height: 43,)
+                                    ],),
+
                                 ],
                               ),
                             ),
@@ -710,7 +900,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     String prioritaString = _selectedPriorita.toString().split('.').last;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/ticket'),
+        Uri.parse('$ipaddressProva/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : data,
@@ -772,7 +962,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(

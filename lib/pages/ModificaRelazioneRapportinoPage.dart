@@ -64,7 +64,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     saveIntervento();
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
+                    backgroundColor: Colors.red,
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20), // Set padding
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8), // Set border radius
@@ -86,7 +86,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,

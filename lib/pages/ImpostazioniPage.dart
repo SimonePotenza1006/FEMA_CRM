@@ -128,7 +128,7 @@ class _ImpostazioniPageState extends State<ImpostazioniPage> {
       child: ElevatedButton.icon(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          primary: Colors.red,
+          backgroundColor: Colors.red,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

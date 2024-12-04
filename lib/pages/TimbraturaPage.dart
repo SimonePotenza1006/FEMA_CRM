@@ -116,7 +116,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<List<UtenteModel>?> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<UtenteModel> utenti = [];
@@ -270,7 +270,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         },
                         child: Text('CERCA', style: TextStyle(color: Colors.white, fontSize: 18)),
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          backgroundColor: Colors.red,
                           padding: EdgeInsets.all(20),
                         ),
                       ),
@@ -399,7 +399,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           resetFirma();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          backgroundColor: Colors.red,
                           padding: EdgeInsets.all(20),
                         ),
                         child: const Text(
@@ -413,7 +413,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             ? _handleTimbraButtonPress
                             : null, // Disabilita il pulsante se _indirizzo è null o vuoto
                         style: ElevatedButton.styleFrom(
-                          primary: (_indirizzo != "" && _indirizzo.isNotEmpty)
+                          backgroundColor: (_indirizzo != "" && _indirizzo.isNotEmpty)
                               ? Colors.red
                               : Colors.grey, // Cambia il colore se disabilitato
                           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
@@ -573,7 +573,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       if (excelBytes != null) {
         await File(filePath).create(recursive: true).then((file) {
           file.writeAsBytesSync(excelBytes);
-          OpenFilex.open(file?.path);
+          OpenFilex.open(file!.path);
         });
 
         // Notifica all'utente che il file Ã¨ stato salvato con successo
@@ -594,7 +594,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (tipoTimbratura == "INGRESSO") {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'gps': _indirizzo.toString(),
@@ -615,7 +615,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,
@@ -684,7 +684,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMarcatempoDataUtente(DateTime data, String utenteid) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -725,7 +725,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMarcatempoToday() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/pres/1/2');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo/pres/1/2');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -771,7 +771,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMarcatempoMonth(int current) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -816,7 +816,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getMarcatempoOggi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/oggi/${widget.utente.id}/2');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo/oggi/${widget.utente.id}/2');
       var response = await http.get(apiUrl);
       var jsonData = jsonDecode(response.body);
       if (response.statusCode == 200) {

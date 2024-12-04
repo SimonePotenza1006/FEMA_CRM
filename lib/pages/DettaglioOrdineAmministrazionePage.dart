@@ -130,9 +130,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           presaVisione();
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), backgroundColor: Colors.red,
                           textStyle: TextStyle(fontSize: 18),
-                          primary: Colors.red,
                         ),
                         child: Text(
                           'Presa visione',
@@ -145,9 +144,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           ordinato();
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), backgroundColor: Colors.red,
                           textStyle: TextStyle(fontSize: 18),
-                          primary: Colors.red,
                         ),
                         child: Text(
                           'Ordinato',
@@ -161,9 +159,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           arrivato();
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), backgroundColor: Colors.red,
                           textStyle: TextStyle(fontSize: 18),
-                          primary: Colors.red,
                         ),
                         child: Text(
                           'Arrivato',
@@ -178,9 +175,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           consegnato();
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), backgroundColor: Colors.red,
                           textStyle: TextStyle(fontSize: 18),
-                          primary: Colors.red,
                         ),
                         child: Text(
                           'Consegnato',
@@ -266,7 +262,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> consegnato() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -308,7 +304,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> arrivato() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -350,7 +346,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> ordinato() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -392,7 +388,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> presaVisione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ordine'),
+        Uri.parse('$ipaddressProva/api/ordine'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ordine.id,
@@ -434,7 +430,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveModifiche() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -575,7 +571,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllFornitori() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];

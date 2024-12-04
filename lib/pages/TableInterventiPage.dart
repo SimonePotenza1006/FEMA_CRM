@@ -71,7 +71,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -92,7 +92,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -113,7 +113,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -134,7 +134,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -166,7 +166,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -211,7 +211,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       isLoading = true; // Inizio del caricamento
     });
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -250,7 +250,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -1126,8 +1126,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(1),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1139,8 +1138,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(2),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1152,8 +1150,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(3),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1165,8 +1162,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(4),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1178,8 +1174,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(5),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1191,8 +1186,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(0),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1295,7 +1289,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/gruppi'),
+          Uri.parse('$ipaddressProva/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1849,7 +1843,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1902,7 +1896,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1962,7 +1956,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

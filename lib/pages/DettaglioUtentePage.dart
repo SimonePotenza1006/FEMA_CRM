@@ -94,8 +94,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               ));
                             },
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.red, // Background color
-                              onPrimary: Colors.white, // Text color
+                              foregroundColor: Colors.white, backgroundColor: Colors.red, // Text color
                               padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15), // Padding
                             ),
                             child: Text(
@@ -119,8 +118,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 });
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.red, // Background color
-                onPrimary: Colors.white, // Text color
+                foregroundColor: Colors.white, backgroundColor: Colors.red, // Text color
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15), // Padding
               ),
               child: Text(
@@ -145,7 +143,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ? _newPasswordController.text
           : widget.utente.password;
 
-      final response = await http.post(Uri.parse('$ipaddress/api/utente'),
+      final response = await http.post(Uri.parse('$ipaddressProva/api/utente'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.utente.id,

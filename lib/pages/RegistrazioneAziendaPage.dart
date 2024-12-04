@@ -45,7 +45,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> createAzienda() async {
-    final url = Uri.parse('$ipaddress/api/azienda');
+    final url = Uri.parse('$ipaddressProva/api/azienda');
     final body = jsonEncode({
       'nome': denominazioneController.text.toString(),
       'luogo_di_lavoro': luogoLavoroController.text.toString(),
@@ -259,7 +259,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -272,7 +272,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   ElevatedButton(
                     onPressed: _areFieldsFilled ? () => createAzienda() : null,
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

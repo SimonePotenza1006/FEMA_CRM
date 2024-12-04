@@ -47,7 +47,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllProdotti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/prodotto'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ProdottoModel> prodotti = [];
@@ -68,7 +68,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllFornitori() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];
@@ -90,7 +90,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -404,8 +404,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       _selectDate(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
+                      foregroundColor: Colors.white, backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -429,8 +428,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       _selectDate2(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
+                      foregroundColor: Colors.white, backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -583,8 +581,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white, backgroundColor: Colors.red,
                     padding: EdgeInsets.all(24),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -603,7 +600,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveNota() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddressProva/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : widget.utente.toMap(),
@@ -621,7 +618,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     var fornitore = selectedFornitore != null ? selectedFornitore?.toMap() : null;
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ordine'),
+        Uri.parse('$ipaddressProva/api/ordine'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -659,7 +656,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       for(var prodotto in prodottiOrdinati){
         try{
           final response = await http.post(
-            Uri.parse('$ipaddress/api/ordine'),
+            Uri.parse('$ipaddressProva/api/ordine'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'descrizione' : _descrizioneController.text,

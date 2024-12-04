@@ -163,7 +163,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          backgroundColor: Colors.red,
                           padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -188,7 +188,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveScadenza() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/scadenza'),
+        Uri.parse('$ipaddressProva/api/scadenza'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : _selectedDate?.toIso8601String(),

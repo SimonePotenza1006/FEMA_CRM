@@ -46,7 +46,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddressProva/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -73,7 +73,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddressProva/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -195,7 +195,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           saveNotaDestinazione();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          backgroundColor: Colors.red,
                           padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Set padding
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8), // Set border radius
@@ -226,7 +226,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           saveNotaCliente();
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
+                          backgroundColor: Colors.red,
                           padding: EdgeInsets.symmetric(horizontal: 28, vertical: 14), // Set padding
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8), // Set border radius
@@ -267,7 +267,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       final now = DateTime.now();
 
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,

@@ -70,7 +70,7 @@ class _AggiuntaFotoRapportinoPageState extends State<AggiuntaFotoRapportinoPage>
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -144,8 +144,7 @@ class _AggiuntaFotoRapportinoPageState extends State<AggiuntaFotoRapportinoPage>
                   ElevatedButton(
                     onPressed: takePicture,
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
+                      foregroundColor: Colors.white, backgroundColor: Colors.red,
                     ),
                     child: Text('SCATTA FOTO', style: TextStyle(fontSize: 18.0)),
                   ),
@@ -154,8 +153,7 @@ class _AggiuntaFotoRapportinoPageState extends State<AggiuntaFotoRapportinoPage>
                   ElevatedButton(
                     onPressed: pickedImages.isNotEmpty ? savePics : null, // Attiva solo se ci sono immagini
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
+                      foregroundColor: Colors.white, backgroundColor: Colors.red,
                     ),
                     child: Text('SALVA', style: TextStyle(fontSize: 18.0)),
                   ),

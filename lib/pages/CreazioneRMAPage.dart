@@ -357,7 +357,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           width: 200,
                           child: ElevatedButton(
                             onPressed: _selezionaData,
-                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                             child: const Text('DATA ACQUISTO', style: TextStyle(color: Colors.white)),
                           ),
                         ),
@@ -406,8 +406,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           ElevatedButton(
                             onPressed: takePicture,
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
-                              onPrimary: Colors.white,
+                              foregroundColor: Colors.white, backgroundColor: Colors.red,
                             ),
                             child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                           ),
@@ -430,7 +429,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 _showSingleUtenteDialog();
                               },
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
+                                backgroundColor: Colors.red,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20), // Bordo squadrato
                                 ),
@@ -456,7 +455,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           width: 200,
                           child: ElevatedButton(
                             onPressed: _selezionaDataRicon,
-                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                             child: const Text('DATA RICONSEGNA', style: TextStyle(color: Colors.white)),
                           ),
                         ),
@@ -514,7 +513,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 _showRitiroDialog();
                               },
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
+                                backgroundColor: Colors.red,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20), // Bordo squadrato
                                 ),
@@ -541,7 +540,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           width: 220,
                           child: ElevatedButton(
                             onPressed: _selezionaDataRientro,
-                            style: ElevatedButton.styleFrom(primary: Colors.red),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                             child: const Text('DATA RIENTRO UFFICIO', style: TextStyle(color: Colors.white)),
                           ),
                         ),
@@ -618,8 +617,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                             ElevatedButton(
                                               onPressed: takePicture,
                                               style: ElevatedButton.styleFrom(
-                                                primary: Colors.red,
-                                                onPrimary: Colors.white,
+                                                foregroundColor: Colors.white, backgroundColor: Colors.red,
                                               ),
                                               child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                                             ),
@@ -649,8 +647,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                             }
                                 : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
                             style: ElevatedButton.styleFrom(
-                                minimumSize: Size(220, 70),
-                                primary: Colors.red),
+                                minimumSize: Size(220, 70), backgroundColor: Colors.red),
                             child:  Text('Salva Merce RMA'.toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 18)),
                           ),
                         ),
@@ -724,7 +721,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/restituzione/${rma.id}')
+              Uri.parse('$ipaddressProva/api/immagine/restituzione/${rma.id}')
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -768,7 +765,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       bool assigned = responsabile != null ? true : false;
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -844,7 +841,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print("PROVA TECNICO ${tecnico?.nome}");
             print("INTERVENTO: ${intervento.id}");
             final response = await http.post(
-              Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+              Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': tecnico?.toMap(),
@@ -885,7 +882,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
@@ -915,7 +912,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     //if(_orarioDisponibile == true){
       try {
         response = await http.post(
-          Uri.parse('$ipaddress/api/restituzioneMerce'),
+          Uri.parse('$ipaddressProva/api/restituzioneMerce'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'prodotto':_prodotto,
@@ -967,7 +964,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     else{
       try {
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data': selectedDate?.toIso8601String(),
@@ -1285,7 +1282,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -1308,7 +1305,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllFornitori() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -1331,7 +1328,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -1352,7 +1349,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

@@ -227,7 +227,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 width: 200,
                                 child: ElevatedButton(
                                   onPressed: _selezionaData,
-                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                   child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
                                 ),
                               ),
@@ -259,8 +259,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                           _selectTime(context);
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          primary: Colors.red, // Colore di sfondo rosso
-                                          onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                                          foregroundColor: Colors.white, backgroundColor: Colors.red, // Colore del testo bianco quando il pulsante è premuto
                                         ),
                                         child: Text('Seleziona Orario'.toUpperCase()),
                                       ),
@@ -408,8 +407,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        primary: Colors.red,
-                                        onPrimary: Colors.white,
+                                        foregroundColor: Colors.white, backgroundColor: Colors.red,
                                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                                       ),
                                       child: Text('Crea nuovo cliente'.toUpperCase()),
@@ -466,8 +464,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        primary: Colors.red,
-                                        onPrimary: Colors.white,
+                                        foregroundColor: Colors.white, backgroundColor: Colors.red,
                                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                                       ),
                                       child: Text('Crea nuova destinazione'.toUpperCase()),
@@ -493,7 +490,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                       _showSingleUtenteDialog();
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      primary: Colors.red,
+                                      backgroundColor: Colors.red,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(20), // Bordo squadrato
                                       ),
@@ -517,7 +514,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                       _showUtentiDialog();
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      primary: Colors.red,
+                                      backgroundColor: Colors.red,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(20),
                                       ),
@@ -626,7 +623,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     }
                                   }
                                       : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
-                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                   child:  Text('Salva Intervento'.toUpperCase(), style: TextStyle(color: Colors.white)),
                                 ),
                               ),
@@ -654,7 +651,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 width: 200,
                                 child: ElevatedButton(
                                   onPressed: _selezionaData,
-                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                   child: const Text('SELEZIONA DATA', style: TextStyle(color: Colors.white)),
                                 ),
                               ),
@@ -686,8 +683,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                           _selectTime(context);
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          primary: Colors.red, // Colore di sfondo rosso
-                                          onPrimary: Colors.white, // Colore del testo bianco quando il pulsante è premuto
+                                          foregroundColor: Colors.white, backgroundColor: Colors.red, // Colore del testo bianco quando il pulsante è premuto
                                         ),
                                         child: Text('Seleziona Orario'.toUpperCase()),
                                       ),
@@ -838,8 +834,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        primary: Colors.red,
-                                        onPrimary: Colors.white,
+                                        foregroundColor: Colors.white, backgroundColor: Colors.red,
                                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                                       ),
                                       child: Text('Crea nuovo cliente'.toUpperCase()),
@@ -896,8 +891,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        primary: Colors.red,
-                                        onPrimary: Colors.white,
+                                        foregroundColor: Colors.white, backgroundColor: Colors.red,
                                         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                                       ),
                                       child: Text('Crea nuova destinazione'.toUpperCase()),
@@ -920,7 +914,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                       _showSingleUtenteDialog();
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      primary: Colors.red,
+                                      backgroundColor: Colors.red,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(20), // Bordo squadrato
                                       ),
@@ -944,7 +938,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                       _showUtentiDialog();
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      primary: Colors.red,
+                                      backgroundColor: Colors.red,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(20),
                                       ),
@@ -1011,8 +1005,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                                   ElevatedButton(
                                                     onPressed: takePicture,
                                                     style: ElevatedButton.styleFrom(
-                                                      primary: Colors.red,
-                                                      onPrimary: Colors.white,
+                                                      foregroundColor: Colors.white, backgroundColor: Colors.red,
                                                     ),
                                                     child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                                                   ),
@@ -1052,7 +1045,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     }
                                   }
                                       : null, // Disabilita il pulsante se le condizioni non sono soddisfatte
-                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                                   child:  Text('Salva Intervento'.toUpperCase(), style: TextStyle(color: Colors.white)),
                                 ),
                               ),
@@ -1130,7 +1123,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+              Uri.parse('$ipaddressProva/api/immagine/${intervento.id}')
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -1181,7 +1174,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       try {
         String prioritaString = _selectedPriorita.toString().split('.').last;
         final response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo': true,
@@ -1257,7 +1250,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             print("PROVA TECNICO ${tecnico?.nome}");
             print("INTERVENTO: ${intervento.id}");
             final response = await http.post(
-              Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+              Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': tecnico?.toMap(),
@@ -1281,7 +1274,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               print('Percorso del file: ${image.path}');
               var request = http.MultipartRequest(
                   'POST',
-                  Uri.parse('$ipaddress/api/immagine/${intervento.id}')
+                  Uri.parse('$ipaddressProva/api/immagine/${intervento.id}')
               );
               request.files.add(
                 await http.MultipartFile.fromPath(
@@ -1327,7 +1320,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddressProva/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
@@ -1359,7 +1352,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         print('$prioritaString');
         final orario = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day, _selectedTime.hour, _selectedTime.minute);
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1410,7 +1403,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       try {
         String prioritaString = _selectedPriorita.toString().split('.').last;
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddressProva/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1748,7 +1741,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -1770,7 +1763,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -1792,7 +1785,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<TipologiaInterventoModel> tipologie = [];
@@ -1813,7 +1806,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

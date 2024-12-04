@@ -160,7 +160,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
+                  backgroundColor: Colors.red,
                 ),
                 child: Text(
                   'Invia PDF via email',
@@ -247,7 +247,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllAgenti() async {
     try {
       print('Recupero agenti...');
-      var apiUrl = Uri.parse('$ipaddress/api/agente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -302,7 +302,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllPreventiviForAgente(String agenteId) async {
     print('Inizio getAllPreventiviForAgente per agente $agenteId');
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/preventivo/agente/$agenteId');
+      var apiUrl = Uri.parse('$ipaddressProva/api/preventivo/agente/$agenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

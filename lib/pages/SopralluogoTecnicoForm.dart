@@ -245,8 +245,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                       ElevatedButton(
                         onPressed: takePicture,
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
-                          onPrimary: Colors.white,
+                          foregroundColor: Colors.white, backgroundColor: Colors.red,
                         ),
                         child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)),
                       ),
@@ -254,8 +253,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                       ElevatedButton(
                         onPressed: pickImagesFromGallery,
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.red,
-                          onPrimary: Colors.white,
+                          foregroundColor: Colors.white, backgroundColor: Colors.red,
                         ),
                         child: Text('Allega foto da galleria', style: TextStyle(fontSize: 18.0)),
                       ),
@@ -351,7 +349,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/sopralluogo/${int.parse(sopralluogo.id!.toString())}'),
+              Uri.parse('$ipaddressProva/api/immagine/sopralluogo/${int.parse(sopralluogo.id!.toString())}'),
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -391,7 +389,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
     late http.Response response;
     try {
       response =
-      await http.post(Uri.parse('$ipaddress/api/sopralluogo'),
+      await http.post(Uri.parse('$ipaddressProva/api/sopralluogo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data': DateTime.now().toIso8601String(),
@@ -417,7 +415,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -449,7 +447,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

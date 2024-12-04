@@ -127,7 +127,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      backgroundColor: Colors.red,
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -177,7 +177,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
+                      backgroundColor: Colors.red,
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -201,7 +201,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/credenziali'),
+        Uri.parse('$ipaddressProva/api/credenziali'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -255,7 +255,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           // Usa `fromBytes` al posto di `fromPath` per inviare `Uint8List`
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/credenziali/${credenziali.id}'),
+            Uri.parse('$ipaddressProva/api/immagine/credenziali/${credenziali.id}'),
           );
           request.files.add(
             http.MultipartFile.fromBytes(

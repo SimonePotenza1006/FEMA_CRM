@@ -54,7 +54,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllPrelievi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -167,7 +167,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
+                  backgroundColor: Colors.red,
                 ),
                 child: Text(
                   'Invia PDF via email',

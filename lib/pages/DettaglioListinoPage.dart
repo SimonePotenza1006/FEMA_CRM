@@ -81,7 +81,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllListiniForCategoria() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddress/api/listino/categoria/${widget.categoria.id}'));
+          '$ipaddressProva/api/listino/categoria/${widget.categoria.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
