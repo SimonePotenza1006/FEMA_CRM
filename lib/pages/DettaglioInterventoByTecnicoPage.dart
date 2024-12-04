@@ -57,6 +57,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
   DDTModel? finalDdt;
   String _indirizzo = "";
+  File? selectedFile;
+  List<String> pdfFiles = [];
+  String? errorMessage;
 
   Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
     try {
@@ -102,6 +105,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     getRelazioni();
     getProdotti();
     _getCurrentLocation();
+    fetchPdfFiles();
   }
 
   Future<http.Response?> getDdtByIntervento() async{
@@ -140,6 +144,82 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       return null;
     }
     return null;
+  }
+
+  Future<void> uploadFile(File file) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$ipaddressProva/pdfu/intervento'),
+      );
+      request.fields['intervento'] = widget.intervento.id!;
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'pdf', // Nome del parametro nel controller
+          file.path,
+        ),
+      );
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print("File caricato con successo!");
+        setState(() {
+          selectedFile = null;
+        });
+
+        // Mostra l'alert dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Successo!"),
+              content: Text("Documento caricato correttamente!"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Chiudi il dialog
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        print("Errore durante il caricamento del file: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Errore durante il caricamento del file: $e");
+    }
+  }
+
+  Future<List<String>> fetchPdfFiles() async {
+    try {
+      print('Inizio richiesta al server per intervento ID: ${widget.intervento.id}'); // Debug
+
+      final response = await http.get(Uri.parse('$ipaddressProva/pdfu/intervento/${widget.intervento.id.toString()}'));
+      print('Risposta ricevuta con status code: ${response.statusCode}'); // Debug
+
+      switch (response.statusCode) {
+        case 200:
+          final List<dynamic> files = jsonDecode(response.body);
+          print('File trovati: $files'); // Debug
+          return files.cast<String>();
+
+        case 204:
+          print('Nessun file trovato per l\'intervento con ID ${widget.intervento.id}.'); // Debug
+          return [];
+
+        case 404:
+          throw Exception('Directory non trovata per intervento ID ${widget.intervento.id}.');
+
+        default:
+          throw Exception('Errore inatteso: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Errore durante la connessione al server: $e'); // Debug
+      throw Exception('Errore durante la connessione al server: $e');
+    }
   }
 
   Widget buildProdottoItem(int index){

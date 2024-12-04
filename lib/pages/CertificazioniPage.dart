@@ -379,6 +379,8 @@ class PDFViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PdfViewerController _pdfViewerController = PdfViewerController();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -394,11 +396,24 @@ class PDFViewer extends StatelessWidget {
               _printPdf(filePath);
             },
           ),
+          IconButton(
+            icon: Icon(Icons.zoom_in, color: Colors.white),
+            onPressed: () {
+              _pdfViewerController.zoomLevel += 0.5;
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.zoom_out, color: Colors.white),
+            onPressed: () {
+              _pdfViewerController.zoomLevel -= 0.5;
+            },
+          ),
         ],
       ),
       body: SfPdfViewer.file(
         io.File(filePath),
-        enableDoubleTapZooming: true, // Utilizza il percorso del file
+        controller: _pdfViewerController,
+        enableDoubleTapZooming: true, // Funziona anche su mobile
       ),
     );
   }
