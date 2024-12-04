@@ -163,6 +163,8 @@ class _DirectoryViewWrapperState extends State<DirectoryViewWrapper> {
   late DirectoryModel _directory;
   List<FileSystemItem> _filteredItems = [];
   String _searchQuery = '';
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {
@@ -308,7 +310,7 @@ class _DirectoryViewWrapperState extends State<DirectoryViewWrapper> {
     String path = file.path.replaceAll('\\', '/');
     String modifiedPath = path.replaceAll('/', '_');
     String encodedFilename = Uri.encodeComponent(file.name);
-    final deleteUrl = 'http://gestione.femasistemi.it:8090/pdfu/certificazioni/$modifiedPath/$encodedFilename';
+    final deleteUrl = '$ipaddressProva/pdfu/certificazioni/$modifiedPath/$encodedFilename';
     print('Delete URL: $deleteUrl');
     try {
       final response = await http.delete(Uri.parse(deleteUrl));
@@ -345,7 +347,7 @@ class _DirectoryViewWrapperState extends State<DirectoryViewWrapper> {
     String encodedFilename = Uri.encodeComponent(file.name);
 
     // Costruisci l'URL con il path modificato
-    final pdfUrl = 'http://gestione.femasistemi.it:8090/pdfu/certificazioni/$modifiedPath/$encodedFilename';
+    final pdfUrl = '$ipaddressProva/pdfu/certificazioni/$modifiedPath/$encodedFilename';
     print('PDF URL: $pdfUrl');
 
     try {
@@ -377,6 +379,8 @@ class PDFViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PdfViewerController _pdfViewerController = PdfViewerController();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -392,11 +396,24 @@ class PDFViewer extends StatelessWidget {
               _printPdf(filePath);
             },
           ),
+          IconButton(
+            icon: Icon(Icons.zoom_in, color: Colors.white),
+            onPressed: () {
+              _pdfViewerController.zoomLevel += 0.5;
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.zoom_out, color: Colors.white),
+            onPressed: () {
+              _pdfViewerController.zoomLevel -= 0.5;
+            },
+          ),
         ],
       ),
       body: SfPdfViewer.file(
         io.File(filePath),
-        enableDoubleTapZooming: true, // Utilizza il percorso del file
+        controller: _pdfViewerController,
+        enableDoubleTapZooming: true, // Funziona anche su mobile
       ),
     );
   }

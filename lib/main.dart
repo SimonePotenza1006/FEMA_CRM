@@ -19,7 +19,7 @@ import 'model/UtenteModel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_udid/flutter_udid.dart';
 import '../model/DeviceModel.dart';
-//import 'package:device_info_plus/device_info_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -162,26 +162,26 @@ class _LoginFormState extends State<LoginForm> {
 
     getDev().whenComplete(() async {
 
-    //DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isWindows) {
       print('windows');
-      //WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+      WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
       //idd = windowsInfo.deviceId.toString();
       platform = 'windows';
-      /*print('Running on '
+      print('Running on '
       //  '${androidInfo.model.toString()} ${androidInfo.id.toString()} '
           '${windowsInfo.computerName.toString()} ${windowsInfo.deviceId
           .toString()}'
-      );*/
+      );
     } else if (Platform.isAndroid) {
       print('android');
-      //AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       //idd= androidInfo.id.toString();
       platform = 'android';
-      /*print('Running on '
+      print('Running on '
           '${androidInfo.model.toString()} ${androidInfo.serialNumber
           .toString()} '
-      );*/
+      );
     }
     /*if (dispositivi.contains(idd)) {
       print('okok');
@@ -206,7 +206,8 @@ class _LoginFormState extends State<LoginForm> {
       return (await showDialog(
           barrierDismissible: false,
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) =>
+              AlertDialog(
               title: new Text('Errore di rete', style: TextStyle(fontWeight: FontWeight.w600),),
               content: new Text("Siamo spiacenti ma al momento non è possibile utilizzare l\'applicazione in quanto sono presenti dei problemi di rete. "
                   "Riprova più tardi"),
@@ -225,7 +226,11 @@ class _LoginFormState extends State<LoginForm> {
     return (await showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) =>
+          WillPopScope(onWillPop: () async {
+            return false;
+          }, child:
+          AlertDialog(
         title: new Text('Numero di licenza', style: TextStyle(fontWeight: FontWeight.w600),),
         content: new Text('Dispositivo $idd non ancora registrato: Inserisci il numero di licenza per utilizzare l\'applicazione Fema'),
         actions: <Widget>[
@@ -305,10 +310,8 @@ class _LoginFormState extends State<LoginForm> {
                     ),
                   ]))
         ],
-      ),
-    )
-    );
-    } //?? false;
+      )),
+    ));} //?? false;
   }
 
   resetLicenza(){
@@ -510,7 +513,6 @@ class _LoginFormState extends State<LoginForm> {
             decoration: BoxDecoration(
 
               image: DecorationImage(
-
                   image: ExactAssetImage("assets/images/background_login_1_1.jpg"),
                   fit: BoxFit.cover,
                   opacity: 0.8
@@ -532,7 +534,7 @@ class _LoginFormState extends State<LoginForm> {
                   // Responsive logo image
                   Image.asset(
                     'assets/images/logo fema trasparente bianco.png',
-                    width: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
+                    width: MediaQuery.of(context).size.width * 0.4, // 30% of screen width
                     //height: MediaQuery.of(context).size.width * 0.3, // 30% of screen width
                     fit: BoxFit.contain,
                   ),
@@ -585,7 +587,7 @@ class _LoginFormState extends State<LoginForm> {
                           SizedBox(height: 30),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
+                              primary: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
@@ -600,18 +602,9 @@ class _LoginFormState extends State<LoginForm> {
                           Spacer(),
                           Align(
                             alignment: Alignment.bottomRight,
-                            child: Text(
-                              'REL. 25.11.24',
-                              textAlign: TextAlign.end,
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ),
-                          /*Row(mainAxisAlignment: MainAxisAlignment.end,
-                              verticalDirection: VerticalDirection.down,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text('REL. 25.11.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12)),]),*/
-                          //SizedBox(height: 15),
+                            child: Text('REL. 02.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
+                          )
+
                         ],
                       ),
                     ),

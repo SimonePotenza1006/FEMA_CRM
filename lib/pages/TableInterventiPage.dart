@@ -161,92 +161,70 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     }
   }
 
-  Future<void> getAllInterventi() async {
-    setState(() {
-      isLoading = true; // Inizio del caricamento
-    });
+  Future<void> getAllInterventi({int page = 0, int size = 20, bool loadAll = true}) async {
+    int currentPage = page;
+    bool allDataLoaded = false;
+
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
-      var response = await http.get(apiUrl);
-      if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-        List<InterventoModel> interventi = [];
-        interventi = (jsonData as List)
-            .take(30) // Limita a 20 elementi
-            .map((item) => InterventoModel.fromJson(item))
-            .toList();
-        Map<int, List<UtenteModel>> interventoUtentiMap = {};
-        for (var intervento in interventi) {
-          var relazioni = await getRelazioni(int.parse(intervento.id.toString()));
-          interventoUtentiMap[int.parse(intervento.id.toString())] = relazioni.map((relazione) => relazione.utente!).toList();
-        }
-        setState(() {
-          _isLoading = false;
-          _allInterventi = interventi;
-          _filteredInterventi = _allInterventi
-              .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
+      while (!allDataLoaded) {
+        // Mostra il messaggio di caricamento per la pagina corrente
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(content: Text('Attendere, caricamento pagina $currentPage...')),
+        //   );
+        // });
+
+        var apiUrl = Uri.parse('$ipaddressProva/api/intervento/paged?page=$currentPage&size=$size');
+        print('Chiamata API alla pagina $currentPage con size $size');
+
+        var response = await http.get(apiUrl);
+        if (response.statusCode == 200) {
+          var jsonData = jsonDecode(response.body);
+          List<InterventoModel> interventi = (jsonData as List)
+              .map((item) => InterventoModel.fromJson(item))
               .toList();
-          _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Attendi qualche istante per il caricamento di tutti gli interventi...'), duration: Duration(seconds: 3)),
-        );
-      } else {
-        _isLoading = false;
-        throw Exception('Failed to load data from API: ${response.statusCode}');
+
+          // Aggiungi i dati progressivamente e aggiorna la griglia
+          setState(() {
+            _allInterventi.addAll(interventi);
+            _filteredInterventi = _allInterventi
+                .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
+                .toList();
+            _dataSource = InterventoDataSource(context, _filteredInterventi, filteredGruppi);
+          });
+
+          // Debug: log degli ID
+          if (interventi.isNotEmpty) {
+            print('Pagina $currentPage: Primo ID = ${interventi.first.id}, Ultimo ID = ${interventi.last.id}');
+          } else {
+            print('Pagina $currentPage: Nessun intervento trovato.');
+          }
+
+          // Controlla se hai finito di caricare i dati
+          if (interventi.length < size || !loadAll) {
+            allDataLoaded = true;
+            // Mostra messaggio di completamento del caricamento
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Caricamento completato!')),
+              );
+            });
+          } else {
+            currentPage++;
+          }
+        } else {
+          throw Exception('Failed to load data from API: ${response.statusCode}');
+        }
       }
     } catch (e) {
+      print('Errore durante la chiamata API: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error during API call: $e')),
       );
-    } finally {
-      setState(() {
-        isLoading = false; // Fine del caricamento
-      });
     }
   }
 
-  Future<void> getAllInterventiTot() async {
-    setState(() {
-      isLoading = true; // Inizio del caricamento
-    });
-    try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/ordered');
-      var response = await http.get(apiUrl);
-      if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-        List<InterventoModel> interventi = [];
-        for (var item in jsonData) {
-          interventi.add(InterventoModel.fromJson(item));
-        }
-        // Recuperare tutte le relazioni utenti-interventi
-        Map<int, List<UtenteModel>> interventoUtentiMap = {};
-        for (var intervento in interventi) {
-          var relazioni = await getRelazioni(int.parse(intervento.id.toString()));
-          interventoUtentiMap[int.parse(intervento.id.toString())] = relazioni.map((relazione) => relazione.utente!).toList();
-        }
-        setState(() {
-          _isLoading = false;
-          _allInterventi = interventi;
-          _filteredInterventi = _allInterventi
-              .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
-              .toList();
-          _dataSource = InterventoDataSource(context, _filteredInterventi, interventoUtentiMap, filteredGruppi);
-        });
-      } else {
-        _isLoading = false;
-        throw Exception('Failed to load data from API: ${response.statusCode}');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error during API call: $e')),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
@@ -290,7 +268,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 5:
           _filteredInterventi = _allInterventi.where((intervento) => (intervento.annullato ?? false)).toList();
       }
-      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap, filteredGruppi);
+      _dataSource.updateData(_filteredInterventi, filteredGruppi);
     });
   }
 
@@ -326,7 +304,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       }).toList();
 
       // Aggiornamento dei dati nella data source
-      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap, filteredGruppi);
+      _dataSource.updateData(_filteredInterventi, filteredGruppi);
     });
   }
 
@@ -367,7 +345,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             tipologia.contains(lowerCaseQuery) ||
             descrizione.contains(lowerCaseQuery);
       }).toList();
-      _dataSource.updateData(_filteredInterventi, _interventoUtentiMap, filteredGruppi);
+      _dataSource.updateData(_filteredInterventi, filteredGruppi);
     });
   }
 
@@ -436,8 +414,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   @override
   void initState() {
     super.initState();
-    _dataSource = InterventoDataSource(context, _filteredInterventi, {}, filteredGruppi);
-    getAllInterventi();
+    _dataSource = InterventoDataSource(context, _filteredInterventi, filteredGruppi);
+    getAllInterventi(page: 0, size: 20, loadAll: true);
     getAllGruppi();
     getAllClienti().whenComplete(() => print('Clienti ok'));
     getAllTipologie().whenComplete(() => print('Tipologie ok'));
@@ -446,7 +424,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     setState((){
       _currentSheet = 1;
     });
-    getAllInterventiTot();
+    //getAllInterventiTot();
   }
 
   @override
@@ -676,9 +654,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           children: [
             SizedBox(height: 10),
             Expanded(
-              child: isLoading // Controlla lo stato di caricamento
-                  ? Center(child: CircularProgressIndicator()) // Mostra l'indicatore di caricamento
-                  : SfDataGrid(
+              child: SfDataGrid(
                 allowPullToRefresh: true,
                 allowSorting: true,
                 allowMultiColumnSorting: true,
@@ -1126,7 +1102,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(1),
                               style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
+                                primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                                onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1138,7 +1115,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(2),
                               style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700],
+                                primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                                onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1150,7 +1128,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(3),
                               style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1162,7 +1141,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(4),
                               style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1174,7 +1154,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(5),
                               style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1186,7 +1167,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(0),
                               style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.black, backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
+                                primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                                onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1274,7 +1256,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 tipologie: tipologieList,
                 interventi: _allInterventi,
                 onFiltrati: (interventiFiltrati) {
-                  _dataSource.updateData(interventiFiltrati, _interventoUtentiMap, filteredGruppi);
+                  _dataSource.updateData(interventiFiltrati, filteredGruppi);
                 },
               );
             },
@@ -1316,7 +1298,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 class InterventoDataSource extends DataGridSource {
   List<InterventoModel> _interventions = [];
   List<InterventoModel> interventiFiltrati = [];
-  Map<int, List<UtenteModel>> _interventoUtentiMap = {};
+  //Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   BuildContext context;
   TextEditingController importoController = TextEditingController();
   TextEditingController codiceDaneaController = TextEditingController();
@@ -1336,20 +1318,20 @@ class InterventoDataSource extends DataGridSource {
   InterventoDataSource(
       this.context,
       List<InterventoModel> interventions,
-      Map<int, List<UtenteModel>> interventoUtentiMap,
+      //Map<int, List<UtenteModel>> interventoUtentiMap,
       List<GruppoInterventiModel> gruppi
       ) {
     _interventions = List.from(interventions);
     interventiFiltrati = List.from(interventions);
-    _interventoUtentiMap = interventoUtentiMap;
+    //_interventoUtentiMap = interventoUtentiMap;
     filteredGruppi = gruppi;
   }
 
-  void updateData(List<InterventoModel> newInterventions, Map<int, List<UtenteModel>> newInterventoUtentiMap, List<GruppoInterventiModel> gruppi) {
+  void updateData(List<InterventoModel> newInterventions, List<GruppoInterventiModel> gruppi) {
     _interventions.clear();
     _interventions.addAll(newInterventions);
     interventiFiltrati = List.from(newInterventions);  // Aggiorna anche la lista filtrata
-    _interventoUtentiMap = newInterventoUtentiMap;
+    //_interventoUtentiMap = newInterventoUtentiMap;
     filteredGruppi = gruppi;
     notifyListeners();
   }
@@ -1418,15 +1400,15 @@ class InterventoDataSource extends DataGridSource {
           ? "CONCLUSO"
           : "///";
 
-      List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
-      String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
+      //List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
+      //String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
       String utentiNomi = '';
-      if (_interventoUtentiMap.containsKey(intervento.id)) {
-        List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
-        utentiNomi = utenti.map((utente) => utente.nomeCompleto()).join(', ');
-      } else {
-        utentiNomi = 'NESSUNO'; // or any other default value
-      }
+      // if (_interventoUtentiMap.containsKey(intervento.id)) {
+      //   List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
+      //   utentiNomi = utenti.map((utente) => utente.nomeCompleto()).join(', ');
+      // } else {
+      //   utentiNomi = 'NESSUNO'; // or any other default value
+      // }
       rows.add(DataGridRow(
         cells: [
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
@@ -1946,7 +1928,7 @@ class InterventoDataSource extends DataGridSource {
         print('EVVAIIIIIIII');
         Navigator.of(context).pop();
         prezzoIvato = false;
-        updateData(interventiFiltrati, _interventoUtentiMap, filteredGruppi);
+        updateData(interventiFiltrati, filteredGruppi);
       }
     } catch (e) {
       print('Errore durante il salvataggio del intervento: $e');
@@ -2003,7 +1985,7 @@ class InterventoDataSource extends DataGridSource {
         codiceDaneaController.clear();
         print('EVVAIIIIIIII');
         Navigator.of(context).pop();
-        updateData(interventiFiltrati, _interventoUtentiMap, filteredGruppi);
+        //updateData(interventiFiltrati, _interventoUtentiMap, filteredGruppi);
       }
     } catch (e) {
       print('Errore durante il salvataggio del intervento: $e');
@@ -2015,9 +1997,9 @@ class InterventoDataSource extends DataGridSource {
     final InterventoModel intervento = row.getCells().firstWhere(
           (cell) => cell.columnName == 'intervento',
     ).value as InterventoModel;
-    final List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
-    utenti.forEach((utente) {
-    });
+    //final List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
+    // utenti.forEach((utente) {
+    // });
     Color? backgroundColor;
     switch (intervento.tipologia?.descrizione) {
       case 'Informatico':
@@ -2095,11 +2077,11 @@ class InterventoDataSource extends DataGridSource {
                   ),
                 ),
               ),
-              child: Text(
-                utenti.isNotEmpty ? utenti.map((utente) =>
-                    utente.nomeCompleto()).join(', ') : 'NESSUNO',
-                overflow: TextOverflow.ellipsis,
-              ),
+              // child: Text(
+              //   utenti.isNotEmpty ? utenti.map((utente) =>
+              //       utente.nomeCompleto()).join(', ') : 'NESSUNO',
+              //   overflow: TextOverflow.ellipsis,
+              // ),
             );
           } else {
             return GestureDetector(

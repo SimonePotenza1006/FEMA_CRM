@@ -17,9 +17,12 @@ import 'CreazioneInterventoByAmministrazionePage.dart';
 import 'DettaglioTicketPage.dart';
 import 'ListaClientiPage.dart';
 import 'DettaglioInterventoPage.dart';
+import 'CreazioneTicketTecnicoPage.dart';
 
 class TableTicketPage extends StatefulWidget{
-  TableTicketPage({Key? key}) : super(key : key);
+  final UtenteModel utente;
+
+  TableTicketPage({Key? key, required this.utente}) : super(key : key);
 
   @override
   _TableTicketPageState createState() => _TableTicketPageState();
@@ -33,17 +36,15 @@ class _TableTicketPageState extends State<TableTicketPage>{
   late TicketDataSource _dataSource;
   Map<String, double> _columnWidths = {
     'ticket' : 0,
+    'id' : 50,
     'data_apertura' : 200,
-    'priorita' : 60,
-    'cliente' : 200,
-    'data' : 200,
-    'orario' : 150,
-    'titolo' : 150,
+    'descrizione' : 370,
     'utente' : 230,
-    'convertito' : 100,
-    'tipologia' : 200,
+    'convertito' : 140,
+    //'tipologia' : 200,
   };
   bool isLoading = true;
+  int _currentSheet = 0;
 
   Future<void> getAllTickets() async{
     try{
@@ -58,8 +59,10 @@ class _TableTicketPageState extends State<TableTicketPage>{
         setState(() {
           isLoading = false;
           _allTickets = tickets;
-          _filteredTickets = tickets;
-          _dataSource = TicketDataSource(context, _filteredTickets);
+          _filteredTickets = _allTickets
+              .where((ticket) => ticket.convertito != true).toList();
+          _dataSource = TicketDataSource(widget.utente,context, _filteredTickets);
+          _dataSource.updateData(_filteredTickets);
         });
       } else {
         isLoading = false;
@@ -79,7 +82,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
   @override
   void initState(){
     super.initState();
-    _dataSource = TicketDataSource(context, _filteredTickets);
+    _dataSource = TicketDataSource(widget.utente, context, _filteredTickets);
     getAllTickets();
   }
 
@@ -91,6 +94,17 @@ class _TableTicketPageState extends State<TableTicketPage>{
         centerTitle: true,
         backgroundColor: Colors.red,
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreazioneTicketTecnicoPage(utente: widget.utente,)));
+            },
+          ),
           IconButton(
             icon: Icon(
               Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -142,6 +156,24 @@ class _TableTicketPageState extends State<TableTicketPage>{
                       minimumWidth: 0,
                     ),
                     GridColumn(
+                      columnName: 'id',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Text('ID'),
+                      ),
+                      width: _columnWidths['id']?? double.nan,
+                      minimumWidth: 100,
+                    ),
+                    GridColumn(
                       columnName: 'data_apertura',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -160,24 +192,6 @@ class _TableTicketPageState extends State<TableTicketPage>{
                       minimumWidth: 100,
                     ),
                     GridColumn(
-                      columnName: 'priorita',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('PR'),
-                      ),
-                      width: _columnWidths['priorita']?? double.nan,
-                      minimumWidth: 45,
-                    ),
-                    GridColumn(
                       columnName: 'convertito',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -193,64 +207,10 @@ class _TableTicketPageState extends State<TableTicketPage>{
                         child: Text('CONVERTITO'),
                       ),
                       width: _columnWidths['convertito']?? double.nan,
-                      minimumWidth: 100,
+                      minimumWidth: 140,
                     ),
                     GridColumn(
-                      columnName: 'cliente',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('CLIENTE'),
-                      ),
-                      width: _columnWidths['cliente']?? double.nan,
-                      minimumWidth: 100,
-                    ),
-                    GridColumn(
-                      columnName: 'data',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('DATA'),
-                      ),
-                      width: _columnWidths['data']?? double.nan,
-                      minimumWidth: 100,
-                    ),
-                    GridColumn(
-                      columnName: 'orario',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('ORARIO'),
-                      ),
-                      width: _columnWidths['orario']?? double.nan,
-                      minimumWidth: 100,
-                    ),
-                    GridColumn(
-                      columnName: 'titolo',
+                      columnName: 'descrizione',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
                         alignment: Alignment.center,
@@ -264,8 +224,8 @@ class _TableTicketPageState extends State<TableTicketPage>{
                         ),
                         child: Text('TITOLO'),
                       ),
-                      width: _columnWidths['titolo']?? double.nan,
-                      minimumWidth: 100,
+                      width: _columnWidths['descrizione']?? double.nan,
+                      minimumWidth: 330,
                     ),
                     GridColumn(
                       columnName: 'utente',
@@ -285,24 +245,6 @@ class _TableTicketPageState extends State<TableTicketPage>{
                       width: _columnWidths['utente']?? double.nan,
                       minimumWidth: 100,
                     ),
-                    GridColumn(
-                      columnName: 'tipologia',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('TIPOLOGIA'),
-                      ),
-                      width: _columnWidths['tipologia']?? double.nan,
-                      minimumWidth: 100,
-                    ),
                   ],
                 onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
                   setState(() {
@@ -311,6 +253,50 @@ class _TableTicketPageState extends State<TableTicketPage>{
                   return true;
                 },
               )
+            ),
+            Flex(
+              direction: Axis.horizontal,
+              children: [
+                Expanded(
+                  child: Container(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: () => _changeSheet(0),
+                            style: ElevatedButton.styleFrom(
+                              primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                              onPrimary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2.0,
+                            ),
+                            child: Text('Non convertiti', style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: () => _changeSheet(1),
+                            style: ElevatedButton.styleFrom(
+                              primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                              onPrimary: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              elevation: 2.0,
+                            ),
+                            child: Text('Convertiti', style: TextStyle(color: Colors.white)),
+                          ),
+
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
             )
           ],
         ),
@@ -318,21 +304,57 @@ class _TableTicketPageState extends State<TableTicketPage>{
     );
   }
 
+  void _changeSheet(int index) {
+    setState(() {
+      _currentSheet = index;
+      switch (index) {
+        case 0:
+          _filteredTickets = _allTickets
+              .where((ticket) => ticket.convertito != true)
+              .toList();
+          break;
+        case 1:
+          _filteredTickets= _allTickets.where((ticket) => ticket.convertito == true).toList();
+          break;
+      }
+      _dataSource.updateData(_filteredTickets);
+    });
+  }
+
+  List<TicketModel> _getInterventiPerSheet(int sheetIndex) {
+    switch (sheetIndex) {
+      case 0:
+        return _allTickets.where((ticket) => ticket.convertito != true).toList();
+      case 1:
+        return _allTickets.where((ticket) => ticket.convertito == true).toList();
+      default:
+        return _allTickets.where((ticket) => ticket.convertito != true).toList();
+    }
+  }
 }
 
 class TicketDataSource extends DataGridSource{
   BuildContext context;
+  UtenteModel utente;
   List<TicketModel> _tickets = [];
   List<TicketModel> _filteredTickets = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   TicketDataSource(
+      this.utente,
       this.context,
       List<TicketModel> tickets,
       ){
     _tickets = List.from(tickets);
     _filteredTickets = List.from(tickets);
+  }
+
+  void updateData(List<TicketModel> newTickets) {
+    _tickets.clear();
+    _tickets.addAll(newTickets);
+    _filteredTickets = List.from(newTickets);  // Aggiorna anche la lista filtrata
+    notifyListeners();
   }
 
   @override
@@ -341,46 +363,29 @@ class TicketDataSource extends DataGridSource{
     for (int i = 0; i < _filteredTickets.length; i++) {
       TicketModel ticket = _filteredTickets[i];
       String? stato = ticket.convertito == true ? "SI" : "NO";
-      String? cliente = ticket.cliente?.denominazione.toString();
-      String? tipologia = ticket.tipologia?.descrizione.toString();
+      //String? tipologia = ticket.tipologia?.descrizione.toString();
       rows.add(DataGridRow(
         cells: [
           DataGridCell<TicketModel>(columnName: 'ticket', value: ticket),
           DataGridCell<String>(
+            columnName: 'id',
+            value: ticket.id,
+          ),
+          DataGridCell<String>(
               columnName: 'data_apertura',
               value: DateFormat('dd/MM/yyyy').format(ticket.data_creazione!)
-          ),
-          DataGridCell<Priorita>(
-            columnName: 'priorita',
-            value : ticket.priorita,
           ),
           DataGridCell<String>(
               columnName: 'convertito',
               value: stato
           ),
           DataGridCell<String>(
-            columnName: 'cliente',
-            value : cliente,
-          ),
-          DataGridCell<String>(
-              columnName: 'data',
-              value: ticket.data != null ? DateFormat('dd/MM/yyyy').format(ticket.data!) : "N/A"
-          ),
-          DataGridCell<String>(
-              columnName: 'data_apertura',
-              value: ticket.orario_appuntamento != null ? DateFormat('HH:mm').format(ticket.orario_appuntamento!) : "N/A"
-          ),
-          DataGridCell<String>(
-              columnName: 'titolo',
-              value: ticket.titolo,
+              columnName: 'descrizione',
+              value: ticket.descrizione,
           ),
           DataGridCell<String>(
               columnName: 'utente',
               value: ticket.utente!.nomeCompleto()
-          ),
-          DataGridCell<String>(
-            columnName: 'tipologia',
-            value: ticket.tipologia?.descrizione ?? '',//int.parse(intervento.tipologia!.id.toString()),
           ),
         ]
       ));
@@ -389,88 +394,57 @@ class TicketDataSource extends DataGridSource{
   }
 
   @override
-  DataGridRowAdapter buildRow(DataGridRow row){
+  DataGridRowAdapter buildRow(DataGridRow row) {
+    // Ottieni il modello del ticket
     final TicketModel ticket = row.getCells().firstWhere(
             (cell) => cell.columnName == 'ticket').value as TicketModel;
-    Color? prioritaColor;
-    Color? backgroundColor;
-    switch (ticket.tipologia?.descrizione) {
-      case 'Informatico':
-        backgroundColor = Colors.grey[200]; // grigio chiaro
-        break;
-      case 'Elettrico':
-        backgroundColor = Colors.yellow[200]; // giallo chiaro
-        break;
-      case 'Idrico':
-        backgroundColor = Colors.lightBlue[200]; // azzurro chiaro
-        break;
-      case 'Elettronico':
-        backgroundColor = Colors.pink[50]; // rosa chiarissimo
-        break;
-      case 'Riparazione Merce':
-        backgroundColor = Colors.green[100]; // verde chiarissimo
-        break;
-      default:
-        backgroundColor = Colors.white;
-    }
 
-    switch (ticket.priorita) {
-      case Priorita.BASSA :
-        prioritaColor = Colors.lightGreen;
-        break;
-      case Priorita.MEDIA :
-        prioritaColor = Colors.yellow; // grigio chiaro
-        break;
-      case Priorita.ALTA:
-        prioritaColor = Colors.orange; // giallo chiaro
-        break;
-      case Priorita.URGENTE:
-        prioritaColor = Colors.red; // azzurro chiaro
-        break;
-      default:
-        prioritaColor = Colors.blueGrey[200];
-    }
+    // Colori per righe pari e dispari
+    Color backgroundColor = Colors.white;
+    Color backgroundColor2 = Colors.grey.shade200;
 
+    // Calcolo del colore
+    final rowColor = (int.parse(ticket.id!) % 2 == 0) ? backgroundColor : backgroundColor2;
+
+    // Debug temporaneo
+    print('ID del ticket: ${ticket.id}, Colore assegnato: $rowColor');
+
+    // Ritorna il DataGridRowAdapter
     return DataGridRowAdapter(
-        color: backgroundColor,
-        cells: row.getCells().map<Widget>((dataGridCell) {
-          if (dataGridCell.columnName == 'ticket') {
-            return SizedBox.shrink(); // La cella sarà invisibile ma presente
-          }
-          if( dataGridCell.columnName == 'priorita'){
-            return Container(
-              color: prioritaColor,
-            );
-          } else{
-            return GestureDetector(
-              onTap: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DettaglioTicketPage(ticket: ticket),
-                  ),
-                );
-              },
-              child: Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  border: Border(
-                    right: BorderSide(
-                      color: Colors.grey[600]!,
-                      width: 1,
-                    ),
-                  ),
+      color: rowColor,
+      cells: row.getCells().map<Widget>((dataGridCell) {
+        if (dataGridCell.columnName == 'ticket') {
+          return SizedBox.shrink(); // La cella è invisibile
+        } else {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      DettaglioTicketPage(ticket: ticket, utente: utente),
                 ),
-                child: Text(
-                  dataGridCell.value.toString(),
-                  overflow: TextOverflow.ellipsis,
+              );
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                border: Border(
+                  right: BorderSide(
+                    color: Colors.grey[600]!,
+                    width: 1,
+                  ),
                 ),
               ),
-            );
-          }
-      }
-    ).toList(),
+              child: Text(
+                dataGridCell.value.toString(),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          );
+        }
+      }).toList(),
     );
   }
 }

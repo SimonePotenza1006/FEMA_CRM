@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 3.0.10+10
+version: 3.0.12+12
 
 environment:
   sdk: '>=2.19.2 <3.0.0'
@@ -42,9 +42,9 @@ dependencies:
   #pdf_image_renderer: ^0.6.0
   shared_preferences:
   share_plus: ^6.3.0
-
+  device_info_plus: ^8.1.0
   #toast: ^0.1.5 #^0.2.9
-  #fluttertoast: ^8.2.8
+  fluttertoast: ^8.2.1
   flutter_email_sender: ^6.0.2
   email_sender: ^1.3.3
   url_launcher: ^6.0.12
@@ -65,7 +65,7 @@ dependencies:
   overlay_support: ^2.1.0
   flutter_screenutil: ^5.0.0
   geocoding: ^2.1.0
-  #address_search_field: ^5.0.3
+  address_search_field: ^5.0.3
   uuid: ^3.0.6
   flutter_google_places_hoc081098: ^1.0.0-nullsafety.5
   google_api_headers: ^1.1.1
@@ -108,16 +108,15 @@ dependencies:
   permission_handler: ^11.3.1
   #document_scanner_flutter: ^0.2.7
   photo_view: ^0.15.0
-  #flutter_image_compress: ^2.2.0
+  flutter_image_compress: ^2.2.0
   fk_toggle: ^0.1.4
   equatable: ^2.0.5
-  audioplayers: ^6.1.0
+  advance_pdf_viewer:
+    git:
+      url: https://github.com/lohanidamodar/pdf_viewer.git
+      ref: 4e5d96be29de515f1081c0b6897741b8dca84722
   native_qr: ^0.0.3
   syncfusion_flutter_datagrid: ^21.2.10
-
-  record: ^5.2.0
-  just_audio: ^0.9.42
-  #flutter_sound: ^8.3.9 #^9.17.0
   #pdfx: ^2.0.0
   #advance_pdf_viewer2: ^2.0.4
 
@@ -163,8 +162,6 @@ flutter:
     - assets/icons/
     - assets/icons/50.png
     - assets/images/placeholder.jpg
-    - assets/audio/
-    - assets/audio/audio.mp3
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -97,6 +98,11 @@ class _PDFPagamentoAccontoPageState extends State<PDFPagamentoAccontoPage>{
   }
 
   Future<Uint8List> _generatePDF() async {
+    final logoImage = pw.MemoryImage(
+      (await rootBundle.load('assets/images/logo.png'))
+          .buffer
+          .asUint8List(),
+    );
     try {
       final pdf = pw.Document();
       pdf.addPage(
@@ -108,6 +114,14 @@ class _PDFPagamentoAccontoPageState extends State<PDFPagamentoAccontoPage>{
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
+                  pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Center(
+                            child: pw.Image(logoImage, height: 40)
+                        )
+                      ]
+                  ),
                   pw.SizedBox(height: 20),
                   pw.Text(
                     "Documento di ${widget.tipoMovimentazione.toString().substring(19)} in data ${DateFormat('dd/MM/yyyy').format(widget.data!)}, relativa all\'intervento con ID ${widget.intervento?.id}, descrizione: ${widget.intervento?.descrizione} ",

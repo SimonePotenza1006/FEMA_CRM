@@ -8,6 +8,8 @@ import 'package:fema_crm/model/RelazioneDdtProdottiModel.dart';
 import 'package:fema_crm/model/RelazioneProdottiInterventoModel.dart';
 import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
 import 'package:fema_crm/pages/TableInterventiPage.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +27,7 @@ import '../model/TipologiaPagamento.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
 import 'AggiuntaManualeProdottiDDTPage.dart';
+import 'CertificazioniPage.dart';
 import 'GalleriaFotoInterventoPage.dart';
 import 'PDFInterventoPage.dart';
 
@@ -103,6 +106,10 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   List<XFile> pickedImages = [];
   String selectedSection = 'Informazioni Generali';
   String hoveredSection = '';
+  File? selectedFile;
+  List<String> pdfFiles = [];
+  String? errorMessage;
+
 
   @override
   void initState() {
@@ -149,6 +156,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     getProdottiDdt();
     _fetchUtentiAttivi();
     getMetodiPagamento();
+    fetchPdfFiles();
     _futureImages = fetchImages();
     rapportinoController.text = (widget.intervento.relazione_tecnico != null ? widget.intervento.relazione_tecnico : '//')!;
     titoloController.text = widget.intervento.titolo != null ? widget.intervento.titolo! : '//';
@@ -307,6 +315,11 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             title: 'Immagini',
             section: 'Immagine',
           ),
+          _buildHoverableListTile(
+            icon: Icons.picture_as_pdf,
+            title: 'Documenti',
+            section: 'Documenti',
+          ),
           if (widget.intervento.merce != null)
             _buildHoverableListTile(
               icon: Icons.build,
@@ -331,6 +344,8 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         return _buildTecnicoSection();
       case 'Immagine':
         return _buildImageSection();
+      case 'Documenti':
+        return _buildDocumentiSection();
       case 'Merce':
         return _buildMerceSection();
       default:
@@ -1064,6 +1079,232 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     );
   }
 
+  Widget _buildDocumentiSection(){
+    return Padding(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'DOCUMENTI',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+              ),
+              SizedBox(width : 8),
+              IconButton(
+                  onPressed: (){
+                    _pickFile();
+                  },
+                  icon: Icon(Icons.add, color: Colors.grey,),
+                  tooltip: "Aggiungi pdf",
+              ),
+            ],
+          ),
+          if(selectedFile != null)
+            Row(
+              children: [
+                Text(
+                  'File selezionato: ${selectedFile!.path.split('/').last}',
+                  style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  width : 12,
+                ),
+                TextButton(
+                  onPressed: () {
+                    uploadFile(selectedFile!);
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white, // Colore del testo
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // Bordi arrotondati
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Spaziatura interna
+                  ),
+                  child: Text(
+                    "Salva",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(
+                  width : 10,
+                ),
+                IconButton(
+                  onPressed: (){
+                    setState((){
+                      selectedFile = null;
+                    });
+                  },
+                  icon: Icon(Icons.delete, color: Colors.grey,),
+                  tooltip: "Elimina",
+                ),
+              ],
+            ),
+          SizedBox(height: 25),
+          Container(
+            width: 1000,
+            height: 600,
+            child: FutureBuilder<List<String>>(
+              future: fetchPdfFiles(), // Chiama la funzione per recuperare i file
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Errore: ${snapshot.error}'));
+                } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                  return Center(child: Text('Nessun file PDF trovato.'));
+                } else if (snapshot.hasData) {
+                  final pdfFiles = snapshot.data!;
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // Numero di card per riga
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 10.0,
+                    ),
+                    itemCount: pdfFiles.length,
+                    itemBuilder: (context, index) {
+                      final fileName = pdfFiles[index]; // Nome del file PDF
+                      return SizedBox(
+                        width: 200, // Larghezza fissa della card
+                        height: 250, // Altezza fissa della card
+                        child: Card(
+                          elevation: 3,
+                          color: Colors.white, // Sfondo bianco
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                              color: Colors.red, // Bordi rossi
+                              width: 1.5, // Spessore del bordo
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                flex: 2, // Mantiene proporzioni equilibrate
+                                child: Icon(
+                                  Icons.picture_as_pdf,
+                                  size: 60,
+                                  color: Colors.redAccent,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  fileName,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        // Apri il PDF
+                                        await _openPdfFile(context, widget.intervento.id!, fileName);
+                                      },
+                                      child: Text('Apri'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.delete_forever),
+                                      color: Colors.red,
+                                      onPressed: () {
+                                        _showDeleteDialog(context, widget.intervento.id!, fileName);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return Center(child: Text('Nessun risultato.'));
+                }
+              },
+            ),
+          ),
+        ],
+      )
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, String interventoId, String fileName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Conferma Cancellazione'),
+          content: Text('Cancellare definitivamente il file "$fileName"?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Chiude il dialog senza fare nulla
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Chiama la funzione per cancellare il file
+                final success = await _deletePdfFile(interventoId, fileName);
+                Navigator.of(context).pop(); // Chiude il dialog
+
+                // Mostra feedback
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('File eliminato con successo!')),
+                  );
+                  fetchPdfFiles();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Errore durante l\'eliminazione del file.')),
+                  );
+                }
+              },
+              child: Text('Sì'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool> _deletePdfFile(String interventoId, String fileName) async {
+    final url = Uri.parse('$ipaddressProva/pdfu/intervento/$interventoId/$fileName');
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode == 200) {
+        print('File eliminato con successo.');
+        return true;
+      } else {
+        print('Errore durante l\'eliminazione del file: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Errore durante la richiesta: $e');
+      return false;
+    }
+  }
+
   Widget _buildImageSection(){
     return Padding(
       padding: EdgeInsets.all(16),
@@ -1131,9 +1372,177 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             ),
             child: Text('Salva Foto', style: TextStyle(fontSize: 18.0)),
           ) : Container(),
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment : MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.attach_file, color: Colors.black,),
+                      onPressed: _pickFile,
+                      tooltip: 'Seleziona un pdf',
+                    ),
+                    SizedBox(width: 5),
+                    Text('Seleziona un pdf')
+                  ],
+                ),
+                if(selectedFile != null) // Mostra il nome del file se selezionato
+                  Text(
+                    'File selezionato: ${selectedFile!.path.split('/').last}',
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                SizedBox(height : 10),
+                if(selectedFile != null)
+                  ElevatedButton(
+                    onPressed: (){
+
+                    },
+                    child: const Text('Salva PDF'),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                      onPrimary: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+              ],
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _openPdfFile(BuildContext context, String interventoId, String fileName) async {
+    // Costruisci l'URL dell'endpoint
+    final pdfUrl = '$ipaddressProva/pdfu/intervento/$interventoId/$fileName';
+    print('PDF URL: $pdfUrl'); // Debug
+
+    try {
+      final response = await http.get(Uri.parse(pdfUrl));
+
+      if (response.statusCode == 200) {
+        print('Download del PDF riuscito');
+        final dir = await getTemporaryDirectory();
+        final fileToSave = File('${dir.path}/$fileName');
+        await fileToSave.writeAsBytes(response.bodyBytes);
+
+        // Naviga alla schermata del visualizzatore PDF
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PDFViewer(filePath: fileToSave.path),
+          ),
+        );
+      } else {
+        print('Errore durante il download del PDF: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore durante il download del PDF: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      print('Errore durante il download: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore durante il download: $e')),
+      );
+    }
+  }
+
+
+  Future<List<String>> fetchPdfFiles() async {
+    try {
+      print('Inizio richiesta al server per intervento ID: ${widget.intervento.id}'); // Debug
+
+      final response = await http.get(Uri.parse('$ipaddressProva/pdfu/intervento/${widget.intervento.id.toString()}'));
+      print('Risposta ricevuta con status code: ${response.statusCode}'); // Debug
+
+      switch (response.statusCode) {
+        case 200:
+          final List<dynamic> files = jsonDecode(response.body);
+          print('File trovati: $files'); // Debug
+          return files.cast<String>();
+
+        case 204:
+          print('Nessun file trovato per l\'intervento con ID ${widget.intervento.id}.'); // Debug
+          return [];
+
+        case 404:
+          throw Exception('Directory non trovata per intervento ID ${widget.intervento.id}.');
+
+        default:
+          throw Exception('Errore inatteso: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Errore durante la connessione al server: $e'); // Debug
+      throw Exception('Errore durante la connessione al server: $e');
+    }
+  }
+
+  Future<void> uploadFile(File file) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$ipaddressProva/pdfu/intervento'),
+      );
+      request.fields['intervento'] = widget.intervento.id!;
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'pdf', // Nome del parametro nel controller
+          file.path,
+        ),
+      );
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print("File caricato con successo!");
+        setState(() {
+          selectedFile = null;
+        });
+
+        // Mostra l'alert dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Successo!"),
+              content: Text("Documento caricato correttamente!"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Chiudi il dialog
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        print("Errore durante il caricamento del file: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Errore durante il caricamento del file: $e");
+    }
+  }
+
+
+  Future<void> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null && result.files.single.path != null) {
+        setState(() {
+          // Salva il file selezionato come un oggetto File
+          selectedFile = File(result.files.single.path!);
+        });
+        print("File selezionato: ${selectedFile!.path}");
+      } else {
+        // L'utente ha annullato la selezione
+        print("Nessun file selezionato.");
+      }
+    } catch (e) {
+      print("Errore durante la selezione del file: $e");
+    }
   }
 
   Widget _buildTecnicoSection(){
@@ -2065,7 +2474,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                         children:[
                           buildInfoRow(
                               title: 'Orario Inizio',
-                              value: widget.intervento.orario_inizio != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
+                              value: widget.intervento.orario_inizio != null ? DateFormat("HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
                               context: context
                           ),
                           SizedBox(width : 10),
@@ -2097,7 +2506,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
               children: [
                 buildInfoRow(
                     title: 'Orario Fine',
-                    value: widget.intervento.orario_fine != null ? DateFormat("dd/MM/yyyy HH:mm").format(widget.intervento.orario_fine!) : "N/A",
+                    value: widget.intervento.orario_fine != null ? DateFormat("HH:mm").format(widget.intervento.orario_fine!) : "N/A",
                     context: context
                 ),
                 SizedBox(width : 10),

@@ -1301,7 +1301,7 @@ class _HomeFormAmministrazioneNewPageState
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => TableTicketPage()),
+                                        MaterialPageRoute(builder: (context) => TableTicketPage(utente : widget.userData!)),
                                       );
                                     },
                                   ),
@@ -2435,7 +2435,7 @@ class _HomeFormAmministrazioneNewPageState
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => TableTicketPage()),//LogisticaPreventiviHomepage(userData: widget.userData)),
+                                          MaterialPageRoute(builder: (context) => TableTicketPage(utente: widget.userData)),//LogisticaPreventiviHomepage(userData: widget.userData)),
                                         );
                                       },
                                     ),

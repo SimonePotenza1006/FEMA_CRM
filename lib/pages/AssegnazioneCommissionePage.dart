@@ -84,7 +84,6 @@ class _AssegnazioneCommissionePageState
                   ),
                 ),
               ),
-
               SizedBox(height: 20),
               SizedBox(
                 width: 450,

@@ -240,7 +240,54 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                         DataCell(Text(DateFormat('yyyy-MM-dd HH:mm').format(movimento.dataCreazione!))),
                         DataCell(Text(DateFormat('yyyy-MM-dd').format(movimento.data!))),
                         DataCell(Text(movimento.descrizione ?? '')),
-                        DataCell(Text(_getTipoMovimentazioneString(movimento.tipo_movimentazione))),
+                        DataCell(
+                          movimento.tipo_movimentazione == TipoMovimentazione.Prelievo
+                              ? GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PDFPrelievoCassaPage(
+                                    descrizione: movimento.descrizione ?? '',
+                                    data: movimento.dataCreazione,
+                                    utente: movimento.utente,
+                                    tipoMovimentazione: TipoMovimentazione.Prelievo,
+                                    importo: movimento.importo?.toString() ?? '',
+                                    firmaIncaricato: null, // Passa la firma come Uint8List
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 1.0), // Aggiunge spazio tra testo e underline
+                                  child: Text(
+                                    'Prelievo',
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0, // Posiziona la linea esattamente sotto il testo
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    height: 1, // Altezza della linea di sottolineatura
+                                    color: Colors.blue, // Colore della linea di sottolineatura
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                              : Text(
+                            _getTipoMovimentazioneString(movimento.tipo_movimentazione),
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
                         DataCell(Text(movimento.importo != null ? movimento.importo!.toStringAsFixed(2) + '€' : '')),
                         DataCell(Text(movimento.cliente != null ? movimento.cliente!.denominazione! : '///')),
                         DataCell(
@@ -852,7 +899,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                                 data: DateTime.now(),
                                 utente: widget.userData,
                                 tipoMovimentazione: TipoMovimentazione.Prelievo,
-                                importo: _prelievoController.text,
+                                importo: cleanedInput,
                                 firmaIncaricato: firmaIncaricato, // Passa la firma come Uint8List
                               ),
                             ),
