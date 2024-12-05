@@ -48,7 +48,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
 
   Future<void> getAllTickets() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/ticket');
+      var apiUrl = Uri.parse('$ipaddressProva/api/ticket');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -268,10 +268,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
                           ElevatedButton(
                             onPressed: () => _changeSheet(0),
                             style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
-                              //primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                              //onPrimary: Colors.black,
+                              foregroundColor: Colors.black, backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
@@ -283,10 +280,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
                           ElevatedButton(
                             onPressed: () => _changeSheet(1),
                             style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
-                              //primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                              //onPrimary: Colors.black,
+                              foregroundColor: Colors.black, backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
