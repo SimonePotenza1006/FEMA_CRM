@@ -697,7 +697,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 width: 580,
                                 child: DropdownButton<TipologiaInterventoModel>(
                                   value: _selectedTipologia,
-                                  hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
+                                  hint:  Text('Seleziona tipologia'.toUpperCase()),
                                   onChanged: (TipologiaInterventoModel? newValue) {
                                     setState(() {
                                       _selectedTipologia = newValue;
