@@ -202,7 +202,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getSopralluoghiByUtente() async {
     try {
-      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/sopralluogo/utente/${widget.utente.id}'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/sopralluogo/utente/${widget.utente.id}'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<SopralluogoModel> sopralluoghi = [];

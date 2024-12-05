@@ -47,7 +47,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllProdotti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/prodotto'));
+      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ProdottoModel> prodotti = [];
@@ -68,7 +68,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllFornitori() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];
@@ -90,7 +90,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -600,7 +600,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveNota() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/noteTecnico'),
+        Uri.parse('$ipaddress/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : widget.utente.toMap(),
@@ -618,7 +618,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     var fornitore = selectedFornitore != null ? selectedFornitore?.toMap() : null;
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/ordine'),
+        Uri.parse('$ipaddress/api/ordine'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -656,7 +656,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       for(var prodotto in prodottiOrdinati){
         try{
           final response = await http.post(
-            Uri.parse('$ipaddressProva/api/ordine'),
+            Uri.parse('$ipaddress/api/ordine'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'descrizione' : _descrizioneController.text,
