@@ -479,13 +479,72 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                       child: Column(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.all(16.0),
+                                              padding: const EdgeInsets.all(0.0),
                                               child: Form(
                                                 child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: [
                                                       SizedBox(height: 15,),
-                                                      _buildImagePreview(),
+                                                      if (pickedImages.isNotEmpty) _buildImagePreview(),
+                                                      const SizedBox(height: 30),
+                                                      if (Platform.isAndroid)
+                                                        Column(children: [
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                onPressed: _isRecording ? null : _startRecording,
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.blue,
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                      horizontal: 30, vertical: 15),
+                                                                ),
+                                                                child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                              ),
+                                                              const SizedBox(width: 1),
+                                                              Icon(
+                                                                _isRecording ? Icons.mic : Icons.mic_none,
+                                                                size: 85,
+                                                                color: _isRecording ? Colors.red : Colors.blue,
+                                                              ),
+                                                              const SizedBox(width: 1),
+                                                              ElevatedButton(
+                                                                onPressed: _isRecording ? _stopRecording : null,
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.red,
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                      horizontal: 30, vertical: 15),
+                                                                ),
+                                                                child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Text(
+                                                            '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                                          ),
+                                                          const SizedBox(height: 17),
+                                                          ElevatedButton(
+                                                            onPressed: !_isRecording ? _playRecording : null,
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: Colors.green,
+                                                              padding:
+                                                              const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                                            ),
+                                                            child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                          ),
+                                                          Slider(
+                                                            value: _currentPosition,
+                                                            max: _totalDuration,
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                _currentPosition = value;
+                                                              });
+                                                              _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                                            },
+                                                          ),
+                                                          SizedBox(height: 43,)
+                                                        ],),
                                                     ]
                                                 ),
                                               ),
