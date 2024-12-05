@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:excel/excel.dart';
@@ -13,6 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:record/record.dart';
+import 'package:just_audio/just_audio.dart';
 import 'dart:io';
 import '../model/ClienteModel.dart';
 import '../model/DestinazioneModel.dart';
@@ -39,10 +42,77 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
   TextEditingController _titoloController = TextEditingController();
   List<XFile> pickedImages =  [];
   final ImagePicker _picker = ImagePicker();
+  final record = AudioRecorder();
+  bool showPlayer = false;
+  String? audioPath;
+  bool isRecording = false;
+  final AudioRecorder _recorder = AudioRecorder();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isRecording = false;
+  String? _filePath;
+  double _currentPosition = 0;
+  double _totalDuration = 0;
+  Timer? _timer;
+  int _elapsedSeconds = 0;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> _startRecording() async {
+    final bool isPermissionGranted = await _recorder.hasPermission();
+    if (!isPermissionGranted) {
+      return;
+    }
+
+    final directory = await getApplicationDocumentsDirectory();
+    // Generate a unique file name using the current timestamp
+    String fileName = 'recording_${DateTime.now().millisecondsSinceEpoch}.mp3';
+    _filePath = '${directory.path}/$fileName';
+
+    // Define the configuration for the recording
+    const config = RecordConfig(
+      // Specify the format, encoder, sample rate, etc., as needed
+      encoder: AudioEncoder.aacLc, // For example, using AAC codec
+      sampleRate: 44100, // Sample rate
+      bitRate: 128000, // Bit rate
+    );
+
+    // Start recording to file with the specified configuration
+    await _recorder.start(config, path: _filePath!);
+    setState(() {
+      _isRecording = true;
+      _elapsedSeconds = 0;
+    });
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });
+  }
+
+  Future<void> _stopRecording() async {
+    final path = await _recorder.stop();
+    setState(() {
+      _isRecording = false;
+    });
+    _timer?.cancel();
+  }
+
+  Future<void> _playRecording() async {
+    if (_filePath != null) {
+      await _audioPlayer.setFilePath(_filePath!);
+      _totalDuration = _audioPlayer.duration?.inSeconds.toDouble() ?? 0;
+      _audioPlayer.play();
+
+      _audioPlayer.positionStream.listen((position) {
+        setState(() {
+          _currentPosition = position.inSeconds.toDouble();
+        });
+      });
+    }
   }
 
   Future<void> pickImagesFromGallery() async {
@@ -182,7 +252,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                             Padding(
                               padding: const EdgeInsets.all(20.0),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(height: 20.0),
                                   SizedBox(
@@ -212,7 +282,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                         focusedBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide(
-                                            color: Colors.blue, // Colore del bordo quando il campo è attivo
+                                            color: Colors.red, // Colore del bordo quando il campo è attivo
                                             width: 2.0,
                                           ),
                                         ),
@@ -255,7 +325,66 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  _buildImagePreview(),
+                                  if (pickedImages.isNotEmpty) _buildImagePreview(),
+                          const SizedBox(height: 30),
+                          if (Platform.isAndroid)
+                      Column(children: [
+                    Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: _isRecording ? null : _startRecording,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 15),
+                          ),
+                          child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          _isRecording ? Icons.mic : Icons.mic_none,
+                          size: 95,
+                          color: _isRecording ? Colors.red : Colors.blue,
+                        ),
+                        const SizedBox(width: 6),
+                        ElevatedButton(
+                          onPressed: _isRecording ? _stopRecording : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 15),
+                          ),
+                          child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  Text(
+                  '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 17),
+                  ElevatedButton(
+                  onPressed: !_isRecording ? _playRecording : null,
+                  style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  ),
+                  child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  Slider(
+                  value: _currentPosition,
+                  max: _totalDuration,
+                  onChanged: (value) {
+                  setState(() {
+                  _currentPosition = value;
+                  });
+                  _audioPlayer.seek(Duration(seconds: value.toInt()));
+                  },
+                  ),
+                  SizedBox(height: 43,)
+                      ],),
                                 ],
                               ),
                             ),
@@ -350,13 +479,72 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                       child: Column(
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.all(16.0),
+                                              padding: const EdgeInsets.all(0.0),
                                               child: Form(
                                                 child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     children: [
                                                       SizedBox(height: 15,),
-                                                      _buildImagePreview(),
+                                                      if (pickedImages.isNotEmpty) _buildImagePreview(),
+                                                      const SizedBox(height: 30),
+                                                      if (Platform.isAndroid)
+                                                        Column(children: [
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                onPressed: _isRecording ? null : _startRecording,
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.blue,
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                      horizontal: 30, vertical: 15),
+                                                                ),
+                                                                child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                              ),
+                                                              const SizedBox(width: 1),
+                                                              Icon(
+                                                                _isRecording ? Icons.mic : Icons.mic_none,
+                                                                size: 85,
+                                                                color: _isRecording ? Colors.red : Colors.blue,
+                                                              ),
+                                                              const SizedBox(width: 1),
+                                                              ElevatedButton(
+                                                                onPressed: _isRecording ? _stopRecording : null,
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.red,
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                      horizontal: 30, vertical: 15),
+                                                                ),
+                                                                child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Text(
+                                                            '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                                          ),
+                                                          const SizedBox(height: 17),
+                                                          if (_timer != null) ElevatedButton(
+                                                            onPressed: !_isRecording ? _playRecording : null,
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor: Colors.green,
+                                                              padding:
+                                                              const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                                            ),
+                                                            child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                          ),
+                                                          if (_timer != null) Slider(
+                                                            value: _currentPosition,
+                                                            max: _totalDuration,
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                _currentPosition = value;
+                                                              });
+                                                              _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                                            },
+                                                          ),
+                                                          SizedBox(height: 43,)
+                                                        ],),
                                                     ]
                                                 ),
                                               ),
@@ -386,7 +574,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     var descrizione = _descrizioneController.text.isNotEmpty ? _descrizioneController.text : null;
     try{
       response = await http.post(
-        Uri.parse('$ipaddressProva/api/ticket'),
+        Uri.parse('$ipaddress/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'titolo' : titolo,
@@ -426,7 +614,6 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
         );
       },
     );
-
     // Inizia il salvataggio
     try {
       final data = await saveTicket();
@@ -442,7 +629,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -466,9 +653,42 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
           print('Errore: Il percorso del file non è valido');
         }
       }
+
+      var file = File(_filePath!);
+      //for (var image in pickedImages) {
+      if (file.path != null && file.path.isNotEmpty) {
+        print('Percorso del file audio: ${file.path}');
+        var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('$ipaddress/api/immagine/ticketaudio/${int.parse(ticket.id!.toString())}'),
+        );
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'ticket', // Field name
+            file.path, // File path
+            contentType: MediaType('audio', 'mp3'),
+          ),
+        );
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          print('File inviato con successo');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Audio salvato!'),
+            ),
+          );
+        } else {
+          print('Errore durante l\'invio del file audio: ${response.statusCode}');
+        }
+      } else {
+        // Gestisci il caso in cui il percorso del file non è valido
+        print('Errore: Il percorso del file audio non è valido');
+      }
+
     } catch (e) {
       print('Errore durante l\'invio del file: $e');
     } finally {
+
       // Chiude il dialog e torna indietro nella navigazione
       Navigator.pop(context); // Chiude il dialog
       Navigator.pop(context); // Torna indietro nella navigazione

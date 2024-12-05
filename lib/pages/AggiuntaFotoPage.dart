@@ -111,7 +111,7 @@ class _AggiuntaFotoPageState extends State<AggiuntaFotoPage> {
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
