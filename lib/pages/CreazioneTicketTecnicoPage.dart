@@ -335,17 +335,17 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                         ElevatedButton(
                           onPressed: _isRecording ? null : _startRecording,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: Colors.red,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 30, vertical: 15),
                           ),
-                          child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold, color : Colors.white)),
                         ),
                         const SizedBox(width: 6),
                         Icon(
                           _isRecording ? Icons.mic : Icons.mic_none,
                           size: 95,
-                          color: _isRecording ? Colors.red : Colors.blue,
+                          color: _isRecording ? Colors.red : Colors.red,
                         ),
                         const SizedBox(width: 6),
                         ElevatedButton(
@@ -355,7 +355,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 30, vertical: 15),
                           ),
-                          child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                         ),
                       ],
                     ),
@@ -367,11 +367,11 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                   ElevatedButton(
                   onPressed: !_isRecording ? _playRecording : null,
                   style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.red,
                   padding:
                   const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   ),
-                  child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                   Slider(
                   value: _currentPosition,
