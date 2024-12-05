@@ -93,6 +93,45 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     });
   }
 
+  Future<void> _resetRecording() async {
+
+
+    setState(() {
+      _filePath = null;
+      _isRecording = false;
+      _elapsedSeconds = 0;
+      _timer?.cancel();
+      _timer = null;
+    });
+
+
+    /*final directory = await getApplicationDocumentsDirectory();
+    // Generate a unique file name using the current timestamp
+    String fileName = 'recording_${DateTime.now().millisecondsSinceEpoch}.mp3';
+    _filePath = '${directory.path}/$fileName';
+
+    // Define the configuration for the recording
+    const config = RecordConfig(
+      // Specify the format, encoder, sample rate, etc., as needed
+      encoder: AudioEncoder.aacLc, // For example, using AAC codec
+      sampleRate: 44100, // Sample rate
+      bitRate: 128000, // Bit rate
+    );
+
+    // Start recording to file with the specified configuration
+    await _recorder.start(config, path: _filePath!);
+    setState(() {
+      _isRecording = true;
+      _elapsedSeconds = 0;
+    });
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedSeconds++;
+      });
+    });*/
+  }
+
   Future<void> _stopRecording() async {
     final path = await _recorder.stop();
     setState(() {
@@ -344,7 +383,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                         const SizedBox(width: 6),
                         Icon(
                           _isRecording ? Icons.mic : Icons.mic_none,
-                          size: 95,
+                          size: 85,
                           color: _isRecording ? Colors.red : Colors.red,
                         ),
                         const SizedBox(width: 6),
@@ -363,8 +402,58 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                   '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 17),
-                  ElevatedButton(
+                  const SizedBox(height: 12),
+                        if (_timer != null) Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: !_isRecording ? _playRecording : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                              ),
+                              child: Icon(
+                                Icons.play_arrow, // Icona di play
+                                color: Colors.white, // Colore dell'icona
+                                size: 28, // Dimensione dell'icona
+                              ),
+                            ),
+                            /*ElevatedButton(
+                                  onPressed: !_isRecording ? _playRecording : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                  ),
+                                  child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),*/
+                            SizedBox(width: 30,),
+                            ElevatedButton(
+                              onPressed: _resetRecording,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                              ),
+                              child: Icon(
+                                Icons.delete_forever, // Icona di play
+                                color: Colors.white, // Colore dell'icona
+                                size: 28, // Dimensione dell'icona
+                              ),
+                            ),
+                            //if (_timer != null)
+                            /*ElevatedButton(
+                                  onPressed: _resetRecording,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                  ),
+                                  child: const Text('annulla', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),*/
+                          ],),
+                  /*ElevatedButton(
                   onPressed: !_isRecording ? _playRecording : null,
                   style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
@@ -372,8 +461,9 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                   const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   ),
                   child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                  ),
-                  Slider(
+                  ),*/
+                  if (_timer != null) Slider(
+                    activeColor: Colors.blue,
                   value: _currentPosition,
                   max: _totalDuration,
                   onChanged: (value) {
@@ -495,11 +585,11 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                                               ElevatedButton(
                                                                 onPressed: _isRecording ? null : _startRecording,
                                                                 style: ElevatedButton.styleFrom(
-                                                                  backgroundColor: Colors.blue,
+                                                                  backgroundColor: Colors.red,
                                                                   padding: const EdgeInsets.symmetric(
                                                                       horizontal: 30, vertical: 15),
                                                                 ),
-                                                                child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                                child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                                               ),
                                                               const SizedBox(width: 1),
                                                               Icon(
@@ -515,7 +605,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                                                   padding: const EdgeInsets.symmetric(
                                                                       horizontal: 30, vertical: 15),
                                                                 ),
-                                                                child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                                child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                                               ),
                                                             ],
                                                           ),
@@ -523,8 +613,58 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                                             '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
                                                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                                           ),
-                                                          const SizedBox(height: 17),
-                                                          if (_timer != null) ElevatedButton(
+                                                          const SizedBox(height: 12),
+                                                          if (_timer != null) Row(
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                onPressed: !_isRecording ? _playRecording : null,
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.red,
+                                                                  padding:
+                                                                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                                                ),
+                                                                child: Icon(
+                                                                  Icons.play_arrow, // Icona di play
+                                                                  color: Colors.white, // Colore dell'icona
+                                                                  size: 28, // Dimensione dell'icona
+                                                                ),
+                                                              ),
+                                                              /*ElevatedButton(
+                                  onPressed: !_isRecording ? _playRecording : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                  ),
+                                  child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),*/
+                                                              SizedBox(width: 30,),
+                                                              ElevatedButton(
+                                                                onPressed: _resetRecording,
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.red,
+                                                                  padding:
+                                                                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                                                ),
+                                                                child: Icon(
+                                                                  Icons.delete_forever, // Icona di play
+                                                                  color: Colors.white, // Colore dell'icona
+                                                                  size: 28, // Dimensione dell'icona
+                                                                ),
+                                                              ),
+                                                              //if (_timer != null)
+                                                              /*ElevatedButton(
+                                  onPressed: _resetRecording,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                  ),
+                                  child: const Text('annulla', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),*/
+                                                            ],),
+                                                          /*if (_timer != null) ElevatedButton(
                                                             onPressed: !_isRecording ? _playRecording : null,
                                                             style: ElevatedButton.styleFrom(
                                                               backgroundColor: Colors.green,
@@ -532,8 +672,9 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                                               const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                                                             ),
                                                             child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
-                                                          ),
+                                                          ),*/
                                                           if (_timer != null) Slider(
+                                                            activeColor: Colors.blue,
                                                             value: _currentPosition,
                                                             max: _totalDuration,
                                                             onChanged: (value) {

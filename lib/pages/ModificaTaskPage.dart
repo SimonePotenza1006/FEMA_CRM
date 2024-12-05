@@ -759,6 +759,7 @@ class _ModificaTaskPageState
                                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                             ),
                                             Slider(
+                                              activeColor: Colors.blue,
                                               value: _currentPosition,
                                               max: _totalDuration,
                                               onChanged: (value) {
