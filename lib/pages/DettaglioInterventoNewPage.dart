@@ -1400,8 +1400,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                     },
                     child: const Text('Salva PDF'),
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.red,
-                      onPrimary: Colors.white,
+                      foregroundColor: Colors.white, backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

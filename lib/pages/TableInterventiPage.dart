@@ -1102,8 +1102,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(1),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.white,
+                                backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
+                                //primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                                //onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1115,8 +1117,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(2),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.white,
+                                backgroundColor: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700],
+                                //primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                                //onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1128,8 +1132,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(3),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.white,
+                                backgroundColor: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                //primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                //onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1141,8 +1147,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(4),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.white,
+                                backgroundColor: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                //primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                //onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1154,8 +1162,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(5),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.white,
+                                backgroundColor: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                //primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                //onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
@@ -1167,8 +1177,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                             ElevatedButton(
                               onPressed: () => _changeSheet(0),
                               style: ElevatedButton.styleFrom(
-                                primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                                onPrimary: Colors.black,
+                                foregroundColor: Colors.white,
+                                backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
+                                //primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                                //onPrimary: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),

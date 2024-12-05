@@ -587,7 +587,9 @@ class _LoginFormState extends State<LoginForm> {
                           SizedBox(height: 30),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.red,
+
+                              backgroundColor: Colors.red,
+                              //primary: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
@@ -602,7 +604,7 @@ class _LoginFormState extends State<LoginForm> {
                           Spacer(),
                           Align(
                             alignment: Alignment.bottomRight,
-                            child: Text('REL. 02.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
+                            child: Text('REL. 05.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
                           )
 
                         ],

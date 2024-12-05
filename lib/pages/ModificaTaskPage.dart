@@ -33,7 +33,7 @@ class _ModificaTaskPageState
   // Controller for the text fields
   TextEditingController _descrizioneController = TextEditingController();
   TextEditingController _titoloController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   UtenteModel? selectedUtente;
   List<TipoTaskModel> allTipi = [];
@@ -541,8 +541,8 @@ class _ModificaTaskPageState
               if (pickedImages.isNotEmpty)
                 _buildImagePreview(),
               SizedBox(height: 20),
-              if (_futureAudio != null)
-              //Row(children: [
+              if (resp != null)//(_futureAudio != null)
+              Column(children: [
                 ElevatedButton(
                   onPressed: _playRecording,
                   style: ElevatedButton.styleFrom(
@@ -588,7 +588,7 @@ class _ModificaTaskPageState
                     );
                   }
                 },
-              ),
+              ),]),
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: _selectedTipo != null ? () {
