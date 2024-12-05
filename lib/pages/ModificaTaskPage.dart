@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:fema_crm/pages/TableTaskPage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -301,17 +302,26 @@ class _ModificaTaskPageState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        /*leading: BackButton(
-          onPressed: (){Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>  TableTaskPage(utente: widget.utente),
-            ),
-          );},
-          color: Colors.black, // <-- SEE HERE
-        ),*/
+    return WillPopScope(
+      onWillPop: () async {
+        // Ottieni la larghezza dello schermo
+        final size = MediaQuery.of(context).size;
+        const double thresholdWidth = 450.0;
+        // Cambia l'orientamento in base alla larghezza
+        if (size.width < thresholdWidth) {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.landscapeRight,
+          ]);
+        } else {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+          ]);
+        }
+        // Consenti la navigazione indietro
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
           title: const Text('MODIFICA TASK',
               style: TextStyle(color: Colors.white)),
           centerTitle: true,
@@ -322,9 +332,8 @@ class _ModificaTaskPageState
                 builder: (context, constraints){
                   return Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Center(
                       child:  Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           /*SizedBox(
                 width: 200,
@@ -340,55 +349,165 @@ class _ModificaTaskPageState
                           SizedBox(height: 20),
                           // Description Field
                           SizedBox(
-                            width: 450,
+                            width: 600,
                             child: TextFormField(
                               controller: _titoloController,
                               maxLines: null,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
                               decoration: InputDecoration(
-                                labelText: 'Titolo',
-                                border: OutlineInputBorder(),
+                                labelText: 'Titolo'.toUpperCase(),
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none, // Rimuove il bordo standard
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                hintText: "Inserisci il titolo",
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
                             ),
                           ),
                           SizedBox(height: 20),
                           // Description Field
                           SizedBox(
-                            width: 450,
-                            child: TextFormField(minLines: 4,
+                            width: 600,
+                            child: TextFormField(
                               controller: _descrizioneController,
-                              maxLines: null,
+                              maxLines: 5,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
                               decoration: InputDecoration(
-                                labelText: 'Descrizione',
-                                border: OutlineInputBorder(),
+                                labelText: 'Descrizione'.toUpperCase(),
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                hintText: "Inserisci la descrizione",
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
                             ),
                           ),
                           SizedBox(height: 20),
                           SizedBox(
-                            width: 400,
+                            width: 600,
                             child: DropdownButtonFormField<TipoTaskModel>(
                               value: _selectedTipo,
-                              onChanged: (TipoTaskModel? newValue){
+                              onChanged: (TipoTaskModel? newValue) {
                                 setState(() {
                                   _selectedTipo = newValue;
                                 });
                               },
-                              items: allTipi.map((TipoTaskModel tipo){
+                              items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
                                 return DropdownMenuItem<TipoTaskModel>(
-                                  value: tipo,
-                                  child: Text(tipo.descrizione!),
+                                  value: tipologia,
+                                  child: Text(
+                                    tipologia.descrizione!, // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
+                                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                                  ),
                                 );
                               }).toList(),
                               decoration: InputDecoration(
-                                  labelText: 'Seleziona tipologia'.toUpperCase()
+                                labelText: 'TIPOLOGIA TASK',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Selezionare una tipologia di task';
+                                }
+                                return null;
+                              },
                             ),
                           ),
                           SizedBox(height: 20),
                           (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
-                            width: 200,
+                            width: 400,
                             child: CheckboxListTile(
-                              title: Text('Condiviso'),
+                              title: Text(
+                                'CONDIVISO',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               value: _condiviso,
                               onChanged: (value) {
                                 setState(() {
@@ -398,33 +517,83 @@ class _ModificaTaskPageState
                                   }
                                 });
                               },
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: Colors.redAccent,
+                              checkColor: Colors.white,
+                              tileColor: Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
                           ) : Container(),
                           SizedBox(height: 20),// Button
                           if (_condiviso) SizedBox(
-                            width: 450,
+                            width: 600,
                             child: DropdownButtonFormField<UtenteModel>(
                               value: selectedUtente,
-                              onChanged: (UtenteModel? newValue){
+                              onChanged: (UtenteModel? newValue) {
                                 setState(() {
                                   selectedUtente = newValue;
                                 });
                               },
-                              items: allUtenti.map((UtenteModel utente){
+                              items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
                                 return DropdownMenuItem<UtenteModel>(
                                   value: utente,
-                                  child: Text(utente.nomeCompleto()!),
+                                  child: Text(
+                                    utente.nomeCompleto()!,
+                                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                                  ),
                                 );
                               }).toList(),
                               decoration: InputDecoration(
-                                  labelText: 'Seleziona tecnico'.toUpperCase()
+                                labelText: 'SELEZIONA TECNICO',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Selezionare un tecnico';
+                                }
+                                return null;
+                              },
                             ),
                           ),
                           !(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
-                            width: 200,
+                            width: 400,
                             child: CheckboxListTile(
-                              title: Text('Accettato'),
+                              title: Text(
+                                'ACCETTATO',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               value: _accettato,
                               onChanged: (value) {
                                 setState(() {
@@ -434,12 +603,28 @@ class _ModificaTaskPageState
                                   }
                                 });
                               },
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: Colors.redAccent,
+                              checkColor: Colors.white,
+                              tileColor: Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
                           ) : Container(),
+                          SizedBox(height: 10),
                           SizedBox(
-                            width: 200,
+                            width: 400,
                             child: CheckboxListTile(
-                              title: Text('Concluso'),
+                              title: Text(
+                                'CONCLUSO',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               value: _concluso,
                               onChanged: (value) {
                                 setState(() {
@@ -449,6 +634,14 @@ class _ModificaTaskPageState
                                   }
                                 });
                               },
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: Colors.redAccent,
+                              checkColor: Colors.white,
+                              tileColor: Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
                           ),
                           FutureBuilder<List<Uint8List>>(
@@ -495,7 +688,7 @@ class _ModificaTaskPageState
                             },
                           ),
                           SizedBox(height: 40),
-                          Platform.isWindows ? Center(
+                          Platform.isWindows ? Container(
                             child: ElevatedButton(
                               onPressed: pickImagesFromGallery,
                               style: ElevatedButton.styleFrom(
@@ -530,94 +723,77 @@ class _ModificaTaskPageState
                               ),
 
 
-              ],),
-              SizedBox(height: 30),
-              if (pickedImages.isNotEmpty)
-                _buildImagePreview(),
-              SizedBox(height: 20),
-              if (resp != null)//(_futureAudio != null)
-              Column(children: [
-                ElevatedButton(
-                  onPressed: _playRecording,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  ),
-                  child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              //Text(_totalDuration.toString()),
-              FutureBuilder(
-                future: _futureAudio, // Usa il futuro dell'audio
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Errore nel caricamento dell\'audio'));
-                  } else {
-                    // Qui puoi accedere a _totalDuration e costruire il tuo widget
-                    return SingleChildScrollView(
-                      child: Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              '${(_totalDuration.toInt() ~/ 60).toString().padLeft(2, '0')}:${(_totalDuration.toInt() % 60).toString().padLeft(2, '0')}',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ],),
+                          SizedBox(height: 30),
+                          if (pickedImages.isNotEmpty)
+                            _buildImagePreview(),
+                          SizedBox(height: 20),
+                          if (resp != null)//(_futureAudio != null)
+                            Column(children: [
+                              ElevatedButton(
+                                onPressed: _playRecording,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                ),
+                                child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                              //Text(_totalDuration.toString()),
+                              FutureBuilder(
+                                future: _futureAudio, // Usa il futuro dell'audio
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Center(child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return Center(child: Text('Errore nel caricamento dell\'audio'));
+                                  } else {
+                                    // Qui puoi accedere a _totalDuration e costruire il tuo widget
+                                    return SingleChildScrollView(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(20.0),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              '${(_totalDuration.toInt() ~/ 60).toString().padLeft(2, '0')}:${(_totalDuration.toInt() % 60).toString().padLeft(2, '0')}',
+                                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                            ),
+                                            Slider(
+                                              value: _currentPosition,
+                                              max: _totalDuration,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _currentPosition = value;
+                                                });
+                                                _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                              },
+                                            ),
+                                            // Altri widget...
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),]),
+                          SizedBox(height: 30),
+                          ElevatedButton(
+                            onPressed: _selectedTipo != null ? () {
+                              salvaTask();
+                            } : null,
+                            child: Text('SALVA'),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            Slider(
-                              value: _currentPosition,
-                              max: _totalDuration,
-                              onChanged: (value) {
-                                setState(() {
-                                  _currentPosition = value;
-                                });
-                                _audioPlayer.seek(Duration(seconds: value.toInt()));
-                              },
-                            ),
-                            // Altri widget...
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    );
-                  }
-                },
-              ),]),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _selectedTipo != null ? () {
-                  salvaTask();
-                } : null,
-                child: Text('SALVA'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );})),
-      /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Padding(
-        padding: EdgeInsets.all(22.0),
-        child: ElevatedButton(
-          onPressed: () {
-            createTask();
-          },
-          child: Text('SALVA'),
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red,
-            onPrimary: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-      ),*/
+                    );})),
+      ),
     );
   }
 

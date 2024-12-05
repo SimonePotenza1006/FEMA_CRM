@@ -196,10 +196,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
       response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-
         fileaudio = File(filePath);
-        print(filePath.toString()+' 3333333333 '+response.bodyBytes.toString());
-
         await fileaudio.writeAsBytes(response.bodyBytes);
         resp = response.bodyBytes;
         //await _audioPlayer.setFilePath(filePath);
@@ -236,7 +233,6 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         final images = jsonData.map<Uint8List>((imageData) {
           final base64String = imageData['imageData'];
           final bytes = base64Decode(base64String);
-          print('lllee '+bytes.length.toString());
           return bytes.buffer.asUint8List();
         }).toList();
         return images; // no need to wrap with Future
@@ -419,7 +415,6 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                     future: _futureImages,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        print('sssnnn '+snapshot.data!.length.toString());
                         return Wrap(
                           spacing: 16,
                           runSpacing: 16,
@@ -468,11 +463,11 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                   ElevatedButton(
                     onPressed: _playRecording,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.red,
                       padding:
                       const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     ),
-                    child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 //Text(_totalDuration.toString()),
                 FutureBuilder(
@@ -1655,42 +1650,41 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      color: Colors.redAccent,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      title.toUpperCase() + ": ",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
+                Container(
+                  width: 4,
+                  height: 24,
+                  color: Colors.redAccent,
                 ),
-                Expanded(
+                const SizedBox(width: 10),
+                Text(
+                  title.toUpperCase() + ": ",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                Flexible(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        displayedValue.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Text(
+                          displayedValue.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis, // Assicura che il testo venga troncato
+                          maxLines: 1, // Imposta una sola linea per il testo
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                       if (isValueTooLong && context != null) // Icona per valore lungo
                         IconButton(
-                          icon: Icon(Icons.info_outline),
+                          icon: const Icon(Icons.info_outline),
                           onPressed: () {
                             showDialog(
                               context: context,
@@ -1700,7 +1694,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                                   content: Text(value),
                                   actions: [
                                     TextButton(
-                                      child: Text("Chiudi"),
+                                      child: const Text("Chiudi"),
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
@@ -1713,12 +1707,12 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                         ),
                       if (showCopyIcon) // Icona per copiare negli appunti
                         IconButton(
-                          icon: Icon(Icons.copy),
+                          icon: const Icon(Icons.copy),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: value));
                             if (context != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text("Testo copiato negli appunti"),
                                   duration: Duration(seconds: 2),
                                 ),
@@ -1731,7 +1725,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Divider(
               color: Colors.grey[400],
               thickness: 1,
