@@ -37,7 +37,7 @@ class _CreazioneTaskPageState
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _titoloController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   UtenteModel? selectedUtente;
   DateTime _dataOdierna = DateTime.now();
@@ -269,205 +269,224 @@ class _CreazioneTaskPageState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('CREAZIONE TASK',
-            style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: Colors.red,
-      ),
-      body: LayoutBuilder(
-      builder: (context, constraints){
+    return WillPopScope(
+      onWillPop: () async {
+        // Ottieni la larghezza dello schermo
+        final size = MediaQuery.of(context).size;
+        const double thresholdWidth = 450.0;
 
-      return Padding(
-        padding: EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Center(
-            child:  Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 20),
-                // Description Field
-                SizedBox(
-                  width: 450,
-                  child: TextFormField(
-                    controller: _titoloController,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      labelText: 'Titolo',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                // Description Field
-                SizedBox(
-                  width: 450,
-                  child: TextFormField(minLines: 4,
-                    controller: _descrizioneController,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      labelText: 'Descrizione',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: 400,
-                  child: DropdownButtonFormField<TipoTaskModel>(
-                    value: _selectedTipo,
-                    onChanged: (TipoTaskModel? newValue){
-                      setState(() {
-                        _selectedTipo = newValue;
-                      });
-                    },
-                    items: allTipi.map((TipoTaskModel tipo){
-                      return DropdownMenuItem<TipoTaskModel>(
-                        value: tipo,
-                        child: Text(tipo.descrizione!),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Seleziona tipologia'.toUpperCase()
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: 200,
-                  child: CheckboxListTile(
-                    title: Text('Condiviso'),
-                    value: _condiviso,
-                    onChanged: (value) {
-                      setState(() {
-                        _condiviso = value!;
-                        if (_condiviso) {
-                          _condivisoController.clear();
-                        }
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(height: 10),// Button
-                if (_condiviso) SizedBox(
-                  width: 450,
-                  child: DropdownButtonFormField<UtenteModel>(
-                    value: selectedUtente,
-                    onChanged: (UtenteModel? newValue){
-                      setState(() {
-                        selectedUtente = newValue;
-                      });
-                    },
-                    items: allUtenti.map((UtenteModel utente){
-                      return DropdownMenuItem<UtenteModel>(
-                        value: utente,
-                        child: Text(utente.nomeCompleto()!),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                        labelText: 'Seleziona tecnico'.toUpperCase()
-                    ),
-                  ),
-                ),
-                SizedBox(height: 40),
-                Platform.isWindows ? Center(
-                  child: ElevatedButton(
-                    onPressed: pickImagesFromGallery,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.red,
-                    ),
-                    child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                  ),
-                ) : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: ElevatedButton(
-                      onPressed: takePicture,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Colors.red,
-                      ),
-                      child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                    ),
-                  ),
-                  SizedBox(width: 16,),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed: pickImagesFromGallery,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white, backgroundColor: Colors.red,
-                      ),
-                      child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                    ),
-                  ),
-                ],),
-                SizedBox(height: 10),
-                if (pickedImages.isNotEmpty) _buildImagePreview(),
-                SizedBox(height: 10),
+        // Cambia l'orientamento in base alla larghezza
+        if (size.width < thresholdWidth) {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.landscapeRight,
+          ]);
+        } else {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+          ]);
+        }
+        // Consenti la navigazione indietro
+        return true;
+      },
+      child:Scaffold(
+          appBar: AppBar(
+            title: const Text('CREAZIONE TASK',
+                style: TextStyle(color: Colors.white)),
+            centerTitle: true,
+            backgroundColor: Colors.red,
+          ),
+          body: LayoutBuilder(
+              builder: (context, constraints){
+
+                return Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Center(
+                      child:  Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 20),
+                          // Description Field
+                          SizedBox(
+                            width: 450,
+                            child: TextFormField(
+                              controller: _titoloController,
+                              maxLines: null,
+                              decoration: InputDecoration(
+                                labelText: 'Titolo',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          // Description Field
+                          SizedBox(
+                            width: 450,
+                            child: TextFormField(minLines: 4,
+                              controller: _descrizioneController,
+                              maxLines: null,
+                              decoration: InputDecoration(
+                                labelText: 'Descrizione',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            width: 400,
+                            child: DropdownButtonFormField<TipoTaskModel>(
+                              value: _selectedTipo,
+                              onChanged: (TipoTaskModel? newValue){
+                                setState(() {
+                                  _selectedTipo = newValue;
+                                });
+                              },
+                              items: allTipi.map((TipoTaskModel tipo){
+                                return DropdownMenuItem<TipoTaskModel>(
+                                  value: tipo,
+                                  child: Text(tipo.descrizione!),
+                                );
+                              }).toList(),
+                              decoration: InputDecoration(
+                                  labelText: 'Seleziona tipologia'.toUpperCase()
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          SizedBox(
+                            width: 200,
+                            child: CheckboxListTile(
+                              title: Text('Condiviso'),
+                              value: _condiviso,
+                              onChanged: (value) {
+                                setState(() {
+                                  _condiviso = value!;
+                                  if (_condiviso) {
+                                    _condivisoController.clear();
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 10),// Button
+                          if (_condiviso) SizedBox(
+                            width: 450,
+                            child: DropdownButtonFormField<UtenteModel>(
+                              value: selectedUtente,
+                              onChanged: (UtenteModel? newValue){
+                                setState(() {
+                                  selectedUtente = newValue;
+                                });
+                              },
+                              items: allUtenti.map((UtenteModel utente){
+                                return DropdownMenuItem<UtenteModel>(
+                                  value: utente,
+                                  child: Text(utente.nomeCompleto()!),
+                                );
+                              }).toList(),
+                              decoration: InputDecoration(
+                                  labelText: 'Seleziona tecnico'.toUpperCase()
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 40),
+                          Platform.isWindows ? Center(
+                            child: ElevatedButton(
+                              onPressed: pickImagesFromGallery,
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white, backgroundColor: Colors.red,
+                              ),
+                              child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                            ),
+                          ) : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: takePicture,
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white, backgroundColor: Colors.red,
+                                  ),
+                                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                ),
+                              ),
+                              SizedBox(width: 16,),
+                              Center(
+                                child: ElevatedButton(
+                                  onPressed: pickImagesFromGallery,
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white, backgroundColor: Colors.red,
+                                  ),
+                                  child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                ),
+                              ),
+                            ],),
+                          SizedBox(height: 10),
+                          if (pickedImages.isNotEmpty) _buildImagePreview(),
+                          SizedBox(height: 10),
 
 
-                const SizedBox(height: 20),
-                if (Platform.isAndroid)
-                  Column(children: [
-                  Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: _isRecording ? null : _startRecording,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 15),
-                      ),
-                      child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    const SizedBox(width: 6),
-                    Icon(
-                      _isRecording ? Icons.mic : Icons.mic_none,
-                      size: 95,
-                      color: _isRecording ? Colors.red : Colors.blue,
-                    ),
-                    const SizedBox(width: 6),
-                    ElevatedButton(
-                      onPressed: _isRecording ? _stopRecording : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 15),
-                      ),
-                      child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
-                Text(
-                  '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 17),
-                if (_timer != null) ElevatedButton(
-                  onPressed: !_isRecording ? _playRecording : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  ),
-                  child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                if (_timer != null) Slider(
-                  value: _currentPosition,
-                  max: _totalDuration,
-                  onChanged: (value) {
-                    setState(() {
-                      _currentPosition = value;
-                    });
-                    _audioPlayer.seek(Duration(seconds: value.toInt()));
-                  },
-                ),
-               SizedBox(height: 43,)
-                  ],),
-               /* Center(
+                          const SizedBox(height: 20),
+                          if (Platform.isAndroid)
+                            Column(children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: _isRecording ? null : _startRecording,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 15),
+                                    ),
+                                    child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Icon(
+                                    _isRecording ? Icons.mic : Icons.mic_none,
+                                    size: 95,
+                                    color: _isRecording ? Colors.red : Colors.blue,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  ElevatedButton(
+                                    onPressed: _isRecording ? _stopRecording : null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 15),
+                                    ),
+                                    child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 17),
+                              if (_timer != null) ElevatedButton(
+                                onPressed: !_isRecording ? _playRecording : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                ),
+                                child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                              if (_timer != null) Slider(
+                                value: _currentPosition,
+                                max: _totalDuration,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _currentPosition = value;
+                                  });
+                                  _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                },
+                              ),
+                              SizedBox(height: 43,)
+                            ],),
+                          /* Center(
                   child: showPlayer
                       ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -488,27 +507,28 @@ class _CreazioneTaskPageState
                     },
                   ),
                 ),*/
-              ],
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+          ), floatingActionButton: Padding(
+        padding: EdgeInsets.all(10.0),
+        child: ElevatedButton(
+          onPressed: _selectedTipo != null ? () {
+            saveTaskPlusAudio();//saveTaskPlusPics();
+          } : null,
+          child: Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16) ),
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white, backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),
-      );
-      }
-      ), floatingActionButton: Padding(
-      padding: EdgeInsets.all(10.0),
-      child: ElevatedButton(
-        onPressed: _selectedTipo != null ? () {
-          saveTaskPlusAudio();//saveTaskPlusPics();
-        } : null,
-        child: Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16) ),
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white, backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
-    ));
+      )),
+    );
   }
 
   Future<http.Response?> createTask() async {
@@ -553,42 +573,42 @@ class _CreazioneTaskPageState
       if(data == null){
         throw Exception('Dati del sopralluogo non disponibili.');
       }*/
-      //final task = TaskModel.fromJson(jsonDecode(data.body));
-      try{
-        for (var image in pickedImages) {
-          if (image.path != null && image.path.isNotEmpty) {
-            print('Percorso del file: ${image.path}');
-            var request = http.MultipartRequest(
-              'POST',
-              Uri.parse('$ipaddress/api/immagine/task/${int.parse(task.id!.toString())}'),
-            );
-            request.files.add(
-              await http.MultipartFile.fromPath(
-                'task', // Field name
-                image.path, // File path
-                contentType: MediaType('image', 'jpeg'),
+    //final task = TaskModel.fromJson(jsonDecode(data.body));
+    try{
+      for (var image in pickedImages) {
+        if (image.path != null && image.path.isNotEmpty) {
+          print('Percorso del file: ${image.path}');
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddress/api/immagine/task/${int.parse(task.id!.toString())}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'task', // Field name
+              image.path, // File path
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Foto salvata!'),
               ),
             );
-            var response = await request.send();
-            if (response.statusCode == 200) {
-              print('File inviato con successo');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Foto salvata!'),
-                ),
-              );
-            } else {
-              print('Errore durante l\'invio del file: ${response.statusCode}');
-            }
           } else {
-            // Gestisci il caso in cui il percorso del file non è valido
-            print('Errore: Il percorso del file non è valido');
+            print('Errore durante l\'invio del file: ${response.statusCode}');
           }
+        } else {
+          // Gestisci il caso in cui il percorso del file non è valido
+          print('Errore: Il percorso del file non è valido');
         }
-        pickedImages.clear();
-      } catch (e) {
-        print('Errore durante l\'invio del file: $e');
       }
+      pickedImages.clear();
+    } catch (e) {
+      print('Errore durante l\'invio del file: $e');
+    }
     /*} catch (e) {
       print('Errore durante l\'invio del file: $e');
     }*/
@@ -605,34 +625,34 @@ class _CreazioneTaskPageState
         await saveTaskPlusPics(task);
         var file = File(_filePath!);
         //for (var image in pickedImages) {
-          if (file.path != null && file.path.isNotEmpty) {
-            print('Percorso del file audio: ${file.path}');
-            var request = http.MultipartRequest(
-              'POST',
-              Uri.parse('$ipaddress/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
-            );
-            request.files.add(
-              await http.MultipartFile.fromPath(
-                'task', // Field name
-                file.path, // File path
-                contentType: MediaType('audio', 'mp3'),
+        if (file.path != null && file.path.isNotEmpty) {
+          print('Percorso del file audio: ${file.path}');
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddress/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'task', // Field name
+              file.path, // File path
+              contentType: MediaType('audio', 'mp3'),
+            ),
+          );
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Audio salvato!'),
               ),
             );
-            var response = await request.send();
-            if (response.statusCode == 200) {
-              print('File inviato con successo');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Audio salvato!'),
-                ),
-              );
-            } else {
-              print('Errore durante l\'invio del file audio: ${response.statusCode}');
-            }
           } else {
-            // Gestisci il caso in cui il percorso del file non è valido
-            print('Errore: Il percorso del file audio non è valido');
+            print('Errore durante l\'invio del file audio: ${response.statusCode}');
           }
+        } else {
+          // Gestisci il caso in cui il percorso del file non è valido
+          print('Errore: Il percorso del file audio non è valido');
+        }
         //}
         pickedImages.clear();
       } catch (e) {
