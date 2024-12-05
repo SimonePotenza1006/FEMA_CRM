@@ -129,78 +129,6 @@ class _CreazioneTaskPageState
     }
   }
 
-  /*String _generateRandomId() {
-    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-    final random = Random();
-    return List.generate(
-      10,
-          (index) => chars[random.nextInt(chars.length)],
-      growable: false,
-    ).join();
-  }
-
-  Future<void> _startRecording() async {
-    try {
-      debugPrint(
-          '=========>>>>>>>>>>> RECORDING!!!!!!!!!!!!!!! <<<<<<===========');
-
-      String filePath = await getApplicationDocumentsDirectory()
-          .then((value) => '${value.path}/${_generateRandomId()}.wav');
-
-      await _audioRecorder?.start(
-        const RecordConfig(
-          // specify the codec to be `.wav`
-          encoder: AudioEncoder.wav,
-        ),
-        path: filePath,
-      );
-    } catch (e) {
-      debugPrint('ERROR WHILE RECORDING: $e');
-    }
-  }
-
-  Future<void> _stopRecording() async {
-    try {
-      String? path = await _audioRecorder?.stop();
-
-      setState(() {
-        _audioPath = path!;
-      });
-      debugPrint('=========>>>>>> PATH: $_audioPath <<<<<<===========');
-    } catch (e) {
-      debugPrint('ERROR WHILE STOP RECORDING: $e');
-    }
-  }
-
-  void _record() async {
-    if (isRecording == false) {
-      final status = await Permission.microphone.request();
-
-      if (status == PermissionStatus.granted) {
-        setState(() {
-          isRecording = true;
-        });
-        await _startRecording();
-      } else if (status == PermissionStatus.permanentlyDenied) {
-        debugPrint('Permission permanently denied');
-        // TODO: handle this case
-      }
-    } else {
-      await _stopRecording();
-
-      setState(() {
-        isRecording = false;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    _recorder.dispose();
-    super.dispose();
-  }*/
-
   Future<void> _selezionaData() async {
     final DateTime? dataSelezionata = await showDatePicker(
       locale: const Locale('it', 'IT'),
@@ -302,232 +230,348 @@ class _CreazioneTaskPageState
                   padding: EdgeInsets.all(20.0),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
-                    child: Center(
-                      child:  Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 20),
-                          // Description Field
-                          SizedBox(
-                            width: 450,
-                            child: TextFormField(
-                              controller: _titoloController,
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                labelText: 'Titolo',
-                                border: OutlineInputBorder(),
+                    child:  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 20),
+                        // Description Field
+                        SizedBox(
+                          width: 450,
+                          child: TextFormField(
+                            controller: _titoloController,
+                            maxLines: null,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: 'Titolo'.toUpperCase(),
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
                               ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none, // Rimuove il bordo standard
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              hintText: "Inserisci il titolo",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                             ),
                           ),
-                          SizedBox(height: 20),
-                          // Description Field
-                          SizedBox(
-                            width: 450,
-                            child: TextFormField(minLines: 4,
-                              controller: _descrizioneController,
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                labelText: 'Descrizione',
-                                border: OutlineInputBorder(),
+                        ),
+                        SizedBox(height: 20),
+                        // Description Field
+                        SizedBox(
+                          width: 600,
+                          child: TextFormField(
+                            controller: _descrizioneController,
+                            maxLines: 5,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: 'Descrizione'.toUpperCase(),
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
                               ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              hintText: "Inserisci la descrizione",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                             ),
                           ),
-                          SizedBox(height: 20),
-                          SizedBox(
-                            width: 400,
-                            child: DropdownButtonFormField<TipoTaskModel>(
-                              value: _selectedTipo,
-                              onChanged: (TipoTaskModel? newValue){
-                                setState(() {
-                                  _selectedTipo = newValue;
-                                });
-                              },
-                              items: allTipi.map((TipoTaskModel tipo){
-                                return DropdownMenuItem<TipoTaskModel>(
-                                  value: tipo,
-                                  child: Text(tipo.descrizione!),
-                                );
-                              }).toList(),
-                              decoration: InputDecoration(
-                                  labelText: 'Seleziona tipologia'.toUpperCase()
+                        ),
+                        SizedBox(height: 20),
+                        SizedBox(
+                          width: 400,
+                          child: DropdownButtonFormField<TipoTaskModel>(
+                            value: _selectedTipo,
+                            onChanged: (TipoTaskModel? newValue) {
+                              setState(() {
+                                _selectedTipo = newValue;
+                              });
+                            },
+                            items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
+                              return DropdownMenuItem<TipoTaskModel>(
+                                value: tipologia,
+                                child: Text(
+                                  tipologia.descrizione!, // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
+                                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                                ),
+                              );
+                            }).toList(),
+                            decoration: InputDecoration(
+                              labelText: 'TIPOLOGIA TASK',
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Selezionare una tipologia di task';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        SizedBox(
+                          width: 200,
+                          child: CheckboxListTile(
+                            title: Text('Condiviso'),
+                            value: _condiviso,
+                            onChanged: (value) {
+                              setState(() {
+                                _condiviso = value!;
+                                if (_condiviso) {
+                                  _condivisoController.clear();
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 10),// Button
+                        if (_condiviso) SizedBox(
+                          width: 400,
+                          child: DropdownButtonFormField<UtenteModel>(
+                            value: selectedUtente,
+                            onChanged: (UtenteModel? newValue) {
+                              setState(() {
+                                selectedUtente = newValue;
+                              });
+                            },
+                            items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
+                              return DropdownMenuItem<UtenteModel>(
+                                value: utente,
+                                child: Text(
+                                  utente.nomeCompleto()!,
+                                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                                ),
+                              );
+                            }).toList(),
+                            decoration: InputDecoration(
+                              labelText: 'SELEZIONA TECNICO',
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Selezionare un tecnico';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 40),
+                        Platform.isWindows ? Container(
+                          child: ElevatedButton(
+                            onPressed: pickImagesFromGallery,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white, backgroundColor: Colors.red,
+                            ),
+                            child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                          ),
+                        ) : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: takePicture,
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white, backgroundColor: Colors.red,
+                                ),
+                                child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                               ),
                             ),
-                          ),
-                          SizedBox(height: 20),
-                          SizedBox(
-                            width: 200,
-                            child: CheckboxListTile(
-                              title: Text('Condiviso'),
-                              value: _condiviso,
+                            SizedBox(width: 16,),
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: pickImagesFromGallery,
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white, backgroundColor: Colors.red,
+                                ),
+                                child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        if (pickedImages.isNotEmpty) _buildImagePreview(),
+                        SizedBox(height: 10),
+                        const SizedBox(height: 20),
+                        if (Platform.isAndroid)
+                          Column(children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: _isRecording ? null : _startRecording,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 15),
+                                  ),
+                                  child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),
+                                const SizedBox(width: 6),
+                                Icon(
+                                  _isRecording ? Icons.mic : Icons.mic_none,
+                                  size: 95,
+                                  color: _isRecording ? Colors.red : Colors.blue,
+                                ),
+                                const SizedBox(width: 6),
+                                ElevatedButton(
+                                  onPressed: _isRecording ? _stopRecording : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 15),
+                                  ),
+                                  child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 17),
+                            if (_timer != null) ElevatedButton(
+                              onPressed: !_isRecording ? _playRecording : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                padding:
+                                const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                              ),
+                              child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                            ),
+                            if (_timer != null) Slider(
+                              value: _currentPosition,
+                              max: _totalDuration,
                               onChanged: (value) {
                                 setState(() {
-                                  _condiviso = value!;
-                                  if (_condiviso) {
-                                    _condivisoController.clear();
-                                  }
+                                  _currentPosition = value;
                                 });
+                                _audioPlayer.seek(Duration(seconds: value.toInt()));
                               },
                             ),
+                            SizedBox(height: 43),
+                          ],
                           ),
-                          SizedBox(height: 10),// Button
-                          if (_condiviso) SizedBox(
-                            width: 450,
-                            child: DropdownButtonFormField<UtenteModel>(
-                              value: selectedUtente,
-                              onChanged: (UtenteModel? newValue){
-                                setState(() {
-                                  selectedUtente = newValue;
-                                });
-                              },
-                              items: allUtenti.map((UtenteModel utente){
-                                return DropdownMenuItem<UtenteModel>(
-                                  value: utente,
-                                  child: Text(utente.nomeCompleto()!),
-                                );
-                              }).toList(),
-                              decoration: InputDecoration(
-                                  labelText: 'Seleziona tecnico'.toUpperCase()
+                        Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: ElevatedButton(
+                            onPressed: _selectedTipo != null ? () {
+                              saveTaskPlusAudio();//saveTaskPlusPics();
+                            } : null,
+                            child: Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16) ),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white, backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                           ),
-                          SizedBox(height: 40),
-                          Platform.isWindows ? Center(
-                            child: ElevatedButton(
-                              onPressed: pickImagesFromGallery,
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white, backgroundColor: Colors.red,
-                              ),
-                              child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                            ),
-                          ) : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: ElevatedButton(
-                                  onPressed: takePicture,
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white, backgroundColor: Colors.red,
-                                  ),
-                                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                                ),
-                              ),
-                              SizedBox(width: 16,),
-                              Center(
-                                child: ElevatedButton(
-                                  onPressed: pickImagesFromGallery,
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white, backgroundColor: Colors.red,
-                                  ),
-                                  child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
-                                ),
-                              ),
-                            ],),
-                          SizedBox(height: 10),
-                          if (pickedImages.isNotEmpty) _buildImagePreview(),
-                          SizedBox(height: 10),
-
-
-                          const SizedBox(height: 20),
-                          if (Platform.isAndroid)
-                            Column(children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: _isRecording ? null : _startRecording,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 30, vertical: 15),
-                                    ),
-                                    child: const Text('START', style: TextStyle(fontWeight: FontWeight.bold)),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Icon(
-                                    _isRecording ? Icons.mic : Icons.mic_none,
-                                    size: 95,
-                                    color: _isRecording ? Colors.red : Colors.blue,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  ElevatedButton(
-                                    onPressed: _isRecording ? _stopRecording : null,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 30, vertical: 15),
-                                    ),
-                                    child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 17),
-                              if (_timer != null) ElevatedButton(
-                                onPressed: !_isRecording ? _playRecording : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  padding:
-                                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                                ),
-                                child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                              if (_timer != null) Slider(
-                                value: _currentPosition,
-                                max: _totalDuration,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _currentPosition = value;
-                                  });
-                                  _audioPlayer.seek(Duration(seconds: value.toInt()));
-                                },
-                              ),
-                              SizedBox(height: 43,)
-                            ],),
-                          /* Center(
-                  child: showPlayer
-                      ? Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: AudioPlayer(
-                      source: audioPath!,
-                      onDelete: () {
-                        setState(() => showPlayer = false);
-                      },
-                    ),
-                  )
-                      : Recorder(
-                    onStop: (path) {
-                      if (kDebugMode) print('Recorded file path: $path');
-                      setState(() {
-                        audioPath = path;
-                        showPlayer = true;
-                      });
-                    },
-                  ),
-                ),*/
-                        ],
-                      ),
+                        )
+                      ],
                     ),
                   ),
                 );
               }
-          ), floatingActionButton: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: ElevatedButton(
-          onPressed: _selectedTipo != null ? () {
-            saveTaskPlusAudio();//saveTaskPlusPics();
-          } : null,
-          child: Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16) ),
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-      )),
+          ), ),
     );
   }
 
