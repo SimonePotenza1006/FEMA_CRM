@@ -393,7 +393,10 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
           )
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+          child: LayoutBuilder(
+              builder: (context, constraints){
+                return Padding(
         padding: EdgeInsets.all(20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1250,7 +1253,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
               ),
           ],
         )
-      ),
+      );})),
     );
   }
 
