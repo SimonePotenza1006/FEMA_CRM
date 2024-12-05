@@ -1,7 +1,8 @@
 import 'dart:typed_data';
-
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../model/ClienteModel.dart';
 import '../model/DestinazioneModel.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:fema_crm/model/CommissioneModel.dart';
+import 'package:audioplayers/audioplayers.dart' as ap;
 
 import '../model/TipoTaskModel.dart';
 import '../model/TipologiaInterventoModel.dart';
@@ -56,10 +58,18 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   TipoTaskModel? selectedTipoTask;
   List<UtenteModel> allUtenti = [];
   UtenteModel? selectedUtente;
+  Future<ap.AudioPlayer>? _futureAudio;
+  late File fileaudio;
+  ap.AudioPlayer _audioPlayer = ap.AudioPlayer();
+  Uint8List? resp;
+  double _currentPosition = 0;
+  late double _totalDuration;
+  bool ok = false;
+  bool okimg = false;
 
   Future<void> getAllTipiTask() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -80,7 +90,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response =await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -101,7 +111,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -122,7 +132,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -150,22 +160,83 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     getAllTipologie();
     getAllUtenti();
     getAllTipiTask();
-    _futureImages = fetchImages();
+    //_futureImages = fetchImages();
     _descrizioneController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione!.toString() : '');
     _notaController.text = (widget.ticket.note != null ? widget.ticket.note! : '');
     _descrizioneTaskController.text = (widget.ticket.descrizione != null ? widget.ticket.descrizione! : '');
+    _fetchImagesVoid();
   }
 
+  void _fetchImagesVoid() {
+    setState(() {
+      _futureImages = fetchImages();
+      _futureAudio = fetchAudio();
+    });
+
+  }
+
+  Future<void> _playRecording() async {
+
+    await _audioPlayer.play(ap.BytesSource(resp!));
+
+    _audioPlayer.onPositionChanged.listen((position) {
+      setState(() {
+        _currentPosition = position.inSeconds.toDouble();
+      });
+    });
+  }
+
+  Future<ap.AudioPlayer> fetchAudio() async {
+    final dir = await getApplicationDocumentsDirectory();
+    String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
+    final player = ap.AudioPlayer();
+    final url = '$ipaddress/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/audio';
+    http.Response? response;
+    try {
+
+      response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+
+        fileaudio = File(filePath);
+        print(filePath.toString()+' 3333333333 '+response.bodyBytes.toString());
+
+        await fileaudio.writeAsBytes(response.bodyBytes);
+        resp = response.bodyBytes;
+        //await _audioPlayer.setFilePath(filePath);
+        //await _audioPlayer.setAudioSource(AudioSource.uri(Uri.file(filePath)));
+        //await player.play(ap.BytesSource(response.bodyBytes));//filePath));
+        //await player.play(ap.AssetSource('audio/audio.mp3'));//filePath));
+        //await _audioPlayer.setFilePath(filePath);
+        //await _audioPlayer.play();
+        await _audioPlayer.setSource(ap.BytesSource(resp!)).whenComplete(() =>
+            _audioPlayer.getDuration().then((val) => _totalDuration = val!.inSeconds.toDouble() ?? 0));
+        ok = true;
+        return player;//images; // no need to wrap with Future
+      } else {
+        throw Exception('Errore durante la chiamata al server: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore durante la chiamata al server: $e');
+      if (response!= null) {
+        //print('Risposta del server: ${response.body}');
+      }
+      throw e; // rethrow the exception
+    }
+  }
+
+
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddressProva/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
+    final url = '$ipaddress/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
+        okimg= true;
         final jsonData = jsonDecode(response.body);
         final images = jsonData.map<Uint8List>((imageData) {
           final base64String = imageData['imageData'];
           final bytes = base64Decode(base64String);
+          print('lllee '+bytes.length.toString());
           return bytes.buffer.asUint8List();
         }).toList();
         return images; // no need to wrap with Future
@@ -201,7 +272,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
       for(var imageBytes in images){
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddressProva/api/immagine/task/$taskId'),
+          Uri.parse('$ipaddress/api/immagine/task/$taskId'),
         );
         request.files.add(http.MultipartFile.fromBytes(
           'task', // Nome del campo nel form
@@ -263,7 +334,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         // Converte Uint8List in MultipartFile
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddressProva/api/immagine/$interventoId'),
+          Uri.parse('$ipaddress/api/immagine/$interventoId'),
         );
         request.files.add(http.MultipartFile.fromBytes(
           'intervento', // Nome del campo nel form
@@ -337,13 +408,15 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                 buildInfoRow(title: "Descrizione", value: widget.ticket.descrizione ?? "N/A", showCopyIcon : true, context: context),
                 buildInfoRow(title: "Note", value: widget.ticket.note ?? "N/A", showCopyIcon : true, context: context),
                 SizedBox(height: 10),
-                Container(
-                  width: 500,
-                  height: 200,
+                //if (okimg)
+                  Container(
+                  //width: 500,
+                  //height: 200,
                   child: FutureBuilder<List<Uint8List>>(
                     future: _futureImages,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
+                        print('sssnnn '+snapshot.data!.length.toString());
                         return Wrap(
                           spacing: 16,
                           runSpacing: 16,
@@ -384,6 +457,58 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                     },
                   ),
                 ),
+                SizedBox(height: 20),
+                if (resp != null)
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                  ElevatedButton(
+                    onPressed: _playRecording,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    ),
+                    child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                //Text(_totalDuration.toString()),
+                FutureBuilder(
+                  future: _futureAudio, // Usa il futuro dell'audio
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Errore nel caricamento dell\'audio'));
+                    } else {
+                      // Qui puoi accedere a _totalDuration e costruire il tuo widget
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                '${(_totalDuration.toInt() ~/ 60).toString().padLeft(2, '0')}:${(_totalDuration.toInt() % 60).toString().padLeft(2, '0')}',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              Slider(
+                                value: _currentPosition,
+                                max: _totalDuration,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _currentPosition = value;
+                                  });
+                                  _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                },
+                              ),
+                              // Altri widget...
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                ]),
                 SizedBox(width: 30),
                 SizedBox(
                   width: 200, // Larghezza desiderata
@@ -1159,7 +1284,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   Future<void> deleteTicket(int ticketId) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddressProva/api/ticket/$ticketId'),
+        Uri.parse('$ipaddress/api/ticket/$ticketId'),
         headers: {'Content-Type': 'application/json'},
       );
       print(response.statusCode);
@@ -1215,7 +1340,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         },
       );
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : selectedUtente?.toMap(),
@@ -1240,7 +1365,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
             'Errore durante la creazione dell\'intervento: ${response.statusCode}');
       }
       final response2 = await http.post(
-        Uri.parse('$ipaddressProva/api/ticket'),
+        Uri.parse('$ipaddress/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ticket.id,
@@ -1291,7 +1416,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         },
       );
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'attivo': true,
@@ -1318,7 +1443,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
       }
 
       final response2 = await http.post(
-        Uri.parse('$ipaddressProva/api/ticket'),
+        Uri.parse('$ipaddress/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ticket.id,
@@ -1497,7 +1622,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -1521,7 +1646,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
 
     return SizedBox(
-      width: 500,
+      width: 282,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(

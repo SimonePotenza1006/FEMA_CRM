@@ -413,7 +413,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> deletePics(MovimentiModel movimento) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
+        Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id.toString())}'),
         headers: {'Content-Type': 'application/json'},
       );
       if(response.statusCode == 204){
@@ -430,7 +430,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> deleteMovimentazione(MovimentiModel movimento) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddressProva/api/movimenti/${movimento.id}'),
+        Uri.parse('$ipaddress/api/movimenti/${movimento.id}'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 204) {
@@ -615,7 +615,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   Future<void> getAllMovimentazioniExcel() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -651,7 +651,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   Future<void> getAllMovimentazioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/movimenti/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti/ordered');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -999,7 +999,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     );
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -1025,7 +1025,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> saveFondocassaAfterChiusura() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -1049,7 +1049,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addUscita() async{
     try{
        final response = await http.post(
-         Uri.parse('$ipaddressProva/api/movimenti'),
+         Uri.parse('$ipaddress/api/movimenti'),
          headers: {'Content-Type': 'application/json'},
          body: jsonEncode({
            'data': DateTime.now().toIso8601String(),
@@ -1087,7 +1087,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addPrelievo(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
@@ -1124,7 +1124,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   Future<void> addVersamento(String importo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({  // serializza il corpo della richiesta come JSON
           'data': DateTime.now().toIso8601String(),
