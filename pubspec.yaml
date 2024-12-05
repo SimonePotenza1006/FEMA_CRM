@@ -111,6 +111,9 @@ dependencies:
   flutter_image_compress: ^2.2.0
   fk_toggle: ^0.1.4
   equatable: ^2.0.5
+  record: ^5.2.0
+  audioplayers: ^6.1.0
+  just_audio : ^0.9.42
   advance_pdf_viewer:
     git:
       url: https://github.com/lohanidamodar/pdf_viewer.git

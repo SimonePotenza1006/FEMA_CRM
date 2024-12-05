@@ -774,8 +774,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.red,
-                            onPrimary: Colors.white,
+                            foregroundColor: Colors.white, backgroundColor: Colors.red,
                             padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                           ),
                           child: Text('Crea nuovo cliente'.toUpperCase()),
@@ -830,8 +829,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.red,
-                            onPrimary: Colors.white,
+                            foregroundColor: Colors.white, backgroundColor: Colors.red,
                             padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
                           ),
                           child: Text('Crea nuova destinazione'.toUpperCase()),

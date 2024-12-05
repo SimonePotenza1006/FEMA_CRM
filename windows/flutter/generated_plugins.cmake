@@ -4,12 +4,14 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   address_search_field
+  audioplayers_windows
   file_selector_windows
   flutter_localization
   flutter_udid
   geolocator_windows
   permission_handler_windows
   printing
+  record_windows
   share_plus
   syncfusion_pdfviewer_windows
   url_launcher_windows

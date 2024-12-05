@@ -510,8 +510,7 @@ class _ModificaTaskPageState
                             child: ElevatedButton(
                               onPressed: pickImagesFromGallery,
                               style: ElevatedButton.styleFrom(
-                                primary: Colors.red,
-                                onPrimary: Colors.white,
+                                foregroundColor: Colors.white, backgroundColor: Colors.red,
                               ),
                               child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                             ),
@@ -522,8 +521,7 @@ class _ModificaTaskPageState
                                 child: ElevatedButton(
                                   onPressed: takePicture,
                                   style: ElevatedButton.styleFrom(
-                                    primary: Colors.red,
-                                    onPrimary: Colors.white,
+                                    foregroundColor: Colors.white, backgroundColor: Colors.red,
                                   ),
                                   child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                                 ),
@@ -533,8 +531,7 @@ class _ModificaTaskPageState
                                 child: ElevatedButton(
                                   onPressed: pickImagesFromGallery,
                                   style: ElevatedButton.styleFrom(
-                                    primary: Colors.red,
-                                    onPrimary: Colors.white,
+                                    foregroundColor: Colors.white, backgroundColor: Colors.red,
                                   ),
                                   child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                                 ),
@@ -553,8 +550,8 @@ class _ModificaTaskPageState
                             } : null,
                             child: Text('SALVA'),
                             style: ElevatedButton.styleFrom(
-                              primary: _selectedTipo != null ? Colors.red : Colors.grey, // Cambia colore quando disabilitato
-                              onPrimary: Colors.white,
+                              backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey, // Cambia colore quando disabilitato
+                              foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

@@ -268,8 +268,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
                           ElevatedButton(
                             onPressed: () => _changeSheet(0),
                             style: ElevatedButton.styleFrom(
-                              primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                              onPrimary: Colors.black,
+                              foregroundColor: Colors.black, backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
@@ -281,8 +280,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
                           ElevatedButton(
                             onPressed: () => _changeSheet(1),
                             style: ElevatedButton.styleFrom(
-                              primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                              onPrimary: Colors.black,
+                              foregroundColor: Colors.black, backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
