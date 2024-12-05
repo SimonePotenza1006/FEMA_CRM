@@ -40,7 +40,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   Uint8List? signatureBytes;
   GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey<SfSignaturePadState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   ClienteModel? selectedCliente;
   List<ClienteModel> clientiList = [];
   List<ClienteModel> filteredClientiList = [];
@@ -285,7 +285,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     // Filtra solo i valori desiderati: Acconto e Pagamento
                     items: [TipoMovimentazione.Acconto, TipoMovimentazione.Pagamento]
                         .map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
-                      String label = "";
+                      String label = '';
                       if (value == TipoMovimentazione.Acconto) {
                         label = 'ACCONTO';
                       } else if (value == TipoMovimentazione.Pagamento) {
@@ -298,6 +298,37 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     }).toList(),
                     decoration: InputDecoration(
                       labelText: 'TIPO MOVIMENTAZIONE',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      hintText: 'Seleziona il tipo di movimentazione',
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[400],
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                     ),
                     validator: (value) {
                       if (value == null) {
@@ -307,6 +338,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     },
                   ),
                 ),
+
                 SizedBox(height: 20),
                 SizedBox(
                   width: 400,
@@ -352,10 +384,41 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 SizedBox(height: 10),
                 SizedBox(
                   width: 400,
-                  child:TextFormField(
+                  child: TextFormField(
                     controller: _descrizioneController,
                     decoration: InputDecoration(
                       labelText: 'DESCRIZIONE',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      hintText: 'Inserisci una descrizione',
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[400],
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -376,6 +439,37 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ],
                     decoration: InputDecoration(
                       labelText: 'IMPORTO',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      hintText: 'Inserisci l\'importo',
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[400],
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                     ),
                     validator: (value) {
                       if (value == null || double.tryParse(value) == null) {
@@ -388,7 +482,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 SizedBox(
                   height: 20,
                 ),
-                
+
                 Text(
                   'Data di riferimento:'.toUpperCase(),
                   style: TextStyle(color: Colors.black),
@@ -425,7 +519,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     Text('IL TECNICO HA EFFETTUATO LA MOVIMENTAZIONE?'), // Testo accanto alla checkbox
                   ],
                 ),
-                  SizedBox(height: 10),
+                SizedBox(height: 10),
                 if(tecnico == true)
                   SizedBox(
                     width: 400,
@@ -447,169 +541,169 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       ),
                     ),
                   ),
-                  SizedBox(height: 40),
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            content: Container(
-                              width: 700,
-                              height: 250,
-                              child: SfSignaturePad(
-                                key: _signaturePadKey,
-                                backgroundColor: Colors.white,
-                                strokeColor: Colors.black,
-                                minimumStrokeWidth: 2.0,
-                                maximumStrokeWidth: 4.0,
-                              ),
+                SizedBox(height: 40),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          content: Container(
+                            width: 700,
+                            height: 250,
+                            child: SfSignaturePad(
+                              key: _signaturePadKey,
+                              backgroundColor: Colors.white,
+                              strokeColor: Colors.black,
+                              minimumStrokeWidth: 2.0,
+                              maximumStrokeWidth: 4.0,
                             ),
-                            actions: <Widget>[
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('Chiudi'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final signatureImage = await _signaturePadKey
-                                      .currentState!
-                                      .toImage(pixelRatio: 3.0);
-                                  final data = await signatureImage.toByteData(
-                                      format: ui.ImageByteFormat.png);
-                                  setState(() {
-                                    signatureBytes = data!.buffer.asUint8List();
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('Salva'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                      width: 500,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: Center(
-                        child: signatureBytes != null
-                            ? Image.memory(signatureBytes!)
-                            : Text(
-                          'Firma responsabile cassa'.toUpperCase(),
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                          ),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Chiudi'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final signatureImage = await _signaturePadKey
+                                    .currentState!
+                                    .toImage(pixelRatio: 3.0);
+                                final data = await signatureImage.toByteData(
+                                    format: ui.ImageByteFormat.png);
+                                setState(() {
+                                  signatureBytes = data!.buffer.asUint8List();
+                                });
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Salva'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: 500,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: Center(
+                      child: signatureBytes != null
+                          ? Image.memory(signatureBytes!)
+                          : Text(
+                        'Firma responsabile cassa'.toUpperCase(),
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            content: Container(
-                              width: 700,
-                              height: 250,
-                              child: SfSignaturePad(
-                                key: _signaturePadKeyIncaricato,
-                                backgroundColor: Colors.white,
-                                strokeColor: Colors.black,
-                                minimumStrokeWidth: 2.0,
-                                maximumStrokeWidth: 4.0,
-                              ),
+                ),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          content: Container(
+                            width: 700,
+                            height: 250,
+                            child: SfSignaturePad(
+                              key: _signaturePadKeyIncaricato,
+                              backgroundColor: Colors.white,
+                              strokeColor: Colors.black,
+                              minimumStrokeWidth: 2.0,
+                              maximumStrokeWidth: 4.0,
                             ),
-                            actions: <Widget>[
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('Chiudi'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  final signatureImage = await _signaturePadKeyIncaricato
-                                      .currentState!
-                                      .toImage(pixelRatio: 3.0);
-                                  final data = await signatureImage.toByteData(
-                                      format: ui.ImageByteFormat.png);
-                                  setState(() {
-                                    signatureBytesIncaricato = data!.buffer.asUint8List();
-                                  });
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text('Salva'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: Container(
-                      width: 500,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: Center(
-                        child: signatureBytesIncaricato != null
-                            ? Image.memory(signatureBytesIncaricato!)
-                            : Text(
-                           tecnico == false ? 'Firma cliente'.toUpperCase() : 'Firma Tecnico'.toUpperCase(),
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                          ),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Chiudi'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final signatureImage = await _signaturePadKeyIncaricato
+                                    .currentState!
+                                    .toImage(pixelRatio: 3.0);
+                                final data = await signatureImage.toByteData(
+                                    format: ui.ImageByteFormat.png);
+                                setState(() {
+                                  signatureBytesIncaricato = data!.buffer.asUint8List();
+                                });
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Salva'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: 500,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: Center(
+                      child: signatureBytesIncaricato != null
+                          ? Image.memory(signatureBytesIncaricato!)
+                          : Text(
+                        tecnico == false ? 'Firma cliente'.toUpperCase() : 'Firma Tecnico'.toUpperCase(),
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                ),
+                SizedBox(height: 20),
                 SizedBox(height: 30),
-                  Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: takePicture,
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white, backgroundColor: Colors.red,
-                        ),
-                        child: Text('Scatta Foto5', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: takePicture,
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white, backgroundColor: Colors.red,
                       ),
-                      if(pickedImages.isNotEmpty)
-                        _buildImagePreview(),
-                    ],
-                  ),
+                      child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                    ),
+                    if(pickedImages.isNotEmpty)
+                      _buildImagePreview(),
+                  ],
+                ),
                 SizedBox(height: 16.0),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
                       if (_validateInputs()) {
-                          if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
-                            saveStatusInterventoPagamento();
-                            saveMovimentoPlusPics();
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
-                            );
-                            return;
-                          }
-                          if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto){
-                            saveStatusInterventoAcconto();
-                            saveMovimentoPlusPics();
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
-                            );
-                            return;
-                          }
+                        if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
+                          saveStatusInterventoPagamento();
+                          saveMovimentoPlusPics();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
+                          );
+                          return;
                         }
+                        if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto){
+                          saveStatusInterventoAcconto();
+                          saveMovimentoPlusPics();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
+                          );
+                          return;
+                        }
+                      }
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(horizontal: 10, vertical: 2))
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                        padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(horizontal: 10, vertical: 2))
                     ),
                     child: Text(
                       'Conferma Inserimento',
@@ -796,7 +890,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveStatusInterventoPagamento() async{
     try{
       final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
-          headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
           'attivo' : selectedIntervento?.attivo,
@@ -916,11 +1010,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
             );
             request.files.add(
-              await http.MultipartFile.fromPath(
-                'movimento',
-                image.path,
-                contentType: MediaType('image', 'jpeg'),
-              )
+                await http.MultipartFile.fromPath(
+                  'movimento',
+                  image.path,
+                  contentType: MediaType('image', 'jpeg'),
+                )
             );
             var response = await request.send();
             if(response.statusCode == 200){

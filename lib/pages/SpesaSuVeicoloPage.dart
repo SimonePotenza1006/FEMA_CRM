@@ -68,16 +68,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
-  /*Future<Uint8List?> compressImage(String imagePath) async {
-    final result = await FlutterImageCompress.compressWithFile(
-      imagePath,
-      minHeight: 1920,
-      minWidth: 1080,
-      quality: 50, // Imposta la qualità dell'immagine tra 0 e 100
-    );
-    return result;
-  }*/
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +88,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 children: [
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 220,
+                    width: 300,
                     child: DropdownButtonFormField<VeicoloModel>(
                       value: selectedVeicolo,
                       onChanged: (VeicoloModel? newValue) {
@@ -110,61 +100,154 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       items: allVeicoli.map((VeicoloModel veicolo) {
                         return DropdownMenuItem<VeicoloModel>(
                           value: veicolo,
-                          child: Text(veicolo.descrizione!),
+                          child: Text(
+                            veicolo.descrizione!,
+                            style: TextStyle(
+                              fontSize: 14,  // FontSize coerente con gli altri widget
+                              color: Colors.black87,  // Colore coerente con gli altri widget
+                            ),
+                          ),
                         );
                       }).toList(),
                       decoration: InputDecoration(
-                        labelText: 'Veicolo'.toString().toUpperCase(),
+                        labelText: 'VEICOLO',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
-                      validator: (value) => value == null ? 'Seleziona un veicolo'.toString().toUpperCase() : null,
+                      validator: (value) => value == null ? 'SELEZIONA UN VEICOLO' : null,
                     ),
                   ),
                   SizedBox(height: 20),
-                  SizedBox(
-                    width: 220,
-                    child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
-                      value: selectedTipologia,
-                      onChanged: (TipologiaSpesaVeicoloModel? newValue) {
-                        setState(() {
-                          selectedTipologia = newValue;
-                        });
-                      },
-                      items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
-                        return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
-                          value: tipologia,
-                          child: Text(tipologia.descrizione!),
-                        );
-                      }).toList(),
-                      decoration: InputDecoration(
-                        labelText: 'TIPOLOGIA DI SPESA',
+                SizedBox(
+                  width: 300,
+                  child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
+                    value: selectedTipologia,
+                    onChanged: (TipologiaSpesaVeicoloModel? newValue) {
+                      setState(() {
+                        selectedTipologia = newValue;
+                      });
+                    },
+                    items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
+                      return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
+                        value: tipologia,
+                        child: Text(
+                          tipologia.descrizione!,
+                          style: TextStyle(
+                            fontSize: 14,  // FontSize coerente con gli altri widget
+                            color: Colors.black87,  // Colore coerente con gli altri widget
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'TIPOLOGIA DI SPESA',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
                       ),
-                      validator: (value) => value == null ? 'Seleziona una tipologia di spesa'.toString().toUpperCase() : null,
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                     ),
+                    validator: (value) => value == null ? 'SELEZIONA UNA TIPOLOGIA DI SPESA' : null,
                   ),
+                ),
                   SizedBox(height: 20),
                   if (selectedTipologia?.descrizione == "ALTRO")
                     Container(
                       child: SizedBox(
-                        width: 220,
+                        width: 300,
                         height: 80,
                         child: TextFormField(
                           controller: _noteSpesaController,
                           decoration: InputDecoration(
-                            labelText: "Tipologia di spesa".toString().toUpperCase(),
-                            hintText: "Scrivi la tipologia di spesa".toString().toUpperCase(),
+                            labelText: "TIPOLOGIA DI SPESA",
+                            labelStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.bold,
+                            ),
+                            hintText: "SCRIVI LA TIPOLOGIA DI SPESA",
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[200],
                             border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey, width: 2)),
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.redAccent,
+                                width: 2.0,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1.0,
+                              ),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                           ),
-                          validator: (value) =>
-                          value == null || value.isEmpty ? 'Inserisci la tipologia di spesa'.toString().toUpperCase() : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'INSERISCI LA TIPOLOGIA DI SPESA'
+                              : null,
                         ),
                       ),
                     ),
                   SizedBox(
-                    width: 220,
+                    width: 300,
                     child: DropdownButtonFormField<String>(
                       value: selectedFornitore,
-                      onChanged: (newValue) {
+                      onChanged: (String? newValue) {
                         setState(() {
                           selectedFornitore = newValue;
                         });
@@ -175,31 +258,92 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       ].map((categoria) {
                         return DropdownMenuItem<String>(
                           value: categoria,
-                          child: Text(categoria),
+                          child: Text(
+                            categoria,
+                            style: TextStyle(
+                              fontSize: 14,  // FontSize coerente con gli altri widget
+                              color: Colors.black87,  // Colore coerente con gli altri widget
+                            ),
+                          ),
                         );
                       }).toList(),
                       decoration: InputDecoration(
-                        labelText: 'Fornitore'.toString().toUpperCase(),
+                        labelText: 'FORNITORE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
-                      validator: (value) => value == null ? 'Seleziona un fornitore'.toString().toUpperCase() : null,
+                      validator: (value) => value == null ? 'SELEZIONA UN FORNITORE' : null,
                     ),
                   ),
                   SizedBox(height: 20),
                   if (selectedFornitore == "ALTRO")
                     Container(
                       child: SizedBox(
-                        width: 200,
+                        width: 300,
                         height: 70,
                         child: TextFormField(
                           controller: _noteFornitoreController,
                           decoration: InputDecoration(
-                            labelText: "Fornitore".toString().toUpperCase(),
-                            hintText: "Scrivere il fornitore".toString().toUpperCase(),
+                            labelText: "FORNITORE",
+                            labelStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.bold,
+                            ),
+                            hintText: "SCRIVERE IL FORNITORE",
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[200],
                             border: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey, width: 2)),
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.redAccent,
+                                width: 2.0,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1.0,
+                              ),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                           ),
-                          validator: (value) =>
-                          value == null || value.isEmpty ? 'Inserisci il fornitore'.toString().toUpperCase() : null,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'INSERISCI IL FORNITORE'
+                              : null,
                         ),
                       ),
                     ),
@@ -207,30 +351,63 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     Column(
                       children: [
                         SizedBox(height: 20),
-                        TextFormField(
-                          controller: _dataPolizzaController,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            labelText: "Data nuova scadenza polizza".toString().toUpperCase(),
-                            hintText: "Seleziona la nuova data di scadenza della polizza".toString().toUpperCase(),
+                        SizedBox(
+                          width: 300, // Imposta la larghezza come quella degli altri widget
+                          child: TextFormField(
+                            controller: _dataPolizzaController,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              labelText: "DATA NUOVA SCADENZA POLIZZA",
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              hintText: "SELEZIONA LA NUOVA DATA DI SCADENZA DELLA POLIZZA",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: dataScadenzaPolizza ?? DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2101),
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  dataScadenzaPolizza = pickedDate;
+                                  _dataPolizzaController.text =
+                                      DateFormat('yyyy-MM-dd').format(pickedDate);
+                                });
+                              }
+                            },
+                            validator: (value) =>
+                            value == null || value.isEmpty ? 'SELEZIONA UNA DATA' : null,
                           ),
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: dataScadenzaPolizza ?? DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2101),
-                            );
-                            if (pickedDate != null) {
-                              setState(() {
-                                dataScadenzaPolizza = pickedDate;
-                                _dataPolizzaController.text =
-                                    DateFormat('yyyy-MM-dd').format(pickedDate);
-                              });
-                            }
-                          },
-                          validator: (value) =>
-                          value == null || value.isEmpty ? 'Seleziona una data'.toString().toUpperCase() : null,
                         ),
                         SizedBox(height: 20),
                       ],
@@ -239,51 +416,111 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     Column(
                       children: [
                         SizedBox(height: 20),
-                        TextFormField(
-                          controller: _dataBolloController,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            labelText: "Data nuova scadenza bollo".toString().toUpperCase(),
-                            hintText: "Seleziona la nuova data di scadenza del bollo".toString().toUpperCase(),
+                        SizedBox(
+                          width: 400, // Imposta la larghezza come quella degli altri widget
+                          child: TextFormField(
+                            controller: _dataBolloController,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              labelText: "DATA NUOVA SCADENZA BOLLO",
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              hintText: "SELEZIONA LA NUOVA DATA DI SCADENZA DEL BOLLO",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: dataScadenzaBollo ?? DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2101),
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  dataScadenzaBollo = pickedDate;
+                                  _dataBolloController.text =
+                                      DateFormat('yyyy-MM-dd').format(pickedDate);
+                                });
+                              }
+                            },
+                            validator: (value) =>
+                            value == null || value.isEmpty ? 'SELEZIONA UNA DATA' : null,
                           ),
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: dataScadenzaBollo ?? DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2101),
-                            );
-                            if (pickedDate != null) {
-                              setState(() {
-                                dataScadenzaBollo = pickedDate;
-                                _dataBolloController.text =
-                                    DateFormat('yyyy-MM-dd').format(pickedDate);
-                              });
-                            }
-                          },
-                          validator: (value) =>
-                          value == null || value.isEmpty ? 'Seleziona una data'.toString().toUpperCase() : null,
                         ),
                       ],
                     ),
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 200,
+                    width: 300,
                     child: TextFormField(
                       controller: _importoController,
                       decoration: InputDecoration(
-                        labelText: "Importo".toString().toUpperCase(),
-                        hintText: "Inserisci l'importo della spesa".toString().toUpperCase(),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                        labelText: "IMPORTO",
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
                         ),
+                        hintText: "INSERISCI L'IMPORTO DELLA SPESA",
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
                       ],
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
                       validator: (value) =>
-                      value == null || value.isEmpty ? 'Inserisci un importo valido' : null,
+                      value == null || value.isEmpty ? 'INSERISCI UN IMPORTO VALIDO' : null,
                     ),
                   ),
                   SizedBox(height: 20),
@@ -293,20 +530,56 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           "Inserire un chilometraggio qualsiasi, il sistema recupererà il precedente record!".toString().toUpperCase()),
                     ),
                   SizedBox(
-                    width: 200,
+                    width: 300,
                     child: TextFormField(
                       controller: _kmController,
                       decoration: InputDecoration(
-                        labelText: "Chilometri".toString().toUpperCase(),
-                        hintText: "Inserisci il chilometraggio".toString().toUpperCase(),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                        labelText: "CHILOMETRI",
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
                         ),
+                        hintText: "INSERISCI IL CHILOMETRAGGIO",
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                       keyboardType: TextInputType.number,
-                      validator: (value) =>
-                      value == null || value.isEmpty || double.parse(value) < double.parse(selectedVeicolo!.chilometraggio_attuale!.toString()) ? 'Inserisci un chilometraggio valido'.toString().toUpperCase() : null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'INSERISCI UN CHILOMETRAGGIO VALIDO';
+                        }
+                        if (double.parse(value) < double.parse(selectedVeicolo!.chilometraggio_attuale!.toString())) {
+                          return 'INSERISCI UN CHILOMETRAGGIO VALIDO';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(height: 20),

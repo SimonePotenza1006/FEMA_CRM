@@ -372,26 +372,29 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 ),
               ),
               SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  _showFornitoriDialog();
-                },
-                child: SizedBox(//Padding(
-                  height: 50,
-                  //padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        (selectedFornitore?.denominazione != null && selectedFornitore!.denominazione!.length > 18)
-                            ? '${selectedFornitore!.denominazione?.substring(0, 18)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
-                            : (selectedFornitore?.denominazione ?? 'Seleziona fornitore').toUpperCase(),
+              SizedBox(
+                width: 400,
+                child: GestureDetector(
+                  onTap: () {
+                    _showFornitoriDialog();
+                  },
+                  child: SizedBox(//Padding(
+                    height: 50,
+                    //padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          (selectedFornitore?.denominazione != null && selectedFornitore!.denominazione!.length > 18)
+                              ? '${selectedFornitore!.denominazione?.substring(0, 18)}...'  // Troncamento a 15 caratteri e aggiunta di "..."
+                              : (selectedFornitore?.denominazione ?? 'Seleziona fornitore').toUpperCase(),
 
-                        //selectedCliente?.denominazione ?? 'Seleziona Cliente',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      Icon(Icons.arrow_drop_down),
-                    ],
+                          //selectedCliente?.denominazione ?? 'Seleziona Cliente',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Icon(Icons.arrow_drop_down),
+                      ],
+                    ),
                   ),
                 ),
               ),
