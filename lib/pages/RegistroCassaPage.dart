@@ -773,10 +773,40 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                 TextFormField(
                   controller: _descrizioneUscitaController,
                   decoration: InputDecoration(
-                    labelText: 'Descrizione'.toUpperCase(),
-                    border: OutlineInputBorder(),
+                    labelText: 'DESCRIZIONE',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    hintText: 'Inserisci una descrizione valida',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[400],
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   ),
-                  validator: (value) { // Aggiungi validatore
+                  validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Inserisci una descrizione valida';
                     }
@@ -787,14 +817,44 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                 TextFormField(
                   controller: _uscitaController,
                   decoration: InputDecoration(
-                    labelText: 'Importo uscita'.toUpperCase(),
-                    border: OutlineInputBorder(),
+                    labelText: 'IMPORTO USCITA',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    hintText: 'Inserisci un importo valido',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[400],
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   ),
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // Consenti solo numeri e fino a 2 decimali
                   ],
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) { // Aggiungi validatore
+                  validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Inserisci un importo valido';
                     }
@@ -838,14 +898,44 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                 TextFormField(
                   controller: _prelievoController,
                   decoration: InputDecoration(
-                    labelText: 'Importo prelievo'.toUpperCase(),
-                    border: OutlineInputBorder(),
+                    labelText: 'IMPORTO PRELIEVO',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    hintText: 'Inserisci un importo valido',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[400],
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   ),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // Consenti solo numeri e fino a 2 decimali
                   ],
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) { // Aggiungi validatore
+                  validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Inserisci un importo valido';
                     }
@@ -859,7 +949,9 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     return null;
                   },
                 ),
-                SizedBox(height: 5),
+                SizedBox(height: 10),
+                Text('Inserire la firma', style: TextStyle(fontWeight: FontWeight.bold)),
+                SizedBox(height: 10),
                 Container(
                   width: 700,
                   height: 250,
@@ -937,32 +1029,95 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                 TextFormField(
                   controller: _causaleVersamentoController,
                   decoration: InputDecoration(
-                    labelText: 'Causale versamento'.toUpperCase(),
-                    border: OutlineInputBorder(),
+                    labelText: 'CAUSALE VERSAMENTO',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    hintText: 'Inserisci la causale del versamento',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[400],
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   ),
-                  validator: (value) { // Aggiungi validatore
+                  validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Inserisci una causale valida';
                     }
+                    return null;
                   },
                 ),
+
                 SizedBox(height: 5),
+
                 TextFormField(
                   controller: _versamentoController,
                   decoration: InputDecoration(
-                    labelText: 'Importo versamento'.toUpperCase(),
-                    border: OutlineInputBorder(),
+                    labelText: 'IMPORTO VERSAMENTO',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    hintText: 'Inserisci l\'importo del versamento',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[400],
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   ),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // Consenti solo numeri e fino a 2 decimali
                   ],
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) { // Aggiungi validatore
+                  validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Inserisci un importo valido';
                     }
                     try {
-                      double.parse(value);
+                      double.parse(value);  // Verifica che il valore sia un numero
                     } catch (e) {
                       return 'Inserisci un importo numerico valido';
                     }

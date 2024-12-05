@@ -24,7 +24,7 @@ class TableInterventiPage extends StatefulWidget {
 }
 
 class _TableInterventiPageState extends State<TableInterventiPage> {
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<InterventoModel> _allInterventi = [];
   List<InterventoModel> _filteredInterventi = [];
@@ -430,243 +430,243 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Lista Interventi'.toUpperCase(),
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.red,
-        actions: [
-          Row(
-            children: [
-              PopupMenuButton<TipologiaInterventoModel>(
-                icon: Icon(Icons.filter_alt_outlined, color: Colors.white), // Icona della casa
-                onSelected: (TipologiaInterventoModel tipologia) {
-                  setState(() {
-                    selectedTipologia = tipologia;
-                  });
-                  filterInterventiByTipologia(tipologia.descrizione!);
-                },
-                itemBuilder: (BuildContext context) {
-                  return tipologieList.map((TipologiaInterventoModel tipologia) {
-                    return PopupMenuItem<TipologiaInterventoModel>(
-                      value: tipologia,
-                      child: Text(tipologia.descrizione!.toUpperCase()),
-                    );
-                  }).toList();
-                },
-              ),
-              SizedBox(width: 2),
-              Text('${selectedTipologia != null ? "${selectedTipologia?.descrizione!.toUpperCase()}" : "TUTTI"}', style: TextStyle(color: Colors.white)),
-              SizedBox(width: 6)
-            ],
+        appBar: AppBar(
+          title: Text(
+            'Lista Interventi'.toUpperCase(),
+            style: TextStyle(color: Colors.white),
           ),
-          SizedBox(width: 10),
-          IconButton(
-            icon: Icon(Icons.info),
-            color: Colors.white,
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (BuildContext context) {
-                  return Container(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Legenda colori:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.grey[200],
-                            ),
-                            SizedBox(width: 3),
-                            Text('INFORMATICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.yellow[200],
-                            ),
-                            SizedBox(width: 3),
-                            Text('ELETTRICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.lightBlue[200],
-                            ),
-                            SizedBox(width: 3),
-                            Text('IDRICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.pink[50],
-                            ),
-                            SizedBox(width: 3),
-                            Text('ELETTRONICO'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.green[100],
-                            ),
-                            SizedBox(width: 3),
-                            Text('RIPARAZIONE MERCE'),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 3),
-                            Text('VENDITA FRONT OFFICE'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          'Priorità:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ NULLA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.lightGreen,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ BASSA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.yellow,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ MEDIA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.orange,
-                            ),
-                            SizedBox(width: 3),
-                            Text('PRIORITÁ ALTA'),
-                          ],
-                        ),
-                        SizedBox(height: 3),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: Colors.red,
-                            ),
-                            SizedBox(width: 3),
-                            Text('URGENTE'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
-              color: Colors.white,
+          centerTitle: true,
+          backgroundColor: Colors.red,
+          actions: [
+            Row(
+              children: [
+                PopupMenuButton<TipologiaInterventoModel>(
+                  icon: Icon(Icons.filter_alt_outlined, color: Colors.white), // Icona della casa
+                  onSelected: (TipologiaInterventoModel tipologia) {
+                    setState(() {
+                      selectedTipologia = tipologia;
+                    });
+                    filterInterventiByTipologia(tipologia.descrizione!);
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return tipologieList.map((TipologiaInterventoModel tipologia) {
+                      return PopupMenuItem<TipologiaInterventoModel>(
+                        value: tipologia,
+                        child: Text(tipologia.descrizione!.toUpperCase()),
+                      );
+                    }).toList();
+                  },
+                ),
+                SizedBox(width: 2),
+                Text('${selectedTipologia != null ? "${selectedTipologia?.descrizione!.toUpperCase()}" : "TUTTI"}', style: TextStyle(color: Colors.white)),
+                SizedBox(width: 6)
+              ],
             ),
-            onPressed: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => TableInterventiPage()));
-              //getAllInterventi();
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            Expanded(
-              child: SfDataGrid(
-                allowPullToRefresh: true,
-                allowSorting: true,
-                allowMultiColumnSorting: true,
-                source: _dataSource,
-                columnWidthMode: ColumnWidthMode.auto,
-                allowColumnsResizing: true,
-                isScrollbarAlwaysShown: true,
-                rowHeight: 40,
-                gridLinesVisibility: GridLinesVisibility.both,
-                headerGridLinesVisibility: GridLinesVisibility.both,
-                columns: [
-                  GridColumn(
+            SizedBox(width: 10),
+            IconButton(
+              icon: Icon(Icons.info),
+              color: Colors.white,
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Legenda colori:',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.grey[200],
+                              ),
+                              SizedBox(width: 3),
+                              Text('INFORMATICO'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.yellow[200],
+                              ),
+                              SizedBox(width: 3),
+                              Text('ELETTRICO'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.lightBlue[200],
+                              ),
+                              SizedBox(width: 3),
+                              Text('IDRICO'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.pink[50],
+                              ),
+                              SizedBox(width: 3),
+                              Text('ELETTRONICO'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.green[100],
+                              ),
+                              SizedBox(width: 3),
+                              Text('RIPARAZIONE MERCE'),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 3),
+                              Text('VENDITA FRONT OFFICE'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            'Priorità:',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(width: 3),
+                              Text('PRIORITÁ NULLA'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.lightGreen,
+                              ),
+                              SizedBox(width: 3),
+                              Text('PRIORITÁ BASSA'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.yellow,
+                              ),
+                              SizedBox(width: 3),
+                              Text('PRIORITÁ MEDIA'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.orange,
+                              ),
+                              SizedBox(width: 3),
+                              Text('PRIORITÁ ALTA'),
+                            ],
+                          ),
+                          SizedBox(height: 3),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                color: Colors.red,
+                              ),
+                              SizedBox(width: 3),
+                              Text('URGENTE'),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => TableInterventiPage()));
+                //getAllInterventi();
+              },
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              Expanded(
+                child: SfDataGrid(
+                  allowPullToRefresh: true,
+                  allowSorting: true,
+                  allowMultiColumnSorting: true,
+                  source: _dataSource,
+                  columnWidthMode: ColumnWidthMode.auto,
+                  allowColumnsResizing: true,
+                  isScrollbarAlwaysShown: true,
+                  rowHeight: 40,
+                  gridLinesVisibility: GridLinesVisibility.both,
+                  headerGridLinesVisibility: GridLinesVisibility.both,
+                  columns: [
+                    GridColumn(
                       columnName: 'intervento',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -684,599 +684,599 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       ),
-                    width: _columnWidths['intervento']?? double.nan,
-                    minimumWidth: 0,
-                  ),
-                  GridColumn(
-                    columnName: 'id_intervento',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'ID',
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('id_intervento', filtro);
-                          });
-                        },
-                      ),
+                      width: _columnWidths['intervento']?? double.nan,
+                      minimumWidth: 0,
                     ),
-                    width: _columnWidths['id_intervento']?? double.nan,
-                    minimumWidth: 150,
-                  ),
-                  GridColumn(
-                    columnName: 'priorita',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text('PR'),
-                    ),
-                    width: _columnWidths['priorita']?? double.nan,
-                    minimumWidth: 45,
-                  ),
-                  GridColumn(
-                    columnName: 'codice_danea',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'CODICE DANEA',
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('codice_danea', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['codice_danea']?? double.nan,
-                    minimumWidth: 200,
-                  ),
-                  GridColumn(
-                    columnName: 'cliente',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'Cliente'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('cliente', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['cliente']?? double.nan,
-                    minimumWidth: 200, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'data_apertura_intervento',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'Data apertura'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('data_apertura_intervento', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['data_apertura_intervento']?? double.nan,
-                    minimumWidth: 210, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'data',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'APPUNTAMENTO'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('data', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['data']?? double.nan,
-                    minimumWidth: 200,
-                  ),
-                  GridColumn(
-                    columnName: 'orario_appuntamento',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'Orario'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('orario_appuntamento', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['orario_appuntamento']?? double.nan,
-                    minimumWidth: 150, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'descrizione',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'TITOLO'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('descrizione', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['descrizione']?? double.nan,
-                    minimumWidth: 300, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'responsabile',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'Responsabile'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('responsabile', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['responsabile']?? double.nan,
-                    minimumWidth: 230,
-                  ),
-                  GridColumn(
-                    allowSorting: true,
-                    columnName: 'tipologia',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'SETTORE'.toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                    width: _columnWidths['tipologia']?? double.nan,
-                    minimumWidth: 180, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'stato',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text('STATO', style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    width: _columnWidths['stato']?? double.nan,
-                    minimumWidth: 100,
-                  ),
-                  GridColumn(
-                    columnName: 'inserimento_importo',
-                    label : Container(
-                        padding: EdgeInsets.all(8),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                right : BorderSide(
-                                  color: Colors.grey,
-                                  width: 1,
-                                )
-                            )
-                        ),
-                        child: Text(
-                          ''.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                        )
-                    ),
-                    width: _columnWidths['inserimento_importo']?? double.nan,
-                    minimumWidth: 100,
-                  ),
-                  GridColumn(
-                    columnName: 'importo_intervento',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'importo \n netto'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('importo_intervento', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['importo_intervento']?? double.nan,
-                    minimumWidth: 150, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'importo_ivato',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: ColumnFilter(
-                        columnName: 'importo \n ivato'.toUpperCase(),
-                        onFilterApplied: (filtro) {
-                          setState(() {
-                            _dataSource.filtraColonna('importo_ivato', filtro);
-                          });
-                        },
-                      ),
-                    ),
-                    width: _columnWidths['importo_ivato']?? double.nan,
-                    minimumWidth: 150, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'acconto'.toUpperCase(),
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Acconto'.toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                    width: _columnWidths['acconto']?? double.nan,
-                    minimumWidth: 150, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                    columnName: 'importo_restante',
-                    label: Container(
-                      padding: EdgeInsets.all(8.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey[300]!,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Importo restante'.toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                    width: _columnWidths['importo_restante']?? double.nan,
-                    minimumWidth: 150, // Imposta la larghezza minima
-                  ),
-                  GridColumn(
-                      columnName: 'assegna_gruppo',
+                    GridColumn(
+                      columnName: 'id_intervento',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                            border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
-                                )
-                            )
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'ID',
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('id_intervento', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['id_intervento']?? double.nan,
+                      minimumWidth: 150,
+                    ),
+                    GridColumn(
+                      columnName: 'priorita',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Text('PR'),
+                      ),
+                      width: _columnWidths['priorita']?? double.nan,
+                      minimumWidth: 45,
+                    ),
+                    GridColumn(
+                      columnName: 'codice_danea',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'CODICE DANEA',
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('codice_danea', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['codice_danea']?? double.nan,
+                      minimumWidth: 200,
+                    ),
+                    GridColumn(
+                      columnName: 'cliente',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'Cliente'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('cliente', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['cliente']?? double.nan,
+                      minimumWidth: 200, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'data_apertura_intervento',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'Data apertura'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('data_apertura_intervento', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['data_apertura_intervento']?? double.nan,
+                      minimumWidth: 210, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'data',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'APPUNTAMENTO'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('data', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['data']?? double.nan,
+                      minimumWidth: 200,
+                    ),
+                    GridColumn(
+                      columnName: 'orario_appuntamento',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'Orario'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('orario_appuntamento', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['orario_appuntamento']?? double.nan,
+                      minimumWidth: 150, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'descrizione',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'TITOLO'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('descrizione', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['descrizione']?? double.nan,
+                      minimumWidth: 300, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'responsabile',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'Responsabile'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('responsabile', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['responsabile']?? double.nan,
+                      minimumWidth: 230,
+                    ),
+                    GridColumn(
+                      allowSorting: true,
+                      columnName: 'tipologia',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
                         ),
                         child: Text(
-                          'Seleziona Gruppo'.toUpperCase(),
+                          'SETTORE'.toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
-                      )
-                  ),
-                ],
-                onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
-                  setState(() {
-                    _columnWidths[details.column.columnName] = details.width;
-                  });
-                  return true;
-                },
-              ),
-            ),
-            Flex(
-              // height: 60,
-              direction: Axis.horizontal,
-              children: [
-                Expanded(
-                  child:
-                  Container(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(width: 5),
-                            ElevatedButton(
-                              onPressed: () => _changeSheet(1),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
-                                //primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
-                                //onPrimary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                elevation: 2.0,
-                              ),
-                              child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
-                            ),
-                            SizedBox(width: 5),
-                            ElevatedButton(
-                              onPressed: () => _changeSheet(2),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700],
-                                //primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
-                                //onPrimary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                elevation: 2.0,
-                              ),
-                              child: Text('Conclusi non saldati', style: TextStyle(color: Colors.white)),
-                            ),
-                            SizedBox(width: 5),
-                            ElevatedButton(
-                              onPressed: () => _changeSheet(3),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                                //primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
-                                //onPrimary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                elevation: 2.0,
-                              ),
-                              child: Text('Conclusi e Saldati', style: TextStyle(color: Colors.white)),
-                            ),
-                            SizedBox(width: 5),
-                            ElevatedButton(
-                              onPressed: () => _changeSheet(4),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                                //primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
-                                //onPrimary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                elevation: 2.0,
-                              ),
-                              child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
-                            ),
-                            SizedBox(width : 5),
-                            ElevatedButton(
-                              onPressed: () => _changeSheet(5),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
-                                //primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
-                                //onPrimary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                elevation: 2.0,
-                              ),
-                              child: Text('Annullati', style: TextStyle(color: Colors.white)),
-                            ),
-                            SizedBox(width: 5),
-                            ElevatedButton(
-                              onPressed: () => _changeSheet(0),
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
-                                //primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
-                                //onPrimary: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                elevation: 2.0,
-                              ),
-                              child: Text('Tutti', style: TextStyle(color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      )
-                  ),
-                )
-              ]
-            )
-          ],
-        ),
-      ),
-      floatingActionButton:Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: (){
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context){
-                    return AlertDialog(
-                      title: Text('Crea un nuovo gruppo', style: TextStyle(fontWeight: FontWeight.bold)),
-                      actions: <Widget>[
-                        TextFormField(
-                          controller: _descrizioneController,
-                          decoration: InputDecoration(
-                            labelText: 'Nome del nuovo gruppo',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        TextFormField(
-                          controller: _noteController,
-                          decoration: InputDecoration(
-                            labelText: 'Inserisci una nota al gruppo',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Container(
-                          child: GestureDetector(
-                            onTap: () {
-                              _showClientiDialog();
-                            },
-                            child: SizedBox(
-                              height: 50,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
-                                  const Icon(Icons.arrow_drop_down),
-                                ],
-                              ),
+                      ),
+                      width: _columnWidths['tipologia']?? double.nan,
+                      minimumWidth: 180, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'stato',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
                             ),
                           ),
                         ),
-                        SizedBox(height: 12),
-                        TextButton(
-                          onPressed: () {
-                            saveGruppo();
+                        child: Text('STATO', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                      width: _columnWidths['stato']?? double.nan,
+                      minimumWidth: 100,
+                    ),
+                    GridColumn(
+                      columnName: 'inserimento_importo',
+                      label : Container(
+                          padding: EdgeInsets.all(8),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  right : BorderSide(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  )
+                              )
+                          ),
+                          child: Text(
+                            ''.toUpperCase(),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                          )
+                      ),
+                      width: _columnWidths['inserimento_importo']?? double.nan,
+                      minimumWidth: 100,
+                    ),
+                    GridColumn(
+                      columnName: 'importo_intervento',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'importo \n netto'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('importo_intervento', filtro);
+                            });
                           },
-                          child: Text('Salva gruppo'),
                         ),
-                      ],
-                    );
-                  });
-            },
-            backgroundColor: Colors.red,
-            child: Icon(Icons.create_new_folder, color: Colors.white),
-            heroTag: "Tag2",
+                      ),
+                      width: _columnWidths['importo_intervento']?? double.nan,
+                      minimumWidth: 150, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'importo_ivato',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: ColumnFilter(
+                          columnName: 'importo \n ivato'.toUpperCase(),
+                          onFilterApplied: (filtro) {
+                            setState(() {
+                              _dataSource.filtraColonna('importo_ivato', filtro);
+                            });
+                          },
+                        ),
+                      ),
+                      width: _columnWidths['importo_ivato']?? double.nan,
+                      minimumWidth: 150, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'acconto'.toUpperCase(),
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'Acconto'.toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ),
+                      width: _columnWidths['acconto']?? double.nan,
+                      minimumWidth: 150, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                      columnName: 'importo_restante',
+                      label: Container(
+                        padding: EdgeInsets.all(8.0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          'Importo restante'.toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ),
+                      width: _columnWidths['importo_restante']?? double.nan,
+                      minimumWidth: 150, // Imposta la larghezza minima
+                    ),
+                    GridColumn(
+                        columnName: 'assegna_gruppo',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  right: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1,
+                                  )
+                              )
+                          ),
+                          child: Text(
+                            'Seleziona Gruppo'.toUpperCase(),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                        )
+                    ),
+                  ],
+                  onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
+                    setState(() {
+                      _columnWidths[details.column.columnName] = details.width;
+                    });
+                    return true;
+                  },
+                ),
+              ),
+              Flex(
+                // height: 60,
+                  direction: Axis.horizontal,
+                  children: [
+                    Expanded(
+                      child:
+                      Container(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(1),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
+                                    //primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                                    //onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(2),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700],
+                                    //primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                                    //onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('Conclusi non saldati', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(3),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                    //primary: _currentSheet == 3 ? Colors.red[300] : Colors.grey[700],
+                                    //onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('Conclusi e Saldati', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(4),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                    //primary: _currentSheet == 4 ? Colors.red[300] : Colors.grey[700],
+                                    //onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('Non conclusi e Saldati', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width : 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(5),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                    //primary: _currentSheet == 5 ? Colors.red[300] : Colors.grey[700],
+                                    //onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('Annullati', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 5),
+                                ElevatedButton(
+                                  onPressed: () => _changeSheet(0),
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
+                                    //primary: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 0
+                                    //onPrimary: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    elevation: 2.0,
+                                  ),
+                                  child: Text('Tutti', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ),
+                          )
+                      ),
+                    )
+                  ]
+              )
+            ],
           ),
-          SizedBox(height: 10),
-          FloatingActionButton(
-            onPressed: () {
-              mostraRicercaInterventiDialog(
-                context: context,
-                utenti: utentiList,
-                clienti: clientiList,
-                tipologie: tipologieList,
-                interventi: _allInterventi,
-                onFiltrati: (interventiFiltrati) {
-                  _dataSource.updateData(interventiFiltrati, filteredGruppi);
-                },
-              );
-            },
-            child: Icon(Icons.filter_list, color: Colors.white,),
-            backgroundColor: Colors.red,
-          ),
-        ],
-      )
+        ),
+        floatingActionButton:Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: (){
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context){
+                      return AlertDialog(
+                        title: Text('Crea un nuovo gruppo', style: TextStyle(fontWeight: FontWeight.bold)),
+                        actions: <Widget>[
+                          TextFormField(
+                            controller: _descrizioneController,
+                            decoration: InputDecoration(
+                              labelText: 'Nome del nuovo gruppo',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          TextFormField(
+                            controller: _noteController,
+                            decoration: InputDecoration(
+                              labelText: 'Inserisci una nota al gruppo',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                            child: GestureDetector(
+                              onTap: () {
+                                _showClientiDialog();
+                              },
+                              child: SizedBox(
+                                height: 50,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(selectedCliente?.denominazione ?? 'Seleziona Cliente', style: const TextStyle(fontSize: 16)),
+                                    const Icon(Icons.arrow_drop_down),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          TextButton(
+                            onPressed: () {
+                              saveGruppo();
+                            },
+                            child: Text('Salva gruppo'),
+                          ),
+                        ],
+                      );
+                    });
+              },
+              backgroundColor: Colors.red,
+              child: Icon(Icons.create_new_folder, color: Colors.white),
+              heroTag: "Tag2",
+            ),
+            SizedBox(height: 10),
+            FloatingActionButton(
+              onPressed: () {
+                mostraRicercaInterventiDialog(
+                  context: context,
+                  utenti: utentiList,
+                  clienti: clientiList,
+                  tipologie: tipologieList,
+                  interventi: _allInterventi,
+                  onFiltrati: (interventiFiltrati) {
+                    _dataSource.updateData(interventiFiltrati, filteredGruppi);
+                  },
+                );
+              },
+              child: Icon(Icons.filter_list, color: Colors.white,),
+              backgroundColor: Colors.red,
+            ),
+          ],
+        )
     );
   }
 
@@ -1314,7 +1314,7 @@ class InterventoDataSource extends DataGridSource {
   BuildContext context;
   TextEditingController importoController = TextEditingController();
   TextEditingController codiceDaneaController = TextEditingController();
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   GruppoInterventiModel? _selectedGruppo;
   List<GruppoInterventiModel> filteredGruppi = [];
@@ -1471,9 +1471,9 @@ class InterventoDataSource extends DataGridSource {
                   },
                 );
               },
-               child: Text(
-                   '${intervento.numerazione_danea != null ? intervento.numerazione_danea : 'N/A'}'
-               ),
+              child: Text(
+                  '${intervento.numerazione_danea != null ? intervento.numerazione_danea : 'N/A'}'
+              ),
             ),
           ),
           DataGridCell<String>(
@@ -2059,8 +2059,8 @@ class InterventoDataSource extends DataGridSource {
         }
         if( dataGridCell.columnName == 'priorita'){
           return Container(
-              color: prioritaColor,
-            );
+            color: prioritaColor,
+          );
         }
         if (dataGridCell.value is Widget) {
           return Container(
@@ -2362,7 +2362,7 @@ void mostraRicercaInterventiDialog({
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
+                              initialDate: startDate ?? DateTime.now(),
                               firstDate: DateTime(2000),
                               lastDate: DateTime(2100),
                             );
@@ -2373,10 +2373,38 @@ void mostraRicercaInterventiDialog({
                             }
                           },
                           child: InputDecorator(
-                            decoration: InputDecoration(labelText: 'Data Inizio'),
-                            child: Text(startDate == null
-                                ? 'Seleziona'
-                                : DateFormat('dd/MM/yyyy').format(startDate!)),
+                            decoration: InputDecoration(
+                              labelText: 'DATA INIZIO',
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[400]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.blueAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                            child: Text(
+                              startDate == null
+                                  ? 'SELEZIONA'
+                                  : DateFormat('dd/MM/yyyy').format(startDate!),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: startDate == null ? Colors.grey[600] : Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -2386,21 +2414,49 @@ void mostraRicercaInterventiDialog({
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
+                              initialDate: startDate ?? DateTime.now(),
                               firstDate: DateTime(2000),
                               lastDate: DateTime(2100),
                             );
                             if (pickedDate != null) {
                               setState(() {
-                                endDate = pickedDate;
+                                startDate = pickedDate;
                               });
                             }
                           },
                           child: InputDecorator(
-                            decoration: InputDecoration(labelText: 'Data Fine'),
-                            child: Text(endDate == null
-                                ? 'Seleziona'
-                                : DateFormat('dd/MM/yyyy').format(endDate!)),
+                            decoration: InputDecoration(
+                              labelText: 'DATA INIZIO',
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[400]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.blueAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                            child: Text(
+                              startDate == null
+                                  ? 'SELEZIONA'
+                                  : DateFormat('dd/MM/yyyy').format(startDate!),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: startDate == null ? Colors.grey[600] : Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -2408,36 +2464,99 @@ void mostraRicercaInterventiDialog({
                   ),
                   SizedBox(height: 20),
                   DropdownButtonFormField<UtenteModel>(
-                    decoration: InputDecoration(labelText: 'Seleziona Utente'),
+                    decoration: InputDecoration(
+                      labelText: 'SELEZIONA UTENTE',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    ),
                     value: selectedUtente,
                     items: utenti.map((utente) {
-                      return DropdownMenuItem(
+                      return DropdownMenuItem<UtenteModel>(
                         value: utente,
-                        child: Text(utente.nomeCompleto()!),
+                        child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
                       );
                     }).toList(),
-                    onChanged: (val) {
+                    onChanged: (UtenteModel? val) {
                       setState(() {
                         selectedUtente = val;
                       });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Seleziona un utente';
+                      }
+                      return null;
                     },
                   ),
                   SizedBox(height: 20),
                   TextFormField(
                     controller: _clienteController,
-                    decoration: InputDecoration(labelText: 'Cerca Cliente per denominazione, indirizzo, numero di telefono, etc.'),
+                    decoration: InputDecoration(
+                      labelText: 'CERCA CLIENTE',
+                      hintText: 'Inserisci denominazione, indirizzo, telefono, ecc.',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    ),
                     onChanged: (query) {
                       setState(() {
-                        clientiFiltrati = clienti
-                            .where((cliente) {
-                          return (cliente.denominazione != null && cliente.denominazione!.toLowerCase().contains(query.toLowerCase())) ||
-                              (cliente.cellulare != null && cliente.cellulare!.toLowerCase().contains(query.toLowerCase())) ||
-                              (cliente.telefono != null && cliente.telefono!.toLowerCase().contains(query.toLowerCase())) ||
-                              (cliente.citta != null && cliente.citta!.toLowerCase().contains(query.toLowerCase())) ||
-                              (cliente.codice_fiscale != null && cliente.codice_fiscale!.toLowerCase().contains(query.toLowerCase())) ||
-                              (cliente.partita_iva != null && cliente.partita_iva!.toLowerCase().contains(query.toLowerCase())) ||
-                              (cliente.fax != null && cliente.fax!.toLowerCase().contains(query.toLowerCase())) ||
-                              (cliente.email != null && cliente.email!.toLowerCase().contains(query.toLowerCase()));
+                        clientiFiltrati = clienti.where((cliente) {
+                          final searchQuery = query.toLowerCase();
+                          return (cliente.denominazione != null && cliente.denominazione!.toLowerCase().contains(searchQuery)) ||
+                              (cliente.cellulare != null && cliente.cellulare!.toLowerCase().contains(searchQuery)) ||
+                              (cliente.telefono != null && cliente.telefono!.toLowerCase().contains(searchQuery)) ||
+                              (cliente.citta != null && cliente.citta!.toLowerCase().contains(searchQuery)) ||
+                              (cliente.codice_fiscale != null && cliente.codice_fiscale!.toLowerCase().contains(searchQuery)) ||
+                              (cliente.partita_iva != null && cliente.partita_iva!.toLowerCase().contains(searchQuery)) ||
+                              (cliente.fax != null && cliente.fax!.toLowerCase().contains(searchQuery)) ||
+                              (cliente.email != null && cliente.email!.toLowerCase().contains(searchQuery));
                         }).toList();
                       });
                     },
@@ -2464,12 +2583,44 @@ void mostraRicercaInterventiDialog({
                     ),
                   SizedBox(height: 20),
                   DropdownButtonFormField<TipologiaInterventoModel>(
-                    decoration: InputDecoration(labelText: 'Seleziona Tipologia'),
+                    decoration: InputDecoration(
+                      labelText: 'SELEZIONA TIPOLOGIA',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.blueAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    ),
                     value: selectedTipologia,
+                    isExpanded: true,
                     items: tipologie.map((tipologia) {
-                      return DropdownMenuItem(
+                      return DropdownMenuItem<TipologiaInterventoModel>(
                         value: tipologia,
-                        child: Text(tipologia.descrizione!),
+                        child: Text(
+                          tipologia.descrizione!,
+                          style: TextStyle(fontSize: 14),
+                        ),
                       );
                     }).toList(),
                     onChanged: (val) {
@@ -2477,11 +2628,46 @@ void mostraRicercaInterventiDialog({
                         selectedTipologia = val;
                       });
                     },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Seleziona una tipologia valida';
+                      }
+                      return null;
+                    },
                   ),
                   SizedBox(height : 10),
                   DropdownButtonFormField<String>(
-                    decoration: InputDecoration(labelText: 'Seleziona Stato'),
+                    decoration: InputDecoration(
+                      labelText: 'SELEZIONA STATO',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.blueAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    ),
                     value: selectedStato,
+                    isExpanded: true,
                     items: [
                       DropdownMenuItem(value: 'Assegnato', child: Text('Assegnato')),
                       DropdownMenuItem(value: 'In lavorazione', child: Text('In lavorazione')),
@@ -2492,6 +2678,12 @@ void mostraRicercaInterventiDialog({
                         selectedStato = val;
                       });
                     },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Seleziona uno stato valido';
+                      }
+                      return null;
+                    },
                   ),
                 ],
               ),
@@ -2501,7 +2693,7 @@ void mostraRicercaInterventiDialog({
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('Annulla'),
+                child: Text('Annulla', style : TextStyle(color: Colors.red)),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -2601,6 +2793,10 @@ void mostraRicercaInterventiDialog({
                   onFiltrati(interventiFiltrati);
                   Navigator.of(context).pop();
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Sfondo rosso
+                  foregroundColor: Colors.white, // Testo bianco
+                ),
                 child: Text('Cerca'),
               )
             ],

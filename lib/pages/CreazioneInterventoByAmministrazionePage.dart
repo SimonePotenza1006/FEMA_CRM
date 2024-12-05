@@ -269,21 +269,70 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   ),
                                 ),
                               SizedBox(height: 15),
-                              DropdownButton<TipologiaInterventoModel>(
-                                value: _selectedTipologia,
-                                hint:  Text('Seleziona tipologia di intervento'.toUpperCase()),
-                                onChanged: (TipologiaInterventoModel? newValue) {
-                                  setState(() {
-                                    _selectedTipologia = newValue;
-                                  });
-                                },
-                                items: allTipologie
-                                    .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                                      (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
-                                    value: value,
-                                    child: Text(value.descrizione!),
+                              SizedBox(
+                                width: 400,
+                                child: DropdownButtonFormField<TipologiaInterventoModel>(
+                                  value: _selectedTipologia,
+                                  hint: Text(
+                                    'SELEZIONA TIPOLOGIA DI INTERVENTO',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ).toList(),
+                                  onChanged: (TipologiaInterventoModel? newValue) {
+                                    setState(() {
+                                      _selectedTipologia = newValue;
+                                    });
+                                  },
+                                  items: allTipologie
+                                      .map<DropdownMenuItem<TipologiaInterventoModel>>(
+                                        (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
+                                      value: value,
+                                      child: Text(
+                                        value.descrizione!,
+                                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                                      ),
+                                    ),
+                                  )
+                                      .toList(),
+                                  decoration: InputDecoration(
+                                    labelText: 'TIPOLOGIA INTERVENTO',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[200],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.redAccent,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Selezionare una tipologia di intervento';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                               const SizedBox(height: 20.0),
                               SizedBox(
@@ -291,7 +340,35 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 child: TextFormField(
                                   controller: _titoloController,
                                   maxLines: null,
-                                  decoration:  InputDecoration(labelText: 'Titolo'.toUpperCase()),
+                                  decoration: InputDecoration(
+                                    labelText: 'TITOLO',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[200],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.redAccent,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                  ),
                                   onChanged: (value) {
                                     setState(() {
                                       _titolo = value;
@@ -305,7 +382,35 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 child: TextFormField(
                                   controller: _descrizioneController,
                                   maxLines: null,
-                                  decoration:  InputDecoration(labelText: 'Descrizione'.toUpperCase()),
+                                  decoration: InputDecoration(
+                                    labelText: 'DESCRIZIONE',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[200],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.redAccent,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                  ),
                                   onChanged: (value) {
                                     setState(() {
                                       _descrizione = value;
@@ -319,7 +424,35 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 child: TextFormField(
                                   controller: _notaController,
                                   maxLines: null,
-                                  decoration:  InputDecoration(labelText: 'Nota'.toUpperCase()),
+                                  decoration: InputDecoration(
+                                    labelText: 'NOTA',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[200],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.redAccent,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                  ),
                                   onChanged: (value) {
                                     setState(() {
                                       _nota = value;
@@ -337,7 +470,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                       _selectedPriorita = newValue;
                                     });
                                   },
-                                  // Filtra solo i valori desiderati: Acconto e Pagamento
                                   items: [Priorita.BASSA, Priorita.MEDIA, Priorita.ALTA, Priorita.URGENTE]
                                       .map<DropdownMenuItem<Priorita>>((Priorita value) {
                                     String label = "";
@@ -352,11 +484,40 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                     }
                                     return DropdownMenuItem<Priorita>(
                                       value: value,
-                                      child: Text(label),
+                                      child: Text(
+                                        label,
+                                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                                      ),
                                     );
                                   }).toList(),
                                   decoration: InputDecoration(
                                     labelText: 'PRIORITÀ',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[200],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.redAccent,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                                   ),
                                   validator: (value) {
                                     if (value == null) {

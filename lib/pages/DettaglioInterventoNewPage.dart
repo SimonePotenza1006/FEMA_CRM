@@ -1380,42 +1380,6 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             ),
             child: Text('Salva Foto', style: TextStyle(fontSize: 18.0)),
           ) : Container(),
-          Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment : MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.attach_file, color: Colors.black,),
-                      onPressed: _pickFile,
-                      tooltip: 'Seleziona un pdf',
-                    ),
-                    SizedBox(width: 5),
-                    Text('Seleziona un pdf')
-                  ],
-                ),
-                if(selectedFile != null) // Mostra il nome del file se selezionato
-                  Text(
-                    'File selezionato: ${selectedFile!.path.split('/').last}',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                SizedBox(height : 10),
-                if(selectedFile != null)
-                  ElevatedButton(
-                    onPressed: (){
-
-                    },
-                    child: const Text('Salva PDF'),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-              ],
-          ),
         ],
       ),
     );
