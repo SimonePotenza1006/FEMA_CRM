@@ -1646,7 +1646,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
 
     return SizedBox(
-      width: 500,
+      width: 282,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(
