@@ -706,7 +706,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                       _changeSheet(int.parse(tipo.id!));
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(horizontal: 35, vertical: 25),
+                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                                       backgroundColor: isSelected
                                           ? Colors.red // Colore rosso per il pulsante selezionato
                                           : Colors.grey[300], // Colore grigio chiaro per i non selezionati
