@@ -446,7 +446,7 @@ class _CreazioneTaskPageState
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 17),
-                ElevatedButton(
+                if (_timer != null) ElevatedButton(
                   onPressed: !_isRecording ? _playRecording : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -455,7 +455,7 @@ class _CreazioneTaskPageState
                   ),
                   child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                Slider(
+                if (_timer != null) Slider(
                   value: _currentPosition,
                   max: _totalDuration,
                   onChanged: (value) {
