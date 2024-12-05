@@ -862,7 +862,15 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      return Center(child: Text('Errore: ${snapshot.error}'));
+                      // Controlla il tipo o il messaggio dell'errore
+                      final error = snapshot.error.toString();
+                      if (error.contains('Directory non trovata')) {
+                        return Center(child: Text('Nessun allegato presente.'));
+                      } else if (error.contains('connessione al server')) {
+                        return Center(child: Text('Errore di connessione al server.'));
+                      } else {
+                        return Center(child: Text('Errore sconosciuto: $error'));
+                      }
                     } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                       return Center(child: Text('Nessun file PDF trovato.'));
                     } else if (snapshot.hasData) {
