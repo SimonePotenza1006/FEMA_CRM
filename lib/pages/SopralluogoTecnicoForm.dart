@@ -157,23 +157,71 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                   SizedBox(height: 20),
                   SizedBox(
                     width: 300,
-                    child: DropdownButton<TipologiaInterventoModel>(
+                    child: DropdownButtonFormField<TipologiaInterventoModel>(
                       value: selectedTipologia,
-                      hint: Text('Seleziona tipologia di sopralluogo'),
+                      hint: Text(
+                        'SELEZIONA TIPOLOGIA DI SOPRALLUOGO',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       isExpanded: true,
                       onChanged: (TipologiaInterventoModel? newValue) {
                         setState(() {
                           selectedTipologia = newValue;
                         });
                       },
-                      items: tipologieList
-                          .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                              (TipologiaInterventoModel tipologia) {
-                            return DropdownMenuItem<TipologiaInterventoModel>(
-                              value: tipologia,
-                              child: Text(tipologia.descrizione ?? ''),
-                            );
-                          }).toList(),
+                      items: tipologieList.map<DropdownMenuItem<TipologiaInterventoModel>>(
+                            (TipologiaInterventoModel tipologia) {
+                          return DropdownMenuItem<TipologiaInterventoModel>(
+                            value: tipologia,
+                            child: Text(
+                              tipologia.descrizione ?? '',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          );
+                        },
+                      ).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'TIPOLOGIA DI SOPRALLUOGO',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'SELEZIONARE UNA TIPOLOGIA DI SOPRALLUOGO';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(height: 20),
@@ -201,44 +249,100 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
                   ),
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 400,
+                    width: 300,
                     child: TextFormField(
                       controller: indirizzoController, // Utilizza il controller per il campo indirizzo
                       onChanged: (value) {
                         // Non è più necessario gestire l'evento onChanged
                       },
                       decoration: InputDecoration(
-                        labelText: 'Indirizzo',
-                        hintText: 'Indirizzo',
+                        labelText: 'INDIRIZZO',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintText: 'Inserisci l\'indirizzo',
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[400],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.grey),
+                          borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.red),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
                         ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Inserisci un indirizzo';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(height: 20),
                   SizedBox(
-                    width: 400,
+                    width: 300,
                     child: TextFormField(
                       controller: descrizioneController,
-                      maxLines: null,
+                      maxLines: null, // Per consentire più righe di testo
                       decoration: InputDecoration(
-                        labelText: 'Descrizione',
+                        labelText: 'DESCRIZIONE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
                         hintText: 'Aggiungi una descrizione',
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[400],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.grey),
+                          borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.red),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
                         ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Aggiungi una descrizione';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   SizedBox(height: 20),
