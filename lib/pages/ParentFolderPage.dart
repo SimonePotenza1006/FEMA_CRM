@@ -27,7 +27,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllCartelle() async {
     try {
-      var apiUrl = Uri.parse("$ipaddress/api/cartella");
+      var apiUrl = Uri.parse("$ipaddressProva/api/cartella");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -90,7 +90,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> createCartella(String? name) async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/cartella'),
+        Uri.parse('$ipaddressProva/api/cartella'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'nome' : name.toString(),

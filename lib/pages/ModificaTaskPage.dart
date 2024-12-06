@@ -84,7 +84,44 @@ class _ModificaTaskPageState
     });
   }
 
+  bool _isPlaying = false; // Variabile per tracciare lo stato di riproduzione
+
   Future<void> _playRecording() async {
+    if (_isPlaying) {
+      // Se l'audio è in riproduzione, metti in pausa.
+      await _audioPlayer.pause();
+      setState(() {
+        _isPlaying = false;
+      });
+    } else {
+      // Se l'audio è stato messo in pausa, riprendi la riproduzione dalla posizione corrente.
+      if (_currentPosition > 0 && _currentPosition < _totalDuration) {
+        await _audioPlayer.play(ap.BytesSource(resp!), position: Duration(seconds: _currentPosition.toInt()));
+      } else {
+        // Altrimenti, avvia la riproduzione dall'inizio.
+        await _audioPlayer.play(ap.BytesSource(resp!));
+      }
+      setState(() {
+        _isPlaying = true;
+      });
+    }
+
+    _audioPlayer.onPositionChanged.listen((position) {
+      setState(() {
+        _currentPosition = position.inSeconds.toDouble();
+      });
+    });
+
+    _audioPlayer.onPlayerComplete.listen((_) {
+      setState(() {
+        _isPlaying = false; // Aggiorna lo stato quando la riproduzione è completata
+      });
+    });
+  }
+
+
+
+  Future<void> _playRecordingOld() async {
     /*setState(() {
       _totalDuration = _totalDuration;//duration.inSeconds.toDouble(); // Imposta la durata totale
       _currentPosition = 0;//position!.inSeconds.toDouble(); // Imposta la posizione corrente
@@ -135,7 +172,7 @@ class _ModificaTaskPageState
     final dir = await getApplicationDocumentsDirectory();
     String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
     final player = ap.AudioPlayer();
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
+    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
     http.Response? response;
     try {
 
@@ -168,7 +205,7 @@ class _ModificaTaskPageState
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -195,7 +232,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -728,17 +765,9 @@ class _ModificaTaskPageState
                           if (pickedImages.isNotEmpty)
                             _buildImagePreview(),
                           SizedBox(height: 20),
-                          if (resp != null)//(_futureAudio != null)
+                          //if (resp != null)//(_futureAudio != null)
                             Column(children: [
-                              ElevatedButton(
-                                onPressed: _playRecording,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  padding:
-                                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                                ),
-                                child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+
                               //Text(_totalDuration.toString()),
                               FutureBuilder(
                                 future: _futureAudio, // Usa il futuro dell'audio
@@ -746,7 +775,7 @@ class _ModificaTaskPageState
                                   if (snapshot.connectionState == ConnectionState.waiting) {
                                     return Center(child: CircularProgressIndicator());
                                   } else if (snapshot.hasError) {
-                                    return Center(child: Text('Errore nel caricamento dell\'audio'));
+                                    return Center(child: Text('Nessun audio disponibile'));//'Errore nel caricamento dell\'audio'));
                                   } else {
                                     // Qui puoi accedere a _totalDuration e costruire il tuo widget
                                     return SingleChildScrollView(
@@ -754,6 +783,31 @@ class _ModificaTaskPageState
                                         padding: EdgeInsets.all(20.0),
                                         child: Column(
                                           children: [
+                                            /*ElevatedButton(
+                                              onPressed: _playRecording,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.green,
+                                                padding:
+                                                const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                              ),
+                                              child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold)),
+                                            ),*/
+                                            ElevatedButton(
+                                              onPressed: _playRecording,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: _isPlaying ? Colors.blue : Colors.red,
+                                                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                              ),
+                                              child: _isPlaying ? Icon(
+                                                Icons.pause, // Icona di play
+                                                color: Colors.white, // Colore dell'icona
+                                                size: 28, // Dimensione dell'icona
+                                              ) : Icon(
+                                                Icons.play_arrow, // Icona di play
+                                                color: Colors.white, // Colore dell'icona
+                                                size: 28, // Dimensione dell'icona
+                                              ),
+                                            ),
                                             Text(
                                               '${(_totalDuration.toInt() ~/ 60).toString().padLeft(2, '0')}:${(_totalDuration.toInt() % 60).toString().padLeft(2, '0')}',
                                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -805,7 +859,7 @@ class _ModificaTaskPageState
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.task.id,
@@ -833,7 +887,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

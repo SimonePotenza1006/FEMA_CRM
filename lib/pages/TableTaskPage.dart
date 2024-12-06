@@ -42,9 +42,28 @@ class _TableTaskPageState extends State<TableTaskPage>{
   @override
   void dispose() {
     SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
+      //DeviceOrientation.portraitUp,
     ]);
     super.dispose();
+  }
+
+  Future<void> _refreshData() async {
+    /*setState(() {
+      isLoading = true;
+    });*/
+
+    // Simula un caricamento dei dati
+    await Future.delayed(Duration(seconds: 2));
+
+    // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
+    //_dataSource.updateData();
+    getAllTask();
+    getAllTipi();
+    getAllUtenti();
+
+    /*setState(() {
+      isLoading = false;
+    });*/
   }
 
   void _setPreferredOrientation() {
@@ -74,7 +93,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     bool allDeleted = true;
 
     for (var task in tasksToDelete) {
-      final String url = '$ipaddress/api/task/${task.id}';
+      final String url = '$ipaddressProva/api/task/${task.id}';
       try {
         final response = await http.delete(Uri.parse(url));
         if (response.statusCode == 200 || response.statusCode == 204) {
@@ -120,7 +139,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
       // Step 2: Elimina la tipologia
       print('Task eliminati. Procedo con l\'eliminazione della tipologia.');
-      final String url = '$ipaddress/api/tipoTask/${selectedTipoToDelete.id}';
+      final String url = '$ipaddressProva/api/tipoTask/${selectedTipoToDelete.id}';
       final response = await http.delete(Uri.parse(url));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -140,7 +159,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   @override
   void initState() {
     super.initState();
-    _setPreferredOrientation();
+    //_setPreferredOrientation();
     _columnWidths = {
       'task': 0,
       'accettatoicon': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
@@ -195,7 +214,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -235,7 +254,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -281,8 +300,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
     try {
       // Decidi l'endpoint in base al cognome dell'utente
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
-          ? Uri.parse('$ipaddress/api/task/all')
-          : Uri.parse('$ipaddress/api/task/utente/' + widget.utente!.id!);
+          ? Uri.parse('$ipaddressProva/api/task/all')
+          : Uri.parse('$ipaddressProva/api/task/utente/' + widget.utente!.id!);
       print('Chiamata API verso: $apiUrl');
       var response = await http.get(apiUrl);
       print('Risposta ricevuta con status code: ${response.statusCode}');
@@ -406,14 +425,17 @@ class _TableTaskPageState extends State<TableTaskPage>{
               ),
             ],
           ),
-          body: Padding(
+          body: LayoutBuilder(
+              builder: (context, constraints) { return Padding(
             padding: EdgeInsets.all(10),
             child: Column(
               children: [
                 SizedBox(height: 10),
                 Expanded(
-                    child: isLoading ? Center(child: CircularProgressIndicator()) : SfDataGrid(
-                      allowPullToRefresh: true,
+                    child: RefreshIndicator(
+                        onRefresh: _refreshData,
+                        child: isLoading ? Center(child: CircularProgressIndicator()) : SfDataGrid(
+                      //allowPullToRefresh: true,
                       allowSorting: true,
                       source: _dataSource,
                       columnWidthMode: ColumnWidthMode.auto,
@@ -485,7 +507,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: 60,//_columnWidths['task']?? double.nan,
+                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
                           minimumWidth: 60,
                         ),
                         GridColumn(
@@ -507,7 +529,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: 60,//_columnWidths['task']?? double.nan,
+                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
                           minimumWidth: 60,
                         ),
                         GridColumn(
@@ -529,7 +551,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: _columnWidths['condividi']?? double.nan,
+                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['condividi']?? double.nan,
                           minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
                         ),
                         GridColumn(
@@ -546,12 +568,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               ),
                             ),
                             child: Text(
-                              'Data creazione',
+                              'Data\ncreazione',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: _columnWidths['data_creazione']?? double.nan,
-                          minimumWidth: 150,
+                          width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_creazione']?? double.nan,
+                          minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
                         ),
                         /*GridColumn(
                       columnName: 'data_conclusione',
@@ -592,8 +614,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: _columnWidths['titolo']?? double.nan,
-                          minimumWidth: 300,
+                          width: (constraints.maxWidth < 460) ? 170 : 300,//_columnWidths['titolo']?? double.nan,
+                          minimumWidth: (constraints.maxWidth < 460) ? 170 : 300,
                         ),
                         /*GridColumn(
                       columnName: 'tipologia',
@@ -634,7 +656,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: _columnWidths['utente']?? double.nan,
+                          width: (constraints.maxWidth < 460) ? 120 : 300,//_columnWidths['utente']?? double.nan,
                           minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 300 : 0,
                         ),
                         GridColumn(
@@ -655,7 +677,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: _columnWidths['accettato']?? double.nan,
+                          width: (constraints.maxWidth < 460) ? 110 : 170,//_columnWidths['accettato']?? double.nan,
                           minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
                         ),
                         GridColumn(
@@ -676,8 +698,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: _columnWidths['data_conclusione']?? double.nan,
-                          minimumWidth: 150,
+                          width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_conclusione']?? double.nan,
+                          minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
                         ),
                       ],
                       onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
@@ -686,7 +708,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         });
                         return true;
                       },
-                    )),
+                    ))),
                 if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti")
                   Flex(
                     direction: Axis.horizontal,
@@ -736,7 +758,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   )
               ],
             ),
-          ),
+          );}),
             floatingActionButton: widget.utente.cognome == "Mazzei" ||
                 widget.utente.cognome == "Chiriatti" ?
             Column(
@@ -875,6 +897,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   child: Icon(Icons.create_new_folder, color: Colors.white),
                   heroTag: "Tag2",
                 ),
+                SizedBox(height: 45),
               ]
             ) : Container(),
         )
@@ -884,7 +907,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/tipoTask'),
+        Uri.parse('$ipaddressProva/api/tipoTask'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text
@@ -1010,7 +1033,7 @@ class TaskDataSource extends DataGridSource{
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1043,7 +1066,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1077,7 +1100,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1108,7 +1131,7 @@ class TaskDataSource extends DataGridSource{
   Future<void> deleteTask(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/task/$id'),
+        Uri.parse('$ipaddressProva/api/task/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1132,8 +1155,8 @@ class TaskDataSource extends DataGridSource{
 
   Future<void> getAllTask() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/all')
-          : Uri.parse('$ipaddress/api/task/utente/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
+          : Uri.parse('$ipaddressProva/api/task/utente/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -1263,7 +1286,7 @@ class TaskDataSource extends DataGridSource{
       } else if (dataGridCell.columnName == 'condividi') {
         return IconButton(
           tooltip: 'CONDIVIDI TASK',
-          icon: Icon(Icons.send, color: Colors.grey, size: 22),
+          icon: Icon(Icons.send, color: Colors.grey, size: 24),
           onPressed: () {
             // Variabile locale per tracciare l'utente selezionato
             UtenteModel? localSelectedUtente = selectedUtenteCondivisione;

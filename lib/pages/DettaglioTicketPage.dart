@@ -69,7 +69,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllTipiTask() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -90,7 +90,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response =await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -111,7 +111,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -132,7 +132,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -175,7 +175,42 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   }
 
+  bool _isPlaying = false; // Variabile per tracciare lo stato di riproduzione
+
   Future<void> _playRecording() async {
+    if (_isPlaying) {
+      // Se l'audio è in riproduzione, metti in pausa.
+      await _audioPlayer.pause();
+      setState(() {
+        _isPlaying = false;
+      });
+    } else {
+      // Se l'audio è stato messo in pausa, riprendi la riproduzione dalla posizione corrente.
+      if (_currentPosition > 0 && _currentPosition < _totalDuration) {
+        await _audioPlayer.play(ap.BytesSource(resp!), position: Duration(seconds: _currentPosition.toInt()));
+      } else {
+        // Altrimenti, avvia la riproduzione dall'inizio.
+        await _audioPlayer.play(ap.BytesSource(resp!));
+      }
+      setState(() {
+        _isPlaying = true;
+      });
+    }
+
+    _audioPlayer.onPositionChanged.listen((position) {
+      setState(() {
+        _currentPosition = position.inSeconds.toDouble();
+      });
+    });
+
+    _audioPlayer.onPlayerComplete.listen((_) {
+      setState(() {
+        _isPlaying = false; // Aggiorna lo stato quando la riproduzione è completata
+      });
+    });
+  }
+
+  Future<void> _playRecordingOld() async {
 
     await _audioPlayer.play(ap.BytesSource(resp!));
 
@@ -190,7 +225,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     final dir = await getApplicationDocumentsDirectory();
     String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
     final player = ap.AudioPlayer();
-    final url = '$ipaddress/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/audio';
+    final url = '$ipaddressProva/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/audio';
     http.Response? response;
     try {
 
@@ -223,7 +258,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -268,7 +303,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
       for(var imageBytes in images){
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddress/api/immagine/task/$taskId'),
+          Uri.parse('$ipaddressProva/api/immagine/task/$taskId'),
         );
         request.files.add(http.MultipartFile.fromBytes(
           'task', // Nome del campo nel form
@@ -330,7 +365,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         // Converte Uint8List in MultipartFile
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddress/api/immagine/$interventoId'),
+          Uri.parse('$ipaddressProva/api/immagine/$interventoId'),
         );
         request.files.add(http.MultipartFile.fromBytes(
           'intervento', // Nome del campo nel form
@@ -456,19 +491,11 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                   ),
                 ),
                 SizedBox(height: 20),
-                if (resp != null)
+                //if (resp != null)
                 Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                  ElevatedButton(
-                    onPressed: _playRecording,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    ),
-                    child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                  ),
+
                 //Text(_totalDuration.toString()),
                 FutureBuilder(
                   future: _futureAudio, // Usa il futuro dell'audio
@@ -476,7 +503,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      return Center(child: Text('Errore nel caricamento dell\'audio'));
+                      return Center(child: Text('Nessun audio disponibile'));
                     } else {
                       // Qui puoi accedere a _totalDuration e costruire il tuo widget
                       return SingleChildScrollView(
@@ -484,6 +511,35 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                           padding: EdgeInsets.all(20.0),
                           child: Column(
                             children: [
+                              /*ElevatedButton(
+                                onPressed: _playRecording,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                ),
+                                child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                              ),*/
+                              ElevatedButton(
+                                onPressed: _playRecording,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _isPlaying ? Colors.blue : Colors.red,
+                                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                                ),
+                                child: _isPlaying ? Icon(
+                                  Icons.pause, // Icona di play
+                                  color: Colors.white, // Colore dell'icona
+                                  size: 28, // Dimensione dell'icona
+                                ) : Icon(
+                                  Icons.play_arrow, // Icona di play
+                                  color: Colors.white, // Colore dell'icona
+                                  size: 28, // Dimensione dell'icona
+                                ),
+                                /*Text(
+                                  _isPlaying ? 'PAUSE' : 'PLAY',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),*/
+                              ),
                               Text(
                                 '${(_totalDuration.toInt() ~/ 60).toString().padLeft(2, '0')}:${(_totalDuration.toInt() % 60).toString().padLeft(2, '0')}',
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -508,7 +564,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
                   },
                 ),
                 ]),
-                SizedBox(width: 30),
+                SizedBox(height: 18),
                 SizedBox(
                   width: 200, // Larghezza desiderata
                   height: 50, // Altezza desiderata
@@ -1283,7 +1339,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   Future<void> deleteTicket(int ticketId) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/ticket/$ticketId'),
+        Uri.parse('$ipaddressProva/api/ticket/$ticketId'),
         headers: {'Content-Type': 'application/json'},
       );
       print(response.statusCode);
@@ -1339,7 +1395,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         },
       );
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : selectedUtente?.toMap(),
@@ -1364,7 +1420,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
             'Errore durante la creazione dell\'intervento: ${response.statusCode}');
       }
       final response2 = await http.post(
-        Uri.parse('$ipaddress/api/ticket'),
+        Uri.parse('$ipaddressProva/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ticket.id,
@@ -1415,7 +1471,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         },
       );
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'attivo': true,
@@ -1442,7 +1498,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
       }
 
       final response2 = await http.post(
-        Uri.parse('$ipaddress/api/ticket'),
+        Uri.parse('$ipaddressProva/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ticket.id,
@@ -1621,7 +1677,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

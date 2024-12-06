@@ -48,7 +48,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
 
   Future<void> getAllTickets() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/ticket');
+      var apiUrl = Uri.parse('$ipaddressProva/api/ticket');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -77,6 +77,23 @@ class _TableTicketPageState extends State<TableTicketPage>{
         isLoading = false; // Fine del caricamento
       });
     }
+  }
+
+  Future<void> _refreshData() async {
+    /*setState(() {
+      isLoading = true;
+    });*/
+
+    // Simula un caricamento dei dati
+    await Future.delayed(Duration(seconds: 2));
+
+    // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
+    //_dataSource.updateData();
+    getAllTickets();
+
+    /*setState(() {
+      isLoading = false;
+    });*/
   }
 
   @override
@@ -121,9 +138,11 @@ class _TableTicketPageState extends State<TableTicketPage>{
         child: Column(
           children: [
             SizedBox(height: 10),
-            Expanded(child: isLoading ? Center(child: CircularProgressIndicator()) :
+            Expanded(child: RefreshIndicator(
+                onRefresh: _refreshData,
+                child: isLoading ? Center(child: CircularProgressIndicator()) :
               SfDataGrid(
-                  allowPullToRefresh: true,
+                  //allowPullToRefresh: true,
                   allowSorting: true,
                   allowMultiColumnSorting: true,
                   source: _dataSource,
@@ -252,7 +271,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
                   });
                   return true;
                 },
-              )
+              ))
             ),
             Flex(
               direction: Axis.horizontal,
