@@ -79,6 +79,23 @@ class _TableTicketPageState extends State<TableTicketPage>{
     }
   }
 
+  Future<void> _refreshData() async {
+    /*setState(() {
+      isLoading = true;
+    });*/
+
+    // Simula un caricamento dei dati
+    await Future.delayed(Duration(seconds: 2));
+
+    // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
+    //_dataSource.updateData();
+    getAllTickets();
+
+    /*setState(() {
+      isLoading = false;
+    });*/
+  }
+
   @override
   void initState(){
     super.initState();
@@ -121,9 +138,11 @@ class _TableTicketPageState extends State<TableTicketPage>{
         child: Column(
           children: [
             SizedBox(height: 10),
-            Expanded(child: isLoading ? Center(child: CircularProgressIndicator()) :
+            Expanded(child: RefreshIndicator(
+                onRefresh: _refreshData,
+                child: isLoading ? Center(child: CircularProgressIndicator()) :
               SfDataGrid(
-                  allowPullToRefresh: true,
+                  //allowPullToRefresh: true,
                   allowSorting: true,
                   allowMultiColumnSorting: true,
                   source: _dataSource,
@@ -252,7 +271,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
                   });
                   return true;
                 },
-              )
+              ))
             ),
             Flex(
               direction: Axis.horizontal,

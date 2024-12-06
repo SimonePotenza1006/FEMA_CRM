@@ -767,11 +767,11 @@ class _CreazioneTaskPageState
           var response = await request.send();
           if (response.statusCode == 200) {
             print('File inviato con successo');
-            ScaffoldMessenger.of(context).showSnackBar(
+            /*ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Audio salvato!'),
               ),
-            );
+            );*/
           } else {
             print('Errore durante l\'invio del file audio: ${response.statusCode}');
           }
