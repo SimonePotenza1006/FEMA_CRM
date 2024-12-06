@@ -284,9 +284,9 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                   if(constraints.maxWidth >= 800){
                     return Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Center(
+                      //child: Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(20.0),
@@ -367,8 +367,11 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                   if (pickedImages.isNotEmpty) _buildImagePreview(),
                           const SizedBox(height: 30),
                           if (Platform.isAndroid)
-                      Column(children: [
-                    Row(
+                  Column(
+                    children: [
+                      Container(
+                          width: 600, // Imposta la larghezza desiderata
+                          child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
@@ -397,13 +400,20 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                           child: const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                         ),
                       ],
-                    ),
-                  Text(
+                    )),
+                        Container(
+                        width: 600, // Imposta la larghezza desiderata
+                  child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Text(
                   '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  )])),
                   const SizedBox(height: 12),
-                        if (_timer != null) Row(
+                        if (_timer != null) Container(
+                        width: 600, // Imposta la larghezza desiderata
+                 child:
+                  Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
@@ -452,7 +462,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                                   ),
                                   child: const Text('annulla', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                 ),*/
-                          ],),
+                          ],)),
                   /*ElevatedButton(
                   onPressed: !_isRecording ? _playRecording : null,
                   style: ElevatedButton.styleFrom(
@@ -462,7 +472,12 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                   ),
                   child: const Text('PLAY', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                   ),*/
-                  if (_timer != null) Slider(
+                  if (_timer != null) Container(
+                  width: 600, // Imposta la larghezza desiderata
+                  child: Center(child:
+                  /*mainAxisAlignment: MainAxisAlignment.center,
+                  children: [*/
+                    Slider(
                     activeColor: Colors.blue,
                   value: _currentPosition,
                   max: _totalDuration,
@@ -472,7 +487,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                   });
                   _audioPlayer.seek(Duration(seconds: value.toInt()));
                   },
-                  ),
+                  ))),
                   SizedBox(height: 43,)
                       ],),
                                 ],
@@ -480,7 +495,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
                             ),
                           ],
                         ),
-                      ),
+                      //),
                     );
                   } else{
                     return Padding(
