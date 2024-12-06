@@ -63,6 +63,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   File? selectedFile;
   List<String> pdfFiles = [];
   String? errorMessage;
+  TextEditingController _rapportinoController = TextEditingController();
 
   Future<String> getAddressFromCoordinates(double latitude, double longitude) async {
     try {
@@ -80,6 +81,79 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+  Future<void> saveRapportino() async {
+    // If _selectedTimeAppuntamento is not null, convert TimeOfDay to DateTime, else use widget.intervento.orario_appuntamento
+    DateTime? orario;
+    try {
+      // Making HTTP request to update the 'intervento
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id,
+          'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
+          'titolo' : widget.intervento.titolo,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento': orario?.toIso8601String(),  // Ensured correct DateTime
+          'posizione_gps': widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,  // Using potentially updated descrizione
+          'importo_intervento': widget.intervento.importo_intervento,  // Using potentially updated importo
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
+          'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto': widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale': widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico': widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico': _rapportinoController.text,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce': widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo': widget.intervento.gruppo?.toMap(),
+        }),
+      );
+      // Handle response success/failure
+      if (response.statusCode == 201) {
+        setState(() {
+          widget.intervento.relazione_tecnico = _rapportinoController.text;
+        });
+        print('Modifica effettuata');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento modificato con successo!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DettaglioInterventoByTecnicoPage(intervento: widget.intervento, utente: widget.utente)),
+        );
+      } else {
+        print('Errore nella richiesta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore nell\'aggiornamento dell\'intervento: $e');
+    }
+  }
+
   Future<void> _getCurrentLocation() async {
     try {
       await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).then((value) =>
@@ -90,11 +164,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             });
           })
       );
-      /*String indirizzo = await getAddressFromCoordinates(position.latitude, position.longitude);
-      setState(() {
-        _gps = "${position.latitude}, ${position.longitude}";
-        _indirizzo = indirizzo.toString();
-      });*/
     } catch (e) {
       print("Errore durante l'ottenimento della posizione: $e");
     }
@@ -109,13 +178,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     getProdotti();
     _getCurrentLocation();
     fetchPdfFiles();
+    _rapportinoController.text = widget.intervento.relazione_tecnico.toString();
   }
 
   Future<http.Response?> getDdtByIntervento() async{
     late http.Response response;
     try{
       response = await http.get(
-        Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+        Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
           DDTModel ddt = DDTModel.fromJson(jsonData);
@@ -135,7 +205,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.get(
-          Uri.parse('$ipaddress/api/intervento/${widget.intervento.id}'));
+          Uri.parse('$ipaddressProva/api/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
         InterventoModel intervento = InterventoModel.fromJson(jsonData);
@@ -153,7 +223,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/intervento'),
+        Uri.parse('$ipaddressProva/pdfu/intervento'),
       );
       request.fields['intervento'] = widget.intervento.id!;
       request.files.add(
@@ -200,7 +270,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       print('Inizio richiesta al server per intervento ID: ${widget.intervento.id}'); // Debug
 
-      final response = await http.get(Uri.parse('$ipaddress/pdfu/intervento/${widget.intervento.id.toString()}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/pdfu/intervento/${widget.intervento.id.toString()}'));
       print('Risposta ricevuta con status code: ${response.statusCode}'); // Debug
 
       switch (response.statusCode) {
@@ -257,7 +327,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
       final ddt = DDTModel.fromJson(jsonDecode(data.body));
       try{
-        var apiUrl = Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}');
+        var apiUrl = Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}');
         var response = await http.get(apiUrl);
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
@@ -281,7 +351,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -301,7 +371,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllNoteByIntervento() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}');
+      var apiUrl = Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -321,66 +391,16 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   void modificaOrarioFine() async{
-    // try{
-    //   final response = await http.post(
-    //     Uri.parse('$ipaddress/api/intervento'),
-    //     headers: {'Content-Type': 'application/json'},
-    //     body: jsonEncode({
-    //       'id': widget.intervento.id?.toString(),
-    //       'numerazione_danea' : widget.intervento.numerazione_danea,
-    //       'priorita' : widget.intervento.priorita.toString().split('.').last,
-    //       'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
-    //       'data': widget.intervento.data?.toIso8601String(),
-    //       'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
-    //       'posizione_gps' : widget.intervento.posizione_gps,
-    //       'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
-    //       'orario_fine': DateTime.now().toIso8601String(),//widget.intervento.orario_fine?.toIso8601String(),
-    //       'descrizione': widget.intervento.descrizione,
-    //       'importo_intervento': widget.intervento.importo_intervento,
-    //       'prezzo_ivato' : widget.intervento.prezzo_ivato,
-    //       'iva' : widget.intervento.iva,
-    //       'acconto' : widget.intervento.acconto,
-    //       'assegnato': widget.intervento.assegnato,
-    //       'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
-    //       'conclusione_parziale' : widget.intervento.conclusione_parziale,
-    //       'concluso': true,
-    //       'saldato': widget.intervento.saldato,
-    //       'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
-    //       'note': widget.intervento.note,
-    //       'relazione_tecnico' : widget.intervento.relazione_tecnico,
-    //       'firma_cliente': widget.intervento.firma_cliente,
-    //       'utente': widget.intervento.utente?.toMap(),
-    //       'cliente': widget.intervento.cliente?.toMap(),
-    //       'veicolo': widget.intervento.veicolo?.toMap(),
-    //       'merce' :widget.intervento.merce?.toMap(),
-    //       'tipologia': widget.intervento.tipologia?.toMap(),
-    //       'categoria_intervento_specifico':
-    //       widget.intervento.categoria_intervento_specifico?.toMap(),
-    //       'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
-    //       'destinazione': widget.intervento.destinazione?.toMap(),
-    //       'gruppo' : widget.intervento.gruppo?.toMap()
-    //     }),
-    //   );
-    //   if(response.statusCode == 201){
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(
-    //         content: Text('Orario di fine intervento salvato con successo!'),
-    //       ),
-    //     );
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SceltaRapportinoPage(utente: widget.utente, intervento: widget.intervento,)),
         );
-    //   }
-    // } catch(e){
-    //   print('Qualcosa non va: $e');
-    // }
   }
 
   void modificaOrarioInizio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -895,6 +915,63 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   },
                 ),
               ),
+              SizedBox(height : 35),
+              Container(
+                width: 500,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Adatta il contenitore ai contenuti
+                  children: [
+                    Container(
+                      height: 200, // Altezza fissa per il campo di testo
+                      child: TextFormField(
+                        controller: _rapportinoController,
+                        maxLines: null, // Abilita multilinea
+                        expands: true, // Occupare tutta l'altezza del container
+                        decoration: InputDecoration(
+                          labelText: "Rapportino",
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          hintText: "",
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.save, color: Colors.redAccent),
+                            onPressed: () {
+                              saveRapportino();
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               SizedBox(height: 25),
               if (widget.intervento.orario_inizio == null) ElevatedButton(
                 onPressed: () {
@@ -958,7 +1035,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> _openPdfFile(BuildContext context, String interventoId, String fileName) async {
     // Costruisci l'URL dell'endpoint
-    final pdfUrl = '$ipaddress/pdfu/intervento/$interventoId/$fileName';
+    final pdfUrl = '$ipaddressProva/pdfu/intervento/$interventoId/$fileName';
     print('PDF URL: $pdfUrl'); // Debug
 
     try {

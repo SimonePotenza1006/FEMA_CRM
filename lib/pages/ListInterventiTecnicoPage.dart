@@ -42,6 +42,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
   Map<int, int> _menuItemClickCount = {};
+  TextEditingController _rapportinoController = TextEditingController();
   // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   // Map<String, dynamic> _deviceData = <String, dynamic>{};
 
@@ -55,7 +56,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -79,7 +80,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -102,7 +103,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getMerce(String userId) async{
     try{
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/intervento/withMerce/$userId'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -126,7 +127,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddressProva/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -140,7 +141,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
 
         //getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate);
         http.Response response2 = await http
-            .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
+            .get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/utente/$userId'));
         if (response2.statusCode == 200) {
           var responseData2 = json.decode(response2.body);
           //print('rrdd2 '+responseData2.toString());
@@ -210,7 +211,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -234,7 +235,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getAllInterventi() async {
     try {
       print('getAllInterventi chiamato');
-      var apiUrl = Uri.parse('$ipaddress/api/intervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -987,59 +988,6 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                         },
                       ),
                       const SizedBox(height: 50.0),
-                      /*Center(
-                        child: Text(
-                          'Agenda commissioni',
-                          style: TextStyle(
-                              fontSize: 30.0, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      FutureBuilder<List<CommissioneModel>>(
-                        future: getAllCommissioniByUtente(
-                            widget.userData!.id.toString()),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Errore: ${snapshot.error}'));
-                          } else if (snapshot.hasData) {
-                            List<CommissioneModel> commissioni = snapshot.data!;
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: commissioni.length,
-                              itemBuilder: (context, index) {
-                                CommissioneModel commissione = commissioni[index];
-                                return ListTile(
-                                  title: Text(
-                                      '${commissione.descrizione.toString()}', style: TextStyle(color: Colors.black)),
-                                  subtitle: Text(commissione.note?? '', style: TextStyle(color: Colors.black)),
-                                  trailing: Text(
-                                    commissione.data!= null
-                                        ? '${commissione.data!.day.toString().padLeft(2, '0')}/${commissione.data!.month.toString().padLeft(2, '0')}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
-                                        : 'Data non disponibile',
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.black),
-                                  ),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DettaglioCommissioneTecnicoPage(
-                                                commissione: commissione),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          } else {
-                            return Center(child: Text(''));
-                          }
-                        },
-                      ),*/
                     ],
                   ),
                 );
@@ -1047,151 +995,46 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                 return Scaffold(
                   body: SingleChildScrollView(
                     child: Column(
-                      mainAxisSize:
-                      MainAxisSize.min, // Imposta grandezza minima per la colonna
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),//EdgeInsets.all(35.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              /*Center(
-                                child: Text(
-                                  "CIAO ${widget.userData!.nome!.toUpperCase().toString()}!",
-                                  textAlign: TextAlign.center, // Centra il testo
-                                  style: TextStyle(
-                                    fontSize: 24, // Imposta la dimensione del testo
-                                    fontWeight: FontWeight.bold, // Imposta il grassetto
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                              buildMenuButton(
-                                icon: Icons.lock_clock,
-                                text: 'TIMBRATURA',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => TimbraturaPage(utente: widget.userData!)),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 20),
-                              buildMenuButton(
-                                icon: Icons.calendar_month_outlined,
-                                text: 'CALENDARIO',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => CalendarioUtentePage(utente: widget.userData)),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 20),
-                              buildMenuButton(
-                                icon: Icons.car_rental_outlined,
-                                text: 'SPESA SU VEICOLO',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => SpesaSuVeicoloPage(utente: widget.userData!)),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 20),
-                              buildMenuButton(
-                                icon: Icons.snippet_folder_outlined,
-                                text: 'ORDINI AL FORNITORE',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => FormOrdineFornitorePage(utente: widget.userData!)),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 20),
-                              buildMenuButton(
-                                icon: Icons.remove_red_eye_outlined,
-                                text: 'SOPRALLUOGHI',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => MenuSopralluoghiTecnicoPage(utente: widget.userData!)),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 20),
-                              buildMenuButton(
-                                icon: Icons.build,
-                                text: 'CREA INTERVENTO',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => InterventoTecnicoForm(userData: widget.userData!)),
-                                  );
-                                },
-                              ),*/
-                            ],
-                          ),
-                        ),
                         widget.userData!.id != '19' ? Wrap(children: <Widget>[
-                          Center(
+                          //joytek 19
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'INTERVENTI PERSONALI',
+                                  'Interventi in corso',
                                   style: TextStyle(
                                       fontSize: 30.0, fontWeight: FontWeight.bold),
                                 ),
-                                /*SizedBox(width: 15),
-                              IconButton(
-                                icon: Icon(Icons.calendar_today),
-                                onPressed: () async {
-                                  final DateTime? pickedDate = await showDatePicker(
-                                    context: context,
-                                    initialDate: selectedDate,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2100),
-                                  );
-                                  if (pickedDate != null && pickedDate != selectedDate) {
-                                    setState(() {
-                                      selectedDate = pickedDate;
-                                    });
-                                  }
-                                },
-                              ),*/
                               ],
                             ),
                           ),
                           const SizedBox(height: 10.0),
                           FutureBuilder<List<InterventoModel>>(
                             future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
-                            builder: (context, snapshot) {
+                            builder: (context, snapshot){
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return Center(child: CircularProgressIndicator());
                               } else if (snapshot.hasError) {
                                 return Center(child: Text('Errore: ${snapshot.error}'));
-                              } else if (snapshot.hasData) {
+                              } else if(snapshot.hasData){
                                 List<InterventoModel> interventi = snapshot.data!;
                                 interventi = interventi.where((intervento) => intervento.merce == null).toList();
                                 interventi = interventi.where((intervento) {
-                                  return intervento.data == null || intervento.data!.isBefore(selectedDate.add(Duration(days: 1)));//isSameDay(selectedDate);
+                                  return intervento.orario_inizio != null && intervento.orario_fine == null;
                                 }).toList();
                                 if (interventi.isEmpty) {
                                   return Center(child: Text('', style: TextStyle(color: Colors.black,
                                       fontSize: 15.0)));
                                 }
-
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
                                   itemCount: interventi.length,
                                   itemBuilder: (context, index) {
                                     InterventoModel intervento = interventi[index];
-
-                                    // Metodo per mappare la priorità al colore corrispondente
                                     Color getPriorityColor(Priorita priorita) {
                                       switch (priorita) {
                                         case Priorita.BASSA:
@@ -1207,7 +1050,6 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                       }
                                     }
                                     Color backgroundColor =  getPriorityColor(intervento.priorita!);
-
                                     TextStyle textStyle = intervento.concluso ?? false
                                         ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
                                         : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
@@ -1217,7 +1059,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                       elevation: 4,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                       child: ListTile(
-                                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+
                                         title: Text(
                                           '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                           style: textStyle,
@@ -1227,17 +1070,19 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                           style: textStyle,
                                         ),
                                         trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
-
+                                            // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                            if (intervento.concluso ?? false)
+                                              Icon(Icons.check, color: Colors.black, size: 18), // Check icon
                                             Text(
-                                              // Formatta la data secondo il tuo formato desiderato
-                                              intervento.data!= null
+                                              intervento.data != null
                                                   ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                                   : 'Nessun appuntamento stabilito',
                                               style: TextStyle(fontSize: 13, color: Colors.black),
                                             ),
                                             Text(
-                                              intervento.orario_appuntamento!= null
+                                              intervento.orario_appuntamento != null
                                                   ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                                   : 'Nessun orario stabilito',
                                               style: TextStyle(fontSize: 13, color: Colors.black),
@@ -1255,9 +1100,127 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                             ),
                                           );
                                         },
-                                        tileColor: backgroundColor,
+                                        tileColor: Colors.white60,
                                         shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                          side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else{
+                                return Center(child: Text(''));
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 10.0),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Interventi personali',
+                                  style: TextStyle(
+                                      fontSize: 30.0, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          FutureBuilder<List<InterventoModel>>(
+                            future: getAllInterventiByUtente(widget.userData!.id.toString(), selectedDate),
+                            builder: (context, snapshot) {
+                              //print('length '+snapshot.data!.length.toString());
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(child: Text('Errore: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                List<InterventoModel> interventi = snapshot.data!;
+                                interventi = interventi.where((intervento) => intervento.merce == null).toList();
+                                interventi = interventi.where((intervento) {
+                                  return intervento.data == null || intervento.data!.isBefore(selectedDate.add(Duration(days: 1)));//isSameDay(selectedDate);
+                                }).toList();
+                                if (interventi.isEmpty) {
+                                  return Center(child: Text('', style: TextStyle(color: Colors.black,
+                                      fontSize: 15.0)));
+                                }
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: interventi.length,
+                                  itemBuilder: (context, index) {
+                                    InterventoModel intervento = interventi[index];
+                                    Color getPriorityColor(Priorita priorita) {
+                                      switch (priorita) {
+                                        case Priorita.BASSA:
+                                          return Colors.lightGreen;
+                                        case Priorita.MEDIA:
+                                          return Colors.yellow; // grigio chiaro
+                                        case Priorita.ALTA:
+                                          return Colors.orange; // giallo chiaro
+                                        case Priorita.URGENTE:
+                                          return Colors.red; // azzurro chiaro
+                                        default:
+                                          return Colors.blueGrey[200]!;
+                                      }
+                                    }
+                                    Color backgroundColor =  getPriorityColor(intervento.priorita!);
+                                    TextStyle textStyle = intervento.concluso ?? false
+                                        ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
+                                        : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
+
+                                    return Card(
+                                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+
+                                        title: Text(
+                                          '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
+                                          style: textStyle,
+                                        ),
+                                        subtitle: Text(
+                                          '${intervento.titolo}',
+                                          style: textStyle,
+                                        ),
+                                        trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                            if (intervento.concluso ?? false)
+                                              Icon(Icons.check, color: Colors.black, size: 18), // Check icon
+                                            Text(
+                                              intervento.data != null
+                                                  ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
+                                                  : 'Nessun appuntamento stabilito',
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
+                                            ),
+                                            Text(
+                                              intervento.orario_appuntamento != null
+                                                  ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                                  : 'Nessun orario stabilito',
+                                              style: TextStyle(fontSize: 13, color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => DettaglioInterventoByTecnicoPage(
+                                                utente: widget.userData!,
+                                                intervento: intervento,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        tileColor: Colors.white60,
+                                        shape: RoundedRectangleBorder(
+                                          side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                       ),
@@ -1269,94 +1232,14 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               }
                             },
                           ),
-                          /*FutureBuilder<List<RelazioneUtentiInterventiModel>>(
-                          future: getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<RelazioneUtentiInterventiModel> relazioni = snapshot.data!;
-                              relazioni = relazioni.where((relazione) => relazione.intervento!.concluso != true && relazione.intervento!.merce == null).toList();
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: relazioni.length,
-                                itemBuilder: (context, index) {
-                                  RelazioneUtentiInterventiModel relazione = relazioni[index];
-                                  Color backgroundColor = relazione.intervento!.concluso ?? false ? Colors.green : Colors.white;
-                                  TextStyle textStyle = relazione.intervento?.concluso ?? false
-                                      ? TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)
-                                      : TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold);
-                                  return
-                                    Card(
-                                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                      child:
-                                    ListTile(
-                                    title: Text(
-                                      '${relazione.intervento?.cliente!.denominazione!}\n ${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
-                                      style: textStyle,
-                                    ),
-                                    subtitle: Text(
-                                      '${relazione.intervento?.titolo}',
-                                      style: textStyle,
-                                    ),
-                                    trailing: Column(
-                                      children: [
-                                        if (relazione.intervento?.concluso ?? false)
-                                          Icon(Icons.check, color: Colors.white, size: 15),
-                                        Text(
-                                          // Formatta la data secondo il tuo formato desiderato
-                                          relazione.intervento?.data!= null
-                                              ? '${relazione.intervento?.data!.day.toString().padLeft(2, '0')}/${relazione.intervento?.data!.month.toString().padLeft(2, '0')}/${relazione.intervento?.data!.year}'
-                                              : 'Nessun appuntamento stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.black),
-                                        ),
-                                        Text(
-                                          relazione.intervento?.orario_appuntamento!= null
-                                              ? '${relazione.intervento?.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${relazione.intervento?.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                              : 'Nessun orario stabilito',
-                                          style: TextStyle(fontSize: 10, color: Colors.black),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              DettaglioInterventoByTecnicoPage(
-                                                utente: widget.userData!,
-                                                intervento: relazione.intervento!,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                    tileColor: backgroundColor,
-                                      shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                  )
-                                    );
-                                },
-                              );
-                            } else {
-                              return Center(child: Text(''));
-                            }
-                          },
-                        ),*/
                         ]) : Wrap(children: <Widget>[
-
-                          Center(
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'INTERVENTI',
+                                  'Interventi',
                                   style: TextStyle(
                                       fontSize: 30.0, fontWeight: FontWeight.bold),
                                 ),
@@ -1396,17 +1279,14 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                 }).toList();
                                 if (interventi.isEmpty) {
                                   return Center(child: Text('', style: TextStyle(color: Colors.black,
-                                  )));
+                                      fontSize: 15.0)));
                                 }
-
                                 return ListView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
                                   itemCount: interventi.length,
                                   itemBuilder: (context, index) {
                                     InterventoModel intervento = interventi[index];
-
-                                    // Metodo per mappare la priorità al colore corrispondente
                                     Color getPriorityColor(Priorita priorita) {
                                       switch (priorita) {
                                         case Priorita.BASSA:
@@ -1421,6 +1301,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                           return Colors.blueGrey[200]!;
                                       }
                                     }
+                                    // Determina il colore in base alla priorità
                                     Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
                                     TextStyle textStyle = intervento.concluso ?? false
@@ -1432,7 +1313,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                       elevation: 4,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                       child: ListTile(
-                                        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                        contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+
                                         title: Text(
                                           '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                           style: textStyle,
@@ -1442,16 +1324,19 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                           style: textStyle,
                                         ),
                                         trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
+                                            // Condizione per visualizzare l'icona di check se l'intervento è concluso
+                                            if (intervento.concluso ?? false)
+                                              Icon(Icons.check, color: Colors.black, size: 18), // Check icon
                                             Text(
-                                              // Formatta la data secondo il tuo formato desiderato
-                                              intervento.data!= null
+                                              intervento.data != null
                                                   ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
                                                   : 'Nessun appuntamento stabilito',
                                               style: TextStyle(fontSize: 13, color: Colors.black),
                                             ),
                                             Text(
-                                              intervento.orario_appuntamento!= null
+                                              intervento.orario_appuntamento != null
                                                   ? '${intervento.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${intervento.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
                                                   : 'Nessun orario stabilito',
                                               style: TextStyle(fontSize: 13, color: Colors.black),
@@ -1469,10 +1354,11 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                             ),
                                           );
                                         },
-                                        tileColor: backgroundColor,
+                                        tileColor: Colors.white60,
                                         shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                          side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
                                           borderRadius: BorderRadius.circular(12),
+
                                         ),
                                       ),
                                     );
@@ -1483,11 +1369,11 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                               }
                             },
                           ),
-
                         ]),
+                        const SizedBox(height: 50.0),
                         Center(
                           child: Text(
-                            'Interventi di settore'.toUpperCase(),
+                            'Interventi di settore',
                             style: TextStyle(
                                 fontSize: 30.0, fontWeight: FontWeight.bold),
                           ),
@@ -1531,6 +1417,8 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                         return Colors.blueGrey[200]!;
                                     }
                                   }
+
+                                  // Determina il colore in base alla priorità
                                   Color backgroundColor =  getPriorityColor(intervento.priorita!);
 
                                   TextStyle textStyle = intervento.concluso ?? false
@@ -1542,7 +1430,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                     elevation: 4,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                     child: ListTile(
-                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                       title: Text(
                                         '${intervento.cliente!.denominazione!}\n ${intervento.destinazione?.citta}, ${intervento.destinazione?.indirizzo}',
                                         style: textStyle,
@@ -1556,7 +1444,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                         children: [
                                           // Condizione per visualizzare l'icona di check se l'intervento è concluso
                                           if (intervento.concluso ?? false)
-                                            Icon(Icons.check, color: Colors.white, size: 15), // Check icon
+                                            Icon(Icons.check, color: Colors.black, size: 18), // Check icon
                                           Text(
                                             intervento.data != null
                                                 ? '${intervento.data!.day.toString().padLeft(2, '0')}/${intervento.data!.month.toString().padLeft(2, '0')}/${intervento.data!.year}'
@@ -1582,9 +1470,9 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                           ),
                                         );
                                       },
-                                      tileColor: backgroundColor,
+                                      tileColor: Colors.white60,
                                       shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        side: BorderSide(color: getPriorityColor(intervento!.priorita!), width: 8),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
@@ -1599,12 +1487,12 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                         const SizedBox(height: 50.0),
                         Center(
                           child: Text(
-                            'MERCE IN RIPARAZIONE',
+                            'Merce in riparazione',
                             style: TextStyle(
                                 fontSize: 30.0, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        const SizedBox(height: 10.0),
+                        const SizedBox(height: 20.0),
                         FutureBuilder<List<InterventoModel>>(
                           future: getMerce(widget.userData!.id.toString()),
                           builder: (context, snapshot) {
@@ -1617,6 +1505,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
 
                               // Filtra i dati della lista per mostrare solo quelli con merce presente
                               merce = merce.where((item) => item.merce != null).toList();
+
                               if (merce.isEmpty) {
                                 return Center(child: Text('', style: TextStyle(color: Colors.black,
                                     fontSize: 15.0)));
@@ -1656,7 +1545,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                     elevation: 4,
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                     child: ListTile(
-                                      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                       title: Text(
                                         '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
                                         style: textStyle,
@@ -1690,9 +1579,9 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                           ),
                                         );
                                       },
-                                      tileColor: backgroundColor,
+                                      tileColor: Colors.white60,
                                       shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.grey.shade100, width: 0.5),
+                                        side: BorderSide(color: getPriorityColor(singolaMerce!.priorita!), width: 8),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
@@ -1759,7 +1648,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                     child: ListTile(
                                       contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                                       title: Text(
-                                        '${relazione.intervento?.cliente!.denominazione}\n${relazione.intervento?.descrizione}',
+                                        '${relazione.intervento?.cliente!.denominazione} \n${relazione.intervento?.descrizione}',
                                         style: textStyle,
                                       ),
                                       subtitle: Text(
@@ -1806,55 +1695,6 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                           },
                         ),
                         const SizedBox(height: 50.0),
-                        /*const Text(
-                          'AGENDA COMMISSIONI',
-                          style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 20.0),
-                        FutureBuilder<List<CommissioneModel>>(
-                          future: getAllCommissioniByUtente(widget.userData!.id.toString()),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              List<CommissioneModel> commissioni = snapshot.data!;
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: commissioni.length,
-                                itemBuilder: (context, index) {
-                                  CommissioneModel commissione = commissioni[index];
-                                  return ListTile(
-                                    title: Text('${commissione.descrizione.toString()}', style: TextStyle(color: Colors.black)),
-                                    subtitle: Text(commissione.note ?? '', style: TextStyle(color: Colors.black)),
-                                    trailing: Text(
-                                      // Formatta la data secondo il tuo formato desiderato
-                                      commissione.data != null
-                                          ? '${commissione.data!.day.toString().padLeft(2, '0')}/${commissione.data!.month.toString().padLeft(2, '0')}/${commissione.data!.year} ${commissione.data!.hour}:${commissione.data!.minute.toStringAsFixed(1)}'
-                                          : 'Data non disponibile',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black), // Stile opzionale per la data
-                                    ),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              DettaglioCommissioneTecnicoPage(
-                                                  commissione: commissione),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            } else {
-                              return Center(child: Text('Nessuna commissione trovata'));
-                            }
-                          },
-                        ),*/
                       ],
                     ),
                   ),

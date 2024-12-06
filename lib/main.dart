@@ -335,7 +335,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddress/api/utente/ulogin'),
+          Uri.parse('$ipaddressProva/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -541,7 +541,7 @@ class _LoginFormState extends State<LoginForm> {
                   SizedBox(height: 40),
                   Container(
                     width: 300,
-                    height: 318,
+                    height: 300,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -558,31 +558,75 @@ class _LoginFormState extends State<LoginForm> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: <Widget>[
-                          TextField(
-                            onSubmitted: (value) {login();},
-                            controller: _conUserId,
-                            decoration: InputDecoration(
-                              labelText: 'Username',
-                              hintText: 'Inserisci il tuo username',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
+                          SizedBox(
+                            width: 400,
+                            child: TextFormField(
+                              onFieldSubmitted: (value) {
+                                login();
+                              },
+                              controller: _conUserId,
+                              decoration: InputDecoration(
+                                labelText: 'USERNAME',
+                                hintText: 'INSERISCI IL TUO USERNAME',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[400]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
+                              autofillHints: [AutofillHints.username],
                             ),
-                            autofillHints: [AutofillHints.username],
                           ),
                           SizedBox(height: 15),
-                          TextField(
-                            onSubmitted: (value) {login();},
-                            controller: _conPassword,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              hintText: 'Inserisci la password',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
+                          SizedBox(
+                            width: 400,
+                            child: TextFormField(
+                              onFieldSubmitted: (value) {
+                                login();
+                              },
+                              controller: _conPassword,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: 'PASSWORD',
+                                hintText: 'INSERISCI LA PASSWORD',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[400]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                               ),
+                              autofillHints: [AutofillHints.password],
                             ),
-                            autofillHints: [AutofillHints.password],
                           ),
                           SizedBox(height: 30),
                           ElevatedButton(
@@ -598,7 +642,6 @@ class _LoginFormState extends State<LoginForm> {
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
                           ),
-                          SizedBox(height: 25),
                           Spacer(),
                           Align(
                             alignment: Alignment.bottomRight,

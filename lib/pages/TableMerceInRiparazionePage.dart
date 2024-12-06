@@ -63,7 +63,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
       isLoading = true; // Inizio del caricamento
     });
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/withMerce');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/withMerce');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -92,45 +92,6 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
     }
   }
 
-  void filterInterventi(String query) {
-    final lowerCaseQuery = query.toLowerCase();
-    setState(() {
-      _filteredInterventi = _allInterventi.where((intervento) {
-        final cliente = intervento.cliente?.denominazione?.toLowerCase() ?? '';
-        final indirizzo = intervento.cliente?.indirizzo?.toLowerCase() ?? '';
-        final indirizzoD = intervento.destinazione?.indirizzo?.toLowerCase() ?? '';
-        final citta = intervento.cliente?.citta?.toLowerCase() ?? '';
-        final cittaD = intervento.destinazione?.citta?.toLowerCase() ?? '';
-        final codiceFiscale = intervento.cliente?.codice_fiscale?.toLowerCase() ?? '';
-        final codiceFiscaleD = intervento.destinazione?.codice_fiscale?.toLowerCase() ?? '';
-        final partitaIva = intervento.cliente?.partita_iva?.toLowerCase() ?? '';
-        final partitaIvaD = intervento.destinazione?.partita_iva?.toLowerCase() ?? '';
-        final telefono = intervento.cliente?.telefono?.toLowerCase() ?? '';
-        final telefonoD = intervento.destinazione?.telefono?.toLowerCase() ?? '';
-        final cellulare = intervento.cliente?.cellulare?.toLowerCase() ?? '';
-        final cellulareD = intervento.destinazione?.cellulare?.toLowerCase() ?? '';
-        final tipologia = intervento.tipologia?.descrizione?.toLowerCase() ?? '';
-        final descrizione = intervento.descrizione?.toLowerCase() ?? '';
-
-        return cliente.contains(lowerCaseQuery) ||
-            indirizzo.contains(lowerCaseQuery) ||
-            indirizzoD.contains(lowerCaseQuery) ||
-            citta.contains(lowerCaseQuery) ||
-            cittaD.contains(lowerCaseQuery) ||
-            codiceFiscale.contains(lowerCaseQuery) ||
-            codiceFiscaleD.contains(lowerCaseQuery) ||
-            partitaIva.contains(lowerCaseQuery) ||
-            partitaIvaD.contains(lowerCaseQuery) ||
-            telefono.contains(lowerCaseQuery) ||
-            telefonoD.contains(lowerCaseQuery) ||
-            cellulare.contains(lowerCaseQuery) ||
-            cellulareD.contains(lowerCaseQuery) ||
-            tipologia.contains(lowerCaseQuery) ||
-            descrizione.contains(lowerCaseQuery);
-      }).toList();
-      _dataSource.updateData(_filteredInterventi);
-    });
-  }
 
   @override
   Widget build(BuildContext context){
@@ -663,7 +624,7 @@ class InterventoDataSource extends DataGridSource{
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

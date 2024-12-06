@@ -44,7 +44,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Generazione PDF'),
+        title: Text('Generazione PDF', style: TextStyle(color: Colors.white),),
+        backgroundColor: Colors.red,
       ),
       body: FutureBuilder<Uint8List>(
         future: _pdfFuture,
@@ -65,7 +66,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Confermare il preventivo?'),
+                title: Text('Confermare e inviare il rapportino info@femasistemi.it?'),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () {
@@ -138,11 +139,9 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           tempFile,
           fileName: 'rapportino.pdf',
         ));
-
       // Invia l'email
       final sendReport = await send(message, smtpServer);
       print('Email inviata con successo: $sendReport');
-
       // Elimina il file temporaneo
       await tempFile.delete();
     } catch (e) {
@@ -160,7 +159,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var orarioInizio = widget.intervento.orario_inizio;
       var orarioFine = widget.intervento.orario_fine;
       var data = widget.intervento.data;
-
       var formattedOrarioInizio = orarioInizio != null
           ? DateFormat('HH:mm').format(DateTime.parse(orarioInizio.toString()))
           : '';
@@ -171,19 +169,13 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var formattedDataCreazione = data != null
           ? DateFormat('dd/MM/yyyy').format(DateTime.parse(data.toString()))
           : '';
-
       var relazione = widget.intervento.relazione_tecnico;
-
       var formattedImporto = importo != null
           ? importo.toStringAsFixed(2)
           : '';
       var formattedRelazione = relazione != null
           ? relazione.toString()
           : '';
-
-
-
-
     } catch(e){
       print('Errore durante la formattazione delle stringhe: $e');
     }
@@ -1007,9 +999,6 @@ class PDFViewerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     print('PDFViewerPage creato con bytes: ${pdfBytes.length}');
     return Scaffold(
-      appBar: AppBar(
-        title: Text('PDF Visualizzato'),
-      ),
       body: PdfPreview(
         // Utilizza il widget PdfPreview fornito dalla libreria pdf per visualizzare il PDF
         build: (format) => pdfBytes,

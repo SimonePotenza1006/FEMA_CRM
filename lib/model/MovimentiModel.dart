@@ -1,9 +1,8 @@
 import 'dart:io';
-
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:intl/intl.dart';
-
 import 'ClienteModel.dart';
+import 'FornitoreModel.dart';
 import 'InterventoModel.dart';
 
 class MovimentiModel {
@@ -14,6 +13,7 @@ class MovimentiModel {
   TipoMovimentazione? tipo_movimentazione;
   double? importo;
   UtenteModel? utente;
+  FornitoreModel? fornitore;
   InterventoModel? intervento;
   ClienteModel? cliente;
 
@@ -25,6 +25,7 @@ class MovimentiModel {
     this.tipo_movimentazione,
     this.importo,
     this.utente,
+    this.fornitore,
     this.intervento,
     this.cliente
   );
@@ -38,6 +39,8 @@ class MovimentiModel {
             (type) => type.toString() == 'tipo_movimentazione.${map['tipo_movimentazione']}');
     importo = map['importo'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
+    fornitore = map['fornitore'] != null ? FornitoreModel.fromMap(map['fornitore']) : null;
+    intervento = map['intervento'] != null ? InterventoModel.fromMap(map['intervento']) : null;
     cliente = map['cliente'] != null ? ClienteModel.fromMap(map['utente']) : null;
   }
 
@@ -50,6 +53,7 @@ class MovimentiModel {
       'tipo_movimentazione': tipo_movimentazione.toString(),
       'importo': importo,
       'utente': utente?.toMap(),
+      'fornitore' : fornitore?.toMap(),
       'intervento' : intervento?.toMap(),
       'cliente' : cliente?.toMap()
     };
@@ -64,11 +68,10 @@ class MovimentiModel {
       'tipo_movimentazione': tipo_movimentazione.toString().split('.').last, // Convert enum to string
       'importo': importo,
       'utente': utente?.toJson(),
+      'fornitore' : fornitore?.toJson(),
       'intervento' : intervento?.toJson(),
       'cliente' : cliente?.toJson()
   };
-
-
 
   factory MovimentiModel.fromJson(Map<String, dynamic> json) {
     return MovimentiModel(
@@ -79,6 +82,7 @@ class MovimentiModel {
         _getTipoMovimentazioneFromString(json['tipo_movimentazione']),
       json['importo'] != null ? double.parse(json['importo'].toString()) : null,
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
+      json['fornitore'] != null ? FornitoreModel.fromJson(json['fornitore']) : null,
       json['intervento'] != null ? InterventoModel.fromJson(json['intervento']) : null,
       json['cliente'] != null ? ClienteModel.fromJson(json['cliente']) : null,
     );
@@ -103,9 +107,7 @@ class MovimentiModel {
       throw Exception('Valore non valido per TipoMovimentazione: $tipoMovimentazione');
     }
   }
-
 }
-
 
 enum TipoMovimentazione {
   Entrata,

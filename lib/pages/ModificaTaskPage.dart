@@ -135,7 +135,7 @@ class _ModificaTaskPageState
     final dir = await getApplicationDocumentsDirectory();
     String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
     final player = ap.AudioPlayer();
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
+    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
     http.Response? response;
     try {
 
@@ -168,7 +168,7 @@ class _ModificaTaskPageState
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -195,7 +195,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -805,7 +805,7 @@ class _ModificaTaskPageState
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.task.id,
@@ -833,7 +833,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

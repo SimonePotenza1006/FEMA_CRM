@@ -71,7 +71,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -92,7 +92,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -113,7 +113,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -134,7 +134,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -167,42 +167,42 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
     try {
       while (!allDataLoaded) {
-        // Mostra il messaggio di caricamento per la pagina corrente
-        // WidgetsBinding.instance.addPostFrameCallback((_) {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     SnackBar(content: Text('Attendere, caricamento pagina $currentPage...')),
-        //   );
-        // });
-
-        var apiUrl = Uri.parse('$ipaddress/api/intervento/paged?page=$currentPage&size=$size');
+        var apiUrl = Uri.parse('$ipaddressProva/api/intervento/paged?page=$currentPage&size=$size');
         print('Chiamata API alla pagina $currentPage con size $size');
-
         var response = await http.get(apiUrl);
+
         if (response.statusCode == 200) {
           var jsonData = jsonDecode(response.body);
+
+          // Mappa i dati in una lista di oggetti InterventoModel
           List<InterventoModel> interventi = (jsonData as List)
               .map((item) => InterventoModel.fromJson(item))
               .toList();
 
-          // Aggiungi i dati progressivamente e aggiorna la griglia
+          // Debug: Verifica dei dati ricevuti
+          print('Interventi ricevuti dalla pagina $currentPage: ${interventi.length}');
+          // Filtra gli interventi con tipologia.id != 6
+          List<InterventoModel> interventiFiltrati = interventi
+              .where((intervento) => intervento.tipologia?.id != "6")
+              .toList();
+          // Aggiungi gli interventi filtrati alla lista complessiva
           setState(() {
-            _allInterventi.addAll(interventi);
+            _allInterventi.addAll(interventiFiltrati);
+
+            // Filtra ulteriormente per costruire _filteredInterventi
             _filteredInterventi = _allInterventi
-                .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
+                .where((intervento) =>
+            intervento.concluso != true && intervento.orario_fine == null)
                 .toList();
+
+            // Aggiorna la sorgente dati
             _dataSource = InterventoDataSource(context, _filteredInterventi, filteredGruppi);
           });
-
-          // Debug: log degli ID
-          if (interventi.isNotEmpty) {
-            print('Pagina $currentPage: Primo ID = ${interventi.first.id}, Ultimo ID = ${interventi.last.id}');
-          } else {
-            print('Pagina $currentPage: Nessun intervento trovato.');
-          }
 
           // Controlla se hai finito di caricare i dati
           if (interventi.length < size || !loadAll) {
             allDataLoaded = true;
+
             // Mostra messaggio di completamento del caricamento
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -210,6 +210,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
               );
             });
           } else {
+            // Passa alla pagina successiva
             currentPage++;
           }
         } else {
@@ -224,11 +225,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     }
   }
 
-
-
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -248,25 +247,62 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     setState(() {
       _currentSheet = index;
       switch (index) {
-        case 0:
-          _filteredInterventi = _allInterventi.toList();
-          break;
-        case 1:
+        case 0: // Tutti (esclusi gli annullati)
           _filteredInterventi = _allInterventi
-              .where((intervento) => intervento.concluso != true && intervento.orario_fine == null)
+              .where((intervento) {
+            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+            return intervento.annullato != true; // Escludi annullati
+          })
               .toList();
           break;
-        case 2:
-          _filteredInterventi = _allInterventi.where((intervento) => (intervento.concluso ?? false) && !(intervento.saldato ?? false)).toList();
+        case 1: // Non conclusi
+          _filteredInterventi = _allInterventi
+              .where((intervento) {
+            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+            return intervento.annullato != true && // Escludi annullati
+                intervento.concluso != true &&
+                intervento.orario_fine == null;
+          })
+              .toList();
           break;
-        case 3:
-          _filteredInterventi = _allInterventi.where((intervento) => (intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
+        case 2: // Conclusi non saldati
+          _filteredInterventi = _allInterventi
+              .where((intervento) {
+            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            return intervento.annullato != true && // Escludi annullati
+                (intervento.concluso ?? false) &&
+                !(intervento.saldato ?? false);
+          })
+              .toList();
           break;
-        case 4:
-          _filteredInterventi = _allInterventi.where((intervento) => !(intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
+        case 3: // Conclusi e saldati
+          _filteredInterventi = _allInterventi
+              .where((intervento) {
+            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            return intervento.annullato != true && // Escludi annullati
+                (intervento.concluso ?? false) &&
+                (intervento.saldato ?? false);
+          })
+              .toList();
           break;
-        case 5:
-          _filteredInterventi = _allInterventi.where((intervento) => (intervento.annullato ?? false)).toList();
+        case 4: // Non conclusi e saldati
+          _filteredInterventi = _allInterventi
+              .where((intervento) {
+            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            return intervento.annullato != true && // Escludi annullati
+                !(intervento.concluso ?? false) &&
+                (intervento.saldato ?? false);
+          })
+              .toList();
+          break;
+        case 5: // Solo annullati
+          _filteredInterventi = _allInterventi
+              .where((intervento) {
+            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+            return intervento.annullato == true; // Solo annullati
+          })
+              .toList();
+          break;
       }
       _dataSource.updateData(_filteredInterventi, filteredGruppi);
     });
@@ -274,22 +310,67 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   List<InterventoModel> _getInterventiPerSheet(int sheetIndex) {
     switch (sheetIndex) {
-      case 0:
-        return _allInterventi.toList();
-      case 1:
-        return _allInterventi.where((intervento) => intervento.concluso != true && intervento.orario_fine == null).toList();
-      case 2:
-        return _allInterventi.where((intervento) => (intervento.concluso ?? false) && !(intervento.saldato ?? false)).toList();
-      case 3:
-        return _allInterventi.where((intervento) => (intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
-      case 4:
-        return _allInterventi.where((intervento) => !(intervento.concluso ?? false) && (intervento.saldato ?? false)).toList();
-      case 5:
-        return _allInterventi.where((intervento) => (intervento.annullato ?? false)).toList();
-      default:
-        return _allInterventi.toList();
+      case 0: // Tutti (esclusi gli annullati)
+        return _allInterventi
+            .where((intervento) {
+          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          return intervento.annullato != true; // Escludi annullati
+        })
+            .toList();
+      case 1: // Non conclusi
+        return _allInterventi
+            .where((intervento) {
+          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+          return intervento.annullato != true && // Escludi annullati
+              intervento.concluso != true &&
+              intervento.orario_fine == null;
+        })
+            .toList();
+      case 2: // Conclusi non saldati
+        return _allInterventi
+            .where((intervento) {
+          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          return intervento.annullato != true && // Escludi annullati
+              (intervento.concluso ?? false) &&
+              !(intervento.saldato ?? false);
+        })
+            .toList();
+      case 3: // Conclusi e saldati
+        return _allInterventi
+            .where((intervento) {
+          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          return intervento.annullato != true && // Escludi annullati
+              (intervento.concluso ?? false) &&
+              (intervento.saldato ?? false);
+        })
+            .toList();
+      case 4: // Non conclusi e saldati
+        return _allInterventi
+            .where((intervento) {
+          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          return intervento.annullato != true && // Escludi annullati
+              !(intervento.concluso ?? false) &&
+              (intervento.saldato ?? false);
+        })
+            .toList();
+      case 5: // Solo annullati
+        return _allInterventi
+            .where((intervento) {
+          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          return intervento.annullato == true; // Solo annullati
+        })
+            .toList();
+      default: // Default: Tutti (esclusi gli annullati)
+        return _allInterventi
+            .where((intervento) {
+          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          return intervento.annullato != true; // Escludi annullati
+        })
+            .toList();
     }
   }
+
+
 
   void filterInterventiByTipologia(String tipologia) {
     final lowerCaseQuery = tipologia.toLowerCase();
@@ -414,18 +495,27 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   @override
   void initState() {
     super.initState();
+    // Inizializza il data source vuoto (senza dati)
     _dataSource = InterventoDataSource(context, _filteredInterventi, filteredGruppi);
-    getAllInterventi(page: 0, size: 20, loadAll: true);
+    // Carica i dati asincroni
+    getAllInterventi(page: 0, size: 20, loadAll: true).then((_) {
+      setState(() {
+        _currentSheet = 1; // Imposta il foglio iniziale su "Non conclusi"
+        _filteredInterventi = _allInterventi
+            .where((intervento) =>
+        intervento.annullato != true &&
+            intervento.concluso != true &&
+            intervento.orario_fine == null)
+            .toList();
+        _dataSource.updateData(_filteredInterventi, filteredGruppi); // Aggiorna il data source
+      });
+    });
     getAllGruppi();
     getAllClienti().whenComplete(() => print('Clienti ok'));
     getAllTipologie().whenComplete(() => print('Tipologie ok'));
     getAllUtenti().whenComplete(() => print('Utenti ok'));
-    _filteredInterventi = _allInterventi.toList();
-    setState((){
-      _currentSheet = 1;
-    });
-    //getAllInterventiTot();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1283,7 +1373,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/gruppi'),
+          Uri.parse('$ipaddressProva/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1837,7 +1927,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1890,7 +1980,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1950,7 +2040,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2794,8 +2884,8 @@ void mostraRicercaInterventiDialog({
                   Navigator.of(context).pop();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red, // Sfondo rosso
-                  foregroundColor: Colors.white, // Testo bianco
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
                 ),
                 child: Text('Cerca'),
               )
