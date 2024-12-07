@@ -179,255 +179,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          SizedBox(
-                            width: 900,
-                            height: 600,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.black,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: Scrollbar(
-                                      controller: _verticalScrollController,
-                                      thumbVisibility: true,
-                                      trackVisibility: true,
-                                      child: SingleChildScrollView(
-                                        controller: _verticalScrollController,
-                                        scrollDirection: Axis.vertical,
-                                        child: Column(
-                                          children: [
-                                            Scrollbar(
-                                              controller: _horizontalScrollController,
-                                              thumbVisibility: true,
-                                              trackVisibility: true,
-                                              child: SingleChildScrollView(
-                                                scrollDirection: Axis.horizontal,
-                                                controller: _horizontalScrollController,
-                                                child: DataTable(
-                                                  columnSpacing: 18,
-                                                  columns: [
-                                                    DataColumn(
-                                                        label: Text('Azienda',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Categoria merceologica',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Cliente',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Agente',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Utente',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Importo',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Accettato',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Rifiutato',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Attesa di accettazione',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Attesa di consegna',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Consegnato',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Data creazione',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Data accettazione',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                    DataColumn(
-                                                        label: Text('Data consegna',
-                                                            style: TextStyle(fontWeight: FontWeight.bold))),
-                                                  ],
-                                                  rows: preventiviList.map((preventivo) {
-                                                    Color backgroundColor = Colors.white;
-                                                    Color textColor = Colors.black;
-
-                                                    if (preventivo.accettato ?? false) {
-                                                      backgroundColor = Colors.yellow;
-                                                    } else if (preventivo.rifiutato ?? false) {
-                                                      backgroundColor = Colors.red;
-                                                    } else if (preventivo.attesa ?? false) {
-                                                      backgroundColor = Colors.white;
-                                                    } else if (preventivo.consegnato ?? false) {
-                                                      backgroundColor = Colors.green;
-                                                    } else if (preventivo.pendente ?? false) {
-                                                      backgroundColor = Colors.orangeAccent;
-                                                    }
-
-                                                    if (backgroundColor == Colors.red || backgroundColor == Colors.green) {
-                                                      textColor = Colors.white;
-                                                    }
-
-                                                    return DataRow(
-                                                      color: MaterialStateColor.resolveWith((states) => backgroundColor),
-                                                      cells: [
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.azienda?.nome.toString() ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.categoria_merceologica ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.cliente?.denominazione ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.agente?.nome ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.utente?.cognome ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.importo?.toStringAsFixed(2) ?? '0.0',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.accettato ?? false ? 'SI' : 'NO',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.rifiutato ?? false ? 'SI' : 'NO',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.attesa ?? false ? 'SI' : 'NO',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.pendente ?? false ? 'SI' : 'NO',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.consegnato ?? false ? 'SI' : 'NO',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.data_creazione?.toString() ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.data_accettazione?.toString() ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                        DataCell(
-                                                          Center(
-                                                            child: Text(
-                                                              preventivo.data_consegna?.toString() ?? 'N/A',
-                                                              style: TextStyle(color: textColor),
-                                                            ),
-                                                          ),
-                                                          onTap: () => _navigateToDetailsPage(preventivo),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  }).toList(),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Scrollbar(
-                                    controller: _horizontalScrollController2, // Nuovo ScrollController
-                                    thumbVisibility: true,
-                                    trackVisibility: true,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      controller: _horizontalScrollController2, // Nuovo ScrollController
-                                      child: Container(),  // Contenitore vuoto per la scrollbar orizzontale
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
                           GestureDetector(
                             onTapUp: (details) {
                               if (_hoveredIndex != -1) {
@@ -475,289 +226,111 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      SizedBox(height: 50),
                       SizedBox(
-                        width: 900,
-                        height: 600,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 1,
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Scrollbar(
-                                  controller: _verticalScrollController,
-                                  thumbVisibility: true,
-                                  trackVisibility: true,
-                                  child: SingleChildScrollView(
-                                    controller: _verticalScrollController,
-                                    scrollDirection: Axis.vertical,
-                                    child: Column(
-                                      children: [
-                                        Scrollbar(
-                                          controller: _horizontalScrollController,
-                                          thumbVisibility: true,
-                                          trackVisibility: true,
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            controller: _horizontalScrollController,
-                                            child: DataTable(
-                                              columnSpacing: 18,
-                                              columns: [
-                                                DataColumn(
-                                                    label: Text('Azienda',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Categoria merceologica',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Cliente',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Agente',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Utente',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Importo',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Accettato',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Rifiutato',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Attesa di accettazione',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Attesa di consegna',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Consegnato',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Data creazione',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Data accettazione',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                                DataColumn(
-                                                    label: Text('Data consegna',
-                                                        style: TextStyle(fontWeight: FontWeight.bold))),
-                                              ],
-                                              rows: preventiviList.map((preventivo) {
-                                                Color backgroundColor = Colors.white;
-                                                Color textColor = Colors.black;
-
-                                                if (preventivo.accettato ?? false) {
-                                                  backgroundColor = Colors.yellow;
-                                                } else if (preventivo.rifiutato ?? false) {
-                                                  backgroundColor = Colors.red;
-                                                } else if (preventivo.attesa ?? false) {
-                                                  backgroundColor = Colors.white;
-                                                } else if (preventivo.consegnato ?? false) {
-                                                  backgroundColor = Colors.green;
-                                                } else if (preventivo.pendente ?? false) {
-                                                  backgroundColor = Colors.orangeAccent;
-                                                }
-
-                                                if (backgroundColor == Colors.red || backgroundColor == Colors.green) {
-                                                  textColor = Colors.white;
-                                                }
-
-                                                return DataRow(
-                                                  color: MaterialStateColor.resolveWith((states) => backgroundColor),
-                                                  cells: [
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.azienda?.nome.toString() ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.categoria_merceologica ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.cliente?.denominazione ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.agente?.nome ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.utente?.cognome ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.importo?.toStringAsFixed(2) ?? '0.0',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.accettato ?? false ? 'SI' : 'NO',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.rifiutato ?? false ? 'SI' : 'NO',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.attesa ?? false ? 'SI' : 'NO',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.pendente ?? false ? 'SI' : 'NO',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.consegnato ?? false ? 'SI' : 'NO',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.data_creazione?.toString() ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.data_accettazione?.toString() ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                    DataCell(
-                                                      Center(
-                                                        child: Text(
-                                                          preventivo.data_consegna?.toString() ?? 'N/A',
-                                                          style: TextStyle(color: textColor),
-                                                        ),
-                                                      ),
-                                                      onTap: () => _navigateToDetailsPage(preventivo),
-                                                    ),
-                                                  ],
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Scrollbar(
-                                controller: _horizontalScrollController2, // Nuovo ScrollController
-                                thumbVisibility: true,
-                                trackVisibility: true,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  controller: _horizontalScrollController2, // Nuovo ScrollController
-                                  child: Container(),  // Contenitore vuoto per la scrollbar orizzontale
-                                ),
-                              ),
-                            ],
-                          ),
+                        width: 350,
+                        child: buildMenuButton(icon: Icons.business_outlined, text: 'REGISTRA AZIENDA',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => RegistrazioneAziendaPage()),
+                            );
+                          },
                         ),
                       ),
-                      SizedBox(height: 90),
-                      GestureDetector(
-                        onTapUp: (details) {
-                          if (_hoveredIndex != -1) {
-                            _navigateToPage(_hoveredIndex);
-                          }
-                        },
-                        onPanUpdate: (details) {
-                          RenderBox box = context.findRenderObject() as RenderBox;
-                          Offset localOffset = box.globalToLocal(details.globalPosition);
-                          setState(() {
-                            _hoveredIndex = _calculateHoveredIndex(localOffset);
-                          });
-                        },
-                        child: CustomPaint(
-                          size: Size(600, 600),
-                          painter: MenuPainter(
-                                (index) {
-                              setState(() {
-                                _hoveredIndex = index;
-                              });
-                            },
-                                () {
-                              setState(() {
-                                _hoveredIndex = -1;
-                              });
-                            },
-                            context,
-                            size: Size(650, 650),
-                            hoveredIndex: _hoveredIndex,
-                          ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: 350,
+                        child: buildMenuButton(icon: Icons.person_add_alt_1_outlined, text: 'REGISTRA AGENTE',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => RegistrazioneAgentePage()),
+                            );
+                          },
                         ),
                       ),
-                      SizedBox(height: 100)
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: 350,
+                        child: buildMenuButton(icon: Icons.playlist_add_outlined, text: 'REGISTRA PREVENTIVO',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => RegistrazionePreventivoAmministrazionePage(userData: widget.userData)),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: 350,
+                        child: buildMenuButton(icon: Icons.edit_outlined, text: 'PREVENTIVO SERVIZI',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => MenuPreventiviLiberiPage(utente : widget.userData)),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: 350,
+                        child: buildMenuButton(icon: Icons.bar_chart_outlined, text: 'REPORT PREVENTIVI',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ReportPreventiviPage()),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      SizedBox(
+                        width: 350,
+                        child: buildMenuButton(icon: Icons.folder_shared_outlined, text: 'REPORT PREVENTIVI/AGENTE',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ReportPreventiviPerAgentePage()),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      // GestureDetector(
+                      //   onTapUp: (details) {
+                      //     if (_hoveredIndex != -1) {
+                      //       _navigateToPage(_hoveredIndex);
+                      //     }
+                      //   },
+                      //   onPanUpdate: (details) {
+                      //     RenderBox box = context.findRenderObject() as RenderBox;
+                      //     Offset localOffset = box.globalToLocal(details.globalPosition);
+                      //     setState(() {
+                      //       _hoveredIndex = _calculateHoveredIndex(localOffset);
+                      //     });
+                      //   },
+                      //   child: CustomPaint(
+                      //     size: Size(600, 600),
+                      //     painter: MenuPainter(
+                      //           (index) {
+                      //         setState(() {
+                      //           _hoveredIndex = index;
+                      //         });
+                      //       },
+                      //           () {
+                      //         setState(() {
+                      //           _hoveredIndex = -1;
+                      //         });
+                      //       },
+                      //       context,
+                      //       size: Size(650, 650),
+                      //       hoveredIndex: _hoveredIndex,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 )
@@ -818,6 +391,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
     );
   }
+
 }
 
 class MenuPainter extends CustomPainter {

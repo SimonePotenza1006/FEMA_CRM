@@ -65,36 +65,62 @@ class _MenuPreventiviLiberiPageState extends State<MenuPreventiviLiberiPage>{
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 10),
-                GestureDetector(
-                  onTapUp: (details) {
-                    if (_hoveredIndex != -1) {
-                      _navigateToPage(_hoveredIndex);
-                    }
-                  },
-                  onPanUpdate: (details) {
-                    RenderBox box = context.findRenderObject() as RenderBox;
-                    Offset localOffset = box.globalToLocal(details.globalPosition);
-                    setState(() {
-                      _hoveredIndex = _calculateHoveredIndex(localOffset);
-                    });
-                  },
-                  child: CustomPaint(
-                    size: Size(500, 500),
-                    painter: MenuPainter(
-                          (index) {
-                        setState(() {
-                          _hoveredIndex = index;
-                        });
-                      },
-                          () {
-                        setState(() {
-                          _hoveredIndex = -1;
-                        });
-                      },
-                      context,
-                      size: Size(500, 500),
-                      hoveredIndex: _hoveredIndex,
-                    ),
+                // GestureDetector(
+                //   onTapUp: (details) {
+                //     if (_hoveredIndex != -1) {
+                //       _navigateToPage(_hoveredIndex);
+                //     }
+                //   },
+                //   onPanUpdate: (details) {
+                //     RenderBox box = context.findRenderObject() as RenderBox;
+                //     Offset localOffset = box.globalToLocal(details.globalPosition);
+                //     setState(() {
+                //       _hoveredIndex = _calculateHoveredIndex(localOffset);
+                //     });
+                //   },
+                //   child: CustomPaint(
+                //     size: Size(500, 500),
+                //     painter: MenuPainter(
+                //           (index) {
+                //         setState(() {
+                //           _hoveredIndex = index;
+                //         });
+                //       },
+                //           () {
+                //         setState(() {
+                //           _hoveredIndex = -1;
+                //         });
+                //       },
+                //       context,
+                //       size: Size(500, 500),
+                //       hoveredIndex: _hoveredIndex,
+                //     ),
+                //   ),
+                // ),
+                SizedBox(
+                  width: 350,
+                  child: buildMenuButton(icon: Icons.business_outlined, text: 'REGISTRA PREVENTIVO',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PreventivoServiziPage(utente: widget.utente)),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: 350,
+                  child: buildMenuButton(icon: Icons.sd_storage_outlined, text: 'CASSETTO PREVENTIVI SERVIZI',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PreventivoServiziPage(utente: widget.utente)),
+                      );
+                    },
+                    isDisabled: true,
                   ),
                 ),
               ],
@@ -119,6 +145,68 @@ class _MenuPreventiviLiberiPageState extends State<MenuPreventiviLiberiPage>{
 
     return hoveredIndex;
   }
+
+
+  Widget buildMenuButton({
+    required IconData icon,
+    required String text,
+    required VoidCallback onPressed,
+    bool isDisabled = false, // Aggiunto il parametro booleano
+  }) {
+    return GestureDetector(
+      onTap: isDisabled ? null : onPressed, // Disabilita il tocco se isDisabled è true
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: isDisabled
+              ? LinearGradient(
+            colors: [Colors.grey.shade400, Colors.grey.shade700], // Colori per lo stato disabilitato
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
+              : LinearGradient(
+            colors: [Colors.red.shade400, Colors.red.shade700], // Colori standard
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: isDisabled
+              ? [] // Nessuna ombra per il pulsante disabilitato
+              : [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                icon,
+                color: isDisabled ? Colors.grey.shade200 : Colors.white, // Cambia il colore per lo stato disabilitato
+                size: 30,
+              ),
+              SizedBox(width: 30),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: isDisabled ? Colors.grey.shade200 : Colors.white, // Cambia il colore per lo stato disabilitato
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }
 
 class MenuPainter extends CustomPainter {
