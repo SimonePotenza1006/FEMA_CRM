@@ -973,13 +973,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
         return response;
       } else {
         print('Errore durante il salvataggio della movimentazione: ${response.statusCode}');
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Errore durante il salvataggio della movimentazione'),
-            ),
-          );
-        }
+
       }
     } catch (e) {
       print('Errore durante la chiamata HTTP: $e');
