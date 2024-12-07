@@ -201,13 +201,13 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
                         children: [
                           pdfw.Text('Destinatario', style: pdfw.TextStyle(fontSize: 8, fontWeight: pdfw.FontWeight.bold)),
                           pdfw.SizedBox(height: 3),
-                          pdfw.Text(widget.denomDestinatario != null ? widget.denomDestinatario! : "//", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
+                          pdfw.Text(widget.denomDestinatario != null ? widget.denomDestinatario! : "", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
                           pdfw.SizedBox(height: 3),
-                          pdfw.Text(widget.indirizzoDestinatario != null ? widget.indirizzoDestinatario! : "//", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
+                          pdfw.Text(widget.indirizzoDestinatario != null ? widget.indirizzoDestinatario! : "", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
                           pdfw.SizedBox(height: 3),
-                          pdfw.Text(widget.cittaDestinatario != null ? widget.cittaDestinatario! : "//", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
+                          pdfw.Text(widget.cittaDestinatario != null ? widget.cittaDestinatario! : "", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
                           pdfw.SizedBox(height: 3),
-                          pdfw.Text(widget.codFisc != null ? widget.codFisc! : "//", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
+                          pdfw.Text(widget.codFisc != null ? widget.codFisc! : "", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
                         ]
                       )
                     )
@@ -223,11 +223,11 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
                               children: [
                                 pdfw.Text('Destinazione', style: pdfw.TextStyle(fontSize: 8, fontWeight: pdfw.FontWeight.bold)),
                                 pdfw.SizedBox(height: 3),
-                                pdfw.Text(widget.denomDestinazione != null ? widget.denomDestinazione! : "//", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
+                                pdfw.Text(widget.denomDestinazione != null ? widget.denomDestinazione! : "", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
                                 pdfw.SizedBox(height: 3),
-                                pdfw.Text(widget.indirizzoDestinazione != null ? widget.indirizzoDestinazione! : "//", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
+                                pdfw.Text(widget.indirizzoDestinazione != null ? widget.indirizzoDestinazione! : "", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
                                 pdfw.SizedBox(height: 3),
-                                pdfw.Text(widget.cittaDestinazione != null ? widget.cittaDestinazione! : "//", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
+                                pdfw.Text(widget.cittaDestinazione != null ? widget.cittaDestinazione! : "", style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 11)),
                               ]
                           )
                       )
@@ -239,6 +239,71 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
           ),
           footer: (context) => pdfw.Column(
             children: [
+              pdfw.Row(
+                mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pdfw.Container(
+                    width: 250,
+                    height: 120,
+                    child: pdfw.Row(
+                      mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pdfw.Column(
+                          crossAxisAlignment: pdfw.CrossAxisAlignment.start,
+                          children: [
+                            pdfw.SizedBox(height: 10),
+                            pdfw.Text('Modalità di pagamento', style: pdfw.TextStyle(fontSize: 13, fontWeight: pdfw.FontWeight.bold)),
+                            pdfw.SizedBox(height: 60),
+                            pdfw.Text('Tutti i prezzi indicati hanno validità 10 giorni', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
+                          ],
+                        ),
+                        pdfw.Column(
+                          children: [
+                            pdfw.SizedBox(height: 10),
+                            pdfw.Text('Acconto', style: pdfw.TextStyle(fontSize: 13, fontWeight: pdfw.FontWeight.bold)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  pdfw.Container(
+                    height: 120,
+                    width: 250,
+                    color: PdfColors.grey200,
+                    child: pdfw.Padding(
+                      padding: pdfw.EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+                      child: pdfw.Column(
+                        children: [
+                          pdfw.Row(
+                            mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pdfw.Text('Tot. imponibile', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
+                              pdfw.Text('${widget.totaleImponibile}${String.fromCharCode(128)}', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
+                            ],
+                          ),
+                          pdfw.SizedBox(height: 10),
+                          pdfw.Row(
+                            mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pdfw.Text('Tot. Iva', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
+                              pdfw.Text('${widget.totaleIva}${String.fromCharCode(128)}', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
+                            ],
+                          ),
+                          pdfw.SizedBox(height: 40),
+                          pdfw.Row(
+                            mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pdfw.Text('Tot. documento', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 18)),
+                              pdfw.Text('${widget.totaleDocumento}${String.fromCharCode(128)}', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 18)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              pdfw.SizedBox(height: 5),
               pdfw.Center(
                 child: pdfw.Padding(
                   padding: pdfw.EdgeInsets.symmetric(horizontal: 2),
@@ -256,70 +321,6 @@ class _PreventivoServiziPdfPageState extends State<PreventivoServiziPdfPage>{
                 mainAxisAlignment: pdfw.MainAxisAlignment.end,
                 children: [
                   pdfw.Spacer(), // Aggiunge uno spazio flessibile per spingere il contenuto verso il fondo
-                  pdfw.Row(
-                    mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pdfw.Container(
-                        width: 250,
-                        height: 120,
-                        child: pdfw.Row(
-                          mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
-                          children: [
-                            pdfw.Column(
-                              crossAxisAlignment: pdfw.CrossAxisAlignment.start,
-                              children: [
-                                pdfw.SizedBox(height: 10),
-                                pdfw.Text('Modalità di pagamento', style: pdfw.TextStyle(fontSize: 13, fontWeight: pdfw.FontWeight.bold)),
-                                pdfw.SizedBox(height: 60),
-                                pdfw.Text('Tutti i prezzi indicati hanno validità 10 giorni', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
-                              ],
-                            ),
-                            pdfw.Column(
-                              children: [
-                                pdfw.SizedBox(height: 10),
-                                pdfw.Text('Acconto', style: pdfw.TextStyle(fontSize: 13, fontWeight: pdfw.FontWeight.bold)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      pdfw.Container(
-                        height: 120,
-                        width: 250,
-                        color: PdfColors.grey200,
-                        child: pdfw.Padding(
-                          padding: pdfw.EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-                          child: pdfw.Column(
-                            children: [
-                              pdfw.Row(
-                                mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
-                                children: [
-                                  pdfw.Text('Tot. imponibile', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
-                                  pdfw.Text('${widget.totaleImponibile}${String.fromCharCode(128)}', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
-                                ],
-                              ),
-                              pdfw.SizedBox(height: 10),
-                              pdfw.Row(
-                                mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
-                                children: [
-                                  pdfw.Text('Tot. Iva', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
-                                  pdfw.Text('${widget.totaleIva}${String.fromCharCode(128)}', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold)),
-                                ],
-                              ),
-                              pdfw.SizedBox(height: 40),
-                              pdfw.Row(
-                                mainAxisAlignment: pdfw.MainAxisAlignment.spaceBetween,
-                                children: [
-                                  pdfw.Text('Tot. documento', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 18)),
-                                  pdfw.Text('${widget.totaleDocumento}${String.fromCharCode(128)}', style: pdfw.TextStyle(fontWeight: pdfw.FontWeight.bold, fontSize: 18)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),
