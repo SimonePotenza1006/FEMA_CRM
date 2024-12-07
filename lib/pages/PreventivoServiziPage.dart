@@ -45,6 +45,12 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   final _conIndirizzoDestinazione = TextEditingController();
   final _conCittaDestinazione = TextEditingController();
 
+  void _rimuoviProdotto(){
+    setState(() {
+      prodotti.removeLast();
+    });
+  }
+
   void _aggiungiProdotto() {
     var nuovoProdotto = Prodotto(
       codiceController: TextEditingController(),
@@ -612,17 +618,34 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ),
           Positioned(
             right: 16,
-              bottom: 90,
-              child: FloatingActionButton(
-                onPressed: _aggiungiProdotto,
-                backgroundColor: Colors.red,
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
+              bottom: 165,
+              child: Tooltip(
+                message: "Aggiungi riga",
+                child: FloatingActionButton(
+                  onPressed: _rimuoviProdotto,
+                  backgroundColor: Colors.red,
+                  child: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
                 ),
               )
-
-          )
+          ),
+          Positioned(
+              right: 16,
+              bottom: 90,
+              child: Tooltip(
+                message: "Rimuovi ultima riga",
+                child: FloatingActionButton(
+                  onPressed: _aggiungiProdotto,
+                  backgroundColor: Colors.red,
+                  child: Icon(
+                    Icons.remove,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+          ),
         ],
       ),
 

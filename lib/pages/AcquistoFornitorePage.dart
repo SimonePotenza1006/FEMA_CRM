@@ -4,20 +4,9 @@ import 'dart:ui' as ui;
 import 'package:fema_crm/model/FornitoreModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-//import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
-import '../model/ClienteModel.dart';
-import '../model/InterventoModel.dart';
 import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
-import '../model/UtenteModel.dart';
-import 'PDFPagamentoAccontoPage.dart';
-import 'PDFPrelievoCassaPage.dart';
-import 'dart:io';
 
 class AcquistoFornitorePage extends StatefulWidget{
   final UtenteModel utente;
@@ -127,6 +116,20 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,78 +142,168 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Form(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  width: 400,
-                  child: Container(
-                    child: GestureDetector(
-                      onTap: () {
-                        _showFornitoriDialog();
+            child: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    width: 500,
+                    child: Container(
+                      child: GestureDetector(
+                        onTap: () {
+                          _showFornitoriDialog();
+                        },
+                        child: SizedBox(
+                          height: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(selectedFornitore?.denominazione ?? 'Seleziona fornitore'.toUpperCase(), style: const TextStyle(fontSize: 16)),
+                              const Icon(Icons.arrow_drop_down),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  SizedBox(
+                    width: 500,
+                    child: TextFormField(
+                      controller: _descrizioneController,
+                      decoration: InputDecoration(
+                        labelText: 'DESCRIZIONE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintText: 'Inserisci una descrizione',
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[400],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Inserisci una descrizione';
+                        }
+                        return null;
                       },
-                      child: SizedBox(
-                        height: 50,
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  SizedBox(
+                    width: 500,
+                    child: TextFormField(
+                      controller: _importoController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'IMPORTO',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintText: 'Inserisci l\'importo',
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[400],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null || double.tryParse(value) == null) {
+                          return 'Inserisci un importo valido';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Data di riferimento:'.toUpperCase(),
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  Center(
+                    child: GestureDetector(
+                        onTap: () {
+                          _selectDate(context);
+                        },
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(selectedFornitore?.denominazione ?? 'Seleziona fornitore'.toUpperCase(), style: const TextStyle(fontSize: 16)),
-                            const Icon(Icons.arrow_drop_down),
-                          ],
-                        ),
-                      ),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year.toString().substring(2)} ',
+                                style: TextStyle(color: Colors.black, fontSize: 16),
+                              ),
+                              Icon(Icons.edit, size: 16),
+                            ])
                     ),
                   ),
-                ),
-                SizedBox(height: 15),
-                SizedBox(
-                  width: 400,
-                  child: TextFormField(
-                    controller: _descrizioneController,
-                    decoration: InputDecoration(
-                      labelText: 'DESCRIZIONE',
-                      labelStyle: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                      hintText: 'Inserisci una descrizione',
-                      hintStyle: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[400],
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.redAccent,
-                          width: 2.0,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1.0,
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserisci una descrizione';
-                      }
-                      return null;
+                  SizedBox(height: 15),
+                  ElevatedButton(
+                    onPressed: () {
+                        addMovimento();
                     },
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                        padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.symmetric(horizontal: 10, vertical: 2))
+                    ),
+                    child: Text(
+                      'Conferma Inserimento',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            )
           ),
         ),
       ),
@@ -218,4 +311,31 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
   }
 
 
+  Future<void> addMovimento() async{
+    try{
+      String prioritaString = TipoMovimentazione.Uscita.toString().split('.').last;
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/movimenti'),
+        headers: {'Content-Type' : 'application/json'},
+        body: jsonEncode({
+          'data' : selectedDate.toIso8601String(),
+          'descrizione' : _descrizioneController.text,
+          'importo' : double.tryParse(_importoController.text.toString()),
+          'utente' : widget.utente.toMap(),
+          'fornitore' : selectedFornitore?.toMap(),
+          'tipo_movimentazione' : prioritaString,
+        })
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Movimentazione salvata con successo!'),
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch(e){
+      print('errore:$e');
+    }
+  }
 }
