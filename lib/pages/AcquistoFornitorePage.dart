@@ -47,7 +47,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
 
   Future<void> getAllFornitori() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];
