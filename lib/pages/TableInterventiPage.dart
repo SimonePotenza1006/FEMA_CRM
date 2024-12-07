@@ -69,6 +69,20 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   bool isLoading = true;
   bool _isLoading = true;
 
+  Future<void> _refreshData() async {
+
+    // Simula un caricamento dei dati
+    await Future.delayed(Duration(seconds: 2));
+
+    // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
+    //_dataSource.updateData();
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TableInterventiPage()));
+
+
+  }
+
   Future<void> getAllUtenti() async{
     try{
       var apiUrl = Uri.parse('$ipaddress/api/utente');
@@ -743,9 +757,10 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           child: Column(
             children: [
               SizedBox(height: 10),
-              Expanded(
+              Expanded(child: RefreshIndicator(
+                onRefresh: _refreshData,
                 child: SfDataGrid(
-                  allowPullToRefresh: true,
+                  //allowPullToRefresh: true,
                   allowSorting: true,
                   allowMultiColumnSorting: true,
                   source: _dataSource,
@@ -1174,7 +1189,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                     });
                     return true;
                   },
-                ),
+                )),
               ),
               Flex(
                 // height: 60,

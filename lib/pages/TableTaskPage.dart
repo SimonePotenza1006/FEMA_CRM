@@ -56,7 +56,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     await Future.delayed(Duration(seconds: 2));
 
     // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
-    //_dataSource.updateData();
+
     getAllTask();
     getAllTipi();
     getAllUtenti();
@@ -224,6 +224,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         }
         setState(() {
           allUtenti = utenti;
+          if (widget.utente.cognome! == "Mazzei") selectedUtente = utenti.firstWhere((element) => element.id == widget.utente.id);
         });
       } else {
         throw Exception(
@@ -390,7 +391,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       },
                     ),
                     SizedBox(width: 2),
-                    Text('${selectedUtente != null ? "${selectedUtente?.nomeCompleto()!.toUpperCase()}" : "TUTTI"}', style: TextStyle(color: Colors.white)),
+                    Text('${selectedUtente != null ? "${selectedUtente?.nomeCompleto()!.toUpperCase()}" : "UTENTE"}', style: TextStyle(color: Colors.white)),
                     SizedBox(width: 6)
                   ],
                 ),
@@ -937,7 +938,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
             .where((task) {
           final taskId = task.tipologia?.id?.toString(); // Converte l'ID del task in stringa
           final tipoIdStr = tipoId.toString(); // Converte il tipo selezionato in stringa
-          final matches = taskId == tipoIdStr; // Confronta come stringhe
+
+          final taskUserId = task.utente?.id; // ID dell'utente nella commissione
+          final selectedUserId = selectedUtente!.id; // ID dell'utente selezionato
+          //final matches = taskUserId == selectedUserId; // Confronta gli ID
+
+          final matches = (taskId == tipoIdStr && taskUserId == selectedUserId); // Confronta come stringhe
           print('Filtering task: $taskId matches: $matches'); // Debug
           return matches;
         })

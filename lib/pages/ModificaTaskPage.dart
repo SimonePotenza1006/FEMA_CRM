@@ -63,7 +63,7 @@ class _ModificaTaskPageState
     super.initState();
     _descrizioneController = TextEditingController(text: widget.task.descrizione);
     _titoloController = TextEditingController(text: widget.task.titolo);
-    //_selectedTipo = widget.task.tipologia;
+
     _condiviso = widget.task.condiviso!;
     _concluso = widget.task.concluso!;
     _accettato = widget.task.accettato!;
@@ -242,6 +242,7 @@ class _ModificaTaskPageState
         }
         setState(() {
           allTipi = tipi;
+          _selectedTipo = tipi.firstWhere((element) => element.id==widget.task.tipologia!.id!);
         });
       } else {
         throw Exception(
@@ -869,7 +870,8 @@ class _ModificaTaskPageState
           'descrizione': _descrizioneController.text,
           'concluso': _concluso,
           'condiviso': _condiviso,
-          'accettato': _accettato,
+          'accettato':  _condiviso ? (selectedUtente != null && selectedUtente?.toMap() != widget.task.utente) ? false :
+              _accettato : true,//_accettato,
           'tipologia': _selectedTipo.toString().split('.').last,
           'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
@@ -897,6 +899,7 @@ class _ModificaTaskPageState
         }
         setState(() {
           allUtenti = utenti;
+          selectedUtente = utenti.firstWhere((element) => element.id==widget.task.utente!.id!);
         });
       } else {
         throw Exception(

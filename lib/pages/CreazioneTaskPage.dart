@@ -68,10 +68,10 @@ class _CreazioneTaskPageState
     super.initState();
     getAllUtenti();
     getAllTipi();
-    SystemChrome.setPreferredOrientations([
+    /*SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
-    ]);
+    ]);*/
   }
 
   Future<void> _startRecording() async {
@@ -240,7 +240,7 @@ class _CreazioneTaskPageState
     return WillPopScope(
       onWillPop: () async {
         // Ottieni la larghezza dello schermo
-        final size = MediaQuery.of(context).size;
+        /*final size = MediaQuery.of(context).size;
         const double thresholdWidth = 450.0;
 
         // Cambia l'orientamento in base alla larghezza
@@ -252,7 +252,7 @@ class _CreazioneTaskPageState
           SystemChrome.setPreferredOrientations([
             DeviceOrientation.portraitUp,
           ]);
-        }
+        }*/
         // Consenti la navigazione indietro
         return true;
       },
@@ -675,7 +675,7 @@ class _CreazioneTaskPageState
           'descrizione': _descrizioneController.text,
           'concluso': false,
           'condiviso': _condiviso,
-          'accettato': false,
+          'accettato': _condiviso ? false : true,
           'tipologia': _selectedTipo?.toMap(),
           'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
         }),

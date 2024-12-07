@@ -36,6 +36,7 @@ import '../model/InterventoModel.dart';
 import '../model/NotaTecnicoModel.dart';
 import '../model/OrdinePerInterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
+import '../model/TaskModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
@@ -107,6 +108,45 @@ class _HomeFormAmministrazioneNewPageState
     _scheduleGetAllOrdini();
     fetchData();
     getAllInterventiBySettore();
+    getAllTasks();
+  }
+
+  Future<void> getAllTasks() async {
+    try {
+      String userId = widget.userData!.id.toString();
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/task/utente/$userId'));
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        List<TaskModel> tasks = [];
+        for (var item in responseData) {
+          TaskModel task = TaskModel.fromJson(item);
+          if (task.accettato == false) {
+            tasks.add(task);
+          }
+        }
+        if (tasks.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Attenzione"),
+                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Chiude l'alert
+                    },
+                    child: Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      print('Error fetching commissioni: $e');
+    }
   }
 
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
