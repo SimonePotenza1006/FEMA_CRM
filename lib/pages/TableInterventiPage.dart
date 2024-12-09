@@ -281,7 +281,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
-                intervento.tipologia?.id != "6" &&
+                //intervento.tipologia?.id != "6" &&
                 !(intervento.saldato ?? false);
           })
               .toList();
@@ -292,7 +292,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
-                intervento.tipologia?.id != "6" &&
+                //intervento.tipologia?.id != "6" &&
                 (intervento.saldato ?? false);
           })
               .toList();
@@ -346,7 +346,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
-              intervento.tipologia?.id != "6" &&
+              //intervento.tipologia?.id != "6" &&
               !(intervento.saldato ?? false);
         })
             .toList();
@@ -356,7 +356,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
-              intervento.tipologia?.id != "6" &&
+              //intervento.tipologia?.id != "6" &&
               (intervento.saldato ?? false);
         })
             .toList();
