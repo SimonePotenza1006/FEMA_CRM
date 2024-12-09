@@ -16,6 +16,7 @@ import '../model/SpesaVeicoloModel.dart';
 import '../model/TipologiaSpesaVeicoloModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
+import 'HomeFormAmministrazioneNewPage.dart';
 
 class SpesaSuVeicoloPage extends StatefulWidget {
   final UtenteModel utente;
@@ -661,13 +662,19 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                           },
                         );
                         checkScadenze().whenComplete(() async {
-                          await saveImmagine().whenComplete(() => 
+                          await saveImmagine().whenComplete(() {
+                            if (widget.utente.ruolo?.descrizione == "Tecnico" || widget.utente.ruolo?.descrizione == "Developer") {
                               Navigator.pushReplacement(
-                              context,
-                                MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente))
-                            )
-                          );
-                          
+                                  context,
+                                  MaterialPageRoute(builder: (context) => HomeFormTecnicoNewPage(userData: widget.utente))
+                              );
+                            } else {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => HomeFormAmministrazioneNewPage(userData: widget.utente))
+                              );
+                            }
+                          });
                         });
                       }
                     }

@@ -622,7 +622,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               child: Tooltip(
                 message: "Aggiungi riga",
                 child: FloatingActionButton(
-                  onPressed: _rimuoviProdotto,
+                  onPressed: _aggiungiProdotto,
                   backgroundColor: Colors.red,
                   child: Icon(
                     Icons.add,
@@ -637,7 +637,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               child: Tooltip(
                 message: "Rimuovi ultima riga",
                 child: FloatingActionButton(
-                  onPressed: _aggiungiProdotto,
+                  onPressed: _rimuoviProdotto,
                   backgroundColor: Colors.red,
                   child: Icon(
                     Icons.remove,
@@ -648,7 +648,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ),
         ],
       ),
-
     );
   }
 
