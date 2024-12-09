@@ -48,24 +48,71 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 _buildTextFormField(_descrizioneController, "Numero carta", "Inserisci i 4 numeri finali della carta"),
                 SizedBox(height: 15),
                 SizedBox(
-                  width: 300,
-                  child: DropdownButton<TipologiaCartaModel>(
-                    value: selectedTipologiaCarta,
-                    hint: Text('Seleziona la tipologia della carta'),
-                    isExpanded: true,
-                    onChanged: (TipologiaCartaModel? newValue) {
-                      setState(() {
-                        selectedTipologiaCarta = newValue;
-                      });
-                    },
-                    items: tipologieCartaList
-                        .map<DropdownMenuItem<TipologiaCartaModel>>(
-                            (TipologiaCartaModel tipologia) {
-                          return DropdownMenuItem<TipologiaCartaModel>(
-                            value: tipologia,
-                            child: Text(tipologia.descrizione ?? ''),
-                          );
-                        }).toList(),
+                  width: 400,
+                  child: SizedBox(
+                    width: 600,
+                    child: DropdownButtonFormField<TipologiaCartaModel>(
+                      value: selectedTipologiaCarta,
+                      hint: Text(
+                        'SELEZIONA TIPOLOGIA CARTA',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onChanged: (TipologiaCartaModel? newValue) {
+                        setState(() {
+                          selectedTipologiaCarta = newValue;
+                        });
+                      },
+                      items: tipologieCartaList
+                          .map<DropdownMenuItem<TipologiaCartaModel>>(
+                            (TipologiaCartaModel value) => DropdownMenuItem<TipologiaCartaModel>(
+                          value: value,
+                          child: Text(
+                            value.descrizione!,
+                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                          ),
+                        ),
+                      )
+                          .toList(),
+                      decoration: InputDecoration(
+                        labelText: 'TIPOLOGIA CARTA',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Selezionare una tipologia di carta';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(height: 50),
@@ -122,32 +169,41 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Widget _buildTextFormField(
       TextEditingController controller, String label, String hintText) {
     return SizedBox(
-      width: 300,
+      width: 400, // Larghezza modificata
       child: TextFormField(
         controller: controller,
+        maxLines: null, // Permette più righe
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
           hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              color: Colors.grey,
-            ),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: Colors.red,
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
             ),
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Campo obbligatorio';
-          }
-          return null;
-        },
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ), // Funzione di validazione
       ),
     );
   }

@@ -478,6 +478,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       'Tipo di movimentazione',
       'Importo',
       'Descrizione',
+      'Fornitore',
       'Utente',
     ]);
     // Applica lo stile di sfondo bianco per l'intestazione
@@ -519,9 +520,10 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       // Aggiungi la riga
       sheetObject.appendRow([
         spesa.data != null ? DateFormat('yyyy-MM-dd').format(spesa.data!) : 'N/A',
-        spesa.tipo_movimentazione.toString().split('.').last ?? 'N/A',
+        spesa.tipo_movimentazione.toString().split('.').last,
         importoFormatted,
         spesa.descrizione ?? 'N/A',
+        spesa.fornitore?.denominazione ?? 'N/A',
         spesa.utente?.cognome ?? 'N/A'
       ]);
       // Alterna il colore di sfondo tra bianco e verde chiaro

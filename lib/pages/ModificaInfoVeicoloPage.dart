@@ -39,7 +39,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   @override
   void initState(){
     super.initState();
-    _descrizioneController = TextEditingController(text: widget.veicolo.descrizione);
+    _descrizioneController = TextEditingController(text: widget.veicolo.descrizione != null ? widget.veicolo.descrizione : '');
     _chilometraggioController = TextEditingController(text: widget.veicolo.chilometraggio_attuale.toString());
     _chilometraggioTagliandoController = TextEditingController(text: widget.veicolo.chilometraggio_ultimo_tagliando.toString());
     _sogliaTagliandoController = TextEditingController(text: widget.veicolo.soglia_tagliando.toString());
@@ -69,61 +69,16 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           child: Column(
             children: [
               SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child:TextFormField(
-                  controller: _descrizioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Descrizione'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _proprietarioController,
-                  decoration: InputDecoration(
-                    labelText: 'Proprietario'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _targaController,
-                  decoration: InputDecoration(
-                    labelText: 'TARGA',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _imeiController,
-                  decoration: InputDecoration(
-                    labelText: 'IMEI GPS',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _serialeController,
-                  decoration: InputDecoration(
-                    labelText: 'SERIALE GPS',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
+              _buildTextFormField(_descrizioneController, 'Descrizione', 'Inserisci la descrizione del veicolo'),
+              SizedBox(height: 10),
+              _buildTextFormField(_proprietarioController, 'Proprietario', 'Inserisci il proprietario del veicolo'),
+              SizedBox(height: 10),
+              _buildTextFormField(_targaController, 'Targa', 'Inserisci il numero di targa'),
+              SizedBox(height: 10),
+              _buildTextFormField(_imeiController, 'Imei Gps', 'Inserisci l\'IMEI gps del veicolo'),
+              SizedBox(height: 10),
+              _buildTextFormField(_serialeController, 'Seriale', 'Inserisci il seriale del veicolo'),
+              SizedBox(height: 10),
               SizedBox(
                 width: 420,
                 child:GestureDetector(
@@ -150,91 +105,21 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _chilometraggioController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio attuale'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _chilometraggioTagliandoController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio ultimo tagliando'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width:420,
-                child: TextFormField(
-                  controller: _sogliaTagliandoController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometri da effettuare prima del prossimo tagliando'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child:TextFormField(
-                  controller: _chilometraggioInversioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio ultima inversione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _sogliaInversioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometri da effettuare prima della prossima inversione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _chilometraggioSostituzioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometraggio ultima sostituzione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: TextFormField(
-                  controller: _sogliaSostituzioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Chilometri da effettuare prima della prossima sostituzione gomme'.toUpperCase(),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
+              _buildTextFormField(_chilometraggioController, 'Chilometraggio attuale', 'Inserisci il chilometraggio attuale del veicolo'),
+              SizedBox(height: 10),
+              _buildTextFormField(_chilometraggioTagliandoController, 'Chilometraggio ultimo tagliando', 'Inserisci il chilometraggio dell\'ultimo tagliando'),
+              SizedBox(height: 10),
+              _buildTextFormField(_sogliaTagliandoController, 'Soglia tagliando', 'Inserisci i chilometri da effettuare prima del prossimo tagliando'),
+              SizedBox(height: 10),
+              _buildTextFormField(_chilometraggioInversioneController, 'Chilometraggio ultima inversione gomme', 'Inserisci il chilometraggio all\'ultima inversione gomme'),
+              SizedBox(height: 10),
+              _buildTextFormField(_sogliaInversioneController, 'Soglia inversione', 'Inserisci i chilometri da effettuare prima della prossima inversione'),
+              SizedBox(height: 10),
+              _buildTextFormField(_chilometraggioSostituzioneController, 'Chilometraggio ultima sostituzione gomme', 'Inserisci il chilometraggio all\'ultima inversione gomme'),
+              SizedBox(height: 10),
+              _buildTextFormField(_sogliaSostituzioneController, 'Soglia sostituzione', 'Inserisci i chilometri da effettuare prima della prossima sostituzione'),
+              SizedBox(height: 10),
               SizedBox(
                 width: 420,
                 child:GestureDetector(
@@ -415,6 +300,50 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText,
+      {String? Function(String?)? validator}) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
+      child: TextFormField(
+        controller: controller,
+        maxLines: null, // Permette più righe
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ),
+        validator: validator, // Funzione di validazione
       ),
     );
   }

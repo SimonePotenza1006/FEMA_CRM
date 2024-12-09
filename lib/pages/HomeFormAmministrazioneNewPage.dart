@@ -37,6 +37,7 @@ import '../model/NotaTecnicoModel.dart';
 import '../model/OrdinePerInterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/TaskModel.dart';
+import '../model/TicketModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
@@ -109,6 +110,44 @@ class _HomeFormAmministrazioneNewPageState
     fetchData();
     getAllInterventiBySettore();
     getAllTasks();
+    checkTickets();
+  }
+
+  Future<void> checkTickets() async{
+    try{
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/ticket'));
+      if(response.statusCode == 200){
+        var responseData = json.decode(response.body);
+        List<TicketModel> tickets = [];
+        for(var item in responseData){
+          TicketModel ticket = TicketModel.fromJson(item);
+          if(ticket.convertito == false){
+            tickets.add(ticket);
+          }
+        }
+        if(tickets.isNotEmpty){
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Attenzione"),
+                content: Text("Sono presenti dei ticket non acora convertiti, controlla nell\'apposita sezione."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Chiude l'alert
+                    },
+                    child: Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch(e){
+      print('Error fetching tickets: $e');
+    }
   }
 
   Future<void> getAllTasks() async {
@@ -145,7 +184,7 @@ class _HomeFormAmministrazioneNewPageState
         }
       }
     } catch (e) {
-      print('Error fetching commissioni: $e');
+      print('Error fetching task: $e');
     }
   }
 

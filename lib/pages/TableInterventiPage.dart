@@ -70,17 +70,13 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   bool _isLoading = true;
 
   Future<void> _refreshData() async {
-
     // Simula un caricamento dei dati
     await Future.delayed(Duration(seconds: 2));
-
     // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
     //_dataSource.updateData();
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => TableInterventiPage()));
-
-
   }
 
   Future<void> getAllUtenti() async{
@@ -195,18 +191,17 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
           // Debug: Verifica dei dati ricevuti
           print('Interventi ricevuti dalla pagina $currentPage: ${interventi.length}');
-          // Filtra gli interventi con tipologia.id != 6
-          List<InterventoModel> interventiFiltrati = interventi
-              .where((intervento) => intervento.tipologia?.id != "6")
-              .toList();
-          // Aggiungi gli interventi filtrati alla lista complessiva
-          setState(() {
-            _allInterventi.addAll(interventiFiltrati);
 
-            // Filtra ulteriormente per costruire _filteredInterventi
+          setState(() {
+            // Aggiungi tutti gli interventi alla lista complessiva
+            _allInterventi.addAll(interventi);
+
+            // Filtra per i tab diversi da "Tutti"
             _filteredInterventi = _allInterventi
                 .where((intervento) =>
-            intervento.concluso != true && intervento.orario_fine == null)
+            intervento.concluso != true &&
+                intervento.orario_fine == null &&
+                intervento.tipologia?.id != "6")
                 .toList();
 
             // Aggiorna la sorgente dati
@@ -238,6 +233,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       );
     }
   }
+
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
@@ -275,9 +271,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
             return intervento.annullato != true && // Escludi annullati
                 intervento.concluso != true &&
-                intervento.orario_fine == null;
-          })
-              .toList();
+                intervento.orario_fine == null &&
+                intervento.tipologia?.id != "6"; // Escludi tipologia id 6
+          }).toList();
           break;
         case 2: // Conclusi non saldati
           _filteredInterventi = _allInterventi
@@ -285,6 +281,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
+                //intervento.tipologia?.id != "6" &&
                 !(intervento.saldato ?? false);
           })
               .toList();
@@ -295,6 +292,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
+                //intervento.tipologia?.id != "6" &&
                 (intervento.saldato ?? false);
           })
               .toList();
@@ -305,6 +303,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 !(intervento.concluso ?? false) &&
+                intervento.tipologia?.id != "6" &&
                 (intervento.saldato ?? false);
           })
               .toList();
@@ -337,6 +336,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
           return intervento.annullato != true && // Escludi annullati
               intervento.concluso != true &&
+              intervento.tipologia?.id != "6" &&
               intervento.orario_fine == null;
         })
             .toList();
@@ -346,6 +346,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
+              //intervento.tipologia?.id != "6" &&
               !(intervento.saldato ?? false);
         })
             .toList();
@@ -355,6 +356,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
+              //intervento.tipologia?.id != "6" &&
               (intervento.saldato ?? false);
         })
             .toList();
@@ -364,6 +366,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               !(intervento.concluso ?? false) &&
+              intervento.tipologia?.id != "6" &&
               (intervento.saldato ?? false);
         })
             .toList();
@@ -519,6 +522,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             .where((intervento) =>
         intervento.annullato != true &&
             intervento.concluso != true &&
+            intervento.tipologia?.id != "6" &&
             intervento.orario_fine == null)
             .toList();
         _dataSource.updateData(_filteredInterventi, filteredGruppi); // Aggiorna il data source
@@ -529,7 +533,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     getAllTipologie().whenComplete(() => print('Tipologie ok'));
     getAllUtenti().whenComplete(() => print('Utenti ok'));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -747,7 +750,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => TableInterventiPage()));
-                //getAllInterventi();
               },
             ),
           ],

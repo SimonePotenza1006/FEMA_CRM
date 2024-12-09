@@ -68,11 +68,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 _buildTextFormField(_passwordController, 'Password', 'Inserisci la password che dovrà usare l\'utente'),
                 SizedBox(height: 15),
                 SizedBox(
-                  width: 300,
-                  child: DropdownButton<TipologiaInterventoModel>(
+                  width: 600,
+                  child: DropdownButtonFormField<TipologiaInterventoModel>(
                     value: selectedTipologia,
-                    hint: Text('Seleziona tipologia di intervento'),
-                    isExpanded: true,
+                    hint: Text(
+                      'SELEZIONA TIPOLOGIA DI INTERVENTO',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     onChanged: (TipologiaInterventoModel? newValue) {
                       setState(() {
                         selectedTipologia = newValue;
@@ -80,21 +86,65 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     },
                     items: tipologieList
                         .map<DropdownMenuItem<TipologiaInterventoModel>>(
-                            (TipologiaInterventoModel tipologia) {
-                          return DropdownMenuItem<TipologiaInterventoModel>(
-                            value: tipologia,
-                            child: Text(tipologia.descrizione ?? ''),
-                          );
-                        }).toList(),
+                          (TipologiaInterventoModel value) => DropdownMenuItem<TipologiaInterventoModel>(
+                        value: value,
+                        child: Text(
+                          value.descrizione!,
+                          style: TextStyle(fontSize: 14, color: Colors.black87),
+                        ),
+                      ),
+                    )
+                        .toList(),
+                    decoration: InputDecoration(
+                      labelText: 'TIPOLOGIA INTERVENTO',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Selezionare una tipologia di intervento';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 SizedBox(height: 15),
                 SizedBox(
-                  width: 300,
-                  child: DropdownButton<RuoloUtenteModel>(
+                  width: 600,
+                  child: DropdownButtonFormField<RuoloUtenteModel>(
                     value: selectedRuolo,
-                    hint: Text('Seleziona il ruolo dell\'utente'),
-                    isExpanded: true,
+                    hint: Text(
+                      'SELEZIONA IL RUOLO DELL\'UTENTE',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     onChanged: (RuoloUtenteModel? newValue) {
                       setState(() {
                         selectedRuolo = newValue;
@@ -102,12 +152,50 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     },
                     items: ruoliList
                         .map<DropdownMenuItem<RuoloUtenteModel>>(
-                            (RuoloUtenteModel ruolo) {
-                          return DropdownMenuItem<RuoloUtenteModel>(
-                            value: ruolo,
-                            child: Text(ruolo.descrizione ?? ''),
-                          );
-                        }).toList(),
+                          (RuoloUtenteModel value) => DropdownMenuItem<RuoloUtenteModel>(
+                        value: value,
+                        child: Text(
+                          value.descrizione!,
+                          style: TextStyle(fontSize: 14, color: Colors.black87),
+                        ),
+                      ),
+                    )
+                        .toList(),
+                    decoration: InputDecoration(
+                      labelText: 'RUOLO',
+                      labelStyle: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.bold,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.redAccent,
+                          width: 2.0,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.grey[300]!,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                    ),
+                    validator: (value) {
+                      if (value == null) {
+                      return 'Selezionare un ruolo!';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 SizedBox(height: 50),
@@ -257,29 +345,45 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Widget _buildTextFormField(
-      TextEditingController controller, String label, String hintText, {String? Function(String?)? validator}) {
+      TextEditingController controller, String label, String hintText,
+      {String? Function(String?)? validator}) {
     return SizedBox(
-      width: 320,
+      width: 600, // Larghezza modificata
       child: TextFormField(
         controller: controller,
+        maxLines: null, // Permette più righe
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
           hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              color: Colors.grey,
-            ),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: Colors.red,
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
             ),
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
         ),
-        validator: validator, // Assegna la funzione di validazione
+        validator: validator, // Funzione di validazione
       ),
     );
   }

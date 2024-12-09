@@ -82,217 +82,163 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  //mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      //mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
 
-                    SizedBox(height: 20),
-                    FutureBuilder<List<LicenzaModel>>(
-                      future: futureLicenze(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        } else {
-                          // Inizializza la lista delle note se è vuota
-                          if (_noteControllers.isEmpty) {
-                            for (var licenza in snapshot.data!) {
-                              var controller = TextEditingController(text: licenza.note);
-                              _noteControllers[licenza.id!] = controller;
-                              _isSaveEnabled[licenza.id!] = ValueNotifier(false);
+                        SizedBox(height: 20),
+                        FutureBuilder<List<LicenzaModel>>(
+                          future: futureLicenze(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else {
+                              // Inizializza la lista delle note se è vuota
+                              if (_noteControllers.isEmpty) {
+                                for (var licenza in snapshot.data!) {
+                                  var controller = TextEditingController(text: licenza.note);
+                                  _noteControllers[licenza.id!] = controller;
+                                  _isSaveEnabled[licenza.id!] = ValueNotifier(false);
 
-                              controller.addListener(() {
-                                // Aggiorna il ValueNotifier in base al contenuto del campo di testo
-                                _isSaveEnabled[licenza.id!]!.value = controller.text.isNotEmpty;
-                              });
-                            }
-                          }
+                                  controller.addListener(() {
+                                    // Aggiorna il ValueNotifier in base al contenuto del campo di testo
+                                    _isSaveEnabled[licenza.id!]!.value = controller.text.isNotEmpty;
+                                  });
+                                }
+                              }
 
-                          return DataTable(
-                            headingRowHeight: 30,
-                            //columnSpacing: 10,
-                            dataRowMinHeight:  20,
-                            dataRowMaxHeight: 34,
+                              return DataTable(
+                                headingRowHeight: 30,
+                                //columnSpacing: 10,
+                                dataRowMinHeight:  20,
+                                dataRowMaxHeight: 34,
 
-                            border: TableBorder.all(color: Colors.grey),
-                            columns: [
-                              DataColumn(
-                                label: Container(
-                                  width: 140, // Imposta la larghezza se necessario
-                                  child: Text(
-                                    'LICENZA',
-                                    textAlign: TextAlign.center, // Centra il testo
-                                  ),
-                                ),
-                              ),
-                              DataColumn(label: Text('UTILIZZATA')),
-                              DataColumn(
-                                label: Container(
-                                  width: 210, // Imposta la larghezza se necessario
-                                  child: Text(
-                                    'NOTE',
-                                    textAlign: TextAlign.center, // Centra il testo
-                                  ),
-                                ),
-                              ),
-
-                            ],
-                            rows: snapshot.data!.asMap().entries.map((entry) {
-                              int index = entry.key;
-                              LicenzaModel model = entry.value;
-
-                              TextEditingController _controller = TextEditingController(text: model.note);
-                              //bool isModified = false; // Flag per controllare se la nota è stata modificata
-
-
-                              return DataRow(cells: [
-                                DataCell(
-                                    Container(
-                                        width: 140,
-                                      alignment: Alignment.center,
-                                      child: Text(model.descrizione!))),
-                                DataCell(
-                                    Container(//width: 120,
-                                    alignment: Alignment.center,
-                                    child:
-                                    Text(model.utilizzato! ? 'SI' : 'NO'))),
-                                DataCell(
-                                  Container(width: 210,
-                                    alignment: Alignment.centerLeft,
-                                    child: Row(children: [
-
-                                      IconButton(
-                                      onPressed: () {
-    showDialog(
-    context: context,
-    builder: (BuildContext context) {
-    return
-    StatefulBuilder(
-    builder: (context, setState) {
-    // Variabile per memorizzare l'aliquota IVA selezionata
-    return AlertDialog(
-    title: Text('Modifica note'),
-    actions: <Widget>[
-    TextFormField(
-    controller: _controller,
-    decoration: InputDecoration(
-    labelText: 'Note',
-    border: OutlineInputBorder(),
-    ),
-
-    keyboardType: TextInputType.numberWithOptions(decimal: true),
-    ),
-      TextButton(
-        onPressed: () {
-          noteLicenza(model, _controller.text).then((_) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => CreazioneLicenzaPage()),
-            );
-          });;
-
-        },
-        child: Text('Salva note'),
-      ),
-    ]);});});
-
-
-                                      }, icon: Icon(Icons.create, color: Colors.grey),),
-                                      Text(model.note ?? ''),
-                                    ],)//Text(model.note ?? '')
-                                  )
-                                ),
-
-                                  /*TextField(
-                                    controller: TextEditingController(text: notes[index]),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        notes[index] = value; // Aggiorna solo la nota in memoria
-                                        activeSaveIndex = index; // Imposta l'indice attivo quando si digita
-                                      });
-                                    },
-                                  ),*/
-                                    /*TextField(
-                                      controller: _controller,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          activeSaveIndex = index; // Imposta l'indice attivo quando si digita
-                                        });
-                                      },
-                                    ),*/
-                                    /*controller: TextEditingController(
-                                        text: _controller.text),
-                                        onChanged: (value) {
-                                          _controller.text = value;
-                                    },*/
-
-
-                                /*DataCell(
-                                  Container(
-                                    alignment: Alignment.center,
-                                    child: ElevatedButton(
-                                      onPressed: (activeSaveIndex == index) ? () {
-                                        noteLicenza(model, notes[index]).whenComplete(() {
-                                          setState(() {
-                                            //isModified = false;
-                                            // Ricarica i dati o fai altre operazioni se necessario
-                                          });
-                                        });
-                                      } : null, // Disabilita il bottone se non è stato modificato
-                                      child: Text('SALVA'),
+                                border: TableBorder.all(color: Colors.grey),
+                                columns: [
+                                  DataColumn(
+                                    label: Container(
+                                      width: 140, // Imposta la larghezza se necessario
+                                      child: Text(
+                                        'LICENZA',
+                                        textAlign: TextAlign.center, // Centra il testo
+                                      ),
                                     ),
                                   ),
-                                    /*Container(
-                                        alignment: Alignment.center,
-                                        child:
-                                        ElevatedButton(
-                                          onPressed:  (_controller.value.text != model.note) ? () {
-                                            noteLicenza(model, _controller.value.text).whenComplete(() {
-                                                  setState(() {
-                                                    //_editedRowIndex = null; // Resetta la riga in modifica
-                                                  });
-                                                });
-                                            } : null,
-                                          child: Text('SALVA'),
-                                        ),)*/
-                                ),*/
-                              ]);
-                            }).toList(),
-                          );
-                        }
-                      },
+                                  DataColumn(label: Text('UTILIZZATA')),
+                                  DataColumn(
+                                    label: Container(
+                                      width: 210, // Imposta la larghezza se necessario
+                                      child: Text(
+                                        'NOTE',
+                                        textAlign: TextAlign.center, // Centra il testo
+                                      ),
+                                    ),
+                                  ),
+
+                                ],
+                                rows: snapshot.data!.asMap().entries.map((entry) {
+                                  int index = entry.key;
+                                  LicenzaModel model = entry.value;
+
+                                  TextEditingController _controller = TextEditingController(text: model.note);
+                                  //bool isModified = false; // Flag per controllare se la nota è stata modificata
+
+
+                                  return DataRow(cells: [
+                                    DataCell(
+                                        Container(
+                                            width: 140,
+                                            alignment: Alignment.center,
+                                            child: Text(model.descrizione!))),
+                                    DataCell(
+                                        Container(//width: 120,
+                                            alignment: Alignment.center,
+                                            child:
+                                            Text(model.utilizzato! ? 'SI' : 'NO'))),
+                                    DataCell(
+                                        Container(width: 210,
+                                            alignment: Alignment.centerLeft,
+                                            child: Row(children: [
+
+                                              IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return
+                                                          StatefulBuilder(
+                                                              builder: (context, setState) {
+                                                                // Variabile per memorizzare l'aliquota IVA selezionata
+                                                                return AlertDialog(
+                                                                    title: Text('Modifica note'),
+                                                                    actions: <Widget>[
+                                                                      TextFormField(
+                                                                        controller: _controller,
+                                                                        decoration: InputDecoration(
+                                                                          labelText: 'Note',
+                                                                          border: OutlineInputBorder(),
+                                                                        ),
+
+                                                                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                                                      ),
+                                                                      TextButton(
+                                                                        onPressed: () {
+                                                                          noteLicenza(model, _controller.text).then((_) {
+                                                                            Navigator.pushReplacement(
+                                                                              context,
+                                                                              MaterialPageRoute(builder: (context) => CreazioneLicenzaPage()),
+                                                                            );
+                                                                          });;
+
+                                                                        },
+                                                                        child: Text('Salva note'),
+                                                                      ),
+                                                                    ]);});});
+
+
+                                                }, icon: Icon(Icons.create, color: Colors.grey),),
+                                              Text(model.note ?? ''),
+                                            ],)//Text(model.note ?? '')
+                                        )
+                                    ),
+                                  ]);
+                                }).toList(),
+                              );
+                            }
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Column(children: [
-                  SizedBox(width: 40),]),
+                    Column(children: [
+                      SizedBox(width: 40),]),
 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                    SizedBox(height: 20),
-                    _buildTextFormField(_licenzaController, 'Licenza',
-                        'Inserisci una licenza'),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 20),
+                        _buildTextFormField(_licenzaController, 'Licenza',
+                            'Inserisci una licenza'),
 
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          createNewLicenza();
-                        }
-                      },
-                      child: Text('CREA', style: TextStyle(color: Colors.white)),
-                      style: ButtonStyle(
-                        backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.red),
-                      ),
-                    ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              createNewLicenza();
+                            }
+                          },
+                          child: Text('CREA', style: TextStyle(color: Colors.white)),
+                          style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.red),
+                          ),
+                        ),
 
-                  ],)
+                      ],)
 
-                ],),
+                  ],),
 
               )
           ),
@@ -320,7 +266,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
           licenze.add(LicenzaModel.fromJson(item));
         }
         // Recuperare tutte le relazioni utenti-interventi
-      return licenze.reversed.toList();
+        return licenze.reversed.toList();
       } else {
 
         throw Exception('Failed to load data from API: ${response.statusCode}');
@@ -336,32 +282,41 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   Widget _buildTextFormField(
       TextEditingController controller, String label, String hintText) {
     return SizedBox(
-      width: 500,
+      width: 600, // Larghezza modificata
       child: TextFormField(
         controller: controller,
+        maxLines: null, // Permette più righe
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
           hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              color: Colors.grey,
-            ),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: Colors.red,
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
             ),
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Campo obbligatorio';
-          }
-          return null;
-        },
       ),
     );
   }
