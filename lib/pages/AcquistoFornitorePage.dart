@@ -315,7 +315,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
     try{
       String prioritaString = TipoMovimentazione.Uscita.toString().split('.').last;
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'data' : selectedDate.toIso8601String(),

@@ -440,6 +440,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       allowSorting: true,
                       source: _dataSource,
                       columnWidthMode: ColumnWidthMode.auto,
+                      /*footer: _dataSource.rows.isEmpty
+                          ?  Text('Nessun risultato')
+                          : null,*/
                       allowColumnsResizing: true,
                       isScrollbarAlwaysShown: true,
                       rowHeight: 40,
@@ -710,6 +713,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         return true;
                       },
                     ))),
+
                 if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti")
                   Flex(
                     direction: Axis.horizontal,

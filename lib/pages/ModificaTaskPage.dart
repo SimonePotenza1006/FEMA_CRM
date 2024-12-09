@@ -535,7 +535,8 @@ class _ModificaTaskPageState
                             ),
                           ),
                           SizedBox(height: 20),
-                          (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
+                          //(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ?
+                          SizedBox(
                             width: 400,
                             child: CheckboxListTile(
                               title: Text(
@@ -564,8 +565,9 @@ class _ModificaTaskPageState
                               ),
                               contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
-                          ) : Container(),
-                          SizedBox(height: 20),// Button
+                          ) ,
+                              //: Container(),
+                          SizedBox(height: 10),// Button
                           if (_condiviso) SizedBox(
                             width: 600,
                             child: DropdownButtonFormField<UtenteModel>(
@@ -621,6 +623,7 @@ class _ModificaTaskPageState
                               },
                             ),
                           ),
+                          SizedBox(height: 10),
                           !(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
                             width: 400,
                             child: CheckboxListTile(

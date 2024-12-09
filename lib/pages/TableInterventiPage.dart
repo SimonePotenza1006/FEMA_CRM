@@ -1380,6 +1380,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
               child: Icon(Icons.filter_list, color: Colors.white,),
               backgroundColor: Colors.red,
             ),
+            SizedBox(height: 45),
           ],
         )
     );
