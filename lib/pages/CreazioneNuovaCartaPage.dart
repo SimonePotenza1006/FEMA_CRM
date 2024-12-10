@@ -230,7 +230,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
-
   void _showErrorDialog() {
     showDialog(
       context: context,
@@ -252,7 +251,4 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       },
     );
   }
-
-
-
 }

@@ -9,6 +9,7 @@ import 'UtenteModel.dart';
 class TaskModel {
   String? id;
   String? titolo;
+  String? riferimento;
   String? descrizione;
   DateTime? data_creazione;
   DateTime? data_conclusione;
@@ -23,6 +24,7 @@ class TaskModel {
   TaskModel(
       this.id,
       this.titolo,
+      this.riferimento,
       this.descrizione,
       this.data_creazione,
       this.data_conclusione,
@@ -39,6 +41,7 @@ class TaskModel {
     var map = <String, dynamic>{
       'id' : id,
       'titolo' : titolo,
+      'riferimento' : riferimento,
       'descrizione' : descrizione,
       'data_creazione' : data_creazione?.toIso8601String(),
       'data_conclusione' : data_conclusione?.toIso8601String(),
@@ -56,6 +59,7 @@ class TaskModel {
   TaskModel.fromMap(Map<String, dynamic> map){
     id = map['id'];
     titolo = map['titolo'];
+    riferimento = map['riferimento'];
     descrizione = map['descrizione'];
     map['data_creazione'] != null ? DateTime.parse(map['data_creazione']) : null;
     map['data_conclusione'] != null ? DateTime.parse(map['data_conclusione']) : null;
@@ -71,6 +75,7 @@ class TaskModel {
   Map<String, dynamic> toJson() =>{
     'id' : id,
     'titolo' : titolo,
+    'riferimento' : riferimento,
     'descrizione' : descrizione,
     'data_creazione' : data_creazione?.toIso8601String(),
     'data_conclusione' : data_conclusione?.toIso8601String(),
@@ -87,6 +92,7 @@ class TaskModel {
     return TaskModel(
       json['id']?.toString(),
       json['titolo'],
+      json['riferimento'],
       json['descrizione'],
       json['data_creazione'] != null ? DateTime.parse(json['data_creazione']) : null,
       json['data_conclusione'] != null ? DateTime.parse(json['data_conclusione']) : null,
