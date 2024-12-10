@@ -51,7 +51,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> createAgente() async {
-    final url = Uri.parse('$ipaddress/api/agente');
+    final url = Uri.parse('$ipaddressProva/api/agente');
     final body = jsonEncode({
       'nome': nomeController.text.toString(),
       'cognome': cognomeController.text.toString(),
@@ -87,7 +87,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/azienda');
+      var apiUrl = Uri.parse('$ipaddressProva/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

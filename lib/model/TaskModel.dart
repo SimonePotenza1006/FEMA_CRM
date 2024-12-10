@@ -14,6 +14,7 @@ class TaskModel {
   DateTime? data_conclusione;
   bool? concluso;
   UtenteModel? utente;
+  UtenteModel? utentecreate;
   TipoTaskModel? tipologia;
   bool? condiviso;
   bool? accettato;
@@ -27,6 +28,7 @@ class TaskModel {
       this.data_conclusione,
       this.concluso,
       this.utente,
+      this.utentecreate,
       this.tipologia,
       this.condiviso,
       this.accettato,
@@ -42,6 +44,7 @@ class TaskModel {
       'data_conclusione' : data_conclusione?.toIso8601String(),
       'concluso' : concluso,
       'utente' : utente?.toMap(),
+      'utentecreate' : utentecreate?.toMap(),
       'tipologia' : tipologia?.toMap(),
       'condiviso' : condiviso,
       'accettato' : accettato,
@@ -58,6 +61,7 @@ class TaskModel {
     map['data_conclusione'] != null ? DateTime.parse(map['data_conclusione']) : null;
     concluso = map['concluso'];
     utente = map['utente'] != null ? UtenteModel.fromMap(map['utente']) : null;
+    utentecreate = map['utentecreate'] != null ? UtenteModel.fromMap(map['utentecreate']) : null;
     tipologia = map['tipologia'] != null ? TipoTaskModel.fromMap(map['tipologia']) : null;
     condiviso = map['condiviso'];
     accettato = map['accettato'];
@@ -72,6 +76,7 @@ class TaskModel {
     'data_conclusione' : data_conclusione?.toIso8601String(),
     'concluso' : concluso,
     'utente' : utente?.toMap(),
+    'utentecreate' : utentecreate?.toMap(),
     'tipologia' : tipologia?.toJson(),
     'condiviso' : condiviso,
     'accettato' : accettato,
@@ -87,6 +92,7 @@ class TaskModel {
       json['data_conclusione'] != null ? DateTime.parse(json['data_conclusione']) : null,
       json['concluso'],
       json['utente'] != null ? UtenteModel.fromJson(json['utente']) : null,
+      json['utentecreate'] != null ? UtenteModel.fromJson(json['utentecreate']) : null,
       json['tipologia'] != null ? TipoTaskModel.fromJson(json['tipologia']) : null,
       json['condiviso'],
       json['accettato'],

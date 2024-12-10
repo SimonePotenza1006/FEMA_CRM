@@ -233,7 +233,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveUtente() async {
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/utente'),
+          Uri.parse('$ipaddressProva/api/utente'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -261,7 +261,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -302,7 +302,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllRuoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/ruolo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/ruolo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

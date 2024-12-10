@@ -827,7 +827,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     if(selectedTipologia?.descrizione == "TAGLIANDO"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/veicolo'),
+          Uri.parse('$ipaddressProva/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -867,7 +867,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if(selectedTipologia?.descrizione == "INVERSIONE GOMME") {
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/veicolo'),
+          Uri.parse('$ipaddressProva/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -907,7 +907,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if(selectedTipologia?.descrizione == "POLIZZA") {
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/veicolo'),
+          Uri.parse('$ipaddressProva/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -947,7 +947,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if(selectedTipologia?.descrizione == "SOSTITUZIONE GOMME"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/veicolo'),
+          Uri.parse('$ipaddressProva/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -987,7 +987,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if (selectedTipologia?.descrizione == "BOLLO"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/veicolo'),
+          Uri.parse('$ipaddressProva/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -1027,7 +1027,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else if (selectedTipologia?.descrizione == "REVISIONE"){
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/veicolo'),
+          Uri.parse('$ipaddressProva/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -1067,7 +1067,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } else {
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/veicolo'),
+          Uri.parse('$ipaddressProva/api/veicolo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id': selectedVeicolo?.id,
@@ -1123,7 +1123,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (differenza_sostituzione_gomme >= (int.parse(veicolo.soglia_sostituzione.toString()) - 100)) {
           try {
             final response = await http.post(
-              Uri.parse('$ipaddress/api/noteTecnico'),
+              Uri.parse('$ipaddressProva/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
@@ -1140,7 +1140,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (differenza_inversione_gomme >= (int.parse(veicolo.soglia_inversione.toString()) - 100)) {
           try {
             final response = await http.post(
-              Uri.parse('$ipaddress/api/noteTecnico'),
+              Uri.parse('$ipaddressProva/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
@@ -1157,7 +1157,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (differenza_tagliando >= (int.parse(veicolo.soglia_tagliando.toString()) - 100)) {
           try {
             final response = await http.post(
-              Uri.parse('$ipaddress/api/noteTecnico'),
+              Uri.parse('$ipaddressProva/api/noteTecnico'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': widget.utente.toMap(),
@@ -1182,7 +1182,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     var notaS = _noteSpesaController.text.isEmpty ? _noteSpesaController.text : null;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/spesaVeicolo'),
+        Uri.parse('$ipaddressProva/api/spesaVeicolo'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': DateTime.now().toIso8601String(),
@@ -1206,7 +1206,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllSpese() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/spesaVeicolo/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/spesaVeicolo/ordered');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -1246,7 +1246,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllVeicoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/veicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -1307,7 +1307,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         for (var foto in pickedImages) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/spesa/${int.parse(
+            Uri.parse('$ipaddressProva/api/immagine/spesa/${int.parse(
                 spesa.idSpesaVeicolo.toString())}'),
           );
           request.files.add(
@@ -1394,7 +1394,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getTipologieSpesa() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaSpesaVeicolo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaSpesaVeicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

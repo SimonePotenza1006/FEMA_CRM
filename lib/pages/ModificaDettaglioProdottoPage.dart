@@ -62,7 +62,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/prodotto'),
+        Uri.parse('$ipaddressProva/api/prodotto'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
