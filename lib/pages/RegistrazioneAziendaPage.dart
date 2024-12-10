@@ -23,25 +23,38 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
-  bool _areFieldsFilled = false;
+
 
   @override
   void initState() {
     super.initState();
-    _updateAreFieldsFilled();
+
+    // Aggiungi listener ai controller per rilevare i cambiamenti nei campi
+    denominazioneController.addListener(_checkForm);
+    luogoLavoroController.addListener(_checkForm);
+    partitaIVAController.addListener(_checkForm);
+    pecController.addListener(_checkForm);
+    recapitoFatturazioneController.addListener(_checkForm);
+    emailController.addListener(_checkForm);
+    telefonoController.addListener(_checkForm);
+    sitoController.addListener(_checkForm);
   }
 
-  void _updateAreFieldsFilled() {
-    setState(() {
-      _areFieldsFilled = denominazioneController.text.trim().isNotEmpty &&
-          luogoLavoroController.text.trim().isNotEmpty &&
-          partitaIVAController.text.trim().isNotEmpty &&
-          pecController.text.trim().isNotEmpty &&
-          recapitoFatturazioneController.text.trim().isNotEmpty &&
-          emailController.text.trim().isNotEmpty &&
-          sitoController.text.trim().isNotEmpty &&
-          telefonoController.text.trim().isNotEmpty;
-    });
+  void _checkForm() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    denominazioneController.removeListener(_checkForm);
+    luogoLavoroController.removeListener(_checkForm);
+    partitaIVAController.removeListener(_checkForm);
+    pecController.removeListener(_checkForm);
+    recapitoFatturazioneController.removeListener(_checkForm);
+    emailController.removeListener(_checkForm);
+    telefonoController.removeListener(_checkForm);
+    sitoController.removeListener(_checkForm);
+    super.dispose();
   }
 
   Future<void> createAzienda() async {
@@ -105,141 +118,21 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 ),
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: denominazioneController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'Denominazione',
-                  hintText: 'Inserisci la denominazione',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(denominazioneController, "Denominazione", "Inserisci il nome dell\'azienda"),
               SizedBox(height: 20),
-              TextFormField(
-                controller: luogoLavoroController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'Luogo di lavoro',
-                  hintText: 'Inserisci il luogo di lavoro',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(luogoLavoroController, "Luogo di lavoro", "Inserisci il luogo di lavoro dell\'azienda"),
               SizedBox(height: 20),
-              TextFormField(
-                controller: partitaIVAController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'Partita IVA',
-                  hintText: 'Inserisci la partita IVA',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(partitaIVAController, "Partita IVA", "Inserisci la P.IVA dell\'azienda"),
               SizedBox(height: 20),
-              TextFormField(
-                controller: pecController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'PEC',
-                  hintText: 'Inserisci l\'indirizzo PEC',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(pecController, "PEC", "Inserisci la PEC dell\'azienda"),
               SizedBox(height: 20),
-              TextFormField(
-                controller: recapitoFatturazioneController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'Recapito fatturazione elettronica',
-                  hintText: 'Inserisci il recapito di fatturazione elettronica',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(recapitoFatturazioneController, "Recapito fatturazione elettronica", "Inserisci il recapito di fatturazione elettronica dell\'azienda"),
               SizedBox(height: 20),
-              TextFormField(
-                controller: emailController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Inserisci l\'indirizzo email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(emailController, "Email", "Inserisci l\'indirizzo email dell\'azienda"),
               SizedBox(height: 20),
-              TextFormField(
-                controller: telefonoController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'Telefono',
-                  hintText: 'Inserisci il numero di telefono',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(telefonoController, "Telefono", "Inserisci il numero di telefono dell\'azienda"),
               SizedBox(height: 20),
-              TextFormField(
-                controller: sitoController,
-                onChanged: (_) => _updateAreFieldsFilled(),
-                decoration: InputDecoration(
-                  labelText: 'Sito',
-                  hintText: 'Inserisci il sito web',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.red),
-                  ),
-                ),
-              ),
+              _buildTextFormField(sitoController, "Sito web", "Inserisci il sito web dell\'azienda"),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -255,7 +148,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                         recapitoFatturazioneController.clear();
                         emailController.clear();
                         sitoController.clear();
-                        _updateAreFieldsFilled();
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -270,7 +162,16 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: _areFieldsFilled ? () => createAzienda() : null,
+                    onPressed: denominazioneController.text.isNotEmpty &&
+                        luogoLavoroController.text.isNotEmpty &&
+                        partitaIVAController.text.isNotEmpty &&
+                        pecController.text.isNotEmpty &&
+                        recapitoFatturazioneController.text.isNotEmpty &&
+                        emailController.text.isNotEmpty &&
+                        sitoController.text.isNotEmpty &&
+                        telefonoController.text.isNotEmpty
+                        ? createAzienda
+                        : null, // Disabilita il pulsante se uno dei campi è vuoto
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
@@ -290,4 +191,48 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
     );
   }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
+      child: TextFormField(
+        controller: controller,
+        maxLines: null, // Permette più righe
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ), // Funzione di validazione
+      ),
+    );
+  }
+
+
 }

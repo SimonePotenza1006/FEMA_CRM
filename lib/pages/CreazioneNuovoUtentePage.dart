@@ -285,19 +285,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     if (value == null || value.isEmpty) {
       return 'Campo obbligatorio';
     }
-
-    // Controllo sulla lunghezza e sul prefisso
     if (value.length != 27 || !value.startsWith('IT')) {
       return 'Inserisci un IBAN italiano valido';
     }
-
-    // Controllo che gli altri caratteri siano alfanumerici
     final ibanRegex = RegExp(r'^[A-Z0-9]+$');
     if (!ibanRegex.hasMatch(value.substring(2))) {
       return 'Inserisci un IBAN italiano valido';
     }
-
-    return null; // Se tutto è corretto, non c'è errore
+    return null;
   }
 
   Future<void> getAllRuoli() async {
@@ -320,28 +315,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       print('Errore durante la chiamata all\'API: $e');
       _showErrorDialog();
     }
-  }
-
-  void _showErrorDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Errore di connessione'),
-          content: Text(
-            'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.',
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Widget _buildTextFormField(
@@ -387,4 +360,30 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
     );
   }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Errore di connessione'),
+          content: Text(
+            'Impossibile caricare i dati dall\'API. Controlla la tua connessione internet e riprova.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
 }

@@ -30,7 +30,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   @override
   void initState() {
     super.initState();
-    _updateAreFieldsFilled();
+
     getAllAziende();
   }
 
@@ -129,7 +129,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     if (checksumValue != 1) {
       return false;
     }
-
     return true;
   }
 

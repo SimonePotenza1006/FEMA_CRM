@@ -1518,16 +1518,7 @@ class InterventoDataSource extends DataGridSource {
           : (intervento.assegnato == true && intervento.concluso == true)
           ? "CONCLUSO"
           : "///";
-
-      //List<UtenteModel> utenti = _interventoUtentiMap[intervento.id] ?? [];
-      //String utentiString = utenti.isNotEmpty ? utenti.map((utente) => utente.nomeCompleto()).join(', ') : 'NESSUNO';
       String utentiNomi = '';
-      // if (_interventoUtentiMap.containsKey(intervento.id)) {
-      //   List<UtenteModel> utenti = _interventoUtentiMap[intervento.id]!;
-      //   utentiNomi = utenti.map((utente) => utente.nomeCompleto()).join(', ');
-      // } else {
-      //   utentiNomi = 'NESSUNO'; // or any other default value
-      // }
       rows.add(DataGridRow(
         cells: [
           DataGridCell<InterventoModel>(columnName: 'intervento', value: intervento),
@@ -1550,26 +1541,14 @@ class InterventoDataSource extends DataGridSource {
                       StatefulBuilder(
                           builder: (context, setState){
                             return AlertDialog(
-                              title: Text('Inserisci un codice'.toUpperCase()),
+                              title: Text('INSERIMENTO CODICE DANEA'.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold),),
                               actions: <Widget>[
-                                TextFormField(
-                                  controller: codiceDaneaController,
-                                  decoration: InputDecoration(
-                                    labelText: 'CODICE DANEA',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                ),
+                                _buildTextFormField(codiceDaneaController, "CODICE DANEA", 'Inserisci il codice danea'),
                                 TextButton(
                                   onPressed: () {
                                     saveCodice(intervento);
-                                    //     .then((_) {
-                                    //   Navigator.pushReplacement(
-                                    //     context,
-                                    //     MaterialPageRoute(builder: (context) => TableInterventiPage()),
-                                    //   );
-                                    // });
                                   },
-                                  child: Text('Salva codice'.toUpperCase()),
+                                  child: Text('Salva codice'.toUpperCase(), style: TextStyle(color: Colors.red),),
                                 ),
                               ],
                             );
@@ -1647,6 +1626,7 @@ class InterventoDataSource extends DataGridSource {
                             Row(
                               children: [
                                 Checkbox(
+                                  activeColor: Colors.red,
                                   value: !hasIva,
                                   onChanged: (bool? value) {
                                     setState(() {
@@ -1664,6 +1644,7 @@ class InterventoDataSource extends DataGridSource {
                             Row(
                               children: [
                                 Checkbox(
+                                  activeColor: Colors.red,
                                   value: hasIva,
                                   onChanged: (bool? value) {
                                     setState(() {
@@ -1684,6 +1665,7 @@ class InterventoDataSource extends DataGridSource {
                                     Row(
                                       children: [
                                         Checkbox(
+                                          activeColor: Colors.red,
                                           value: ventidue,
                                           onChanged: (bool? value) {
                                             setState(() {
@@ -1701,6 +1683,7 @@ class InterventoDataSource extends DataGridSource {
                                     Row(
                                       children: [
                                         Checkbox(
+                                          activeColor: Colors.red,
                                           value: dieci,
                                           onChanged: (bool? value) {
                                             setState(() {
@@ -1718,6 +1701,7 @@ class InterventoDataSource extends DataGridSource {
                                     Row(
                                       children: [
                                         Checkbox(
+                                          activeColor: Colors.red,
                                           value: quattro,
                                           onChanged: (bool? value) {
                                             setState(() {
@@ -1739,12 +1723,6 @@ class InterventoDataSource extends DataGridSource {
                               onPressed: () {
                                 print('IVA passata: $selectedIva'); // Stampa l'IVA prima di chiamare saveImporto
                                 saveImporto(intervento, hasIva, selectedIva);
-                                // .then((_) {
-                                //   Navigator.pushReplacement(
-                                //     context,
-                                //     MaterialPageRoute(builder: (context) => TableInterventiPage()),
-                                //   );
-                                // });
                               },
                               child: Text('Salva importo'),
                             ),
@@ -2196,11 +2174,6 @@ class InterventoDataSource extends DataGridSource {
                   ),
                 ),
               ),
-              // child: Text(
-              //   utenti.isNotEmpty ? utenti.map((utente) =>
-              //       utente.nomeCompleto()).join(', ') : 'NESSUNO',
-              //   overflow: TextOverflow.ellipsis,
-              // ),
             );
           } else {
             return GestureDetector(
@@ -2232,6 +2205,49 @@ class InterventoDataSource extends DataGridSource {
           }
         }
       }).toList(),
+    );
+  }
+
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText) {
+    return SizedBox(
+      width: 200, // Larghezza modificata
+      child: TextFormField(
+        controller: controller,
+        maxLines: null, // Permette più righe
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ), // Funzione di validazione
+      ),
     );
   }
 }
@@ -2968,7 +2984,7 @@ class _ColumnFilterDialogState extends State<ColumnFilterDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Filtra ${widget.columnName}'),
+      title: Text('FILTRA ${widget.columnName}'),
       content: TextField(
         onSubmitted: (value) {
           widget.onFilterApplied(_controller.text);  // Applica il filtro
@@ -2982,14 +2998,25 @@ class _ColumnFilterDialogState extends State<ColumnFilterDialog> {
           onPressed: () {
             Navigator.of(context).pop(); // Chiudi il dialog senza filtrare
           },
-          child: Text('Annulla'),
+          child: Text('Annulla'.toUpperCase(), style: TextStyle(color: Colors.red)),
         ),
         ElevatedButton(
           onPressed: () {
             widget.onFilterApplied(_controller.text);  // Applica il filtro
             Navigator.of(context).pop();  // Chiudi il dialog
           },
-          child: Text('Filtra'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,  // Imposta il background color a rosso
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),  // Opzionale: per arrotondare gli angoli
+            ),
+          ),
+          child: Text(
+            'Filtra'.toUpperCase(),
+            style: TextStyle(
+              color: Colors.white,  // Imposta il colore del testo a bianco
+            ),
+          ),
         ),
       ],
     );

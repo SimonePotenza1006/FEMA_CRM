@@ -290,7 +290,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 SizedBox(width: 20,)
               ],
             ),
-            onTap: _showVehicleSelectionDialog,
+            onTap: _showFiltersAndGenerateExcelDialog,
           ),
           SizedBox(width: 13),
           Row(
@@ -572,7 +572,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
-
   List<VeicoloModel> getUniqueVeicoli() {
     Map<int, VeicoloModel> veicoloMap = {}; // Usa una mappa per evitare duplicati
     for (var spesa in allSpese) {
@@ -583,84 +582,217 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     return veicoloMap.values.toList();
   }
 
-  void _showVehicleSelectionDialog() async {
-    List<VeicoloModel> uniqueVeicoli = getUniqueVeicoli();
-    VeicoloModel? selectedVeicolo = await showDialog<VeicoloModel>(
+  void _showFiltersAndGenerateExcelDialog() async {
+    DateTime? startDate;
+    DateTime? endDate;
+    bool isIpViaEuropaChecked = false;
+
+    await showDialog<void>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('Seleziona Veicolo'),
-          content: SizedBox(
-            width: 300,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: uniqueVeicoli.length,
-              itemBuilder: (context, index) {
-                VeicoloModel veicolo = uniqueVeicoli[index];
-                return ListTile(
-                  title: Text(veicolo.descrizione ?? 'Sconosciuto'),
-                  onTap: () {
-                    setState(() {
-                      _selectedVeicolo = veicolo;
-                    });
-                    Navigator.pop(context, veicolo);
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Filtri per Esportazione'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Data Inizio:'),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: startDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                          );
+                          if (selectedDate != null) {
+                            setState(() {
+                              startDate = selectedDate;
+                            });
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red, // Sfondo rosso
+                          foregroundColor: Colors.white, // Testo bianco
+                        ),
+                        child: Text(startDate != null
+                            ? DateFormat('dd/MM/yyyy').format(startDate!)
+                            : 'Seleziona'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Data Fine:'),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: endDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                          );
+                          if (selectedDate != null) {
+                            setState(() {
+                              endDate = selectedDate;
+                            });
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red, // Sfondo rosso
+                          foregroundColor: Colors.white, // Testo bianco
+                        ),
+                        child: Text(endDate != null
+                            ? DateFormat('dd/MM/yyyy').format(endDate!)
+                            : 'Seleziona'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  CheckboxListTile(
+                    activeColor: Colors.red,
+                    title: Text('Mostra solo "IP VIA EUROPA"'),
+                    value: isIpViaEuropaChecked,
+                    onChanged: (value) {
+                      setState(() {
+                        isIpViaEuropaChecked = value ?? false;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
                   },
-                );
-              },
-            ),
-          ),
+                  child: Text('Annulla',style: TextStyle(color: Colors.red),),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (startDate != null && endDate != null) {
+                      Navigator.pop(context);
+                      _generateAndDownloadExcel(
+                        selectedDateRange: DateTimeRange(start: startDate!, end: endDate!),
+                        filterIpViaEuropa: isIpViaEuropaChecked,
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Seleziona entrambe le date')),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, // Sfondo rosso
+                    foregroundColor: Colors.white, // Testo bianco
+                  ),
+                  child: Text('Esporta'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
-    if (selectedVeicolo != null) {
-      _generateAndDownloadExcel(selectedVeicolo);
-    }
   }
 
-  Future<void> _generateAndDownloadExcel(VeicoloModel veicolo) async {
+  Future<void> _generateAndDownloadExcel({
+    required DateTimeRange selectedDateRange,
+    required bool filterIpViaEuropa,
+  }) async {
     try {
-      List<SpesaVeicoloModel> filteredSpese = allSpese
-          .where((spesa) =>
-      spesa.veicolo?.id == veicolo.id &&
-          spesa.data != null &&
-          spesa.data!.year == _selectedYear)
-          .toList();
+      print('Filtrando spese dal ${selectedDateRange.start} al ${selectedDateRange.end}');
+      print('Filtro IP VIA EUROPA: $filterIpViaEuropa');
+
+      // Filtra le spese in base ai criteri forniti
+      List<SpesaVeicoloModel> filteredSpese = allSpese.where((spesa) {
+        final hasData = spesa.data != null;
+        final isWithinDateRange = hasData &&
+            spesa.data!.isAfter(selectedDateRange.start.subtract(Duration(days: 1))) &&
+            spesa.data!.isBefore(selectedDateRange.end.add(Duration(days: 1)));
+        final matchesFornitore = !filterIpViaEuropa || spesa.fornitore_carburante == "IP VIA EUROPA";
+
+        if (hasData) {
+          print(
+            'Spesa ${spesa.idSpesaVeicolo}: Data=${spesa.data}, '
+                'Fornitore=${spesa.fornitore_carburante}, '
+                'isWithinDateRange=$isWithinDateRange, '
+                'matchesFornitore=$matchesFornitore',
+          );
+        }
+
+        return isWithinDateRange && matchesFornitore;
+      }).toList();
+
+      print('Spese filtrate trovate: ${filteredSpese.length}');
+
       // Crea un nuovo file Excel
       final excel = exc.Excel.createExcel();
-      // Crea il foglio principale "SpeseVeicolo"
-      exc.Sheet sheetObject = excel['Sheet1'];
-      // Aggiungi intestazioni al foglio
-      sheetObject.appendRow([
-        'Data      ',
-        'Veicolo      ',
-        'Tipologia Spesa        ',
-        'Importo       ',
-        'Chilometraggio        ',
-        'Utente       '
+      final sheet = excel['Sheet1'];
+
+      // Aggiungi intestazioni
+      sheet.appendRow([
+        'Data',
+        'Veicolo',
+        'Tipologia Spesa',
+        'Importo',
+        'Chilometraggio',
+        'Fornitore',
+        'Utente',
       ]);
+
+      // Variabile per il totale
+      double totalImporto = 0.0;
+
       // Aggiungi i dati delle spese filtrate
       for (var spesa in filteredSpese) {
-        sheetObject.appendRow([
-          DateFormat('dd/MM/yyyy').format(spesa.data!),
-          veicolo.descrizione ?? '',
-          spesa.tipologia_spesa?.descrizione ?? '',
-          spesa.importo?.toString() ?? '',
-          spesa.km?.toString() ?? '',
-          spesa.utente?.nomeCompleto() ?? ''
-        ]);
+        if (spesa.data != null) {
+          // Assicurati che importo sia un double
+          final importo = spesa.importo != null ? double.tryParse(spesa.importo!) : 0.0;
+          totalImporto += importo!;
+
+          final row = [
+            DateFormat('dd/MM/yyyy').format(spesa.data!),
+            spesa.veicolo?.descrizione ?? 'N/A',
+            spesa.tipologia_spesa?.descrizione ?? 'N/A',
+            importo.toStringAsFixed(2), // Mostra importo con due cifre decimali
+            spesa.km?.toString() ?? 'N/A',
+            spesa.fornitore_carburante ?? 'N/A',
+            spesa.utente?.nomeCompleto() ?? 'N/A',
+          ];
+
+          // Debug: Verifica la riga prima di aggiungerla
+          print('Aggiungendo riga al foglio Excel: $row');
+
+          sheet.appendRow(row);
+        } else {
+          print('Spesa con ID=${spesa.idSpesaVeicolo} ignorata per mancanza di data.');
+        }
       }
-      Directory? directory;
-      String filePath;
+
+      // Aggiungi riga vuota e riga totale
+      sheet.appendRow([]);
+      sheet.appendRow(['', '', 'Totale:', totalImporto.toStringAsFixed(2)]);
+
+      // Verifica il contenuto del foglio Excel
+      print('Numero di righe scritte nel foglio Excel: ${sheet.rows.length}');
+
+      // Percorso di salvataggio e gestione file
+      String filePath = '';
       try {
-        late String filePath;
         if (Platform.isWindows) {
-          String appDocumentsPath = 'C:\\APP_FEMA\\spese_${_selectedVeicolo!.descrizione!.toString().replaceAll(" ", "_")}';
-          filePath = '$appDocumentsPath\\report_spese_${_selectedYear.toString()}.xlsx';
+          String appDocumentsPath = 'C:\\APP_FEMA\\';
+          filePath = '$appDocumentsPath\\report_spese_${DateTime.now().millisecondsSinceEpoch}.xlsx';
         } else if (Platform.isAndroid) {
           Directory? externalStorageDir = await getExternalStorageDirectory();
           if (externalStorageDir != null) {
-            String appDocumentsPath = externalStorageDir.path;
-            filePath = '$appDocumentsPath/report_registro_cassa.xlsx';
+            filePath = '${externalStorageDir.path}/report_spese.xlsx';
           } else {
             throw Exception('Impossibile ottenere il percorso di salvataggio.');
           }
@@ -671,20 +803,22 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             file.writeAsBytesSync(excelBytes);
           });
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Excel salvato in $filePath')));
+            SnackBar(content: Text('Excel salvato in $filePath')),
+          );
           OpenFile.open(filePath);
         } else {
-          // Gestisci il caso in cui excel.encode() restituisce null
           print('Errore durante la codifica del file Excel');
         }
       } catch (error) {
-        // Gestisci eventuali errori durante il salvataggio del file
         print('Errore durante il salvataggio del file Excel: $error');
       }
-    } catch(e){
-      print('Nope $e');
+    } catch (e) {
+      print('Errore durante la generazione dell\'Excel: $e');
     }
   }
+
+
+
 }
 
 class SpesaDataSource extends DataGridSource {

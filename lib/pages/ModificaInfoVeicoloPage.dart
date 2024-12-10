@@ -79,31 +79,21 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               SizedBox(height: 10),
               _buildTextFormField(_serialeController, 'Seriale', 'Inserisci il seriale del veicolo'),
               SizedBox(height: 10),
-              SizedBox(
-                width: 420,
-                child:GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _scadenzaGps?? DateTime.now().add(Duration(days:1)),
-                      firstDate: DateTime.now().add(Duration(days: 1)),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _scadenzaGps = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data scadenza gps'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _scadenzaGps!= null? DateFormat('dd/MM/yyyy').format(_scadenzaGps!) : ''),
-                    ),
-                  ),
-                ),
+              _buildDatePickerField(
+                context,
+                TextEditingController(
+                    text: _scadenzaGps != null
+                        ? DateFormat('dd/MM/yyyy').format(_scadenzaGps!)
+                        : ''),
+                'Data Scadenza GPS'.toUpperCase(),
+                initialDate: _scadenzaGps ?? DateTime.now().add(Duration(days: 1)),
+                firstDate: DateTime.now().add(Duration(days: 1)),
+                lastDate: DateTime(2100),
+                onDateSelected: (date) {
+                  setState(() {
+                    _scadenzaGps = date;
+                  });
+                },
               ),
               SizedBox(height: 10),
               _buildTextFormField(_chilometraggioController, 'Chilometraggio attuale', 'Inserisci il chilometraggio attuale del veicolo'),
@@ -120,166 +110,89 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               SizedBox(height: 10),
               _buildTextFormField(_sogliaSostituzioneController, 'Soglia sostituzione', 'Inserisci i chilometri da effettuare prima della prossima sostituzione'),
               SizedBox(height: 10),
-              SizedBox(
-                width: 420,
-                child:GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataScadenzaBollo?? DateTime.now().add(Duration(days:1)),
-                      firstDate: DateTime.now().add(Duration(days: 1)),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataScadenzaBollo = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data scadenza bollo'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataScadenzaBollo!= null? DateFormat('dd/MM/yyyy').format(_dataScadenzaBollo!) : ''),
-                    ),
-                  ),
-                ),
+              _buildDatePickerField(
+                context,
+                TextEditingController(
+                    text: _dataScadenzaBollo != null
+                        ? DateFormat('dd/MM/yyyy').format(_dataScadenzaBollo!)
+                        : ''),
+                'Data Scadenza Bollo'.toUpperCase(),
+                initialDate: _dataScadenzaBollo ?? DateTime.now().add(Duration(days: 1)),
+                firstDate: DateTime.now().add(Duration(days: 1)),
+                lastDate: DateTime(2100),
+                onDateSelected: (date) {
+                  setState(() {
+                    _dataScadenzaBollo = date;
+                  });
+                },
               ),
               SizedBox(height: 20),
-              SizedBox(
-                width:420,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataScadenzaPolizza?? DateTime.now().add(Duration(days:1)),
-                      firstDate: DateTime.now().add(Duration(days: 1)),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataScadenzaPolizza = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data scadenza polizza'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataScadenzaPolizza!= null? DateFormat('dd/MM/yyyy').format(_dataScadenzaPolizza!) : ''),
-                    ),
-                  ),
-                ),
+              _buildDatePickerField(
+                context,
+                TextEditingController(
+                    text: _dataScadenzaPolizza != null
+                        ? DateFormat('dd/MM/yyyy').format(_dataScadenzaPolizza!)
+                        : ''),
+                'Data Scadenza Polizza'.toUpperCase(),
+                initialDate: _dataScadenzaPolizza ?? DateTime.now().add(Duration(days: 1)),
+                firstDate: DateTime.now().add(Duration(days: 1)),
+                lastDate: DateTime(2100),
+                onDateSelected: (date) {
+                  setState(() {
+                    _dataScadenzaPolizza = date;
+                  });
+                },
               ),
               SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataTagliando?? DateTime.now().add(Duration(days:1)),
-                      firstDate: DateTime.now().add(Duration(days: 1)),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataTagliando = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data tagliando'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataTagliando!= null? DateFormat('dd/MM/yyyy').format(_dataTagliando!) : ''),
-                    ),
-                  ),
-                ),
+              _buildDatePickerField(
+                context,
+                TextEditingController(
+                    text: _dataTagliando != null
+                        ? DateFormat('dd/MM/yyyy').format(_dataTagliando!)
+                        : ''),
+                'Data Tagliando'.toUpperCase(),
+                initialDate: _dataTagliando ?? DateTime.now().add(Duration(days: 1)),
+                firstDate: DateTime.now().add(Duration(days: 1)),
+                lastDate: DateTime(2100),
+                onDateSelected: (date) {
+                  setState(() {
+                    _dataTagliando = date;
+                  });
+                },
               ),
               SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataRevisione?? DateTime.now().add(Duration(days:1)),
-                      firstDate: DateTime.now().add(Duration(days: 1)),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataRevisione = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data revisione'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataRevisione!= null? DateFormat('dd/MM/yyyy').format(_dataRevisione!) : ''),
-                    ),
-                  ),
-                ),
+              _buildDatePickerField(
+                context,
+                TextEditingController(
+                    text: _dataTagliando != null
+                        ? DateFormat('dd/MM/yyyy').format(_dataTagliando!)
+                        : ''),
+                'Data Tagliando'.toUpperCase(),
+                initialDate: _dataTagliando ?? DateTime.now().add(Duration(days: 1)),
+                firstDate: DateTime.now().add(Duration(days: 1)),
+                lastDate: DateTime(2100),
+                onDateSelected: (date) {
+                  setState(() {
+                    _dataTagliando = date;
+                  });
+                },
               ),
               SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataInversione?? DateTime.now().add(Duration(days:1)),
-                      firstDate: DateTime.now().add(Duration(days: 1)),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataInversione = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data inversione gomme'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataInversione!= null? DateFormat('dd/MM/yyyy').format(_dataInversione!) : ''),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              SizedBox(
-                width: 420,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _dataSostituzione?? DateTime.now().add(Duration(days:1)),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _dataSostituzione = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data sostituzione gomme'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      controller: TextEditingController(text: _dataSostituzione!= null? DateFormat('dd/MM/yyyy').format(_dataSostituzione!) : ''),
-                    ),
-                  ),
-                ),
+              _buildDatePickerField(
+                context,
+                TextEditingController(
+                    text: _dataInversione != null
+                        ? DateFormat('dd/MM/yyyy').format(_dataInversione!)
+                        : ''),
+                'Data Inversione Gomme'.toUpperCase(),
+                initialDate: _dataInversione ?? DateTime.now().add(Duration(days: 1)),
+                firstDate: DateTime.now().add(Duration(days: 1)),
+                lastDate: DateTime(2100),
+                onDateSelected: (date) {
+                  setState(() {
+                    _dataInversione = date;
+                  });
+                },
               ),
               SizedBox(height: 30), // add some space before the button
               Center(
@@ -303,6 +216,65 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       ),
     );
   }
+
+  Widget _buildDatePickerField(
+      BuildContext context, TextEditingController controller, String label,
+      {DateTime? initialDate, DateTime? firstDate, DateTime? lastDate, void Function(DateTime?)? onDateSelected}) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
+      child: GestureDetector(
+        onTap: () {
+          showDatePicker(
+            context: context,
+            initialDate: initialDate ?? DateTime.now(),
+            firstDate: firstDate ?? DateTime.now(),
+            lastDate: lastDate ?? DateTime(2100),
+          ).then((selectedDate) {
+            if (selectedDate != null && onDateSelected != null) {
+              onDateSelected(selectedDate);
+            }
+          });
+        },
+        child: AbsorbPointer(
+          child: TextFormField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: label,
+              labelStyle: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.bold,
+              ),
+              hintText: 'Seleziona una data', // Testo suggerimento
+              filled: true,
+              fillColor: Colors.grey[200], // Sfondo riempito
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Nessun bordo di default
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.redAccent,
+                  width: 2.0, // Larghezza bordo focale
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.grey[300]!,
+                  width: 1.0, // Larghezza bordo abilitato
+                ),
+              ),
+              contentPadding:
+              EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildTextFormField(
       TextEditingController controller, String label, String hintText,
@@ -394,4 +366,5 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
     return response;
   }
+
 }

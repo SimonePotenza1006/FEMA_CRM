@@ -143,33 +143,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           ),
         ],
       ),
-      // floatingActionButton: Stack(
-      //   children: [
-      //     Positioned(
-      //         bottom: 16,
-      //         right: 16,
-      //         child: SpeedDial(
-      //           heroTag: '1',
-      //           animatedIcon: AnimatedIcons.menu_close,
-      //           backgroundColor: Colors.red,
-      //           foregroundColor: Colors.white,
-      //           children: [
-      //             SpeedDialChild(
-      //               child: Icon(Icons.list, color: Colors.white),
-      //               backgroundColor: Colors.red,
-      //               label: 'Report spese'.toUpperCase(),
-      //               onTap: () => Navigator.push(
-      //                 context,
-      //                 MaterialPageRoute(
-      //                   builder: (context) => TableSpeseVeicoliPage(),
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         )
-      //     )
-      //   ],
-      // ),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: Column(
