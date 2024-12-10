@@ -36,6 +36,7 @@ class _CreazioneTaskPageState
   // Controller for the text fields
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _titoloController = TextEditingController();
+  final TextEditingController _riferimentoController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
@@ -312,6 +313,53 @@ class _CreazioneTaskPageState
                                 ),
                               ),
                               hintText: "Inserisci il titolo",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        // Description Field
+                        SizedBox(
+                          width: 600,
+                          child: TextFormField(
+                            controller: _riferimentoController,
+                            maxLines: 5,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: 'Riferimento'.toUpperCase(),
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              hintText: "Inserisci il riferimento",
                               hintStyle: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[500],
@@ -672,6 +720,7 @@ class _CreazioneTaskPageState
           'data_creazione': DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
           'data_conclusione': null,
           'titolo' : titolo,
+          'riferimento': _riferimentoController.text,
           'descrizione': _descrizioneController.text,
           'concluso': false,
           'condiviso': _condiviso,
