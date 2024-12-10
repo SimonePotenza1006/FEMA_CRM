@@ -90,7 +90,6 @@ class _TableTaskPageState extends State<TableTaskPage>{
       print('Nessuna tipologia selezionata, nessuna operazione effettuata.');
       return false;
     }
-
     // Filtra i task con tipologia corrispondente
     List<TaskModel> tasksToDelete = _allCommissioni.where((task) => task.tipologia == selectedTipo).toList();
     bool allDeleted = true;
