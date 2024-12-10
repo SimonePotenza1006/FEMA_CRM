@@ -63,7 +63,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
       isLoading = true; // Inizio del caricamento
     });
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/withMerce');
+      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/withMerce');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -624,7 +624,7 @@ class InterventoDataSource extends DataGridSource{
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

@@ -14,6 +14,7 @@ import '../model/TaskModel.dart';
 import '../model/TipoTaskModel.dart';
 import '../model/UtenteModel.dart';
 import 'ModificaTaskPage.dart';
+import 'PDFTaskPage.dart';
 
 class TableTaskPage extends StatefulWidget{
   final UtenteModel utente;
@@ -37,7 +38,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
   List<TipoTaskModel> allTipi = [];
   List<UtenteModel> allUtenti = [];
   UtenteModel? selectedUtente;
+  UtenteModel? selectedUtenteTipo;
   TextEditingController _descrizioneController = TextEditingController();
+  bool _condivisoTipo = false;
 
   @override
   void dispose() {
@@ -93,7 +96,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     bool allDeleted = true;
 
     for (var task in tasksToDelete) {
-      final String url = '$ipaddress/api/task/${task.id}';
+      final String url = '$ipaddressProva/api/task/${task.id}';
       try {
         final response = await http.delete(Uri.parse(url));
         if (response.statusCode == 200 || response.statusCode == 204) {
@@ -139,7 +142,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
       // Step 2: Elimina la tipologia
       print('Task eliminati. Procedo con l\'eliminazione della tipologia.');
-      final String url = '$ipaddress/api/tipoTask/${selectedTipoToDelete.id}';
+      final String url = '$ipaddressProva/api/tipoTask/${selectedTipoToDelete.id}';
       final response = await http.delete(Uri.parse(url));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -214,7 +217,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -255,7 +258,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -301,8 +304,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
     try {
       // Decidi l'endpoint in base al cognome dell'utente
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
-          ? Uri.parse('$ipaddress/api/task/all')
-          : Uri.parse('$ipaddress/api/task/utente/' + widget.utente!.id!);
+          ? Uri.parse('$ipaddressProva/api/task/all')
+          : Uri.parse('$ipaddressProva/api/task/utente/' + widget.utente!.id!);
       print('Chiamata API verso: $apiUrl');
       var response = await http.get(apiUrl);
       print('Risposta ricevuta con status code: ${response.statusCode}');
@@ -390,7 +393,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         }).toList();
                       },
                     ),
-                    SizedBox(width: 2),
+                    //SizedBox(width: 2),
                     Text('${selectedUtente != null ? "${selectedUtente?.nomeCompleto()!.toUpperCase()}" : "UTENTE"}', style: TextStyle(color: Colors.white)),
                     SizedBox(width: 6)
                   ],
@@ -410,6 +413,17 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       MaterialPageRoute(builder: (context) => CreazioneTaskPage(utente: widget.utente,)));
                 },
               ),
+              IconButton(
+                  color: Colors.white,
+                  icon: Icon(Icons.download), onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PDFTaskPage(timbrature: _filteredCommissioni),
+                  ),
+                );
+              }),
               IconButton(
                 icon: Icon(
                   Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -440,6 +454,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       allowSorting: true,
                       source: _dataSource,
                       columnWidthMode: ColumnWidthMode.auto,
+                      /*footer: _dataSource.rows.isEmpty
+                          ?  Text('Nessun risultato')
+                          : null,*/
                       allowColumnsResizing: true,
                       isScrollbarAlwaysShown: true,
                       rowHeight: 40,
@@ -569,7 +586,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               ),
                             ),
                             child: Text(
-                              'Data\ncreazione',
+                              'DATA\nCREAZIONE',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
@@ -611,7 +628,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               ),
                             ),
                             child: Text(
-                              'Titolo',
+                              'TITOLO',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
@@ -653,7 +670,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               ),
                             ),
                             child: Text(
-                              'Utente',
+                              'UTENTE',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
@@ -674,7 +691,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               ),
                             ),
                             child: Text(
-                              'Accettato',
+                              'ACCETTATO',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
@@ -695,7 +712,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               ),
                             ),
                             child: Text(
-                              'Data conclusione',
+                              'DATA\nCONCLUSIONE',
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
@@ -710,7 +727,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         return true;
                       },
                     ))),
-                if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti")
+
+                if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3')
                   Flex(
                     direction: Axis.horizontal,
                     children: [
@@ -724,31 +742,59 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                 final isSelected = _currentSheet == int.parse(tipo.id!);
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      _changeSheet(int.parse(tipo.id!));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                      backgroundColor: isSelected
-                                          ? Colors.red // Colore rosso per il pulsante selezionato
-                                          : Colors.grey[300], // Colore grigio chiaro per i non selezionati
-                                      foregroundColor: isSelected
-                                          ? Colors.white // Testo bianco per il pulsante selezionato
-                                          : Colors.black, // Testo nero per i non selezionati
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0),
-                                        side: isSelected
-                                            ? BorderSide(color: Colors.red, width: 2.0) // Bordo rosso
-                                            : BorderSide.none, // Nessun bordo
+                                  child:
+                                Container(
+                                //width: 120, // Larghezza del pulsante
+                                height: 50, // Altezza del pulsante
+                                child:
+                                Stack(
+                                    alignment: Alignment.center, // Allinea il pulsante al centro
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          _changeSheet(int.parse(tipo.id!));
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                          backgroundColor: isSelected
+                                              ? Colors.red // Colore rosso per il pulsante selezionato
+                                              : Colors.grey[300], // Colore grigio chiaro per i non selezionati
+                                          foregroundColor: isSelected
+                                              ? Colors.white // Testo bianco per il pulsante selezionato
+                                              : Colors.black, // Testo nero per i non selezionati
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(8.0),
+                                            side: isSelected
+                                                ? BorderSide(color: Colors.red, width: 2.0) // Bordo rosso
+                                                : BorderSide.none, // Nessun bordo
+                                          ),
+                                          elevation: isSelected ? 6.0 : 2.0, // Più elevazione se selezionato
+                                        ),
+                                        child: Text(
+                                          tipo.descrizione!.toUpperCase(), // Mostra la descrizione
+                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
                                       ),
-                                      elevation: isSelected ? 6.0 : 2.0, // Più elevazione se selezionato
-                                    ),
-                                    child: Text(
-                                      tipo.descrizione!, // Mostra la descrizione
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                    ),
-                                  ),
+                                      (tipo.utente != null && tipo.utente != tipo.utentecreate) ? Positioned(
+                                        right: -5, // Posizione a destra (puoi regolare questo valore)
+                                        top: -5, // Posizione in alto (puoi regolare questo valore)
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            //color: isSelected ? Colors.red : Colors.grey[300], // Colore di sfondo dell'icona
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0), // Padding per l'icona
+                                            child: Icon(
+                                              Icons.send, // Icona di notifica
+                                              color: Colors.teal,//isSelected ? Colors.white : Colors.black, // Colore dell'icona
+                                              size: 22, // Dimensione dell'icona
+                                            ),
+                                          ),
+                                        ),
+                                      ) : Container(),
+                                    ],
+                                  )),
                                 );
                               }).toList(),
                             ),
@@ -760,8 +806,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
               ],
             ),
           );}),
-            floatingActionButton: widget.utente.cognome == "Mazzei" ||
-                widget.utente.cognome == "Chiriatti" ?
+            floatingActionButton: (widget.utente.cognome == "Mazzei" ||
+                widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3') ?
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -806,7 +852,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                           title: Text('Conferma Eliminazione'),
                                           content: Text(
                                             'Questa operazione cancellerà la tipologia "${selectedTipoToDelete?.descrizione}" '
-                                                'e tutte le task con la tipologia scelta. Sei sicuro di voler procedere all\'eliminazione?',
+                                                'e tutte le task ad essa associate. Sei sicuro di voler procedere all\'eliminazione?',
                                           ),
                                           actions: [
                                             TextButton(
@@ -858,12 +904,13 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           builder: (BuildContext context, StateSetter setState) {
                             return AlertDialog(
                               title: Text(
-                                'Crea una nuova Tipologia',
+                                'CREA NUOVA TIPOLOGIA',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
+                                  SizedBox(height: 10),
                                   TextFormField(
                                     controller: _descrizioneController,
                                     onChanged: (value) {
@@ -871,11 +918,84 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                       setState(() {});
                                     },
                                     decoration: InputDecoration(
-                                      labelText: 'Nome della nuova tipologia',
+                                      labelText: 'NOME NUOVA TIPOLOGIA',
                                       border: OutlineInputBorder(),
                                     ),
                                   ),
                                   SizedBox(height: 12),
+                                  SizedBox(
+                                    width: 200,
+                                    child: CheckboxListTile(
+                                      title: Text('CONDIVIDI'),
+                                      value: _condivisoTipo,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _condivisoTipo = value!;
+                                          /*if (_condiviso) {
+                                            _condivisoController.clear();
+                                          }*/
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  SizedBox(height: 15),// But
+                                  if (_condivisoTipo) SizedBox(
+                                    //width: 400,
+                                    child: DropdownButtonFormField<UtenteModel>(
+                                      value: selectedUtenteTipo,
+                                      onChanged: (UtenteModel? newValue) {
+                                        setState(() {
+                                          selectedUtenteTipo = newValue;
+                                        });
+                                      },
+                                      items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
+                                        return DropdownMenuItem<UtenteModel>(
+                                          value: utente,
+                                          child: Text(
+                                            utente.nomeCompleto()!,
+                                            style: TextStyle(fontSize: 14, color: Colors.black87),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      decoration: InputDecoration(
+                                        labelText: 'SELEZIONA UTENTE',
+                                        labelStyle: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[200],
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                            color: Colors.redAccent,
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                            color: Colors.grey[300]!,
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null) {
+                                          return 'SELEZIONA UN UTENTE';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+
+
                                 ],
                               ),
                               actions: <Widget>[
@@ -885,7 +1005,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                     saveTipologia();
                                   }
                                       : null, // Disabilita il pulsante se il testo è vuoto
-                                  child: Text('Salva Tipologia'),
+                                  child: Text('SALVA TIPOLOGIA'),
                                 ),
                               ],
                             );
@@ -908,10 +1028,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/tipoTask'),
+        Uri.parse('$ipaddressProva/api/tipoTask'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
-          'descrizione' : _descrizioneController.text
+          'descrizione' : _descrizioneController.text,
+          'utente' : _condivisoTipo ? selectedUtenteTipo : null,
+          'utentecreate' : widget.utente
         })
       );
       Navigator.pop(context);
@@ -940,10 +1062,11 @@ class _TableTaskPageState extends State<TableTaskPage>{
           final tipoIdStr = tipoId.toString(); // Converte il tipo selezionato in stringa
 
           final taskUserId = task.utente?.id; // ID dell'utente nella commissione
+          final taskUsercreateId = task.utentecreate?.id; // ID dell'utentecreate
           final selectedUserId = selectedUtente!.id; // ID dell'utente selezionato
           //final matches = taskUserId == selectedUserId; // Confronta gli ID
 
-          final matches = (taskId == tipoIdStr && taskUserId == selectedUserId); // Confronta come stringhe
+          final matches = (taskId == tipoIdStr && (taskUserId == selectedUserId || taskUsercreateId == selectedUserId)); // Confronta come stringhe
           print('Filtering task: $taskId matches: $matches'); // Debug
           return matches;
         })
@@ -964,8 +1087,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
       // Filtra le commissioni in base all'ID dell'utente
       _filteredCommissioni = _allCommissioni.where((commissione) {
         final taskUserId = commissione.utente?.id; // ID dell'utente nella commissione
+        final taskUsercreateId = commissione.utentecreate?.id; // ID dell'utentecreate
         final selectedUserId = utente.id; // ID dell'utente selezionato
-        final matches = taskUserId == selectedUserId; // Confronta gli ID
+        final matches = taskUserId == selectedUserId || taskUsercreateId == selectedUserId; // Confronta gli ID
         print('Filtering task by user: $taskUserId matches: $matches'); // Debug
         return matches;
       }).toList();
@@ -1039,7 +1163,7 @@ class TaskDataSource extends DataGridSource{
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1072,7 +1196,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1106,7 +1230,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1137,7 +1261,7 @@ class TaskDataSource extends DataGridSource{
   Future<void> deleteTask(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/task/$id'),
+        Uri.parse('$ipaddressProva/api/task/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1161,8 +1285,8 @@ class TaskDataSource extends DataGridSource{
 
   Future<void> getAllTask() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/all')
-          : Uri.parse('$ipaddress/api/task/utente/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/all')
+          : Uri.parse('$ipaddressProva/api/task/utente/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);

@@ -172,7 +172,7 @@ class _ModificaTaskPageState
     final dir = await getApplicationDocumentsDirectory();
     String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
     final player = ap.AudioPlayer();
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
+    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
     http.Response? response;
     try {
 
@@ -205,7 +205,7 @@ class _ModificaTaskPageState
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -232,7 +232,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -535,7 +535,8 @@ class _ModificaTaskPageState
                             ),
                           ),
                           SizedBox(height: 20),
-                          (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
+                          //(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ?
+                          SizedBox(
                             width: 400,
                             child: CheckboxListTile(
                               title: Text(
@@ -564,8 +565,9 @@ class _ModificaTaskPageState
                               ),
                               contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
-                          ) : Container(),
-                          SizedBox(height: 20),// Button
+                          ) ,
+                              //: Container(),
+                          SizedBox(height: 10),// Button
                           if (_condiviso) SizedBox(
                             width: 600,
                             child: DropdownButtonFormField<UtenteModel>(
@@ -585,7 +587,7 @@ class _ModificaTaskPageState
                                 );
                               }).toList(),
                               decoration: InputDecoration(
-                                labelText: 'SELEZIONA TECNICO',
+                                labelText: 'SELEZIONA UTENTE',
                                 labelStyle: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey[600],
@@ -621,6 +623,7 @@ class _ModificaTaskPageState
                               },
                             ),
                           ),
+                          SizedBox(height: 10),
                           !(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
                             width: 400,
                             child: CheckboxListTile(
@@ -682,6 +685,7 @@ class _ModificaTaskPageState
                               contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
                           ),
+                          SizedBox(height: 10),
                           FutureBuilder<List<Uint8List>>(
                             future: _futureImages,
                             builder: (context, snapshot) {
@@ -860,7 +864,7 @@ class _ModificaTaskPageState
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.task.id,
@@ -873,6 +877,7 @@ class _ModificaTaskPageState
           'accettato':  _condiviso ? (selectedUtente != null && selectedUtente?.toMap() != widget.task.utente) ? false :
               _accettato : true,//_accettato,
           'tipologia': _selectedTipo.toString().split('.').last,
+          'utentecreate': widget.task.utentecreate?.toMap(),// _condiviso ? selectedUtente?.toMap() : widget.utente,
           'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
@@ -889,7 +894,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
