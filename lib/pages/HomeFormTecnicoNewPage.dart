@@ -82,6 +82,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
 
         }
         setState(() {
+          print('??? '+int.parse(tipi.first.id!).toString());
           tipoIdGlobal = int.parse(tipi.first.id!);
           //allTipi = tipi;
         });

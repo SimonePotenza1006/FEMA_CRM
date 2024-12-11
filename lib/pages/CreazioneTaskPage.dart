@@ -208,7 +208,7 @@ class _CreazioneTaskPageState
   Widget _buildImagePreview() {
     print('hjgfddfg');
     return SizedBox(
-      width: 200,
+      //width: 200,
       height: 150,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -750,6 +750,7 @@ class _CreazioneTaskPageState
   }
 
   Future<void> saveTaskPlusPics(TaskModel task) async {
+    print('qnt foto '+pickedImages.length.toString());
     //final data = await createTask();
     /*try {
       if(data == null){
@@ -787,7 +788,7 @@ class _CreazioneTaskPageState
           print('Errore: Il percorso del file non è valido');
         }
       }
-      pickedImages.clear();
+      //pickedImages.clear();
     } catch (e) {
       print('Errore durante l\'invio del file: $e');
     }
@@ -836,7 +837,7 @@ class _CreazioneTaskPageState
           print('Errore: Il percorso del file audio non è valido');
         }
         //}
-        pickedImages.clear();
+        //pickedImages.clear();
       } catch (e) {
         print('Errore durante l\'invio del file audio: $e');
       }
