@@ -338,7 +338,7 @@ class DbHelper{
     }
   }
 
-  Future<List<String>> getFilesnameNoleggio() async {
+  Future<List<String>> getFilesnamePreventivi() async {
     try {
       final response = await http.get(Uri.parse('$ipaddressProva/api/pdf/preventiviServizi'));
 

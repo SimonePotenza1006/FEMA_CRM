@@ -26,7 +26,7 @@ class _MenuPreventiviLiberiPageState extends State<MenuPreventiviLiberiPage>{
   }
 
   Future<void> getFilesName() async{
-    listfiles= await dbHelper?.getFilesnameNoleggio();
+    listfiles= await dbHelper?.getFilesnamePreventivi();
   }
 
   void _navigateToPage(int index) {

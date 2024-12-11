@@ -827,7 +827,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                               size: 18, // Dimensione dell'icona
                                             ),
                                           Text(
-                                            ' '+ ((widget.utente.id != tipo.utente!.id) ? tipo.utente!.nome! : tipo.utentecreate!.nome!), // Mostra la descrizione
+                                            ' '+ ((widget.utente.id != tipo.utente!.id) ? tipo.utente!.nome! + " " + tipo.utente!.cognome!.substring(0,1) + ".": tipo.utentecreate!.nome!), // Mostra la descrizione
                                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                                           ),],) : Container()
                                         ],)
@@ -1251,7 +1251,6 @@ class TaskDataSource extends DataGridSource{
           ),
         );
       }
-
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }

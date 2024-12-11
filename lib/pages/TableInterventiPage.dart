@@ -260,7 +260,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 0: // Tutti (esclusi gli annullati)
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
             return intervento.annullato != true; // Escludi annullati
           })
               .toList();
@@ -268,7 +268,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 1: // Non conclusi
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
             return intervento.annullato != true && // Escludi annullati
                 intervento.concluso != true &&
                 intervento.orario_fine == null &&
@@ -278,7 +278,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 2: // Conclusi non saldati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
                 //intervento.tipologia?.id != "6" &&
@@ -289,7 +289,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 3: // Conclusi e saldati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
                 //intervento.tipologia?.id != "6" &&
@@ -300,7 +300,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 4: // Non conclusi e saldati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 !(intervento.concluso ?? false) &&
                 intervento.tipologia?.id != "6" &&
@@ -311,7 +311,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 5: // Solo annullati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
             return intervento.annullato == true; // Solo annullati
           })
               .toList();
@@ -326,14 +326,14 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 0: // Tutti (esclusi gli annullati)
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
           return intervento.annullato != true; // Escludi annullati
         })
             .toList();
       case 1: // Non conclusi
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
           return intervento.annullato != true && // Escludi annullati
               intervento.concluso != true &&
               intervento.tipologia?.id != "6" &&
@@ -343,7 +343,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 2: // Conclusi non saldati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
               //intervento.tipologia?.id != "6" &&
@@ -353,7 +353,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 3: // Conclusi e saldati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
               //intervento.tipologia?.id != "6" &&
@@ -363,7 +363,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 4: // Non conclusi e saldati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               !(intervento.concluso ?? false) &&
               intervento.tipologia?.id != "6" &&
@@ -373,21 +373,19 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 5: // Solo annullati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
           return intervento.annullato == true; // Solo annullati
         })
             .toList();
       default: // Default: Tutti (esclusi gli annullati)
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
           return intervento.annullato != true; // Escludi annullati
         })
             .toList();
     }
   }
-
-
 
   void filterInterventiByTipologia(String tipologia) {
     final lowerCaseQuery = tipologia.toLowerCase();
@@ -408,7 +406,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   void filterInterventi(String query) {
     final lowerCaseQuery = query.toLowerCase();
-
     setState(() {
       _filteredInterventi = _allInterventi.where((intervento) {
         final cliente = intervento.cliente?.denominazione?.toLowerCase() ?? '';

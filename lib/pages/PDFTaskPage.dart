@@ -37,7 +37,7 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
   late Future<Uint8List> _pdfFuture;
   List<RelazionePreventivoProdottiModel> allProdotti = [];
   GlobalKey globalKey = GlobalKey();
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<TaskModel> marcasss = [];
   int totore=0;
@@ -59,7 +59,8 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Generazione PDF report TASK'),
+        backgroundColor: Colors.red,
+        title: Text('Generazione PDF report TASK', style: TextStyle(color: Colors.white)),
       ),
       body: FutureBuilder<Uint8List>(
         future: _pdfFuture,
@@ -84,7 +85,7 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
   // Function to get unique users with time entries
 
   Future<Uint8List> makePdf()  async {
-   // calcolaOreLavoro(widget.timbrature);
+    // calcolaOreLavoro(widget.timbrature);
     //calcolaOreLavoroMese(widget.timbrature);
     try {
       final pdf = pw.Document();
@@ -109,89 +110,80 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
             pw.Table(
               border: pw.TableBorder.all(),
               columnWidths: {
-                0: pw.FixedColumnWidth(100),
+                0: pw.FixedColumnWidth(80),
                 1: pw.FixedColumnWidth(170),
-                2: pw.FixedColumnWidth(120),
+                2: pw.FixedColumnWidth(150),
                 3: pw.FixedColumnWidth(100),
-                4: pw.FixedColumnWidth(100),
+                4: pw.FixedColumnWidth(90),
                 5: pw.FixedColumnWidth(100),
               },
               children: [
                 pw.TableRow(
                   children: [
-    pw.Padding(
-    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-    child: pw.Text('DATA CREAZIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
-    pw.Padding(
-    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-    child: pw.Text('TITOLO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
-    pw.Padding(
-    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-    child: pw.Text('RIFERIMENTO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
-    pw.Padding(
-    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-    child: pw.Text('UTENTE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
-    pw.Padding(
-    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-    child: pw.Text('ACCETTATO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
-    pw.Padding(
-    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-    child: pw.Text('DATA CONCLUSIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+                    pw.Padding(
+                        padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+                        child: pw.Text('DATA CREAZIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+                    pw.Padding(
+                        padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+                        child: pw.Text('TITOLO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+                    pw.Padding(
+                        padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+                        child: pw.Text('RIFERIMENTO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+                    pw.Padding(
+                        padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+                        child: pw.Text('UTENTE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+                    pw.Padding(
+                        padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+                        child: pw.Text('ACCETTATO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+                    pw.Padding(
+                        padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+                        child: pw.Text('DATA CONCLUSIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
                     //pw.Text('TITOLO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                   ],
                 ),
-          for (var task in marcasss)
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-                  child: pw.Text(DateFormat('dd/MM/yyyy').format(task.data_creazione!),
-                    style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
-                  ),
-                ),
-                pw.Padding(
-                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-                  child: pw.Text(task.titolo.toString(),
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
-                  ),
-                ),
-                pw.Padding(
-                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-                  child: pw.Text(task.riferimento != null ? task.riferimento.toString() : '//',
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
-                  ),
-                ),
-                pw.Padding(
-                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-                  child: pw.Text(task.utente!.nomeCompleto()!,
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
-                  ),
-                ),
-                pw.Padding(
-                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-                  child: pw.Text(task.accettato! ? 'ACCETTATO' : 'NON ACCETTATO',
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
-                  ),
-                ),
-                pw.Padding(
-                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
-                  child: pw.Text(task.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(task.data_conclusione!) : 'NON CONCLUSO',
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
-                  ),
-                ),
+                for (var task in marcasss)
 
-              ],
-            ),
+
+                  pw.TableRow(
+                    children: [
+                      createCellWithLine(
+                        text: DateFormat('dd/MM/yyyy').format(task.data_creazione!),
+                        isConcluded: task.concluso!,
+                      ),
+                      createCellWithLine(
+                        text: task.titolo.toString(),
+                        isConcluded: task.concluso!,
+                      ),
+                      createCellWithLine(
+                        text: task.riferimento != null ? task.riferimento.toString() : '//',
+                        isConcluded: task.concluso!,
+                      ),
+                      createCellWithLine(
+                        text: task.utente!.nomeCompleto()!,
+                        isConcluded: task.concluso!,
+                      ),
+                      createCellWithLine(
+                        text: task.accettato! ? 'ACCETTATO' : 'NON ACCETTATO',
+                        isConcluded: task.concluso!,
+                      ),
+                      createCellWithLine(
+                        text: task.data_conclusione != null
+                            ? DateFormat('dd/MM/yyyy').format(task.data_conclusione!)
+                            : 'N.C.',
+                        isConcluded: task.concluso!,
+                      ),
+                    ],
+                  ),
+
+
+
+
+
+
 
                 //...rows, // Aggiungiamo tutte le righe generate
               ],
             ),
-
-
-
-
-
-
           ],
         ),
       );
@@ -203,6 +195,37 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
       rethrow;
     }
   }
+
+  pw.Widget createCellWithLine({
+    required String text,
+    required bool isConcluded,
+  }) {
+    // Se il testo supera i 20 caratteri, lo troncamo a 20
+    String displayText = text.length > 36 ? text.substring(0, 36)+"..." : text;
+
+    return pw.Stack(
+      alignment: pw.Alignment.center,
+      children: [
+        // Linea orizzontale se "concluso"
+        if (isConcluded)
+          pw.Divider(
+            thickness: 0.1, // Spessore linea
+            color: PdfColors.black, // Colore linea
+          ),
+        // Testo normale sopra la linea
+        pw.Padding(
+          padding: pw.EdgeInsets.all(3),
+          child: pw.Text(
+            displayText,
+            style: pw.TextStyle(
+              fontSize: 6,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
 
 
 }
