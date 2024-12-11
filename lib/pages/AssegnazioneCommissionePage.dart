@@ -149,7 +149,7 @@ class _AssegnazioneCommissionePageState
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/commissione'),
+        Uri.parse('$ipaddress/api/commissione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': data, // Utilizza la data formattata
@@ -173,7 +173,7 @@ class _AssegnazioneCommissionePageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

@@ -148,7 +148,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveCarta() async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/cartadicredito'),
+        Uri.parse('$ipaddress/api/cartadicredito'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -210,7 +210,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllTipologieCarta() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiacarta');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiacarta');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

@@ -81,7 +81,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -102,7 +102,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -123,7 +123,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -144,7 +144,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -177,7 +177,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
     try {
       while (!allDataLoaded) {
-        var apiUrl = Uri.parse('$ipaddressProva/api/intervento/paged?page=$currentPage&size=$size');
+        var apiUrl = Uri.parse('$ipaddress/api/intervento/paged?page=$currentPage&size=$size');
         print('Chiamata API alla pagina $currentPage con size $size');
         var response = await http.get(apiUrl);
 
@@ -237,7 +237,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -260,7 +260,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 0: // Tutti (esclusi gli annullati)
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
             return intervento.annullato != true; // Escludi annullati
           })
               .toList();
@@ -268,7 +268,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 1: // Non conclusi
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
             return intervento.annullato != true && // Escludi annullati
                 intervento.concluso != true &&
                 intervento.orario_fine == null &&
@@ -278,7 +278,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 2: // Conclusi non saldati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
                 //intervento.tipologia?.id != "6" &&
@@ -289,7 +289,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 3: // Conclusi e saldati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 (intervento.concluso ?? false) &&
                 //intervento.tipologia?.id != "6" &&
@@ -300,7 +300,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 4: // Non conclusi e saldati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
             return intervento.annullato != true && // Escludi annullati
                 !(intervento.concluso ?? false) &&
                 intervento.tipologia?.id != "6" &&
@@ -311,7 +311,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         case 5: // Solo annullati
           _filteredInterventi = _allInterventi
               .where((intervento) {
-            print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
             return intervento.annullato == true; // Solo annullati
           })
               .toList();
@@ -326,14 +326,14 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 0: // Tutti (esclusi gli annullati)
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
           return intervento.annullato != true; // Escludi annullati
         })
             .toList();
       case 1: // Non conclusi
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
           return intervento.annullato != true && // Escludi annullati
               intervento.concluso != true &&
               intervento.tipologia?.id != "6" &&
@@ -343,7 +343,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 2: // Conclusi non saldati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
               //intervento.tipologia?.id != "6" &&
@@ -353,7 +353,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 3: // Conclusi e saldati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               (intervento.concluso ?? false) &&
               //intervento.tipologia?.id != "6" &&
@@ -363,7 +363,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 4: // Non conclusi e saldati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
           return intervento.annullato != true && // Escludi annullati
               !(intervento.concluso ?? false) &&
               intervento.tipologia?.id != "6" &&
@@ -373,21 +373,19 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       case 5: // Solo annullati
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
           return intervento.annullato == true; // Solo annullati
         })
             .toList();
       default: // Default: Tutti (esclusi gli annullati)
         return _allInterventi
             .where((intervento) {
-          print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
           return intervento.annullato != true; // Escludi annullati
         })
             .toList();
     }
   }
-
-
 
   void filterInterventiByTipologia(String tipologia) {
     final lowerCaseQuery = tipologia.toLowerCase();
@@ -408,7 +406,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   void filterInterventi(String query) {
     final lowerCaseQuery = query.toLowerCase();
-
     setState(() {
       _filteredInterventi = _allInterventi.where((intervento) {
         final cliente = intervento.cliente?.denominazione?.toLowerCase() ?? '';
@@ -1391,7 +1388,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddressProva/api/gruppi'),
+          Uri.parse('$ipaddress/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1923,7 +1920,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1976,7 +1973,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2036,7 +2033,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,

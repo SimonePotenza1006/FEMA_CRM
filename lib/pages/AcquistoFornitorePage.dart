@@ -36,7 +36,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
 
   Future<void> getAllFornitori() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];
@@ -315,7 +315,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
     try{
       String prioritaString = TipoMovimentazione.Uscita.toString().split('.').last;
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'data' : selectedDate.toIso8601String(),
