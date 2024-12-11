@@ -44,6 +44,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   TextEditingController _descrizioneController = TextEditingController();
   bool _condivisoTipo = false;
   int? tipoIdGlobal;
+  List<String>? tipotaskdaacc = [];
 
   @override
   void dispose() {
@@ -221,9 +222,19 @@ class _TableTaskPageState extends State<TableTaskPage>{
         _filteredCommissioni = _allCommissioni.toList();
         print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
       }*/
+      //List<String> ids = [];
 
+      // Verifica se almeno un elemento soddisfa la condizione e aggiungi gli id
+      if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+        tipotaskdaacc = _allCommissioni
+            .where((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)
+            .map((element) => element.tipologia!.id).cast<String>()
+            .toList();
+      }
+
+      //_filteredCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id ? element.tipologia.id));
       _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, List.from(allUtenti));
-      print('Datasource inizializzato con ${_filteredCommissioni.length} task.');
+      print(tipotaskdaacc!.length.toString()+' Datasource inizializzato con ${_filteredCommissioni.length} task.');
     });
     print('Inizializzazione completata.');
   }
@@ -354,6 +365,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
             _filteredCommissioni = commissioni;
             print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
           }*/
+          if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+            tipotaskdaacc = _allCommissioni
+                .where((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)
+                .map((element) => element.tipologia!.id).cast<String>()
+                .toList();
+          }
           _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, allUtenti);
           print('Datasource aggiornato.');
         });
@@ -787,12 +804,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                 final isSelected = tipoIdGlobal == int.parse(tipo.id!);
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                  child:
-                                Container(
+                                  //child: Container(
                                 //width: 120, // Larghezza del pulsante
                                 //height: 50, // Altezza del pulsante
-                                child:
-                                Stack(
+                                child: Container(
+                                clipBehavior: Clip.none, // Permette all'icona di uscire dal contorno
+                                child: Stack(
                                     alignment: Alignment.center, // Allinea il pulsante al centro
                                     children: [
                                       ElevatedButton(
@@ -827,12 +844,15 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                               size: 18, // Dimensione dell'icona
                                             ),
                                           Text(
-                                            ' '+ ((widget.utente.id != tipo.utente!.id) ? tipo.utente!.nome! + " " + tipo.utente!.cognome!.substring(0,1) + ".": tipo.utentecreate!.nome!), // Mostra la descrizione
+                                            ' '+ ((widget.utente.id != tipo.utente!.id) ? tipo.utente!.nome! + " " + tipo.utente!.cognome!.substring(0,1) + ".":
+                                            tipo.utentecreate!.nome! + " " + tipo.utentecreate!.cognome!.substring(0,1) + "."), // Mostra la descrizione
                                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                                           ),],) : Container()
                                         ],)
                                       ),
-                                      /*(tipo.utente != null && tipo.utente != tipo.utentecreate) ? Positioned(
+                                      //(tipo.utente != null && tipo.utente != tipo.utentecreate) ?
+                                      (tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id)) ?
+                                      Positioned(
                                         right: -5, // Posizione a destra (puoi regolare questo valore)
                                         top: -5, // Posizione in alto (puoi regolare questo valore)
                                         child: Container(
@@ -843,15 +863,15 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                           child: Padding(
                                             padding: const EdgeInsets.all(4.0), // Padding per l'icona
                                             child: Icon(
-                                              Icons.send, // Icona di notifica
-                                              color: Colors.teal,//isSelected ? Colors.white : Colors.black, // Colore dell'icona
-                                              size: 22, // Dimensione dell'icona
+                                              Icons.warning, // Icona di notifica
+                                              color: Colors.amber,//isSelected ? Colors.white : Colors.black, // Colore dell'icona
+                                              size: 15, // Dimensione dell'icona
                                             ),
                                           ),
                                         ),
-                                      ) : Container(),*/
+                                      ) : Container(),
                                     ],
-                                  )),
+                                  ))//),
                                 );
                               }).toList(),
                             ),
@@ -1135,7 +1155,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
       }
 
       print('Filtered _filteredCommissioni count: ${_filteredCommissioni.length}'); // Debug
-
+      if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+        tipotaskdaacc = _allCommissioni
+            .where((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)
+            .map((element) => element.tipologia!.id).cast<String>()
+            .toList();
+      }
       // Aggiorna la tabella
       _dataSource.updateData(_filteredCommissioni);
     });
