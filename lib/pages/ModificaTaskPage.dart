@@ -64,7 +64,7 @@ class _ModificaTaskPageState
     super.initState();
     _descrizioneController = TextEditingController(text: widget.task.descrizione);
     _titoloController = TextEditingController(text: widget.task.titolo);
-    _riferimentoController = TextEditingController(text: widget.task.descrizione);
+    _riferimentoController = TextEditingController(text: widget.task.riferimento);
     _condiviso = widget.task.condiviso!;
     _concluso = widget.task.concluso!;
     _accettato = widget.task.accettato!;
@@ -239,7 +239,11 @@ class _ModificaTaskPageState
         var jsonData = jsonDecode(response.body);
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
-          tipi.add(TipoTaskModel.fromJson(item));
+          if (widget.utente.cognome! == "Mazzei" ||
+              (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id)
+              || TipoTaskModel.fromJson(item).utente == null
+              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
+            tipi.add(TipoTaskModel.fromJson(item));
         }
         setState(() {
           allTipi = tipi;
@@ -438,7 +442,7 @@ class _ModificaTaskPageState
                             width: 600,
                             child: TextFormField(
                               controller: _riferimentoController,
-                              maxLines: 5,
+                              maxLines: 2,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
@@ -919,6 +923,7 @@ class _ModificaTaskPageState
           'data_creazione': widget.task.data_creazione!.toIso8601String(),//DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
           'data_conclusione': widget.task.data_conclusione != null ? widget.task.data_conclusione!.toIso8601String() : null,//null,
           'titolo' : _titoloController.text,
+          'riferimento': _riferimentoController.text,
           'descrizione': _descrizioneController.text,
           'concluso': _concluso,
           'condiviso': _condiviso,

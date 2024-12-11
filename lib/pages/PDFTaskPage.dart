@@ -109,17 +109,34 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
             pw.Table(
               border: pw.TableBorder.all(),
               columnWidths: {
-                0: pw.FixedColumnWidth(200),
-                1: pw.FixedColumnWidth(100),
+                0: pw.FixedColumnWidth(100),
+                1: pw.FixedColumnWidth(170),
+                2: pw.FixedColumnWidth(120),
+                3: pw.FixedColumnWidth(100),
+                4: pw.FixedColumnWidth(100),
+                5: pw.FixedColumnWidth(100),
               },
               children: [
                 pw.TableRow(
                   children: [
-                    pw.Text('DATA CREAZIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('TITOLO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('UTENTE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('ACCETTATO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    pw.Text('DATA CONCLUSIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+    pw.Padding(
+    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+    child: pw.Text('DATA CREAZIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+    pw.Padding(
+    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+    child: pw.Text('TITOLO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+    pw.Padding(
+    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+    child: pw.Text('RIFERIMENTO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+    pw.Padding(
+    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+    child: pw.Text('UTENTE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+    pw.Padding(
+    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+    child: pw.Text('ACCETTATO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
+    pw.Padding(
+    padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+    child: pw.Text('DATA CONCLUSIONE', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8))),
                     //pw.Text('TITOLO', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                   ],
                 ),
@@ -127,33 +144,39 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
             pw.TableRow(
               children: [
                 pw.Padding(
-                  padding: pw.EdgeInsets.all(5), // Imposta il padding desiderato
+                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
                   child: pw.Text(DateFormat('dd/MM/yyyy').format(task.data_creazione!),
-                    style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough,) : pw.TextStyle()
+                    style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
                   ),
                 ),
                 pw.Padding(
-                  padding: pw.EdgeInsets.all(5), // Imposta il padding desiderato
+                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
                   child: pw.Text(task.titolo.toString(),
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough,) : pw.TextStyle()
+                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
                   ),
                 ),
                 pw.Padding(
-                  padding: pw.EdgeInsets.all(5), // Imposta il padding desiderato
+                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
+                  child: pw.Text(task.riferimento != null ? task.riferimento.toString() : '//',
+                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
+                  ),
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
                   child: pw.Text(task.utente!.nomeCompleto()!,
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough,) : pw.TextStyle()
+                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
                   ),
                 ),
                 pw.Padding(
-                  padding: pw.EdgeInsets.all(5), // Imposta il padding desiderato
+                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
                   child: pw.Text(task.accettato! ? 'ACCETTATO' : 'NON ACCETTATO',
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough,) : pw.TextStyle()
+                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
                   ),
                 ),
                 pw.Padding(
-                  padding: pw.EdgeInsets.all(5), // Imposta il padding desiderato
+                  padding: pw.EdgeInsets.all(3), // Imposta il padding desiderato
                   child: pw.Text(task.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(task.data_conclusione!) : 'NON CONCLUSO',
-                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough,) : pw.TextStyle()
+                      style: task.concluso! ? pw.TextStyle(decoration: pw.TextDecoration.lineThrough, fontSize: 8) : pw.TextStyle(fontSize: 8)
                   ),
                 ),
 

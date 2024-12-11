@@ -16,6 +16,8 @@ import '../main.dart';
 import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
+import '../model/TaskModel.dart';
+import '../model/TipoTaskModel.dart';
 import '../model/UtenteModel.dart';
 import 'CalendarioPage.dart';
 import 'CalendarioUtentePage.dart';
@@ -43,17 +45,104 @@ class HomeFormSegreteriaMobilePage extends StatefulWidget{
 class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobilePage>{
   DateTime selectedDate = DateTime.now();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String formattedDate = intl.DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
   int _lastClickedIndex = 0;
   Map<int, int> _menuItemClickCount = {};
+  late int tipoIdGlobal;
 
 
   @override
   void initState() {
     super.initState();
     saveIngresso();
+    getAllTasks();
+    getAllTipi();
+  }
+
+  Future<void> getAllTasks() async {
+    try {
+      String userId = widget.userData!.id.toString();
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/task/utente/$userId'));
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        List<TaskModel> tasks = [];
+        for (var item in responseData) {
+          TaskModel task = TaskModel.fromJson(item);
+          if (task.accettato == false && task.utentecreate!.id != widget.userData!.id) {
+            tasks.add(task);
+          }
+        }
+        if (tasks.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Attenzione"),
+                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Chiude l'alert
+                    },
+                    child: Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      print('Error fetching commissioni: $e');
+    }
+  }
+
+  Future<void> getAllTipi() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipoTaskModel> tipi = [];
+        for(var item in jsonData){
+          if (widget.userData!.cognome! == "Mazzei" ||
+              (TipoTaskModel.fromJson(item).utentecreate!.id == widget.userData!.id)
+              || TipoTaskModel.fromJson(item).utente == null
+              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.userData!.id))
+            tipi.add(TipoTaskModel.fromJson(item));
+
+        }
+        setState(() {
+          tipoIdGlobal = int.parse(tipi.first.id!);
+          //allTipi = tipi;
+        });
+      } else {
+        throw Exception(
+            'Failed to load tipi task data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Error fetching tipi task data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Future<void> saveIngresso() async{
@@ -344,7 +433,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData!)),
+                        MaterialPageRoute(builder: (context) => TableTaskPage(
+                          utente: widget.userData!, selectedUtente: widget.userData!, tipoIdGlobal: tipoIdGlobal,)),
                       );
                     },
                   ),

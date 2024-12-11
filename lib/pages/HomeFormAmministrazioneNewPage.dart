@@ -38,6 +38,7 @@ import '../model/OrdinePerInterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/TaskModel.dart';
 import '../model/TicketModel.dart';
+import '../model/TipoTaskModel.dart';
 import '../model/TipologiaInterventoModel.dart';
 import '../model/UtenteModel.dart';
 import '../model/VeicoloModel.dart';
@@ -92,6 +93,7 @@ class _HomeFormAmministrazioneNewPageState
   DateTime selectedDate = DateTime.now();
   Map<int, int> _menuItemClickCount = {};
   bool scadenze = false;
+  late int tipoIdGlobal;
 
   @override
   void initState() {
@@ -111,6 +113,53 @@ class _HomeFormAmministrazioneNewPageState
     getAllInterventiBySettore();
     getAllTasks();
     checkTickets();
+    getAllTipi();
+  }
+
+  Future<void> getAllTipi() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipoTaskModel> tipi = [];
+        for(var item in jsonData){
+          if (widget.userData.cognome! == "Mazzei" ||
+              (TipoTaskModel.fromJson(item).utentecreate!.id == widget.userData.id)
+              || TipoTaskModel.fromJson(item).utente == null
+              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.userData.id))
+            tipi.add(TipoTaskModel.fromJson(item));
+
+        }
+        setState(() {
+          tipoIdGlobal = int.parse(tipi.first.id!);
+          //allTipi = tipi;
+        });
+      } else {
+        throw Exception(
+            'Failed to load tipi task data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Error fetching tipi task data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Future<void> checkTickets() async{
@@ -159,7 +208,7 @@ class _HomeFormAmministrazioneNewPageState
         List<TaskModel> tasks = [];
         for (var item in responseData) {
           TaskModel task = TaskModel.fromJson(item);
-          if (task.accettato == false) {
+          if (task.accettato == false && task.utentecreate!.id != widget.userData.id) {
             tasks.add(task);
           }
         }
@@ -1366,7 +1415,8 @@ class _HomeFormAmministrazioneNewPageState
                                       ]);*/
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData)),
+                                        MaterialPageRoute(builder: (context) => TableTaskPage(
+                                          utente: widget.userData, selectedUtente: widget.userData, tipoIdGlobal: 9,)),
                                       );
                                     },
                                   ),
@@ -2502,7 +2552,8 @@ class _HomeFormAmministrazioneNewPageState
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData)),//LogisticaPreventiviHomepage(userData: widget.userData)),
+                                          MaterialPageRoute(builder: (context) => TableTaskPage(
+                                              utente: widget.userData, selectedUtente: widget.userData, tipoIdGlobal: tipoIdGlobal,)),//LogisticaPreventiviHomepage(userData: widget.userData)),
                                         );
                                       },
                                     ),

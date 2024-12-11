@@ -277,7 +277,7 @@ class _CreazioneTaskPageState
                         SizedBox(height: 20),
                         // Description Field
                         SizedBox(
-                          width: 450,
+                          width: 600,
                           child: TextFormField(
                             controller: _titoloController,
                             maxLines: null,
@@ -327,7 +327,7 @@ class _CreazioneTaskPageState
                           width: 600,
                           child: TextFormField(
                             controller: _riferimentoController,
-                            maxLines: 5,
+                            maxLines: 2,
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.black87,
@@ -423,6 +423,10 @@ class _CreazioneTaskPageState
                             onChanged: (TipoTaskModel? newValue) {
                               setState(() {
                                 _selectedTipo = newValue;
+                                _selectedTipo?.utente != null ?
+                                  selectedUtente = allUtenti.firstWhere((element) =>
+                                  element.id== (_selectedTipo?.utente!.id != widget.utente.id ? _selectedTipo?.utente!.id! : _selectedTipo?.utentecreate!.id!)) : null;
+                                _selectedTipo?.utente != null ? _condiviso = true : null;
                               });
                             },
                             items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
@@ -482,6 +486,8 @@ class _CreazioneTaskPageState
                                 _condiviso = value!;
                                 if (_condiviso) {
                                   _condivisoController.clear();
+                                } else {
+                                  selectedUtente = null;
                                 }
                               });
                             },
@@ -847,7 +853,11 @@ class _CreazioneTaskPageState
         var jsonData = jsonDecode(response.body);
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
-          tipi.add(TipoTaskModel.fromJson(item));
+          if (widget.utente.cognome! == "Mazzei" ||
+              (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id)
+              || TipoTaskModel.fromJson(item).utente == null
+              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
+            tipi.add(TipoTaskModel.fromJson(item));
         }
         setState(() {
           allTipi = tipi;
