@@ -59,7 +59,8 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Generazione PDF report TASK'),
+        backgroundColor: Colors.red,
+        title: Text('Generazione PDF report TASK', style: TextStyle(color: Colors.white)),
       ),
       body: FutureBuilder<Uint8List>(
         future: _pdfFuture,
