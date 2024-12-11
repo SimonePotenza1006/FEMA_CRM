@@ -53,7 +53,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -172,7 +172,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveNewPassword(String password, UtenteModel utente) async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/utente'),
+        Uri.parse('$ipaddressProva/api/utente'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'id' : utente.id,
