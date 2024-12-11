@@ -21,6 +21,7 @@ import '../main.dart';
 import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
+import '../model/TipoTaskModel.dart';
 import '../model/UtenteModel.dart';
 import 'CalendarioPage.dart';
 import 'CreazioneTicketTecnicoPage.dart';
@@ -46,6 +47,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   String formattedDate = DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
   Map<int, int> _menuItemClickCount = {};
+  late int tipoIdGlobal;
+  List<TipoTaskModel>? tipidaacc;
   // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   // Map<String, dynamic> _deviceData = <String, dynamic>{};
 
@@ -60,6 +63,53 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     }
     saveIngresso();
     getAllTasks();
+    getAllTipi();
+  }
+
+  Future<void> getAllTipi() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<TipoTaskModel> tipi = [];
+        for(var item in jsonData){
+          if (widget.userData!.cognome! == "Mazzei" ||
+              (TipoTaskModel.fromJson(item).utentecreate!.id == widget.userData!.id)
+              || TipoTaskModel.fromJson(item).utente == null
+              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.userData!.id))
+            tipi.add(TipoTaskModel.fromJson(item));
+
+        }
+        setState(() {
+          tipoIdGlobal = int.parse(tipi.first.id!);
+          //allTipi = tipi;
+        });
+      } else {
+        throw Exception(
+            'Failed to load tipi task data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Error fetching tipi task data from API: $e');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   final List<MenuItem> _menuItems = [
@@ -105,10 +155,14 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         List<TaskModel> tasks = [];
         for (var item in responseData) {
           TaskModel task = TaskModel.fromJson(item);
-          if (task.accettato == false) {
+          if (task.accettato == false && task.utentecreate!.id != widget.userData!.id) {
             tasks.add(task);
+            tipidaacc?.add(task.tipologia!);
           }
         }
+        tipidaacc?.map((model) => model.descrizione) // Mappa a descrizioni
+            .toSet() // Converte in un Set per ottenere valori unici
+            .toList();
         if (tasks.isNotEmpty) {
           showDialog(
             context: context,
@@ -351,7 +405,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
         case 6:
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData!)),//InterventoTecnicoForm(userData: widget.userData!)),
+            MaterialPageRoute(builder: (context) => TableTaskPage(
+                utente: widget.userData!, selectedUtente: widget.userData!, tipoIdGlobal: tipoIdGlobal)),//InterventoTecnicoForm(userData: widget.userData!)),
           );
           break;
         case 7:
@@ -1563,7 +1618,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => TableTaskPage(utente: widget.userData!)),//InterventoTecnicoForm(userData: widget.userData!)),
+                                    MaterialPageRoute(builder: (context) => TableTaskPage(
+                                        utente: widget.userData!, selectedUtente: widget.userData!, tipoIdGlobal: tipoIdGlobal)),//InterventoTecnicoForm(userData: widget.userData!)),
                                   );
                                 },
                               ),
