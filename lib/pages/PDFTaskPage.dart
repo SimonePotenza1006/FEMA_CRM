@@ -92,7 +92,6 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
       var assetImage = pw.MemoryImage(
         (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List(),
       );
-
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,

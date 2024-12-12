@@ -5,6 +5,7 @@ import 'package:fema_crm/pages/TableTaskPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audioplayers/audioplayers.dart' as ap;
@@ -168,6 +169,70 @@ class _ModificaTaskPageState
     await _audioPlayer.stop();
     print('Riproduzione audio fermata');
   }*/
+
+  Future<void> savePics() async{
+    try{
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Impedisce la chiusura del dialog premendo fuori
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Caricamento in corso..."),
+              ],
+            ),
+          );
+        },
+      );
+      for(var image in pickedImages){
+        if(image.path.isNotEmpty){
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'task',
+              image.path,
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          var response = await request.send();
+          if(response.statusCode == 200){
+            print('File inviato con successo');
+          } else{
+            print('Errore durante l\'invio del file: ${response.statusCode}');
+          }
+        } else {
+          print('Errore: Il percorso del file non è valido');
+        }
+      }
+      pickedImages.clear();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Successo"),
+            content: Text("Caricamento completato!"),
+            actions: [
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.pop(context); // Torna alla pagina precedente
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch(e){
+      Navigator.pop(context); // Chiudi il dialog di caricamento in caso di errore
+      print('Errore durante l\'invio del file: $e');
+    }
+  }
 
   Future<ap.AudioPlayer> fetchAudio() async {
     final dir = await getApplicationDocumentsDirectory();
@@ -891,7 +956,12 @@ class _ModificaTaskPageState
                           SizedBox(height: 30),
                           ElevatedButton(
                             onPressed: _selectedTipo != null ? () {
-                              salvaTask();
+                              if(pickedImages.isNotEmpty){
+                                savePics();
+                                salvaTask();
+                              } else {
+                                salvaTask();
+                              }
                             } : null,
                             child: Text('SALVA'),
                             style: ElevatedButton.styleFrom(
@@ -912,38 +982,48 @@ class _ModificaTaskPageState
   Future<void> salvaTask() async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
-    //var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
-    //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
+      final body = jsonEncode({
+        'id': widget.task.id,
+        'data_creazione': widget.task.data_creazione!.toIso8601String(),
+        'data_conclusione': widget.task.data_conclusione != null
+            ? widget.task.data_conclusione!.toIso8601String()
+            : null,
+        'titolo': _titoloController.text,
+        'riferimento': _riferimentoController.text,
+        'descrizione': _descrizioneController.text,
+        'concluso': _concluso,
+        'condiviso': _condiviso,
+        'accettato': _condiviso
+            ? (selectedUtente != null && selectedUtente?.toMap() != widget.task.utente)
+            ? false
+            : _accettato
+            : true,
+        'tipologia': _selectedTipo?.toMap(),
+        'utentecreate': widget.task.utentecreate?.toMap(),
+        'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
+      });
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': widget.task.id,
-          'data_creazione': widget.task.data_creazione!.toIso8601String(),//DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
-          'data_conclusione': widget.task.data_conclusione != null ? widget.task.data_conclusione!.toIso8601String() : null,//null,
-          'titolo' : _titoloController.text,
-          'riferimento': _riferimentoController.text,
-          'descrizione': _descrizioneController.text,
-          'concluso': _concluso,
-          'condiviso': _condiviso,
-          'accettato':  _condiviso ? (selectedUtente != null && selectedUtente?.toMap() != widget.task.utente) ? false :
-              _accettato : true,//_accettato,
-          'tipologia': _selectedTipo.toString().split('.').last,
-          'utentecreate': widget.task.utentecreate?.toMap(),// _condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
-        }),
+        body: body,
       );
-      Navigator.of(context).pop();//Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Task salvato con successo!'),
-        ),
-      );
+      if (response.statusCode == 201) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Task salvato con successo!'),
+          ),
+        );
+      } else {
+        print('Errore: la risposta ha restituito uno status code non 200');
+      }
     } catch (e) {
-      print('Errore durante il salvataggio del task $e');
+      // Stampa di debug per verificare eventuali eccezioni
+      print('Errore durante il salvataggio del task: $e');
     }
   }
+
 
   Future<void> getAllUtenti() async {
     try {
