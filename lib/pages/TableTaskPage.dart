@@ -66,7 +66,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => TableTaskPage(
-          utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!)));
+            utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!)));
     /*getAllTask();
     getAllTipi();
     getAllUtenti();*/
@@ -208,16 +208,16 @@ class _TableTaskPageState extends State<TableTaskPage>{
     setState(() {
       print('Inizio filtraggio delle commissioni...');
       //if (widget.utente.cognome! == "Mazzei") {
-        print('Utente Mazzei rilevato. Applicazione del filtro per tipologia id = 9 e cognome Mazzei...');
-        _filteredCommissioni = _allCommissioni.where((task) {
-          print(
-              'Task: ${task.titolo}, Tipologia ID: ${widget.tipoIdGlobal}, Utente : ${selectedUtente!.id}');
+      print('Utente Mazzei rilevato. Applicazione del filtro per tipologia id = 9 e cognome Mazzei...');
+      _filteredCommissioni = _allCommissioni.where((task) {
+        print(
+            'Task: ${task.titolo}, Tipologia ID: ${widget.tipoIdGlobal}, Utente : ${selectedUtente!.id}');
 
-          return task.tipologia?.id! == widget.tipoIdGlobal.toString() &&
-              (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
-          //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
-        }).toList();
-        print('Numero di task filtrati: ${_filteredCommissioni.length}');
+        return task.tipologia?.id! == widget.tipoIdGlobal.toString() &&
+            (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
+        //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
+      }).toList();
+      print('Numero di task filtrati: ${_filteredCommissioni.length}');
       /*} else {
         _filteredCommissioni = _allCommissioni.toList();
         print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
@@ -252,7 +252,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         setState(() {
           allUtenti = utenti;
           //if (widget.utente.cognome! == "Mazzei")
-            //selectedUtente = widget.selectedUtente;//utenti.firstWhere((element) => element.id == widget.utente.id);
+          //selectedUtente = widget.selectedUtente;//utenti.firstWhere((element) => element.id == widget.utente.id);
         });
       } else {
         throw Exception(
@@ -292,8 +292,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
           if (widget.utente.cognome! == "Mazzei" ||
               (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id)
               || TipoTaskModel.fromJson(item).utente == null
-          || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
-          tipi.add(TipoTaskModel.fromJson(item));
+              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
+            tipi.add(TipoTaskModel.fromJson(item));
 
         }
         setState(() {
@@ -354,13 +354,13 @@ class _TableTaskPageState extends State<TableTaskPage>{
           print('Tutte le commissioni assegnate a _allCommissioni: ${_allCommissioni.length} task.');
           // Applica il filtro iniziale per filteredCommissioni se l'utente è Mazzei
           //if (widget.utente.cognome! == "Mazzei") {
-            print('Filtraggio per utente Mazzei con tipologia id = 9...');
-            _filteredCommissioni = commissioni.where((task) {
-              print('Task: ${task.titolo}, Tipologia: ${task.tipologia?.id}, Utente: ${task.utente?.cognome}');
-              return task.tipologia?.id! == tipoIdGlobal.toString() && (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
-              //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
-            }).toList();
-            print('Numero di task filtrati: ${_filteredCommissioni.length}');
+          print('Filtraggio per utente Mazzei con tipologia id = 9...');
+          _filteredCommissioni = commissioni.where((task) {
+            print('Task: ${task.titolo}, Tipologia: ${task.tipologia?.id}, Utente: ${task.utente?.cognome}');
+            return task.tipologia?.id! == tipoIdGlobal.toString() && (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
+            //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
+          }).toList();
+          print('Numero di task filtrati: ${_filteredCommissioni.length}');
           /*} else {
             _filteredCommissioni = commissioni;
             print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
@@ -469,10 +469,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
                 ),
                 onPressed: () {
                   print(selectedUtente!.id.toString()+' bbb '+tipoIdGlobal.toString());
-                   Navigator.pushReplacement(
-                       context,
-                       MaterialPageRoute(builder: (context) => TableTaskPage(
-                         utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,)));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => TableTaskPage(
+                        utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,)));
                   /*getAllTask();
                   getAllTipi();
                   getAllUtenti();*/
@@ -482,158 +482,158 @@ class _TableTaskPageState extends State<TableTaskPage>{
           ),
           body: LayoutBuilder(
               builder: (context, constraints) { return Padding(
-            padding: EdgeInsets.all(10),
-            child: Column(
-              children: [
-                SizedBox(height: 10),
-                Expanded(
-                    child: RefreshIndicator(
-                        onRefresh: _refreshData,
-                        child: isLoading ? Center(child: CircularProgressIndicator()) : SfDataGrid(
-                      //allowPullToRefresh: true,
-                      allowSorting: true,
-                      source: _dataSource,
-                      columnWidthMode: ColumnWidthMode.auto,
-                      /*footer: _dataSource.rows.isEmpty
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Expanded(
+                        child: RefreshIndicator(
+                            onRefresh: _refreshData,
+                            child: isLoading ? Center(child: CircularProgressIndicator()) : SfDataGrid(
+                              //allowPullToRefresh: true,
+                              allowSorting: true,
+                              source: _dataSource,
+                              columnWidthMode: ColumnWidthMode.auto,
+                              /*footer: _dataSource.rows.isEmpty
                           ?  Text('Nessun risultato')
                           : null,*/
-                      allowColumnsResizing: true,
-                      isScrollbarAlwaysShown: true,
-                      rowHeight: 40,
-                      gridLinesVisibility: GridLinesVisibility.both,
-                      headerGridLinesVisibility: GridLinesVisibility.both,
-                      columns: [
-                        GridColumn(
-                          columnName: 'task',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
+                              allowColumnsResizing: true,
+                              isScrollbarAlwaysShown: true,
+                              rowHeight: 40,
+                              gridLinesVisibility: GridLinesVisibility.both,
+                              headerGridLinesVisibility: GridLinesVisibility.both,
+                              columns: [
+                                GridColumn(
+                                  columnName: 'task',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'task',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: _columnWidths['task']?? double.nan,
+                                  minimumWidth: 0,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              'task',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: _columnWidths['task']?? double.nan,
-                          minimumWidth: 0,
-                        ),
-                        GridColumn(
-                          allowSorting: false,
-                          columnName: 'accettatoicon',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 0,
+                                GridColumn(
+                                    allowSorting: false,
+                                    columnName: 'accettatoicon',
+                                    label: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          right: BorderSide(
+                                            color: Colors.grey[300]!,
+                                            width: 0,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                      ),
+                                    ),
+                                    width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['accettatoicon']?? double.nan,
+                                    minimumWidth: 60//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              '',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['accettatoicon']?? double.nan,
-                          minimumWidth: 60//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
-                        ),
-                        GridColumn(
-                          allowSorting: false,
-                          columnName: 'completed',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 0,
+                                GridColumn(
+                                  allowSorting: false,
+                                  columnName: 'completed',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 0,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
+                                  minimumWidth: 60,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              '',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
-                          minimumWidth: 60,
-                        ),
-                        GridColumn(
-                          allowSorting: false,
-                          columnName: 'delete',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 0,
+                                GridColumn(
+                                  allowSorting: false,
+                                  columnName: 'delete',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 0,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
+                                  minimumWidth: 60,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              '',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
-                          minimumWidth: 60,
-                        ),
-                        GridColumn(
-                          allowSorting: false,
-                          columnName: 'condividi',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 0,
+                                GridColumn(
+                                  allowSorting: false,
+                                  columnName: 'condividi',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 0,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['condividi']?? double.nan,
+                                  minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              '',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['condividi']?? double.nan,
-                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
-                        ),
-                        GridColumn(
-                          columnName: 'data_creazione',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
+                                GridColumn(
+                                  columnName: 'data_creazione',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'DATA\nCREAZIONE',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_creazione']?? double.nan,
+                                  minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              'DATA\nCREAZIONE',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_creazione']?? double.nan,
-                          minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
-                        ),
-                        /*GridColumn(
+                                /*GridColumn(
                       columnName: 'data_conclusione',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -654,49 +654,49 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       width: _columnWidths['data_conclusione']?? double.nan,
                       minimumWidth: 150,
                     ),*/
-                        GridColumn(
-                          columnName: 'titolo',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
+                                GridColumn(
+                                  columnName: 'titolo',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'TITOLO',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 170 : 300,//_columnWidths['titolo']?? double.nan,
+                                  minimumWidth: (constraints.maxWidth < 460) ? 170 : 300,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              'TITOLO',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 170 : 300,//_columnWidths['titolo']?? double.nan,
-                          minimumWidth: (constraints.maxWidth < 460) ? 170 : 300,
-                        ),
-                        GridColumn(
-                          columnName: 'riferimento',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
+                                GridColumn(
+                                  columnName: 'riferimento',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'RIFERIMENTO',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 170 : 300,//_columnWidths['titolo']?? double.nan,
+                                  minimumWidth: (constraints.maxWidth < 460) ? 170 : 300,
                                 ),
-                              ),
-                            ),
-                            child: Text(
-                              'RIFERIMENTO',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 170 : 300,//_columnWidths['titolo']?? double.nan,
-                          minimumWidth: (constraints.maxWidth < 460) ? 170 : 300,
-                        ),
-                        /*GridColumn(
+                                /*GridColumn(
                       columnName: 'tipologia',
                       label: Container(
                         padding: EdgeInsets.all(8.0),
@@ -717,175 +717,189 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       width: _columnWidths['tipologia']?? double.nan,
                       minimumWidth: 300,
                     ),*/
-                        GridColumn(
-                          columnName: 'utente',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
+                                GridColumn(
+                                  columnName: 'utente',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'UTENTE',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 120 : 300,//_columnWidths['utente']?? double.nan,
+                                  minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 300 : 0,
                                 ),
+                                GridColumn(
+                                  columnName: 'accettato',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'ACCETTATO',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 110 : 170,//_columnWidths['accettato']?? double.nan,
+                                  minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
+                                ),
+                                GridColumn(
+                                  columnName: 'data_conclusione',
+                                  label: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        right: BorderSide(
+                                          color: Colors.grey[300]!,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'DATA\nCONCLUSIONE',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    ),
+                                  ),
+                                  width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_conclusione']?? double.nan,
+                                  minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
+                                ),
+                              ],
+                              onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
+                                setState(() {
+                                  _columnWidths[details.column.columnName] = details.width;
+                                });
+                                return true;
+                              },
+                            ))),
+
+                    //if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3')
+                    Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: allTipi.map((tipo) {
+                                  final isSelected = tipoIdGlobal == int.parse(tipo.id!);
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                    //child: Container(
+                                    //width: 120, // Larghezza del pulsante
+                                    //height: 50, // Altezza del pulsante
+                                    child: Container(
+                                      clipBehavior: Clip.none, // Permette all'icona di uscire dal contorno
+                                      child: Stack(
+                                        clipBehavior: Clip.none, // Permette agli elementi di uscire dai bordi
+                                        alignment: Alignment.center, // Centra gli elementi all'interno del pulsante
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _changeSheet(int.parse(tipo.id!));
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                              backgroundColor: isSelected ? Colors.red : Colors.grey[300],
+                                              foregroundColor: isSelected ? Colors.white : Colors.black,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8.0),
+                                              ),
+                                              elevation: isSelected ? 6.0 : 2.0,
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  tipo.descrizione!.toUpperCase(),
+                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                                ),
+                                                if (tipo.utente != null && tipo.utente != tipo.utentecreate)
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.send,
+                                                        color: Colors.teal,
+                                                        size: 18,
+                                                      ),
+                                                      Text(
+                                                        ' ' +
+                                                            ((widget.utente.id != tipo.utente!.id)
+                                                                ? tipo.utente!.nome! +
+                                                                " " +
+                                                                tipo.utente!.cognome!.substring(0, 1) +
+                                                                "."
+                                                                : tipo.utentecreate!.nome! +
+                                                                " " +
+                                                                tipo.utentecreate!.cognome!.substring(0, 1) +
+                                                                "."),
+                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id))
+                                            Positioned(
+                                              right: -8, // Posizione migliore senza taglio
+                                              top: -8, // Posizione migliore senza taglio
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.amber,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black26,
+                                                      blurRadius: 4,
+                                                      offset: Offset(0, 2),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(3.0),
+                                                  child: Icon(
+                                                    Icons.warning_outlined,
+                                                    color: Colors.black,
+                                                    size: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ),
-                            child: Text(
-                              'UTENTE',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
                           ),
-                          width: (constraints.maxWidth < 460) ? 120 : 300,//_columnWidths['utente']?? double.nan,
-                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 300 : 0,
-                        ),
-                        GridColumn(
-                          columnName: 'accettato',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              'ACCETTATO',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 110 : 170,//_columnWidths['accettato']?? double.nan,
-                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 170 : 0,
-                        ),
-                        GridColumn(
-                          columnName: 'data_conclusione',
-                          label: Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              'DATA\nCONCLUSIONE',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ),
-                          width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_conclusione']?? double.nan,
-                          minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
                         ),
                       ],
-                      onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
-                        setState(() {
-                          _columnWidths[details.column.columnName] = details.width;
-                        });
-                        return true;
-                      },
-                    ))),
-
-                //if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3')
-                  Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: allTipi.map((tipo) {
-                                print(tipoIdGlobal.toString()+' mmm '+tipo.id!);
-                                final isSelected = tipoIdGlobal == int.parse(tipo.id!);
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                  //child: Container(
-                                //width: 120, // Larghezza del pulsante
-                                //height: 50, // Altezza del pulsante
-                                child: Container(
-                                clipBehavior: Clip.none, // Permette all'icona di uscire dal contorno
-                                child: Stack(
-                                    alignment: Alignment.center, // Allinea il pulsante al centro
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          _changeSheet(int.parse(tipo.id!));
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                                          backgroundColor: isSelected
-                                              ? Colors.red // Colore rosso per il pulsante selezionato
-                                              : Colors.grey[300], // Colore grigio chiaro per i non selezionati
-                                          foregroundColor: isSelected
-                                              ? Colors.white // Testo bianco per il pulsante selezionato
-                                              : Colors.black, // Testo nero per i non selezionati
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8.0),
-                                            side: isSelected
-                                                ? BorderSide(color: Colors.red, width: 2.0) // Bordo rosso
-                                                : BorderSide.none, // Nessun bordo
-                                          ),
-                                          elevation: isSelected ? 6.0 : 2.0, // Più elevazione se selezionato
-                                        ),
-                                        child: Column(children: [
-                                        Text(
-                                          tipo.descrizione!.toUpperCase(), // Mostra la descrizione
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                        ),
-                                          (tipo.utente != null && tipo.utente != tipo.utentecreate) ? Row(children: [
-                                            Icon(
-                                              Icons.send, // Icona di notifica
-                                              color: Colors.teal,//isSelected ? Colors.white : Colors.black, // Colore dell'icona
-                                              size: 18, // Dimensione dell'icona
-                                            ),
-                                          Text(
-                                            ' '+ ((widget.utente.id != tipo.utente!.id) ? tipo.utente!.nome! + " " + tipo.utente!.cognome!.substring(0,1) + ".":
-                                            tipo.utentecreate!.nome! + " " + tipo.utentecreate!.cognome!.substring(0,1) + "."), // Mostra la descrizione
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                          ),],) : Container()
-                                        ],)
-                                      ),
-                                      //(tipo.utente != null && tipo.utente != tipo.utentecreate) ?
-                                      (tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id)) ?
-                                      Positioned(
-                                        right: -5, // Posizione a destra (puoi regolare questo valore)
-                                        top: -5, // Posizione in alto (puoi regolare questo valore)
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            //color: isSelected ? Colors.red : Colors.grey[300], // Colore di sfondo dell'icona
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(4.0), // Padding per l'icona
-                                            child: Icon(
-                                              Icons.warning, // Icona di notifica
-                                              color: Colors.amber,//isSelected ? Colors.white : Colors.black, // Colore dell'icona
-                                              size: 15, // Dimensione dell'icona
-                                            ),
-                                          ),
-                                        ),
-                                      ) : Container(),
-                                    ],
-                                  ))//),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-              ],
-            ),
-          );}),
-            floatingActionButton: (widget.utente.cognome == "Mazzei" ||
-                widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3') ?
-            Column(
+                    )
+                  ],
+                ),
+              );}),
+          floatingActionButton: (widget.utente.cognome == "Mazzei" ||
+              widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3') ?
+          Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children : [
@@ -1097,21 +1111,21 @@ class _TableTaskPageState extends State<TableTaskPage>{
                 ),
                 SizedBox(height: 45),
               ]
-            ) : Container(),
+          ) : Container(),
         )
-        );
+    );
   }
 
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/tipoTask'),
-        headers: {'Content-Type' : 'application/json'},
-        body: jsonEncode({
-          'descrizione' : _descrizioneController.text,
-          'utente' : _condivisoTipo ? selectedUtenteTipo : null,
-          'utentecreate' : widget.utente
-        })
+          Uri.parse('$ipaddressProva/api/tipoTask'),
+          headers: {'Content-Type' : 'application/json'},
+          body: jsonEncode({
+            'descrizione' : _descrizioneController.text,
+            'utente' : _condivisoTipo ? selectedUtenteTipo : null,
+            'utentecreate' : widget.utente
+          })
       );
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1145,7 +1159,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
           //final matches = taskUserId == selectedUserId; // Confronta gli ID
 
           final matches = (taskId == tipoIdStr && (taskUserId == selectedUserId || taskUsercreateId == selectedUserId));
-              //|| (task.tipologia!.utente != null && task.tipologia!.utente!.id == selectedUserId); // Confronta come stringhe
+          //|| (task.tipologia!.utente != null && task.tipologia!.utente!.id == selectedUserId); // Confronta come stringhe
           print('Filtering task: $taskId matches: $matches'); // Debug
           return matches;
         })
@@ -1177,7 +1191,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         final selectedUserId = utente.id; // ID dell'utente selezionato
         final matches = (taskUserId == selectedUserId || taskUsercreateId == selectedUserId) &&
             taskId == tipoIdGlobal.toString();
-            //|| (commissione.tipologia!.utente != null && commissione.tipologia!.utente!.id == selectedUserId); // Confronta gli ID
+        //|| (commissione.tipologia!.utente != null && commissione.tipologia!.utente!.id == selectedUserId); // Confronta gli ID
         print('Filtering task by user: $taskUserId matches: $matches'); // Debug
         return matches;
       }).toList();
@@ -1227,19 +1241,19 @@ class TaskDataSource extends DataGridSource{
       String? dataConclusione = task.data_conclusione != null ? (DateFormat('dd/MM/yyyy').format(task.data_conclusione!)) : "NON CONCLUSO";
       String? accettato = task.accettato! ? 'ACCETTATO' : 'NON ACCETTATO';
       rows.add(DataGridRow(
-        cells: [
-          DataGridCell<TaskModel>(columnName: 'task', value: task),
-          DataGridCell<TaskModel>(columnName: 'accettatoicon', value: task),
-          DataGridCell<TaskModel>(columnName: 'completed', value: task),
-          DataGridCell<TaskModel>(columnName: 'delete', value: task),
-          DataGridCell<TaskModel>(columnName: 'condividi', value: task),
-          DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
-          DataGridCell<String>(columnName: 'titolo', value: task.titolo),
-          DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento : '//'),
-          DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
-          DataGridCell<String>(columnName: 'accettato', value: accettato),
-          DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
-        ]
+          cells: [
+            DataGridCell<TaskModel>(columnName: 'task', value: task),
+            DataGridCell<TaskModel>(columnName: 'accettatoicon', value: task),
+            DataGridCell<TaskModel>(columnName: 'completed', value: task),
+            DataGridCell<TaskModel>(columnName: 'delete', value: task),
+            DataGridCell<TaskModel>(columnName: 'condividi', value: task),
+            DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
+            DataGridCell<String>(columnName: 'titolo', value: task.titolo),
+            DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento : '//'),
+            DataGridCell<String>(columnName: 'utente', value: task.condiviso == true ? "${task.utentecreate?.nome!} ${task.utentecreate?.cognome?.substring(0,1)}. ${String.fromCharCode(8594)} ${task.utente?.nomeCompleto()!}" : "${utente.nomeCompleto()}"),
+            DataGridCell<String>(columnName: 'accettato', value: accettato),
+            DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
+          ]
       ));
     }
     return rows;
@@ -1413,12 +1427,12 @@ class TaskDataSource extends DataGridSource{
     ).value as TaskModel;
     return DataGridRowAdapter(
       cells: row.getCells().map<Widget>((dataGridCell) {
-      if (dataGridCell.columnName == 'completed') {
-        return IconButton(tooltip: task.concluso! ? 'TASK CONCLUSO' : 'CLICCA QUI PER CONCLUDERE IL TASK',
-          icon: Icon(size: 27,
-            task.concluso! ? Icons.check_circle : Icons.hourglass_bottom,
-            color: task.concluso! ? Colors.green : Colors.grey,
-          ), onPressed: () { task.concluso! ? null : showDialog(
+        if (dataGridCell.columnName == 'completed') {
+          return IconButton(tooltip: task.concluso! ? 'TASK CONCLUSO' : 'CLICCA QUI PER CONCLUDERE IL TASK',
+            icon: Icon(size: 27,
+              task.concluso! ? Icons.check_circle : Icons.hourglass_bottom,
+              color: task.concluso! ? Colors.green : Colors.grey,
+            ), onPressed: () { task.concluso! ? null : showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
@@ -1444,51 +1458,21 @@ class TaskDataSource extends DataGridSource{
               },
             );
 
-          },
-        );
-      } else if (dataGridCell.columnName == 'accettatoicon') {
-        print('nnn cccc '+utente.nomeCompleto()!);
-        return IconButton(tooltip: !task.accettato! && task.utentecreate!.id != utente.id ? 'CLICCA QUI PER ACCETTARE IL TASK' : '',//'TASK GIA\' ACCETTATO' : ,
-            icon: Icon(size: 27,
-            !task.accettato! && task.utentecreate!.id != utente.id ? Icons.warning : null,//Icons.warning,
-            color: task.accettato! ? Colors.grey : Colors.orange,
-          ), onPressed: () { !task.accettato! && task.utentecreate!.id != utente.id ? showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('ACCETTA TASK'),
-                content: Text(
-                    task.utentecreate!.nomeCompleto()!.toUpperCase()+' HA CREATO UN TASK PER TE, CONFERMI DI AVER PRESO VISIONE?'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('NO'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      accettaTask(task);
-                      //Navigator.of(context).pop();
-                    },
-                    child: Text('OK'),
-                  ),
-                ],
-              );
             },
-          ) : null;},
-        );
-      } else if (dataGridCell.columnName == 'delete') {
-        return IconButton(tooltip: 'CLICCA QUI PER ELIMINARE IL TASK',
-          icon: Icon(Icons.delete, color: Colors.red, size: 27,),
-          onPressed: () {
-            showDialog(
+          );
+        } else if (dataGridCell.columnName == 'accettatoicon') {
+          print('nnn cccc '+utente.nomeCompleto()!);
+          return IconButton(tooltip: !task.accettato! && task.utentecreate!.id != utente.id ? 'CLICCA QUI PER ACCETTARE IL TASK' : '',//'TASK GIA\' ACCETTATO' : ,
+            icon: Icon(size: 27,
+              !task.accettato! && task.utentecreate!.id != utente.id ? Icons.warning : null,//Icons.warning,
+              color: task.accettato! ? Colors.grey : Colors.orange,
+            ), onPressed: () { !task.accettato! && task.utentecreate!.id != utente.id ? showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: Text('ELIMINAZIONE TASK'),
+                  title: Text('ACCETTA TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER ELIMINARE IL TASK \"'+task.titolo!+'\" DALLA LISTA?'),
+                      task.utentecreate!.nomeCompleto()!.toUpperCase()+' HA CREATO UN TASK PER TE, CONFERMI DI AVER PRESO VISIONE?'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -1498,7 +1482,7 @@ class TaskDataSource extends DataGridSource{
                     ),
                     TextButton(
                       onPressed: () {
-                        deleteTask(context, task.id);
+                        accettaTask(task);
                         //Navigator.of(context).pop();
                       },
                       child: Text('OK'),
@@ -1506,78 +1490,108 @@ class TaskDataSource extends DataGridSource{
                   ],
                 );
               },
-            );
-          },
-        );
-      } else if (dataGridCell.columnName == 'condividi') {
-        return IconButton(
-          tooltip: 'CONDIVIDI TASK',
-          icon: Icon(Icons.send, color: Colors.grey, size: 24),
-          onPressed: () {
-            // Variabile locale per tracciare l'utente selezionato
-            UtenteModel? localSelectedUtente = selectedUtenteCondivisione;
+            ) : null;},
+          );
+        } else if (dataGridCell.columnName == 'delete') {
+          return IconButton(tooltip: 'CLICCA QUI PER ELIMINARE IL TASK',
+            icon: Icon(Icons.delete, color: Colors.red, size: 27,),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('ELIMINAZIONE TASK'),
+                    content: Text(
+                        'CONFERMI DI VOLER ELIMINARE IL TASK \"'+task.titolo!+'\" DALLA LISTA?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('NO'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          deleteTask(context, task.id);
+                          //Navigator.of(context).pop();
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          );
+        } else if (dataGridCell.columnName == 'condividi') {
+          return IconButton(
+            tooltip: 'CONDIVIDI TASK',
+            icon: Icon(Icons.send, color: Colors.grey, size: 24),
+            onPressed: () {
+              // Variabile locale per tracciare l'utente selezionato
+              UtenteModel? localSelectedUtente = selectedUtenteCondivisione;
 
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
-                  builder: (BuildContext context, StateSetter setState) {
-                    return AlertDialog(
-                      title: Text('Condividi Task\n\"'+task.titolo!+'\"'),
-                      content: SingleChildScrollView(
-                        child: Container(
-                          width: double.maxFinite,
-                          child: Column(
-                            //mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: _allUtenti.length,
-                                itemBuilder: (context, index) {
-                                  return RadioListTile<UtenteModel>(
-                                    value: _allUtenti[index],
-                                    groupValue: localSelectedUtente,
-                                    onChanged: (UtenteModel? newValue) {
-                                      setState(() {
-                                        localSelectedUtente = newValue; // Aggiorna lo stato locale
-                                      });
-                                    },
-                                    title: Text(_allUtenti[index].nomeCompleto()!),
-                                  );
-                                },
-                              ),
-                            ],
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
+                    builder: (BuildContext context, StateSetter setState) {
+                      return AlertDialog(
+                        title: Text('Condividi Task\n\"'+task.titolo!+'\"'),
+                        content: SingleChildScrollView(
+                          child: Container(
+                            width: double.maxFinite,
+                            child: Column(
+                              //mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: _allUtenti.length,
+                                  itemBuilder: (context, index) {
+                                    return RadioListTile<UtenteModel>(
+                                      value: _allUtenti[index],
+                                      groupValue: localSelectedUtente,
+                                      onChanged: (UtenteModel? newValue) {
+                                        setState(() {
+                                          localSelectedUtente = newValue; // Aggiorna lo stato locale
+                                        });
+                                      },
+                                      title: Text(_allUtenti[index].nomeCompleto()!),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('Annulla'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            if (localSelectedUtente != null) {
-                              // Salva l'utente selezionato
-                              assegnaTask(task, localSelectedUtente!);
-                              print('Utente selezionato: ${localSelectedUtente!.nomeCompleto()}');
-                            }
-                          },
-                          child: Text('Condividi'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            );
-          },
-        );
-      } else {
-        return GestureDetector(
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Annulla'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              if (localSelectedUtente != null) {
+                                // Salva l'utente selezionato
+                                assegnaTask(task, localSelectedUtente!);
+                                print('Utente selezionato: ${localSelectedUtente!.nomeCompleto()}');
+                              }
+                            },
+                            child: Text('Condividi'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        } else {
+          return GestureDetector(
             onTap: () {
               /*/SystemChrome.setPreferredOrientations([
                 DeviceOrientation.portraitUp,
@@ -1586,8 +1600,8 @@ class TaskDataSource extends DataGridSource{
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      ModificaTaskPage(utente: utente, task: task,)//DettaglioCommissioneAmministrazionePage(commissione: commissione),
+                    builder: (context) =>
+                        ModificaTaskPage(utente: utente, task: task,)//DettaglioCommissioneAmministrazionePage(commissione: commissione),
                 ),
               );
             },
