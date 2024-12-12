@@ -808,6 +808,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                 //width: 120, // Larghezza del pulsante
                                 //height: 50, // Altezza del pulsante
                                 child: Container(
+                                  //width: 120, // Larghezza del pulsante
+                                  //height: 50, // Altezza del pulsante
                                 clipBehavior: Clip.none, // Permette all'icona di uscire dal contorno
                                 child: Stack(
                                     alignment: Alignment.center, // Allinea il pulsante al centro
