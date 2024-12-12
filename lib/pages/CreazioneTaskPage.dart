@@ -479,6 +479,7 @@ class _CreazioneTaskPageState
                         SizedBox(
                           width: 200,
                           child: CheckboxListTile(
+                            enabled: _selectedTipo?.utente != null ? false : true,
                             title: Text('Condiviso'),
                             value: _condiviso,
                             onChanged: (value) {
@@ -498,7 +499,7 @@ class _CreazioneTaskPageState
                           width: 400,
                           child: DropdownButtonFormField<UtenteModel>(
                             value: selectedUtente,
-                            onChanged: (UtenteModel? newValue) {
+                            onChanged: _selectedTipo?.utente != null ? null : (UtenteModel? newValue) {
                               setState(() {
                                 selectedUtente = newValue;
                               });
@@ -734,9 +735,10 @@ class _CreazioneTaskPageState
           'tipologia': _selectedTipo?.toMap(),
           'utentecreate': widget.utente,
           'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
+          'attivo': true,
         }),
       );
-      Navigator.of(context).pop();//Navigator.pop(context);
+      Navigator.of(context).pop('aggiorna');//Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Task registrato con successo!'),

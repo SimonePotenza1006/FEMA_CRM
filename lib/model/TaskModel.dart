@@ -20,6 +20,7 @@ class TaskModel {
   bool? condiviso;
   bool? accettato;
   DateTime? data_accettazione;
+  bool? attivo;
 
   TaskModel(
       this.id,
@@ -34,7 +35,8 @@ class TaskModel {
       this.tipologia,
       this.condiviso,
       this.accettato,
-      this.data_accettazione
+      this.data_accettazione,
+      this.attivo
       );
 
   Map<String, dynamic> toMap(){
@@ -51,7 +53,8 @@ class TaskModel {
       'tipologia' : tipologia?.toMap(),
       'condiviso' : condiviso,
       'accettato' : accettato,
-      'data_accettazione' : data_accettazione?.toIso8601String()
+      'data_accettazione' : data_accettazione?.toIso8601String(),
+      'attivo' : attivo,
     };
     return map;
   }
@@ -70,6 +73,7 @@ class TaskModel {
     condiviso = map['condiviso'];
     accettato = map['accettato'];
     map['dat_accettazione'] != null ? DateTime.parse(map['data_accettazioni']) : null;
+    attivo = map['attivo'];
   }
 
   Map<String, dynamic> toJson() =>{
@@ -85,7 +89,8 @@ class TaskModel {
     'tipologia' : tipologia?.toJson(),
     'condiviso' : condiviso,
     'accettato' : accettato,
-    'data_accettazione' : data_accettazione?.toIso8601String()
+    'data_accettazione' : data_accettazione?.toIso8601String(),
+    'attivo' : attivo,
   };
 
   factory TaskModel.fromJson(Map<String, dynamic> json){
@@ -102,7 +107,8 @@ class TaskModel {
       json['tipologia'] != null ? TipoTaskModel.fromJson(json['tipologia']) : null,
       json['condiviso'],
       json['accettato'],
-      json['data_accettazione'] != null ? DateTime.parse(json['data_accettazione']) : null
+      json['data_accettazione'] != null ? DateTime.parse(json['data_accettazione']) : null,
+      json['attivo'],
     );
   }
 }

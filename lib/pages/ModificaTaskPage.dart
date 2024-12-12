@@ -603,6 +603,10 @@ class _ModificaTaskPageState
                               onChanged: (TipoTaskModel? newValue) {
                                 setState(() {
                                   _selectedTipo = newValue;
+                                  _selectedTipo?.utente != null ?
+                                  selectedUtente = allUtenti.firstWhere((element) =>
+                                  element.id== (_selectedTipo?.utente!.id != widget.utente.id ? _selectedTipo?.utente!.id! : _selectedTipo?.utentecreate!.id!)) : null;
+                                  _selectedTipo?.utente != null ? _condiviso = true : null;
                                 });
                               },
                               items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
@@ -656,6 +660,7 @@ class _ModificaTaskPageState
                           SizedBox(
                             width: 400,
                             child: CheckboxListTile(
+                              enabled: _selectedTipo?.utente != null ? false : true,
                               title: Text(
                                 'CONDIVISO',
                                 style: TextStyle(
@@ -689,7 +694,7 @@ class _ModificaTaskPageState
                             width: 600,
                             child: DropdownButtonFormField<UtenteModel>(
                               value: selectedUtente,
-                              onChanged: (UtenteModel? newValue) {
+                              onChanged: _selectedTipo?.utente != null ? null : (UtenteModel? newValue) {
                                 setState(() {
                                   selectedUtente = newValue;
                                 });
@@ -1002,6 +1007,7 @@ class _ModificaTaskPageState
         'tipologia': _selectedTipo?.toMap(),
         'utentecreate': widget.task.utentecreate?.toMap(),
         'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
+        'attivo': widget.task.attivo,
       });
       final response = await http.post(
         Uri.parse('$ipaddressProva/api/task'),
@@ -1009,7 +1015,7 @@ class _ModificaTaskPageState
         body: body,
       );
       if (response.statusCode == 201) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop('aggiorna');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Task salvato con successo!'),
