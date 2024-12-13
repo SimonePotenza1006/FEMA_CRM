@@ -37,7 +37,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<List<Map<String, dynamic>>> fetchImages() async {
-    final url = '$ipaddressProva/api/immagine/cartella/${int.parse(widget.cartella.id.toString())}/images';
+    final url = '$ipaddress/api/immagine/cartella/${int.parse(widget.cartella.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -67,7 +67,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllCartelle() async {
     try {
-      var apiUrl = Uri.parse("$ipaddressProva/api/cartella/parent/${int.parse(widget.cartella.id.toString())}");
+      var apiUrl = Uri.parse("$ipaddress/api/cartella/parent/${int.parse(widget.cartella.id.toString())}");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -127,7 +127,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deletePic(int immagineId) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddressProva/api/immagine/$immagineId'),
+        Uri.parse('$ipaddress/api/immagine/$immagineId'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode != 200) {
@@ -150,7 +150,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> createCartella(String? name) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/cartella'),
+        Uri.parse('$ipaddress/api/cartella'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'nome': name.toString(),
@@ -193,7 +193,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void _uploadFiles(List<PlatformFile> files) async {
     // Create a multipart request to upload the files
     final cartella = widget.cartella.id;
-    final request = http.MultipartRequest('POST', Uri.parse('$ipaddressProva/api/immagine/cartella/$cartella'));
+    final request = http.MultipartRequest('POST', Uri.parse('$ipaddress/api/immagine/cartella/$cartella'));
     request.fields['cartella'] = cartella.toString();
     for (var file in files) {
       final fileStream = File(file.path!).openRead();
