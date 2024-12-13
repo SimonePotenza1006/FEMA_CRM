@@ -321,7 +321,8 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     });
   }
 
-  List<InterventoModel> _getInterventiPerSheet(int sheetIndex) {
+  List<InterventoModel>
+      (int sheetIndex) {
     switch (sheetIndex) {
       case 0: // Tutti (esclusi gli annullati)
         return _allInterventi
