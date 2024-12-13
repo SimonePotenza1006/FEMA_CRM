@@ -13,21 +13,19 @@ import '../model/InterventoModel.dart';
 import '../model/TaskModel.dart';
 import '../model/TipoTaskModel.dart';
 import '../model/UtenteModel.dart';
-import 'CestinoTaskPage.dart';
 import 'ModificaTaskPage.dart';
 import 'PDFTaskPage.dart';
 
-class TableTaskPage extends StatefulWidget{
+class CestinoTaskPage extends StatefulWidget{
   final UtenteModel utente;
-  final UtenteModel selectedUtente;
-  final int tipoIdGlobal;
-  const TableTaskPage({Key? key, required this.utente, required this.selectedUtente, required this.tipoIdGlobal}) : super(key: key);
+
+  const CestinoTaskPage({Key? key, required this.utente}) : super(key: key);
 
   @override
-  _TableTaskPageState createState() => _TableTaskPageState();
+  _CestinoTaskPageState createState() => _CestinoTaskPageState();
 }
 
-class _TableTaskPageState extends State<TableTaskPage>{
+class _CestinoTaskPageState extends State<CestinoTaskPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<TaskModel> _allCommissioni = [];
@@ -66,8 +64,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
     // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
     Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TableTaskPage(
-          utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!)));
+        MaterialPageRoute(builder: (context) => CestinoTaskPage(
+          utente: widget.utente)));
     /*getAllTask();
     getAllTipi();
     getAllUtenti();*/
@@ -172,10 +170,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
     //_setPreferredOrientation();
     _columnWidths = {
       'task': 0,
-      'accettatoicon': 60,//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
-      'completed': 60,
+      //'accettatoicon': 60,//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
+      //'completed': 60,
       'delete': 60,
-      'condividi': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
+      //'condividi': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
       'data_creazione': 150,
       'titolo': 300,
       'riferimento': 300,
@@ -186,12 +184,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
     setState(() {
 
-      selectedUtente = widget.selectedUtente;//allUtenti.firstWhere((element) => element.id == widget.utente.id);
+      //selectedUtente = allUtenti.firstWhere((element) => element.id == widget.utente.id);
       //if(widget.utente.cognome == "Mazzei"){
-      tipoIdGlobal = widget.tipoIdGlobal;//9;
+      tipoIdGlobal = 9;
       //}
     });
-    print(tipoIdGlobal.toString()+''+widget.tipoIdGlobal.toString());
+    print(tipoIdGlobal.toString()+''+tipoIdGlobal.toString());
     initializeData();
   }
 
@@ -212,9 +210,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
         print('Utente Mazzei rilevato. Applicazione del filtro per tipologia id = 9 e cognome Mazzei...');
         _filteredCommissioni = _allCommissioni.where((task) {
           print(
-              'Task: ${task.titolo}, Tipologia ID: ${widget.tipoIdGlobal}, Utente : ${selectedUtente!.id}');
+              'Task: ${task.titolo}, Tipologia ID: ${tipoIdGlobal}, Utente : ${selectedUtente!.id}');
 
-          return task.tipologia?.id! == widget.tipoIdGlobal.toString() &&
+          return task.tipologia?.id! == tipoIdGlobal.toString() &&
               (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
           //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
         }).toList();
@@ -270,6 +268,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         }
         setState(() {
           allUtenti = utenti;
+          selectedUtente = utenti.firstWhere((element) => element.id == widget.utente.id);
           //if (widget.utente.cognome! == "Mazzei")
             //selectedUtente = widget.selectedUtente;//utenti.firstWhere((element) => element.id == widget.utente.id);
         });
@@ -354,8 +353,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
     try {
       // Decidi l'endpoint in base al cognome dell'utente
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
-          ? Uri.parse('$ipaddressProva/api/task/allattivi')
-          : Uri.parse('$ipaddressProva/api/task/utente/' + widget.utente!.id!);
+          ? Uri.parse('$ipaddressProva/api/task/alldisattivi')
+          : Uri.parse('$ipaddressProva/api/task/utentearchivio/' + widget.utente!.id!);
       print('Chiamata API verso: $apiUrl');
       var response = await http.get(apiUrl);
       print('Risposta ricevuta con status code: ${response.statusCode}');
@@ -439,7 +438,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text('LISTA TASK', style: TextStyle(color: Colors.white)),
+            title: Text('ARCHIVIO TASK', style: TextStyle(color: Colors.white)),
             centerTitle: true,
             backgroundColor: Colors.red,
             actions: [
@@ -468,7 +467,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                     SizedBox(width: 6)
                   ],
                 ),
-              IconButton(
+              /*IconButton(
                 icon: Icon(
                   Icons.add, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
                   color: Colors.white,
@@ -484,13 +483,13 @@ class _TableTaskPageState extends State<TableTaskPage>{
                     if (value == 'aggiorna') {
                       Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => TableTaskPage(
-                            utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,)));
+                          MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                            utente: widget.utente)));
                       //setState(() {}); // Aggiorna la pagina
                     }
                   });
                 },
-              ),
+              ),*/
               IconButton(
                   color: Colors.white,
                   icon: Icon(Icons.download), onPressed: () async {
@@ -502,17 +501,17 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   ),
                 );
               }),
-              widget.utente.cognome! == "Mazzei" ? IconButton(
+              /*IconButton(
                   color: Colors.white,
                   icon: Icon(Icons.delete_forever), onPressed: () async {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        CestinoTaskPage(utente: widget.utente),
+                        PDFTaskPage(timbrature: _filteredCommissioni),
                   ),
                 );
-              }) : Container(),
+              }),*/
               IconButton(
                 icon: Icon(
                   Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -522,8 +521,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   print(selectedUtente!.id.toString()+' bbb '+tipoIdGlobal.toString());
                    Navigator.pushReplacement(
                        context,
-                       MaterialPageRoute(builder: (context) => TableTaskPage(
-                         utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,)));
+                       MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                         utente: widget.utente)));
                   /*getAllTask();
                   getAllTipi();
                   getAllUtenti();*/
@@ -575,7 +574,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           width: _columnWidths['task']?? double.nan,
                           minimumWidth: 0,
                         ),
-                        GridColumn(
+                        /*GridColumn(
                           allowSorting: false,
                           columnName: 'accettatoicon',
                           label: Container(
@@ -618,7 +617,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           ),
                           width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
                           minimumWidth: 60,
-                        ),
+                        ),*/
                         GridColumn(
                           allowSorting: false,
                           columnName: 'delete',
@@ -641,7 +640,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
                           minimumWidth: 60,
                         ),
-                        GridColumn(
+                        /*GridColumn(
                           allowSorting: false,
                           columnName: 'condividi',
                           label: Container(
@@ -662,7 +661,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           ),
                           width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['condividi']?? double.nan,
                           minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
-                        ),
+                        ),*/
                         GridColumn(
                           columnName: 'data_creazione',
                           label: Container(
@@ -936,7 +935,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
               ],
             ),
           );}),
-            floatingActionButton: (widget.utente.cognome == "Mazzei" ||
+            /*floatingActionButton: (widget.utente.cognome == "Mazzei" ||
                 widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3') ?
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -1150,7 +1149,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                 ),
                 SizedBox(height: 45),
               ]
-            ) : Container(),
+            ) : Container(),*/
         )
         );
   }
@@ -1314,10 +1313,10 @@ class TaskDataSource extends DataGridSource{
       rows.add(DataGridRow(
         cells: [
           DataGridCell<TaskModel>(columnName: 'task', value: task),
-          DataGridCell<TaskModel>(columnName: 'accettatoicon', value: task),
-          DataGridCell<TaskModel>(columnName: 'completed', value: task),
+          //DataGridCell<TaskModel>(columnName: 'accettatoicon', value: task),
+          //DataGridCell<TaskModel>(columnName: 'completed', value: task),
           DataGridCell<TaskModel>(columnName: 'delete', value: task),
-          DataGridCell<TaskModel>(columnName: 'condividi', value: task),
+         // DataGridCell<TaskModel>(columnName: 'condividi', value: task),
           DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
           DataGridCell<String>(columnName: 'titolo', value: task.titolo),
           DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento : '//'),
@@ -1351,8 +1350,7 @@ class TaskDataSource extends DataGridSource{
           'accettato': task.accettato,//false,
           'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utentecreate': task.utentecreate!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'attivo': task.attivo,
+          'utentecreate': task.utentecreate!.toMap()//_condiviso ? selectedUtente?.toMap() : widget.utente,
         }),
       );
       if(response.statusCode == 201){
@@ -1361,19 +1359,20 @@ class TaskDataSource extends DataGridSource{
             content: Text('Stato Task aggiornato con successo!'),
           ),
         );
+
         //await Future.delayed(Duration(seconds: 2));
         // Qui dovresti aggiornare il tuo DataSource con i nuovi dati
         Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => TableTaskPage(
-                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
+            MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                utente: utente)));
       }
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
   }
 
-  Future<void> assegnaTask(TaskModel task, UtenteModel utentea) async {
+  Future<void> assegnaTask(TaskModel task, UtenteModel utente) async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
@@ -1391,9 +1390,8 @@ class TaskDataSource extends DataGridSource{
           'condiviso': true,//_condiviso,
           'accettato': false,//task.accettato,//false,
           'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
-          'utente': utentea.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utentecreate': task.utentecreate!.toMap(),
-          'attivo': task.attivo
+          'utente': utente.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
+          'utentecreate': task.utentecreate!.toMap()
         }),
       );
       if(response.statusCode == 201){
@@ -1405,8 +1403,8 @@ class TaskDataSource extends DataGridSource{
         );
         Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => TableTaskPage(
-                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
+            MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                utente: utente)));
       }
       //Navigator.of(context).pop();//Navigator.pop(context);
     } catch (e) {
@@ -1433,8 +1431,7 @@ class TaskDataSource extends DataGridSource{
           'accettato': true,//task.accettato,//false,
           'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utentecreate': task.utentecreate!.toMap(),
-          'attivo': task.attivo
+          'utentecreate': task.utentecreate!.toMap()
         }),
       );
       if(response.statusCode == 201){
@@ -1446,64 +1443,48 @@ class TaskDataSource extends DataGridSource{
         );
         Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => TableTaskPage(
-                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
+            MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                utente: utente)));
       }
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
   }
 
-  Future<void> deleteTask(TaskModel task) async {
-    final formatter = DateFormat(
-        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
+  Future<void> deleteTask(BuildContext context, String? id) async {
     try {
-      final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'id': task.id,
-          'data_creazione': task.data_creazione!.toIso8601String(),//DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
-          'data_conclusione': task.data_conclusione != null ? task.data_conclusione!.toIso8601String() : null,//task.data_conclusione!.toIso8601String(),//task.data_conclusione,//null,
-          'titolo' : task.titolo,//_titoloController.text,
-          'riferimento': task.riferimento,
-          'descrizione': task.descrizione,//_descrizioneController.text,
-          'concluso': task.concluso,
-          'condiviso': task.condiviso,//_condiviso,
-          'accettato': task.accettato,//false,
-          'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
-          'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utentecreate': task.utentecreate!.toMap(),
-          'attivo': false//task.attivo
-        }),
+      final response = await http.delete(
+        Uri.parse('$ipaddressProva/api/task/$id'),
       );
-      if(response.statusCode == 201){
+      if (response.statusCode == 200) {
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Task eliminato con successo!'),
-          ),
+          const SnackBar(content: Text('Task eliminato con successo')),
         );
-        /*Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => TableTaskPage(
-              utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)),
-              (Route<dynamic> route) => false, // Rimuove tutte le pagine precedenti
-        );*/
         Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => TableTaskPage(
-                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
+            MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                utente: utente)));
+        /*Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TableTaskPage(utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: ti,),
+          ),
+        );*/
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Impossibile eliminare il task')),
+        );
       }
     } catch (e) {
-      print('Errore durante la modifica del task $e');
+      print('Errore durante l\'eliminazione del task: $e');
     }
   }
 
   Future<void> getAllTask() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/allattivi')
-          : Uri.parse('$ipaddressProva/api/task/utente/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/alldisattivi')
+          : Uri.parse('$ipaddressProva/api/task/utentearchivio/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -1591,7 +1572,7 @@ class TaskDataSource extends DataGridSource{
                   TextButton(
                     onPressed: () {
                       accettaTask(task);
-                      Navigator.of(context).pop();
+                      //Navigator.of(context).pop();
                     },
                     child: Text('OK', style: TextStyle(fontSize: 18)),
                   ),
@@ -1610,7 +1591,7 @@ class TaskDataSource extends DataGridSource{
                 return AlertDialog(
                   title: Text('ELIMINAZIONE TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER ELIMINARE IL TASK \"'+task.titolo!+'\" DALLA LISTA?'),
+                      'CONFERMI DI VOLER ELIMINARE DEFINITIVAMENTE IL TASK \"'+task.titolo!+'\" DALL\'ARCHIVIO?'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -1620,8 +1601,8 @@ class TaskDataSource extends DataGridSource{
                     ),
                     TextButton(
                       onPressed: () {
-                        deleteTask(task);
-                        Navigator.of(context).pop();
+                        deleteTask(context, task.id);
+                        //Navigator.of(context).pop();
                       },
                       child: Text('OK', style: TextStyle(fontSize: 18)),
                     ),
@@ -1685,7 +1666,6 @@ class TaskDataSource extends DataGridSource{
                             if (localSelectedUtente != null) {
                               // Salva l'utente selezionato
                               assegnaTask(task, localSelectedUtente!);
-                              Navigator.of(context).pop();
                               print('Utente selezionato: ${localSelectedUtente!.nomeCompleto()}');
                             }
                           },
@@ -1716,8 +1696,8 @@ class TaskDataSource extends DataGridSource{
                 if (value == 'aggiorna') {
                   Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => TableTaskPage(
-                        utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal,)));
+                      MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                        utente: utente)));
                    // Aggiorna la pagina
                 }
               });

@@ -167,9 +167,9 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
                       ),
                       createCellWithLine(
                         text: task.data_conclusione != null
-                            ? DateFormat('dd/MM/yyyy').format(task.data_conclusione!)
+                            ? DateFormat('dd/MM/yyyy HH:mm').format(task.data_conclusione!)
                             : 'N.C.',
-                        isConcluded: task.concluso!,
+                        isConcluded: false,//task.concluso!,
                       ),
                     ],
                   ),
@@ -207,9 +207,9 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
       children: [
         // Linea orizzontale se "concluso"
         if (isConcluded)
-          pw.Divider(
+          pw.Divider(//borderStyle: BorderStyle.,
             thickness: 0.1, // Spessore linea
-            color: PdfColors.black, // Colore linea
+            color: PdfColors.grey900,
           ),
         // Testo normale sopra la linea
         pw.Padding(
