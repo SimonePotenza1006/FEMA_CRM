@@ -31,8 +31,10 @@ class AggiungiMovimentoPage extends StatefulWidget {
 class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _importoController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   late DateTime selectedDate;
   UtenteModel? selectedUtente;
+  UtenteModel? selectedUtenteSegreteria;
   TipoMovimentazione? _selectedTipoMovimentazione;
   List<UtenteModel> allUtenti = [];
   Uint8List? signatureBytesIncaricato;
@@ -262,7 +264,8 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Aggiungi Movimento', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        title: Text('Pagamento/Acconto Intervento', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
       ),
       body: SingleChildScrollView(
@@ -679,23 +682,27 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_validateInputs()) {
-                        if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
-                          saveStatusInterventoPagamento();
-                          saveMovimentoPlusPics();
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
-                          );
-                          return;
-                        }
-                        if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto){
-                          saveStatusInterventoAcconto();
-                          saveMovimentoPlusPics();
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
-                          );
-                          return;
+                        if(widget.userData.nome == "Segreteria"){
+                          _showVerificaDialog();
+                        } else {
+                          if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
+                            saveStatusInterventoPagamento();
+                            saveMovimentoPlusPics();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente != null ? selectedUtente : widget.userData, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
+                            );
+                            return;
+                          }
+                          if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto){
+                            saveStatusInterventoAcconto();
+                            saveMovimentoPlusPics();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtente != null ? selectedUtente : widget.userData, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
+                            );
+                            return;
+                          }
                         }
                       }
                     },
@@ -714,6 +721,175 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showVerificaDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('VERIFICA UTENZA'),
+          content: Form( // Avvolgi tutto dentro un Form
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Column(
+                  children: [
+                    DropdownButtonFormField<UtenteModel>(
+                      decoration: InputDecoration(
+                        labelText: 'SELEZIONA UTENTE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 10),
+                      ),
+                      value: selectedUtenteSegreteria,
+                      items: allUtenti.map((utente) {
+                        return DropdownMenuItem<UtenteModel>(
+                          value: utente,
+                          child: Text(utente.nomeCompleto() ??
+                              'Nome non disponibile'),
+                        );
+                      }).toList(),
+                      onChanged: (UtenteModel? val) {
+                        setState(() {
+                          selectedUtenteSegreteria = val;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Seleziona un utente';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 12),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'PASSWORD UTENTE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintText: 'Inserire la password dell\'utente',
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[400],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Inserisci una password valida';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () { // Convalida il form
+                if(_passwordController.text == selectedUtenteSegreteria?.password){
+                  if(_selectedTipoMovimentazione == TipoMovimentazione.Pagamento){
+                    saveStatusInterventoPagamento();
+                    saveMovimentoPlusPics();
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtenteSegreteria, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
+                    );
+                    return;
+                  }
+                  if(_selectedTipoMovimentazione == TipoMovimentazione.Acconto){
+                    saveStatusInterventoAcconto();
+                    saveMovimentoPlusPics();
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => PDFPagamentoAccontoPage(utente : selectedUtenteSegreteria, data: selectedDate, descrizione : _descrizioneController.text, importo: _importoController.text, tipoMovimentazione: _selectedTipoMovimentazione!, cliente : selectedCliente, intervento : selectedIntervento, firmaCassa: signatureBytes, firmaIncaricato: signatureBytesIncaricato))
+                    );
+                    return;
+                  }
+                  Navigator.pop(context);
+                } else {
+                  showPasswordErrorDialog(context);
+                }
+              },
+              child: Text('Conferma'.toUpperCase()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showPasswordErrorDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Impedisce la chiusura toccando fuori dal dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Errore'),
+          content: Text('Password errata, impossibile creare il movimento'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Chiude il dialog
+              },
+              child: Text('Ok'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -955,7 +1131,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       'descrizione': _descrizioneController.text.toUpperCase(),
       'tipo_movimentazione': tipoMovimentazioneString,
       'importo': double.parse(_importoController.text.toString()),
-      'utente': widget.userData.toMap(),
+      'utente': widget.userData.nome == "Segreteria" ? selectedUtenteSegreteria?.toMap() : widget.userData.toMap(),
       'intervento' : intervento,
       'cliente' : cliente?.toMap()
     };

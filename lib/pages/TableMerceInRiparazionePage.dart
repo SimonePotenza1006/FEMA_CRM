@@ -49,6 +49,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
   };
   bool isLoading = true;
   bool _isLoading = true;
+  int _currentSheet = 0;
 
   @override
   void initState() {
@@ -56,6 +57,60 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
     _dataSource = InterventoDataSource(context, _filteredInterventi);
     getAllMerci();
     _filteredInterventi = _allInterventi.toList();
+  }
+
+  void _changeSheet(int index) {
+    setState(() {
+      _currentSheet = index;
+      switch (index) {
+        case 0: // Non conclusi
+          _filteredInterventi = _allInterventi
+              .where((intervento) {
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+            return intervento.annullato != true && // Escludi annullati
+                intervento.concluso != true; //Escludi conclusi
+          }).toList();
+          break;
+        case 1: // Conclusi
+          _filteredInterventi = _allInterventi
+              .where((intervento) {
+            //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, saldato = ${intervento.saldato}');
+            return intervento.annullato != true && // Escludi annullati
+                intervento.concluso == true;
+          })
+              .toList();
+          break;
+      }
+      _dataSource.updateData(_filteredInterventi);
+    });
+  }
+
+  List<InterventoModel> _getInterventiPerSheet(int sheetIndex) {
+    switch (sheetIndex) {
+      case 0: // Tutti (esclusi gli annullati)
+        return _allInterventi
+            .where((intervento) {
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          return intervento.annullato != true &&
+          intervento.concluso != true;// Escludi annullati
+        })
+            .toList();
+      case 1: // Non conclusi
+        return _allInterventi
+            .where((intervento) {
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}, concluso = ${intervento.concluso}, orario_fine = ${intervento.orario_fine}');
+          return intervento.annullato != true && // Escludi annullati
+              intervento.concluso == true;
+        })
+            .toList();
+      default: // Default: Tutti (esclusi gli annullati)
+        return _allInterventi
+            .where((intervento) {
+          //print('Controllo intervento ${intervento.id}: annullato = ${intervento.annullato}');
+          return intervento.annullato != true; // Escludi annullati
+        })
+            .toList();
+    }
   }
 
   Future<void> getAllMerci() async{
@@ -428,6 +483,55 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
                     return true;
                   },
                 )
+            ),
+            Flex(
+              // height: 60,
+                direction: Axis.horizontal,
+                children: [
+                  Expanded(
+                    child:
+                    Container(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(width: 5),
+                              ElevatedButton(
+                                onPressed: () => _changeSheet(0),
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: _currentSheet == 0 ? Colors.red[300] : Colors.grey[700],
+                                  //primary: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 1
+                                  //onPrimary: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  elevation: 2.0,
+                                ),
+                                child: Text('Non conclusi', style: TextStyle(color: Colors.white)),
+                              ),
+                              SizedBox(width: 5),
+                              ElevatedButton(
+                                onPressed: () => _changeSheet(1),
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: _currentSheet == 1 ? Colors.red[300] : Colors.grey[700],
+                                  //primary: _currentSheet == 2 ? Colors.red[300] : Colors.grey[700], // Cambia colore di sfondo se _currentSheet è 2
+                                  //onPrimary: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  elevation: 2.0,
+                                ),
+                                child: Text('Conclusi', style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                        )
+                    ),
+                  )
+                ]
             )
           ],
         ),
