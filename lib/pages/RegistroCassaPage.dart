@@ -36,8 +36,9 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   List<MovimentiModel> movimentiListPreviousWeek = [];
   List<MovimentiModel> movimentiListPreviousWeek2 = [];
   List<MovimentiModel> movimentiListPreviousWeek3 = [];
-
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  List<UtenteModel> allUtenti = [];
+  UtenteModel? selectedUtente;
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   double? fondoCassaSettimana1;
   double? fondoCassaSettimana2;
@@ -48,6 +49,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   final _formKeyUscita = GlobalKey<FormState>();
   final _formKeyPrelievo = GlobalKey<FormState>();
   final _formKeyVersamento = GlobalKey<FormState>();
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _versamentoController = TextEditingController();
   final TextEditingController _entrataController = TextEditingController();
   final TextEditingController _uscitaController = TextEditingController();
@@ -59,11 +61,33 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   GlobalKey<SfSignaturePadState> _signaturePadKey =
   GlobalKey<SfSignaturePadState>();
 
+  Future<void> getAllUtenti() async{
+    try{
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200){
+        var jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for(var item in jsonData){
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        throw Exception('Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch(e){
+      print('Qualcosa non va utenti : $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getAllMovimentazioni();
     getAllMovimentazioniExcel();
+    getAllUtenti();
   }
 
   @override
@@ -882,6 +906,105 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     return null;
                   },
                 ),
+                SizedBox(height: 12),
+                if(widget.userData.nome == "Segreteria")
+                  Column(
+                    children: [
+                      DropdownButtonFormField<UtenteModel>(
+                        decoration: InputDecoration(
+                          labelText: 'SELEZIONA UTENTE',
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        ),
+                        value: selectedUtente,
+                        items: allUtenti.map((utente) {
+                          return DropdownMenuItem<UtenteModel>(
+                            value: utente,
+                            child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
+                          );
+                        }).toList(),
+                        onChanged: (UtenteModel? val) {
+                          setState(() {
+                            selectedUtente = val;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Seleziona un utente';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 12),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'PASSWORD UTENTE',
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          hintText: 'Inserire la password dell\'utente',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[400],
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Inserisci una password valida';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  )
               ],
             ),
           ),
@@ -889,10 +1012,43 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
             TextButton(
               onPressed: () {
                 if (_formKeyUscita.currentState!.validate()) { // Convalida il form
-                  addUscita();
+                  if(widget.userData.nome == "Segreteria"){
+                    if(_passwordController.text == selectedUtente?.password){
+                      addUscita();
+                      setState(() {
+                        selectedUtente = null;
+                        _passwordController.clear();
+                      });
+                    } else {
+                      showPasswordErrorDialog(context);
+                    }
+                  } else{
+                    addUscita();
+                  }
                 }
               },
               child: Text('Conferma uscita'.toUpperCase()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showPasswordErrorDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Impedisce la chiusura toccando fuori dal dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Errore'),
+          content: Text('Password errata, impossibile creare il movimento'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Chiude il dialog
+              },
+              child: Text('Ok'),
             ),
           ],
         );
@@ -965,6 +1121,105 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     return null;
                   },
                 ),
+                if(widget.userData.nome == "Segreteria")
+                  Column(
+                    children: [
+                      SizedBox(height: 12),
+                      DropdownButtonFormField<UtenteModel>(
+                        decoration: InputDecoration(
+                          labelText: 'SELEZIONA UTENTE',
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        ),
+                        value: selectedUtente,
+                        items: allUtenti.map((utente) {
+                          return DropdownMenuItem<UtenteModel>(
+                            value: utente,
+                            child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
+                          );
+                        }).toList(),
+                        onChanged: (UtenteModel? val) {
+                          setState(() {
+                            selectedUtente = val;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Seleziona un utente';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 12),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'PASSWORD UTENTE',
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          hintText: 'Inserire la password dell\'utente',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[400],
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Inserisci una password valida';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
                 SizedBox(height: 10),
                 Text('Inserire la firma', style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
@@ -986,43 +1241,89 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
             TextButton(
               onPressed: () async {
                 if (_formKeyPrelievo.currentState!.validate()) { // Convalida il form
-                  // Puliamo l'input prima di inviarlo alla funzione
-                  String cleanedInput = _prelievoController.text.trim();
+                  if(widget.userData.nome == "Segreteria"){
+                    if(_passwordController.text == selectedUtente?.password){
+                      String cleanedInput = _prelievoController.text.trim();
 
-                  // Ottieni la firma dal SignaturePad
-                  final signaturePadState = _signaturePadKey.currentState;
-                  if (signaturePadState != null) {
-                    final image = await signaturePadState.toImage(); // Ottieni l'immagine come dart:ui Image
-                    final byteData = await image.toByteData(format: ImageByteFormat.png); // Convertilo in PNG
-                    final Uint8List? firmaIncaricato = byteData?.buffer.asUint8List(); // Ottieni i byte come Uint8List
+                      // Ottieni la firma dal SignaturePad
+                      final signaturePadState = _signaturePadKey.currentState;
+                      if (signaturePadState != null) {
+                        final image = await signaturePadState
+                            .toImage(); // Ottieni l'immagine come dart:ui Image
+                        final byteData = await image.toByteData(
+                            format: ImageByteFormat.png); // Convertilo in PNG
+                        final Uint8List? firmaIncaricato = byteData?.buffer
+                            .asUint8List(); // Ottieni i byte come Uint8List
 
-                    if (firmaIncaricato != null) {
-                      // Passa la firma e i dati alla pagina PDFPrelievoCassaPage
-                      addPrelievo(cleanedInput).whenComplete(() =>
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PDFPrelievoCassaPage(
-                                descrizione: 'Prelievo del ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
-                                data: DateTime.now(),
-                                utente: widget.userData,
-                                tipoMovimentazione: TipoMovimentazione.Prelievo,
-                                importo: cleanedInput,
-                                firmaIncaricato: firmaIncaricato, // Passa la firma come Uint8List
+                        if (firmaIncaricato != null) {
+                          // Passa la firma e i dati alla pagina PDFPrelievoCassaPage
+                          addPrelievo(cleanedInput).whenComplete(() =>
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      PDFPrelievoCassaPage(
+                                        descrizione: 'Prelievo del ${DateFormat(
+                                            'dd/MM/yyyy').format(
+                                            DateTime.now())}',
+                                        data: DateTime.now(),
+                                        utente: selectedUtente,
+                                        tipoMovimentazione: TipoMovimentazione
+                                            .Prelievo,
+                                        importo: cleanedInput,
+                                        firmaIncaricato: firmaIncaricato, // Passa la firma come Uint8List
+                                      ),
+                                ),
+                              ),
+                          );
+                        } else {
+                          // Gestisci il caso in cui la firma non è stata raccolta
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(
+                                'Firma non valida, riprova.')),
+                          );
+                        }
+                      }
+                    } else {
+                      showPasswordErrorDialog(context);
+                    }
+                  } else {
+                    String cleanedInput = _prelievoController.text.trim();
+
+                    // Ottieni la firma dal SignaturePad
+                    final signaturePadState = _signaturePadKey.currentState;
+                    if (signaturePadState != null) {
+                      final image = await signaturePadState.toImage(); // Ottieni l'immagine come dart:ui Image
+                      final byteData = await image.toByteData(format: ImageByteFormat.png); // Convertilo in PNG
+                      final Uint8List? firmaIncaricato = byteData?.buffer.asUint8List(); // Ottieni i byte come Uint8List
+
+                      if (firmaIncaricato != null) {
+                        // Passa la firma e i dati alla pagina PDFPrelievoCassaPage
+                        addPrelievo(cleanedInput).whenComplete(() =>
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PDFPrelievoCassaPage(
+                                  descrizione: 'Prelievo del ${DateFormat('dd/MM/yyyy').format(DateTime.now())}',
+                                  data: DateTime.now(),
+                                  utente: widget.userData,
+                                  tipoMovimentazione: TipoMovimentazione.Prelievo,
+                                  importo: cleanedInput,
+                                  firmaIncaricato: firmaIncaricato, // Passa la firma come Uint8List
+                                ),
                               ),
                             ),
-                          ),
-                      );
-                    } else {
-                      // Gestisci il caso in cui la firma non è stata raccolta
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Firma non valida, riprova.')),
-                      );
+                        );
+                      } else {
+                        // Gestisci il caso in cui la firma non è stata raccolta
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Firma non valida, riprova.')),
+                        );
+                      }
                     }
                   }
                 }
               },
-
               child: Text('Conferma prelievo'.toUpperCase()),
             ),
           ],
@@ -1085,9 +1386,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     return null;
                   },
                 ),
-
-                SizedBox(height: 5),
-
+                SizedBox(height: 12),
                 TextFormField(
                   controller: _versamentoController,
                   decoration: InputDecoration(
@@ -1140,14 +1439,125 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     return null;
                   },
                 ),
+                if(widget.userData.nome == "Segreteria")
+                  Column(
+                    children: [
+                      SizedBox(height: 12),
+                      DropdownButtonFormField<UtenteModel>(
+                        decoration: InputDecoration(
+                          labelText: 'SELEZIONA UTENTE',
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        ),
+                        value: selectedUtente,
+                        items: allUtenti.map((utente) {
+                          return DropdownMenuItem<UtenteModel>(
+                            value: utente,
+                            child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
+                          );
+                        }).toList(),
+                        onChanged: (UtenteModel? val) {
+                          setState(() {
+                            selectedUtente = val;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Seleziona un utente';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 12),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'PASSWORD UTENTE',
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          hintText: 'Inserire la password dell\'utente',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[400],
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Inserisci una password valida';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  )
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                if (_formKeyVersamento.currentState!.validate()) { // Convalida il form
-                  addVersamento(_versamentoController.text);
+                if (_formKeyVersamento.currentState!.validate()) {
+                  if(widget.userData.nome == "Segreteria"){
+                    if(_passwordController.text == selectedUtente?.password){
+                      addVersamento(_versamentoController.text);
+                      setState(() {
+                        selectedUtente = null;
+                        _passwordController.clear();
+                      });
+                    } else {
+                      showPasswordErrorDialog(context);
+                    }
+                  } else {
+                    addVersamento(_versamentoController.text);
+                  }
                 }
               },
               child: Text('Conferma versamento'.toUpperCase()),
@@ -1219,37 +1629,37 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
 
   Future<void> addUscita() async{
     try{
-       final response = await http.post(
-         Uri.parse('$ipaddressProva/api/movimenti'),
-         headers: {'Content-Type': 'application/json'},
-         body: jsonEncode({
-           'data': DateTime.now().toIso8601String(),
-           'descrizione' : _descrizioneUscitaController.text.toString().toUpperCase(),
-           'tipo_movimentazione' : "Uscita",
-           'importo' : double.parse(_uscitaController.text.toString()),
-           'utente' : widget.userData.toMap()
-         }),
-       );
-       if (response.statusCode == 201) {
-         Navigator.pop(context);
-         _uscitaController.clear();
-         _descrizioneUscitaController.clear();
-         setState(() {
-           showSubMenu = false;
-         });
-         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-             content: Text('Movimentazione salvata con successo'),
-           ),
-         );
-         getAllMovimentazioni();
-       } else {
-         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-             content: Text('Errore durante il salvataggio della movimentazione'),
-           ),
-         );
-       }
+      final response = await http.post(
+        Uri.parse('$ipaddressProva/api/movimenti'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'data': DateTime.now().toIso8601String(),
+          'descrizione' : _descrizioneUscitaController.text.toString().toUpperCase(),
+          'tipo_movimentazione' : "Uscita",
+          'importo' : double.parse(_uscitaController.text.toString()),
+          'utente' : widget.userData.nome == "Segreteria" ? selectedUtente?.toMap() : widget.userData.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        Navigator.pop(context);
+        _uscitaController.clear();
+        _descrizioneUscitaController.clear();
+        setState(() {
+          showSubMenu = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Movimentazione salvata con successo'),
+          ),
+        );
+        getAllMovimentazioni();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Errore durante il salvataggio della movimentazione'),
+          ),
+        );
+      }
     } catch (e) {
       print('Ops: $e');
     }
@@ -1265,7 +1675,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
           'descrizione': "Prelievo del ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}".toUpperCase(),
           'tipo_movimentazione': "Prelievo",
           'importo': importo,
-          'utente': widget.userData.toMap()
+          'utente': widget.userData.nome == "Segreteria" ? selectedUtente?.toMap() : widget.userData.toMap()
         }),
       );
       if (response.statusCode == 201) {
@@ -1302,7 +1712,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
           'descrizione': _causaleVersamentoController.text.toUpperCase(),
           'tipo_movimentazione': "Versamento",
           'importo': double.parse(_versamentoController.text.toString()),
-          'utente': widget.userData.toMap()
+          'utente': widget.userData.nome == "Segreteria" ? selectedUtente?.toMap() : widget.userData.toMap()
         }),
       );
       if (response.statusCode == 201) {

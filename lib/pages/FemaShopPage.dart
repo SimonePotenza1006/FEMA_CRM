@@ -42,10 +42,13 @@ class _FemaShopPageState extends State<FemaShopPage> {
   DestinazioneModel? selectedDestinazione;
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _titoloController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   ClienteModel? selectedCliente;
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  List<UtenteModel> allUtenti = [];
+  UtenteModel? selectedUtenteSegreteria;
 
   Future<void> getAllRelazioniVendite(String clienteId) async{
     try{
@@ -64,6 +67,28 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
     } catch(e){
       print('Errore durante la chiamata all\'API: $e');
+    }
+  }
+
+  Future<void> getAllUtentiAttivi() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var response = await http.get(apiUrl);
+      if(response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<UtenteModel> utenti = [];
+        for(var item in jsonData){
+          utenti.add(UtenteModel.fromJson(item));
+        }
+        setState(() {
+          allUtenti = utenti;
+        });
+      } else {
+        throw Exception(
+            'Failed to load agenti data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching agenti data from API: $e');
     }
   }
 
@@ -406,6 +431,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     dbhelper = DbHelper();
     getAllClienti();
     getAllProdotti();
+    getAllUtentiAttivi();
   }
 
   @override
@@ -575,6 +601,158 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  void _showVerificaDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('VERIFICA UTENZA'),
+          content: Form( // Avvolgi tutto dentro un Form
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Column(
+                  children: [
+                    DropdownButtonFormField<UtenteModel>(
+                      decoration: InputDecoration(
+                        labelText: 'SELEZIONA UTENTE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 10),
+                      ),
+                      value: selectedUtenteSegreteria,
+                      items: allUtenti.map((utente) {
+                        return DropdownMenuItem<UtenteModel>(
+                          value: utente,
+                          child: Text(utente.nomeCompleto() ??
+                              'Nome non disponibile'),
+                        );
+                      }).toList(),
+                      onChanged: (UtenteModel? val) {
+                        setState(() {
+                          selectedUtenteSegreteria = val;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Seleziona un utente';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 12),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'PASSWORD UTENTE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        hintText: 'Inserire la password dell\'utente',
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[400],
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 10),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Inserisci una password valida';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () { // Convalida il form
+                if(_passwordController.text == selectedUtenteSegreteria?.password){
+                  savePrezzi();
+                  saveMovimento();
+                } else {
+                  showPasswordErrorDialog(context);
+                }
+              },
+              child: Text('Conferma'.toUpperCase()),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showPasswordErrorDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Impedisce la chiusura toccando fuori dal dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Errore'),
+          content: Text('Password errata, impossibile creare il movimento'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Chiude il dialog
+              },
+              child: Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   double? _getUltimoPrezzoProdotto(ProdottoModel prodotto, List<RelazioneClientiProdottiModel> relazioniCliente) {
     final relazioniProdotto = relazioniCliente
         .where((relazione) => relazione.prodotto?.id == prodotto.id)
@@ -610,10 +788,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             actions: <Widget>[
               TextButton(
                 onPressed: (){
-                  savePrezzi();
-                  saveMovimento();
+                  if(widget.utente.nome == "Segreteria"){
+                    _showVerificaDialog();
+                  } else {
+                    savePrezzi();
+                    saveMovimento();
+                  }
                 },
-                child: Text('Conferma vendita'.toUpperCase()),
+                child: Text('Conferma vendita'.toUpperCase(), style: TextStyle(color: Colors.red),),
               )
             ],
           );
@@ -669,8 +851,8 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'note': null,
           'relazione_tecnico' : _descrizioneController.text,
           'firma_cliente': null,
-          'utente_apertura' : widget.utente.toMap(),
-          'utente': widget.utente.toMap(),
+          'utente_apertura' : widget.utente.nome == "Segreteria" ? selectedUtenteSegreteria?.toMap() : widget.utente.toMap(),
+          'utente': widget.utente.nome == "Segreteria" ? selectedUtenteSegreteria?.toMap() : widget.utente.toMap(),
           'cliente': selectedCliente?.toMap(),
           'veicolo': null,
           'merce' : null,
@@ -717,7 +899,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               'id' : 2,
               'descrizione' : 'DDT vendita',
             },
-            'utente' : widget.utente.toMap(),
+            'utente' : widget.utente.nome == "Segreteria" ? selectedUtenteSegreteria?.toMap() : widget.utente.toMap(),
             'intervento' : intervento.toMap(),
           })
         );
@@ -821,7 +1003,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           'descrizione' : _descrizioneController.text.toString(),
           'tipo_movimentazione' : "Entrata",
           'importo' : totaleVendita,
-          'utente' : widget.utente.toMap(),
+          'utente' : widget.utente.nome == "Segreteria" ? selectedUtenteSegreteria?.toMap() : widget.utente.toMap(),
           'intervento' : intervento.toMap(),
           'cliente' : selectedCliente?.toMap()
         }),

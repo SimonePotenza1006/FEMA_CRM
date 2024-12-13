@@ -49,6 +49,12 @@ class _PDFPagamentoAccontoPageState extends State<PDFPagamentoAccontoPage>{
   @override
   void initState() {
     super.initState();
+    print("Desccrizione : ${widget.descrizione}");
+    print("Utente : ${widget.utente?.nomeCompleto()}");
+    print("Data : ${widget.data}");
+    print("Importo : ${widget.importo}");
+    print("Tipo : ${widget.tipoMovimentazione}");
+
     _pdfFuture = _generatePDF();
   }
 

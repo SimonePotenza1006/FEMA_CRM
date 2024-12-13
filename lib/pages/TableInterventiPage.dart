@@ -81,7 +81,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
