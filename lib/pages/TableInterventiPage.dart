@@ -81,7 +81,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -321,8 +321,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     });
   }
 
-  List<InterventoModel>
-      (int sheetIndex) {
+  List<InterventoModel> _getInterventiPerSheet(int sheetIndex) {
     switch (sheetIndex) {
       case 0: // Tutti (esclusi gli annullati)
         return _allInterventi
@@ -758,438 +757,438 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             children: [
               SizedBox(height: 10),
               Expanded(child: RefreshIndicator(
-                onRefresh: _refreshData,
-                child: SfDataGrid(
-                  //allowPullToRefresh: true,
-                  allowSorting: true,
-                  allowMultiColumnSorting: true,
-                  source: _dataSource,
-                  columnWidthMode: ColumnWidthMode.auto,
-                  allowColumnsResizing: true,
-                  isScrollbarAlwaysShown: true,
-                  rowHeight: 40,
-                  gridLinesVisibility: GridLinesVisibility.both,
-                  headerGridLinesVisibility: GridLinesVisibility.both,
-                  columns: [
-                    GridColumn(
-                      columnName: 'intervento',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'intervento',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['intervento']?? double.nan,
-                      minimumWidth: 0,
-                    ),
-                    GridColumn(
-                      columnName: 'id_intervento',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'ID',
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('id_intervento', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['id_intervento']?? double.nan,
-                      minimumWidth: 150,
-                    ),
-                    GridColumn(
-                      columnName: 'priorita',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('PR'),
-                      ),
-                      width: _columnWidths['priorita']?? double.nan,
-                      minimumWidth: 45,
-                    ),
-                    GridColumn(
-                      columnName: 'codice_danea',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'CODICE DANEA',
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('codice_danea', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['codice_danea']?? double.nan,
-                      minimumWidth: 200,
-                    ),
-                    GridColumn(
-                      columnName: 'cliente',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'Cliente'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('cliente', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['cliente']?? double.nan,
-                      minimumWidth: 200, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'data_apertura_intervento',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'Data apertura'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('data_apertura_intervento', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['data_apertura_intervento']?? double.nan,
-                      minimumWidth: 210, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'data',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'APPUNTAMENTO'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('data', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['data']?? double.nan,
-                      minimumWidth: 200,
-                    ),
-                    GridColumn(
-                      columnName: 'orario_appuntamento',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'Orario'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('orario_appuntamento', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['orario_appuntamento']?? double.nan,
-                      minimumWidth: 150, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'descrizione',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'TITOLO'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('descrizione', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['descrizione']?? double.nan,
-                      minimumWidth: 300, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'responsabile',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'Responsabile'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('responsabile', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['responsabile']?? double.nan,
-                      minimumWidth: 230,
-                    ),
-                    GridColumn(
-                      allowSorting: true,
-                      columnName: 'tipologia',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'SETTORE'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['tipologia']?? double.nan,
-                      minimumWidth: 180, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'stato',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text('STATO', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      width: _columnWidths['stato']?? double.nan,
-                      minimumWidth: 100,
-                    ),
-                    GridColumn(
-                      columnName: 'inserimento_importo',
-                      label : Container(
-                          padding: EdgeInsets.all(8),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              border: Border(
-                                  right : BorderSide(
-                                    color: Colors.grey,
-                                    width: 1,
-                                  )
-                              )
-                          ),
-                          child: Text(
-                            ''.toUpperCase(),
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                          )
-                      ),
-                      width: _columnWidths['inserimento_importo']?? double.nan,
-                      minimumWidth: 100,
-                    ),
-                    GridColumn(
-                      columnName: 'importo_intervento',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'importo \n netto'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('importo_intervento', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['importo_intervento']?? double.nan,
-                      minimumWidth: 150, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'importo_ivato',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: ColumnFilter(
-                          columnName: 'importo \n ivato'.toUpperCase(),
-                          onFilterApplied: (filtro) {
-                            setState(() {
-                              _dataSource.filtraColonna('importo_ivato', filtro);
-                            });
-                          },
-                        ),
-                      ),
-                      width: _columnWidths['importo_ivato']?? double.nan,
-                      minimumWidth: 150, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'acconto'.toUpperCase(),
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'Acconto'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['acconto']?? double.nan,
-                      minimumWidth: 150, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                      columnName: 'importo_restante',
-                      label: Container(
-                        padding: EdgeInsets.all(8.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          'Importo restante'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                      ),
-                      width: _columnWidths['importo_restante']?? double.nan,
-                      minimumWidth: 150, // Imposta la larghezza minima
-                    ),
-                    GridColumn(
-                        columnName: 'assegna_gruppo',
+                  onRefresh: _refreshData,
+                  child: SfDataGrid(
+                    //allowPullToRefresh: true,
+                    allowSorting: true,
+                    allowMultiColumnSorting: true,
+                    source: _dataSource,
+                    columnWidthMode: ColumnWidthMode.auto,
+                    allowColumnsResizing: true,
+                    isScrollbarAlwaysShown: true,
+                    rowHeight: 40,
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    columns: [
+                      GridColumn(
+                        columnName: 'intervento',
                         label: Container(
                           padding: EdgeInsets.all(8.0),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                              border: Border(
-                                  right: BorderSide(
-                                    color: Colors.grey[300]!,
-                                    width: 1,
-                                  )
-                              )
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
                           ),
                           child: Text(
-                            'Seleziona Gruppo'.toUpperCase(),
+                            'intervento',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                           ),
-                        )
-                    ),
-                  ],
-                  onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
-                    setState(() {
-                      _columnWidths[details.column.columnName] = details.width;
-                    });
-                    return true;
-                  },
-                )),
+                        ),
+                        width: _columnWidths['intervento']?? double.nan,
+                        minimumWidth: 0,
+                      ),
+                      GridColumn(
+                        columnName: 'id_intervento',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'ID',
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('id_intervento', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['id_intervento']?? double.nan,
+                        minimumWidth: 150,
+                      ),
+                      GridColumn(
+                        columnName: 'priorita',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text('PR'),
+                        ),
+                        width: _columnWidths['priorita']?? double.nan,
+                        minimumWidth: 45,
+                      ),
+                      GridColumn(
+                        columnName: 'codice_danea',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'CODICE DANEA',
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('codice_danea', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['codice_danea']?? double.nan,
+                        minimumWidth: 200,
+                      ),
+                      GridColumn(
+                        columnName: 'cliente',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'Cliente'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('cliente', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['cliente']?? double.nan,
+                        minimumWidth: 200, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'data_apertura_intervento',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'Data apertura'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('data_apertura_intervento', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['data_apertura_intervento']?? double.nan,
+                        minimumWidth: 210, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'data',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'APPUNTAMENTO'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('data', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['data']?? double.nan,
+                        minimumWidth: 200,
+                      ),
+                      GridColumn(
+                        columnName: 'orario_appuntamento',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'Orario'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('orario_appuntamento', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['orario_appuntamento']?? double.nan,
+                        minimumWidth: 150, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'descrizione',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'TITOLO'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('descrizione', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['descrizione']?? double.nan,
+                        minimumWidth: 300, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'responsabile',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'Responsabile'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('responsabile', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['responsabile']?? double.nan,
+                        minimumWidth: 230,
+                      ),
+                      GridColumn(
+                        allowSorting: true,
+                        columnName: 'tipologia',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'SETTORE'.toUpperCase(),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                        ),
+                        width: _columnWidths['tipologia']?? double.nan,
+                        minimumWidth: 180, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'stato',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text('STATO', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        width: _columnWidths['stato']?? double.nan,
+                        minimumWidth: 100,
+                      ),
+                      GridColumn(
+                        columnName: 'inserimento_importo',
+                        label : Container(
+                            padding: EdgeInsets.all(8),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    right : BorderSide(
+                                      color: Colors.grey,
+                                      width: 1,
+                                    )
+                                )
+                            ),
+                            child: Text(
+                              ''.toUpperCase(),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                            )
+                        ),
+                        width: _columnWidths['inserimento_importo']?? double.nan,
+                        minimumWidth: 100,
+                      ),
+                      GridColumn(
+                        columnName: 'importo_intervento',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'importo \n netto'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('importo_intervento', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['importo_intervento']?? double.nan,
+                        minimumWidth: 150, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'importo_ivato',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: ColumnFilter(
+                            columnName: 'importo \n ivato'.toUpperCase(),
+                            onFilterApplied: (filtro) {
+                              setState(() {
+                                _dataSource.filtraColonna('importo_ivato', filtro);
+                              });
+                            },
+                          ),
+                        ),
+                        width: _columnWidths['importo_ivato']?? double.nan,
+                        minimumWidth: 150, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'acconto'.toUpperCase(),
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Acconto'.toUpperCase(),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                        ),
+                        width: _columnWidths['acconto']?? double.nan,
+                        minimumWidth: 150, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                        columnName: 'importo_restante',
+                        label: Container(
+                          padding: EdgeInsets.all(8.0),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            'Importo restante'.toUpperCase(),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                        ),
+                        width: _columnWidths['importo_restante']?? double.nan,
+                        minimumWidth: 150, // Imposta la larghezza minima
+                      ),
+                      GridColumn(
+                          columnName: 'assegna_gruppo',
+                          label: Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    right: BorderSide(
+                                      color: Colors.grey[300]!,
+                                      width: 1,
+                                    )
+                                )
+                            ),
+                            child: Text(
+                              'Seleziona Gruppo'.toUpperCase(),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                          )
+                      ),
+                    ],
+                    onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
+                      setState(() {
+                        _columnWidths[details.column.columnName] = details.width;
+                      });
+                      return true;
+                    },
+                  )),
               ),
               Flex(
                 // height: 60,
@@ -2988,7 +2987,7 @@ class _ColumnFilterDialogState extends State<ColumnFilterDialog> {
         onSubmitted: (value) {
           widget.onFilterApplied(_controller.text);  // Applica il filtro
           Navigator.of(context).pop();
-      },
+        },
         controller: _controller,
         decoration: InputDecoration(hintText: 'Inserisci un valore con cui filtrare'),
       ),
@@ -3021,5 +3020,3 @@ class _ColumnFilterDialogState extends State<ColumnFilterDialog> {
     );
   }
 }
-
-
