@@ -447,7 +447,17 @@ class _TableTaskPageState extends State<TableTaskPage>{
                 Row(
                   children: [
                     PopupMenuButton<UtenteModel>(
-                      icon: Icon(Icons.person, color: Colors.white), // Icona della casa
+                      icon: //Icon(Icons.person, color: Colors.white), // Icona della casa
+                      Row(
+                        children: [
+                          Icon(Icons.person, color: Colors.white), // Icona dell'utente
+                          SizedBox(width: 3), // Spazio tra l'icona e il nome
+                          Text(
+                            selectedUtente != null ? selectedUtente!.nomeCompleto()!.toUpperCase() : 'Seleziona Utente',
+                            style: TextStyle(color: Colors.white), // Colore del testo
+                          ),
+                        ],
+                      ),
                       onSelected: (UtenteModel utente) {
                         setState(() {
                           selectedUtente = utente;
@@ -464,8 +474,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                       },
                     ),
                     //SizedBox(width: 2),
-                    Text('${selectedUtente != null ? "${selectedUtente?.nomeCompleto()!.toUpperCase()}" : "UTENTE"}', style: TextStyle(color: Colors.white)),
-                    SizedBox(width: 6)
+                    //Text('${selectedUtente != null ? selectedUtente!.nome!.toUpperCase()+' '+selectedUtente!.cognome!.substring(0,1)+'.' : "UTENTE"}', style: TextStyle(color: Colors.white)),
+                    //SizedBox(width: 6)
                   ],
                 ),
               IconButton(
@@ -678,7 +688,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                             ),
                             child: Text(
                               'DATA\nCREAZIONE',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                           width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_creazione']?? double.nan,
@@ -720,7 +730,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                             ),
                             child: Text(
                               'TITOLO',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                           width: (constraints.maxWidth < 460) ? 170 : 300,//_columnWidths['titolo']?? double.nan,
@@ -741,7 +751,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                             ),
                             child: Text(
                               'RIFERIMENTO',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                           width: (constraints.maxWidth < 460) ? 170 : 300,//_columnWidths['titolo']?? double.nan,
@@ -783,7 +793,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                             ),
                             child: Text(
                               'UTENTE',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                           width: (constraints.maxWidth < 460) ? 120 : 300,//_columnWidths['utente']?? double.nan,
@@ -804,7 +814,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                             ),
                             child: Text(
                               'ACCETTATO',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                           width: (constraints.maxWidth < 460) ? 110 : 170,//_columnWidths['accettato']?? double.nan,
@@ -825,11 +835,11 @@ class _TableTaskPageState extends State<TableTaskPage>{
                             ),
                             child: Text(
                               'DATA\nCONCLUSIONE',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
-                          width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_conclusione']?? double.nan,
-                          minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
+                          width: (constraints.maxWidth < 460) ? 125 : 150,//_columnWidths['data_conclusione']?? double.nan,
+                          minimumWidth: (constraints.maxWidth < 460) ? 125 : 150,
                         ),
                       ],
                       onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
@@ -838,97 +848,122 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         });
                         return true;
                       },
-                    ))),
+                    )
+                    )
+                ),
 
                 //if(widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3')
-                  Flex(
+                //SizedBox(height: 5,),
+                Flex(
+                    crossAxisAlignment : CrossAxisAlignment.end,
                     direction: Axis.horizontal,
                     children: [
+                      SizedBox(height:5),
                       Expanded(
                         child: Container(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: allTipi.map((tipo) {
-                                print(tipoIdGlobal.toString()+' mmm '+tipo.id!);
-                                final isSelected = tipoIdGlobal == int.parse(tipo.id!);
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                  //child: Container(
-                                //width: 120, // Larghezza del pulsante
-                                //height: 50, // Altezza del pulsante
-                                child: Container(
-                                  //width: 120, // Larghezza del pulsante
-                                  //height: 50, // Altezza del pulsante
-                                clipBehavior: Clip.none, // Permette all'icona di uscire dal contorno
-                                child: Stack(
-                                    alignment: Alignment.center, // Allinea il pulsante al centro
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          _changeSheet(int.parse(tipo.id!));
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                                          backgroundColor: isSelected
-                                              ? Colors.red // Colore rosso per il pulsante selezionato
-                                              : Colors.grey[300], // Colore grigio chiaro per i non selezionati
-                                          foregroundColor: isSelected
-                                              ? Colors.white // Testo bianco per il pulsante selezionato
-                                              : Colors.black, // Testo nero per i non selezionati
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(8.0),
-                                            side: isSelected
-                                                ? BorderSide(color: Colors.red, width: 2.0) // Bordo rosso
-                                                : BorderSide.none, // Nessun bordo
-                                          ),
-                                          elevation: isSelected ? 6.0 : 2.0, // Più elevazione se selezionato
-                                        ),
-                                        child: Column(children: [
-                                        Text(
-                                          tipo.descrizione!.toUpperCase(), // Mostra la descrizione
-                                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                        ),
-                                          (tipo.utente != null && tipo.utente != tipo.utentecreate) ? Row(children: [
-                                            Icon(
-                                              Icons.send, // Icona di notifica
-                                              color: Colors.teal,//isSelected ? Colors.white : Colors.black, // Colore dell'icona
-                                              size: 18, // Dimensione dell'icona
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 10),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: allTipi.map((tipo) {
+                                    print(tipoIdGlobal.toString()+' mmm '+tipo.id!);
+                                    final isSelected = tipoIdGlobal == int.parse(tipo.id!);
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                      child: Container(
+                                        //width: 120, // Larghezza del pulsante
+                                        //height: 50, // Altezza del pulsante
+                                          child: Container(
+                                            clipBehavior: Clip.none, // Permette all'icona di uscire dal contorno
+                                            child: Stack(
+                                              clipBehavior: Clip.none, // Permette agli elementi di uscire dai bordi
+                                              alignment: Alignment.center, // Centra gli elementi all'interno del pulsante
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    _changeSheet(int.parse(tipo.id!));
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                                                    backgroundColor: isSelected ? Colors.red : Colors.grey[300],
+                                                    foregroundColor: isSelected ? Colors.white : Colors.black,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(8.0),
+                                                    ),
+                                                    elevation: isSelected ? 6.0 : 2.0,
+                                                  ),
+                                                  child: Column(
+                                                    children: [
+                                                      Text(
+                                                        tipo.descrizione!.toUpperCase(),
+                                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                                      ),
+                                                      if (tipo.utente != null && tipo.utente != tipo.utentecreate)
+                                                        Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.send,
+                                                              color: Colors.teal,
+                                                              size: 18,
+                                                            ),
+                                                            Text(
+                                                              ' ' +
+                                                                  ((widget.utente.id != tipo.utente!.id)
+                                                                      ? tipo.utente!.nome! +
+                                                                      " " +
+                                                                      tipo.utente!.cognome!.substring(0, 1) +
+                                                                      "."
+                                                                      : tipo.utentecreate!.nome! +
+                                                                      " " +
+                                                                      tipo.utentecreate!.cognome!.substring(0, 1) +
+                                                                      "."),
+                                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                if (tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id))
+                                                  Positioned(
+                                                    right: -5, // Posizione migliore senza taglio
+                                                    top: -1, // Posizione migliore senza taglio
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.amber,
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black26,
+                                                            blurRadius: 4,
+                                                            offset: Offset(0, 2),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.all(3.0),
+                                                        child: Icon(
+                                                          Icons.warning_outlined,
+                                                          color: Colors.black,
+                                                          size: 12,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
-                                          Text(
-                                            ' '+ ((widget.utente.id != tipo.utente!.id) ? tipo.utente!.nome! + " " + tipo.utente!.cognome!.substring(0,1) + ".":
-                                            tipo.utentecreate!.nome! + " " + tipo.utentecreate!.cognome!.substring(0,1) + "."), // Mostra la descrizione
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                          ),],) : Container()
-                                        ],)
-                                      ),
-                                      //(tipo.utente != null && tipo.utente != tipo.utentecreate) ?
-                                      (tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id)) ?
-                                      Positioned(
-                                        right: -5, // Posizione a destra (puoi regolare questo valore)
-                                        top: -5, // Posizione in alto (puoi regolare questo valore)
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            //color: isSelected ? Colors.red : Colors.grey[300], // Colore di sfondo dell'icona
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(4.0), // Padding per l'icona
-                                            child: Icon(
-                                              Icons.warning, // Icona di notifica
-                                              color: Colors.amber,//isSelected ? Colors.white : Colors.black, // Colore dell'icona
-                                              size: 15, // Dimensione dell'icona
-                                            ),
-                                          ),
-                                        ),
-                                      ) : Container(),
-                                    ],
-                                  ))//),
-                                );
-                              }).toList(),
-                            ),
-                          ),
+                                          )),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ],
+                          )
                         ),
                       ),
                     ],
@@ -952,14 +987,14 @@ class _TableTaskPageState extends State<TableTaskPage>{
                           builder: (BuildContext context, StateSetter setState) {
                             return AlertDialog(
                               title: Text(
-                                'Scegliere una tipologia da eliminare',
+                                'Scegliere una tipologia da eliminare'.toUpperCase(),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: allTipi.map((tipo) {
                                   return RadioListTile<TipoTaskModel>(
-                                    title: Text(tipo.descrizione!),
+                                    title: Text(tipo.descrizione!.toUpperCase()),
                                     value: tipo,
                                     groupValue: selectedTipoToDelete,
                                     onChanged: (TipoTaskModel? value) {
@@ -979,10 +1014,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: Text('Conferma Eliminazione'),
+                                          title: Text('Conferma Eliminazione'.toUpperCase()),
                                           content: Text(
-                                            'Questa operazione cancellerà la tipologia "${selectedTipoToDelete?.descrizione}" '
-                                                'e tutte le task ad essa associate. Sei sicuro di voler procedere all\'eliminazione?',
+                                            'Questa operazione cancellerà la tipologia "${selectedTipoToDelete?.descrizione!.toUpperCase()}" '
+                                                'e tutte le task ad essa associate. Sei sicuro di voler procedere all\'eliminazione?'.toUpperCase(),
                                           ),
                                           actions: [
                                             TextButton(
@@ -992,26 +1027,26 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                                 Navigator.of(context).pop(); // Chiudi il dialog di conferma
                                                 Navigator.of(context).pop(); // Chiudi il dialog principale
                                               },
-                                              child: Text('Sì'),
+                                              child: Text('SI'),
                                             ),
                                             TextButton(
                                               onPressed: () {
                                                 Navigator.of(context).pop(); // Chiudi il dialog di conferma
                                               },
-                                              child: Text('No'),
+                                              child: Text('NO'),
                                             ),
                                           ],
                                         );
                                       },
                                     );
                                   },
-                                  child: Text('Elimina'),
+                                  child: Text('ELIMINA'),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop(); // Chiudi il dialog principale
                                   },
-                                  child: Text('Annulla'),
+                                  child: Text('ANNULLA'),
                                 ),
                               ],
                             );
@@ -1082,7 +1117,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                         return DropdownMenuItem<UtenteModel>(
                                           value: utente,
                                           child: Text(
-                                            utente.nomeCompleto()!,
+                                            utente.nomeCompleto()!.toUpperCase(),
                                             style: TextStyle(fontSize: 14, color: Colors.black87),
                                           ),
                                         );
@@ -1148,7 +1183,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   child: Icon(Icons.create_new_folder, color: Colors.white),
                   heroTag: "Tag2",
                 ),
-                SizedBox(height: 45),
+                SizedBox(height: 50),
               ]
             ) : Container(),
         )
@@ -1169,7 +1204,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Nuova tipologia registrata con successo!'),
+          content: Text('Nuova tipologia registrata con successo!'.toUpperCase()),
         ),
       );
       getAllTipi();
@@ -1319,9 +1354,12 @@ class TaskDataSource extends DataGridSource{
           DataGridCell<TaskModel>(columnName: 'delete', value: task),
           DataGridCell<TaskModel>(columnName: 'condividi', value: task),
           DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
-          DataGridCell<String>(columnName: 'titolo', value: task.titolo),
-          DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento : '//'),
-          DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
+          DataGridCell<String>(columnName: 'titolo', value: task.titolo!.toUpperCase()),
+          DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento!.toUpperCase() : '//'),
+          //DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
+          DataGridCell<String>(columnName: 'utente', value: task.condiviso == true ?
+            "${task.utentecreate?.nome!} ${task.utentecreate?.cognome?.substring(0,1)}. ${String.fromCharCode(10132)} ${task.utente?.nome!} ${task.utente?.cognome?.substring(0,1)}." :
+            "${utente.nomeCompleto()}"),
           DataGridCell<String>(columnName: 'accettato', value: accettato),
           DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
         ]
@@ -1358,7 +1396,7 @@ class TaskDataSource extends DataGridSource{
       if(response.statusCode == 201){
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Stato Task aggiornato con successo!'),
+            content: Text('Stato Task aggiornato con successo!'.toUpperCase()),
           ),
         );
         //await Future.delayed(Duration(seconds: 2));
@@ -1400,7 +1438,7 @@ class TaskDataSource extends DataGridSource{
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Stato Task aggiornato con successo!'),
+            content: Text('Stato Task aggiornato con successo!'.toUpperCase()),
           ),
         );
         Navigator.pushReplacement(
@@ -1441,7 +1479,7 @@ class TaskDataSource extends DataGridSource{
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Stato Task assegnata con successo!'),
+            content: Text('Stato Task assegnata con successo!'.toUpperCase()),
           ),
         );
         Navigator.pushReplacement(
@@ -1481,7 +1519,7 @@ class TaskDataSource extends DataGridSource{
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Task eliminato con successo!'),
+            content: Text('Task eliminato con successo!'.toUpperCase()),
           ),
         );
         /*Navigator.pushAndRemoveUntil(
@@ -1546,7 +1584,7 @@ class TaskDataSource extends DataGridSource{
                 return AlertDialog(
                   title: Text('CONCLUSIONE TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER AGGIORNARE LO STATO DEL TASK \"'+task.titolo!+'\" COME CONCLUSO?'),
+                      'CONFERMI DI VOLER AGGIORNARE LO STATO DEL TASK \"'+task.titolo!.toUpperCase()+'\" COME CONCLUSO?'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -1580,7 +1618,7 @@ class TaskDataSource extends DataGridSource{
               return AlertDialog(
                 title: Text('ACCETTA TASK'),
                 content: Text(
-                    task.utentecreate!.nomeCompleto()!.toUpperCase()+' HA CREATO UN TASK PER TE, CONFERMI DI AVER PRESO VISIONE?'),
+                    task.utentecreate!.nomeCompleto()!.toUpperCase()+' HA CREATO IL TASK \"${task.titolo!.toUpperCase()}\" PER TE, CONFERMI DI AVER PRESO VISIONE?'),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () {
@@ -1610,7 +1648,7 @@ class TaskDataSource extends DataGridSource{
                 return AlertDialog(
                   title: Text('ELIMINAZIONE TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER ELIMINARE IL TASK \"'+task.titolo!+'\" DALLA LISTA?'),
+                      'CONFERMI DI VOLER ELIMINARE IL TASK \"'+task.titolo!.toUpperCase()+'\" DALLA LISTA?'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -1645,7 +1683,7 @@ class TaskDataSource extends DataGridSource{
                 return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
                   builder: (BuildContext context, StateSetter setState) {
                     return AlertDialog(
-                      title: Text('Condividi Task\n\"'+task.titolo!+'\"'),
+                      title: Text('Condividi Task\n\"'.toUpperCase()+task.titolo!.toUpperCase()+'\"'),
                       content: SingleChildScrollView(
                         child: Container(
                           width: double.maxFinite,
@@ -1665,7 +1703,7 @@ class TaskDataSource extends DataGridSource{
                                         localSelectedUtente = newValue; // Aggiorna lo stato locale
                                       });
                                     },
-                                    title: Text(_allUtenti[index].nomeCompleto()!),
+                                    title: Text(_allUtenti[index].nomeCompleto()!.toUpperCase()),
                                   );
                                 },
                               ),
@@ -1678,7 +1716,7 @@ class TaskDataSource extends DataGridSource{
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
-                          child: Text('Annulla'),
+                          child: Text('Annulla'.toUpperCase()),
                         ),
                         TextButton(
                           onPressed: () {
@@ -1686,10 +1724,10 @@ class TaskDataSource extends DataGridSource{
                               // Salva l'utente selezionato
                               assegnaTask(task, localSelectedUtente!);
                               Navigator.of(context).pop();
-                              print('Utente selezionato: ${localSelectedUtente!.nomeCompleto()}');
+                              print('Utente selezionato: ${localSelectedUtente!.nomeCompleto()}'.toUpperCase());
                             }
                           },
-                          child: Text('Condividi'),
+                          child: Text('Condividi'.toUpperCase(), style: TextStyle(fontSize: 18)),
                         ),
                       ],
                     );
@@ -1724,7 +1762,7 @@ class TaskDataSource extends DataGridSource{
             },//color: task.concluso! ? Colors.white54 : Colors.white,
             child: Container(
               alignment: Alignment.center,
-              padding: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(4.0),
               decoration: BoxDecoration(
                 border: Border(
                   right: BorderSide(

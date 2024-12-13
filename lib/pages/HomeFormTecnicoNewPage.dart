@@ -169,8 +169,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("Attenzione"),
-                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali."),
+                title: Text("Attenzione".toUpperCase()),
+                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali.".toUpperCase()),
                 actions: [
                   TextButton(
                     onPressed: () {

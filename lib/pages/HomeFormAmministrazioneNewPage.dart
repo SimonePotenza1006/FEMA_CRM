@@ -179,8 +179,8 @@ class _HomeFormAmministrazioneNewPageState
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("Attenzione"),
-                content: Text("Sono presenti dei ticket non ancora convertiti, controlla nell\'apposita sezione."),
+                title: Text("Attenzione".toUpperCase()),
+                content: Text("Sono presenti dei ticket non ancora convertiti, controlla nell\'apposita sezione.".toUpperCase()),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -217,8 +217,8 @@ class _HomeFormAmministrazioneNewPageState
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("Attenzione"),
-                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali."),
+                title: Text("Attenzione".toUpperCase()),
+                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali.".toUpperCase()),
                 actions: [
                   TextButton(
                     onPressed: () {

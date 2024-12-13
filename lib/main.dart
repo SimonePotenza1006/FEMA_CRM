@@ -645,7 +645,7 @@ class _LoginFormState extends State<LoginForm> {
                           Spacer(),
                           Align(
                             alignment: Alignment.bottomRight,
-                            child: Text('REL. 12.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
+                            child: Text('REL. 13.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
                           )
 
                         ],

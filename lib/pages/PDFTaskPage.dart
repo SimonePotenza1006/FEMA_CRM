@@ -150,11 +150,11 @@ class _PDFTaskPageState extends State<PDFTaskPage> {
                         isConcluded: task.concluso!,
                       ),
                       createCellWithLine(
-                        text: task.titolo.toString(),
+                        text: task.titolo.toString().toUpperCase(),
                         isConcluded: task.concluso!,
                       ),
                       createCellWithLine(
-                        text: task.riferimento != null ? task.riferimento.toString() : '//',
+                        text: task.riferimento != null ? task.riferimento.toString().toUpperCase() : '//',
                         isConcluded: task.concluso!,
                       ),
                       createCellWithLine(

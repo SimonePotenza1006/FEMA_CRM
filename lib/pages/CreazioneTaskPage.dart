@@ -433,7 +433,7 @@ class _CreazioneTaskPageState
                               return DropdownMenuItem<TipoTaskModel>(
                                 value: tipologia,
                                 child: Text(
-                                  tipologia.descrizione!, // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
+                                  tipologia.descrizione!.toUpperCase(), // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
                                   style: TextStyle(fontSize: 14, color: Colors.black87),
                                 ),
                               );
@@ -469,7 +469,7 @@ class _CreazioneTaskPageState
                             ),
                             validator: (value) {
                               if (value == null) {
-                                return 'Selezionare una tipologia di task';
+                                return 'Selezionare una tipologia di task'.toUpperCase();
                               }
                               return null;
                             },
@@ -480,7 +480,7 @@ class _CreazioneTaskPageState
                           width: 200,
                           child: CheckboxListTile(
                             enabled: _selectedTipo?.utente != null ? false : true,
-                            title: Text('Condiviso'),
+                            title: Text('Condiviso'.toUpperCase()),
                             value: _condiviso,
                             onChanged: (value) {
                               setState(() {
@@ -508,7 +508,7 @@ class _CreazioneTaskPageState
                               return DropdownMenuItem<UtenteModel>(
                                 value: utente,
                                 child: Text(
-                                  utente.nomeCompleto()!,
+                                  utente.nomeCompleto()!.toUpperCase(),
                                   style: TextStyle(fontSize: 14, color: Colors.black87),
                                 ),
                               );
@@ -544,7 +544,7 @@ class _CreazioneTaskPageState
                             ),
                             validator: (value) {
                               if (value == null) {
-                                return 'Selezionare un tecnico';
+                                return 'Selezionare un tecnico'.toUpperCase();
                               }
                               return null;
                             },
@@ -557,7 +557,7 @@ class _CreazioneTaskPageState
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white, backgroundColor: Colors.red,
                             ),
-                            child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                            child: Text('Allega Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                           ),
                         ) : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -568,7 +568,7 @@ class _CreazioneTaskPageState
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white, backgroundColor: Colors.red,
                                 ),
-                                child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                               ),
                             ),
                             SizedBox(width: 16,),
@@ -578,7 +578,7 @@ class _CreazioneTaskPageState
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white, backgroundColor: Colors.red,
                                 ),
-                                child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                child: Text('Allega Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                               ),
                             ),
                           ],
@@ -741,7 +741,7 @@ class _CreazioneTaskPageState
       Navigator.of(context).pop('aggiorna');//Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Task registrato con successo!'),
+          content: Text('Task registrato con successo!'.toUpperCase()),
         ),
       );
       return response;
@@ -779,7 +779,7 @@ class _CreazioneTaskPageState
             print('File inviato con successo');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Foto salvata!'),
+                content: Text('Foto salvata!'.toUpperCase()),
               ),
             );
           } else {
