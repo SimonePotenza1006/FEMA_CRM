@@ -827,8 +827,8 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: (constraints.maxWidth < 460) ? 100 : 150,//_columnWidths['data_conclusione']?? double.nan,
-                          minimumWidth: (constraints.maxWidth < 460) ? 100 : 150,
+                          width: (constraints.maxWidth < 460) ? 125 : 150,//_columnWidths['data_conclusione']?? double.nan,
+                          minimumWidth: (constraints.maxWidth < 460) ? 125 : 150,
                         ),
                       ],
                       onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
@@ -1318,9 +1318,12 @@ class TaskDataSource extends DataGridSource{
           DataGridCell<TaskModel>(columnName: 'delete', value: task),
          // DataGridCell<TaskModel>(columnName: 'condividi', value: task),
           DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
-          DataGridCell<String>(columnName: 'titolo', value: task.titolo),
-          DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento : '//'),
-          DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
+          DataGridCell<String>(columnName: 'titolo', value: task.titolo!.toUpperCase()),
+          DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento!.toUpperCase() : '//'),
+          //DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
+          DataGridCell<String>(columnName: 'utente', value: task.condiviso == true ?
+            "${task.utentecreate?.nome!} ${task.utentecreate?.cognome?.substring(0,1)}. ${String.fromCharCode(10132)} ${task.utente?.nome!} ${task.utente?.cognome?.substring(0,1)}." :
+            "${utente.nomeCompleto()}"),
           DataGridCell<String>(columnName: 'accettato', value: accettato),
           DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
         ]
@@ -1459,7 +1462,7 @@ class TaskDataSource extends DataGridSource{
       if (response.statusCode == 200) {
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Task eliminato con successo')),
+          SnackBar(content: Text('Task eliminato con successo'.toUpperCase())),
         );
         Navigator.pushReplacement(
             context,
@@ -1473,7 +1476,7 @@ class TaskDataSource extends DataGridSource{
         );*/
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Impossibile eliminare il task')),
+           SnackBar(content: Text('Impossibile eliminare il task'.toUpperCase())),
         );
       }
     } catch (e) {
@@ -1527,7 +1530,7 @@ class TaskDataSource extends DataGridSource{
                 return AlertDialog(
                   title: Text('CONCLUSIONE TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER AGGIORNARE LO STATO DEL TASK \"'+task.titolo!+'\" COME CONCLUSO?'),
+                      'CONFERMI DI VOLER AGGIORNARE LO STATO DEL TASK \"'+task.titolo!.toUpperCase()+'\" COME CONCLUSO?'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -1591,7 +1594,7 @@ class TaskDataSource extends DataGridSource{
                 return AlertDialog(
                   title: Text('ELIMINAZIONE TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER ELIMINARE DEFINITIVAMENTE IL TASK \"'+task.titolo!+'\" DALL\'ARCHIVIO?'),
+                      'CONFERMI DI VOLER ELIMINARE DEFINITIVAMENTE IL TASK \"'+task.titolo!.toUpperCase()+'\" DALL\'ARCHIVIO?'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {

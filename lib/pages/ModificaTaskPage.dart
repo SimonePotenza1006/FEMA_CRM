@@ -63,9 +63,9 @@ class _ModificaTaskPageState
   @override
   void initState() {
     super.initState();
-    _descrizioneController = TextEditingController(text: widget.task.descrizione);
-    _titoloController = TextEditingController(text: widget.task.titolo);
-    _riferimentoController = TextEditingController(text: widget.task.riferimento);
+    _descrizioneController = TextEditingController(text: widget.task.descrizione!.toUpperCase());
+    _titoloController = TextEditingController(text: widget.task.titolo!.toUpperCase());
+    _riferimentoController = TextEditingController(text: widget.task.riferimento!.toUpperCase());
     _condiviso = widget.task.condiviso!;
     _concluso = widget.task.concluso!;
     _accettato = widget.task.accettato!;
@@ -181,7 +181,7 @@ class _ModificaTaskPageState
               children: [
                 CircularProgressIndicator(),
                 SizedBox(width: 20),
-                Text("Caricamento in corso..."),
+                Text("Caricamento in corso...".toUpperCase()),
               ],
             ),
           );
@@ -215,8 +215,8 @@ class _ModificaTaskPageState
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Successo"),
-            content: Text("Caricamento completato!"),
+            title: Text("Successo".toUpperCase()),
+            content: Text("Caricamento completato!".toUpperCase()),
             actions: [
               TextButton(
                 child: Text("OK"),
@@ -613,7 +613,7 @@ class _ModificaTaskPageState
                                 return DropdownMenuItem<TipoTaskModel>(
                                   value: tipologia,
                                   child: Text(
-                                    tipologia.descrizione!, // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
+                                    tipologia.descrizione!.toUpperCase(), // Supponendo che TipologiaInterventoModel abbia una proprietà `label`
                                     style: TextStyle(fontSize: 14, color: Colors.black87),
                                   ),
                                 );
@@ -649,7 +649,7 @@ class _ModificaTaskPageState
                               ),
                               validator: (value) {
                                 if (value == null) {
-                                  return 'Selezionare una tipologia di task';
+                                  return 'Selezionare una tipologia di task'.toUpperCase();
                                 }
                                 return null;
                               },
@@ -703,7 +703,7 @@ class _ModificaTaskPageState
                                 return DropdownMenuItem<UtenteModel>(
                                   value: utente,
                                   child: Text(
-                                    utente.nomeCompleto()!,
+                                    utente.nomeCompleto()!.toUpperCase(),
                                     style: TextStyle(fontSize: 14, color: Colors.black87),
                                   ),
                                 );
@@ -739,7 +739,7 @@ class _ModificaTaskPageState
                               ),
                               validator: (value) {
                                 if (value == null) {
-                                  return 'Selezionare un tecnico';
+                                  return 'Selezionare un tecnico'.toUpperCase();
                                 }
                                 return null;
                               },
@@ -845,7 +845,7 @@ class _ModificaTaskPageState
                                   ),
                                 );
                               } else if (snapshot.hasError) {
-                                return Text('Nessuna foto presente nel database!');
+                                return Text('Nessuna foto presente nel database!'.toUpperCase());
                               } else {
                                 return Center(child: CircularProgressIndicator());
                               }
@@ -859,7 +859,7 @@ class _ModificaTaskPageState
                                 foregroundColor: Colors.white,
                                 backgroundColor: Colors.red,
                               ),
-                              child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                              child: Text('Allega Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                             ),
                           ) : Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -871,7 +871,7 @@ class _ModificaTaskPageState
                                     foregroundColor: Colors.white,
                                     backgroundColor: Colors.red,
                                   ),
-                                  child: Text('Scatta Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                  child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                                 ),
                               ),
                               SizedBox(height: 16,),
@@ -882,7 +882,7 @@ class _ModificaTaskPageState
                                     foregroundColor: Colors.white,
                                     backgroundColor: Colors.red,
                                   ),
-                                  child: Text('Allega Foto', style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                  child: Text('Allega Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
                                 ),
                               ),
 
@@ -902,7 +902,7 @@ class _ModificaTaskPageState
                                   if (snapshot.connectionState == ConnectionState.waiting) {
                                     return Center(child: CircularProgressIndicator());
                                   } else if (snapshot.hasError) {
-                                    return Center(child: Text('Nessun audio disponibile'));//'Errore nel caricamento dell\'audio'));
+                                    return Center(child: Text('Nessun audio disponibile'.toUpperCase()));//'Errore nel caricamento dell\'audio'));
                                   } else {
                                     // Qui puoi accedere a _totalDuration e costruire il tuo widget
                                     return SingleChildScrollView(
@@ -1018,7 +1018,7 @@ class _ModificaTaskPageState
         Navigator.of(context).pop('aggiorna');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Task salvato con successo!'),
+            content: Text('Task salvato con successo!'.toUpperCase()),
           ),
         );
       } else {
