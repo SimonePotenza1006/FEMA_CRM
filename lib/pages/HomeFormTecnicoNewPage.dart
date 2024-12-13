@@ -49,6 +49,8 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
   Map<int, int> _menuItemClickCount = {};
   late int tipoIdGlobal;
   List<TipoTaskModel>? tipidaacc;
+  bool sitask = false;
+  Timer? _timer;
   // static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   // Map<String, dynamic> _deviceData = <String, dynamic>{};
 
@@ -165,6 +167,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
             .toSet() // Converte in un Set per ottenere valori unici
             .toList();
         if (tasks.isNotEmpty) {
+          sitask = true;
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -189,6 +192,48 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
     }
   }
 
+  Future<void> getAllTasksStream() async {
+    try {
+      String userId = widget.userData!.id.toString();
+      http.Response response = await http.get(Uri.parse('$ipaddressProva/api/task/utente/$userId'));
+      if (response.statusCode == 200) {
+        var responseData = json.decode(response.body);
+        List<TaskModel> tasks = [];
+        for (var item in responseData) {
+          TaskModel task = TaskModel.fromJson(item);
+          if (task.accettato == false && task.utentecreate!.id != widget.userData!.id) {
+            tasks.add(task);
+            tipidaacc?.add(task.tipologia!);
+          }
+        }
+        tipidaacc?.map((model) => model.descrizione) // Mappa a descrizioni
+            .toSet() // Converte in un Set per ottenere valori unici
+            .toList();
+        if (tasks.isNotEmpty) {
+          sitask = true;
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Attenzione".toUpperCase()),
+                content: Text("Ti sono stati assegnati dei nuovi tasks, controlla nell\'apposita sezione e accettali.".toUpperCase()),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Chiude l'alert
+                    },
+                    child: Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      print('Error fetching commissioni: $e');
+    }
+  }
 
   Future<List<CommissioneModel>> getAllCommissioniByUtente(
       String userId) async {
@@ -1615,7 +1660,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                               SizedBox(height: 20),
                               buildMenuButton(
                                 icon: Icons.edit_note,
-                                text: 'TASK',
+                                text: sitask ? 'TASK!!!' : 'TASK',
                                 onPressed: () {
                                   Navigator.push(
                                     context,

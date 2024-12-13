@@ -551,6 +551,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                     child: RefreshIndicator(
                         onRefresh: _refreshData,
                         child: isLoading ? Center(child: CircularProgressIndicator()) : SfDataGrid(
+                          headerRowHeight: 54,
                       //allowPullToRefresh: true,
                       allowSorting: true,
                       source: _dataSource,
@@ -1479,7 +1480,7 @@ class TaskDataSource extends DataGridSource{
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Stato Task assegnata con successo!'.toUpperCase()),
+            content: Text('Stato Task aggiornato con successo!'.toUpperCase()),
           ),
         );
         Navigator.pushReplacement(
