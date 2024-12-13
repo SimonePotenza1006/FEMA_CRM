@@ -721,7 +721,7 @@ class _CreazioneTaskPageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data_creazione': DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
@@ -765,7 +765,7 @@ class _CreazioneTaskPageState
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/task/${int.parse(task.id!.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/task/${int.parse(task.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -814,7 +814,7 @@ class _CreazioneTaskPageState
           print('Percorso del file audio: ${file.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -850,7 +850,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -894,7 +894,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

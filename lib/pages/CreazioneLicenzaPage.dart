@@ -257,7 +257,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<List<LicenzaModel>> futureLicenze() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/licenza/all');
+      var apiUrl = Uri.parse('$ipaddress/api/licenza/all');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -323,7 +323,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<void> noteLicenza(LicenzaModel licenza, String note) async {
     print(licenza.note.toString()+' '+note);
-    final url = Uri.parse('$ipaddressProva/api/licenza/nuova');
+    final url = Uri.parse('$ipaddress/api/licenza/nuova');
     final body = jsonEncode({
       'id': licenza.id!,
       'descrizione': licenza.descrizione,
@@ -359,7 +359,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   }
 
   Future<void> createNewLicenza() async {
-    final url = Uri.parse('$ipaddressProva/api/licenza/nuova');
+    final url = Uri.parse('$ipaddress/api/licenza/nuova');
     final body = jsonEncode({
       'descrizione': _licenzaController.text,
       'utilizzato': false

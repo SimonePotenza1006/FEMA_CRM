@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
@@ -94,7 +95,80 @@ class MyApp extends StatelessWidget {
       supportedLocales: [
         const Locale('it', 'IT'),
       ],
-      home: LoginForm(),
+      home: SplashScreen(),
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Configurazione del controller dell'animazione
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+
+    // Animazione di scala per lo zoom
+    _animation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _animationController.forward();
+
+    // Naviga verso la schermata di login dopo 3 secondi
+    Timer(Duration(seconds: 3), () {
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: Duration(seconds: 1), // Durata della transizione
+          pageBuilder: (context, animation, secondaryAnimation) => LoginForm(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // Definisce una dissolvenza
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: ScaleTransition(
+          scale: _animation,
+          child: Image.asset(
+            'assets/images/background_login_1_1.jpg',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -335,7 +409,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddressProva/api/utente/ulogin'),
+          Uri.parse('$ipaddress/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -515,7 +589,7 @@ class _LoginFormState extends State<LoginForm> {
               image: DecorationImage(
                   image: ExactAssetImage("assets/images/background_login_1_1.jpg"),
                   fit: BoxFit.cover,
-                  opacity: 0.8
+                  //opacity: 0.8
               ),
             ),
           ),

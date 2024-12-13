@@ -224,7 +224,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveScadenza() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/scadenza'),
+        Uri.parse('$ipaddress/api/scadenza'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : _selectedDate?.toIso8601String(),
