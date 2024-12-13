@@ -25,75 +25,115 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   DateTime? _selectedDate;
   final _formKey = GlobalKey<FormState>();
 
-  Widget _buildTextFormField(TextEditingController controller, String label, String hintText) {
-    return Container(
-      width: MediaQuery.of(context).size.width / 2, // half of the screen width
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText,
+      {String? Function(String?)? validator}) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
       child: TextFormField(
         controller: controller,
+        maxLines: null, // Permette più righe
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
           hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: BorderSide(
-              color: Colors.grey,
-            ),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
-              color: Colors.red,
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
             ),
           ),
-          contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Campo obbligatorio'.toUpperCase();
-          }
-          return null;
-        },
+        validator: validator, // Funzione di validazione
       ),
     );
   }
 
-  Widget _buildDateField(TextEditingController controller, String label, DateTime? selectedDate, void Function(DateTime?) setSelectedDate) {
-    return Container(
-      width: MediaQuery.of(context).size.width / 2, // half of the screen width
-      child: InkWell(
-        onTap: () async {
-          await _selectDate(context, controller, selectedDate, setSelectedDate);
+  Widget _buildDatePickerField(
+      BuildContext context, TextEditingController controller, String label,
+      {DateTime? initialDate,
+        DateTime? firstDate,
+        DateTime? lastDate,
+        void Function(DateTime?)? onDateSelected}) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
+      child: GestureDetector(
+        onTap: () {
+          showDatePicker(
+            context: context,
+            initialDate: initialDate ?? DateTime.now(),
+            firstDate: firstDate ?? DateTime.now(),
+            lastDate: lastDate ?? DateTime(2100),
+          ).then((selectedDate) {
+            if (selectedDate != null) {
+              // Aggiorna il controller con la data selezionata
+              controller.text = "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+              if (onDateSelected != null) {
+                onDateSelected(selectedDate);
+              }
+            }
+          });
         },
-        child: IgnorePointer(
+        child: AbsorbPointer(
           child: TextFormField(
             controller: controller,
             decoration: InputDecoration(
               labelText: label,
+              labelStyle: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.bold,
+              ),
+              hintText: 'Seleziona una data', // Testo suggerimento
+              filled: true,
+              fillColor: Colors.grey[200], // Sfondo riempito
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide(
-                  color: Colors.grey,
-                ),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Nessun bordo di default
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                  color: Colors.red,
+                  color: Colors.redAccent,
+                  width: 2.0, // Larghezza bordo focale
                 ),
               ),
-              contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.grey[300]!,
+                  width: 1.0, // Larghezza bordo abilitato
+                ),
+              ),
+              contentPadding:
+              EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Campo obbligatorio'.toUpperCase();
-              }
-              return null;
-            },
           ),
         ),
       ),
     );
   }
+
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller, DateTime? selectedDate, void Function(DateTime?) setSelectedDate) async {
     // Inizializza l'initialDate con un anno da oggi
@@ -144,11 +184,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   SizedBox(height: 12),
                   SizedBox(
                     width: 400,
-                    child: _buildDateField(_dataController, "DATA DI SCADENZA", _selectedDate, (DateTime? date){
-                      setState(() {
-                        _selectedDate = date;
-                      });
-                    }),
+                    child: _buildDatePickerField(context, _dataController, "DATA DI SCADENZA" ),
                   ),
                   SizedBox(height: 20),
                   Center(

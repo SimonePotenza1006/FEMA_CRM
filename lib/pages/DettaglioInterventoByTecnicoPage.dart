@@ -502,17 +502,17 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               children : [
                 if (widget.intervento.utente?.id == widget.utente.id)
                   if (widget.intervento.orario_inizio == null  && (widget.utente.id == "9" || widget.utente.id == "4" || widget.intervento.id == "5"))
-                    SpeedDialChild(
-                      child: Icon(Icons.lock_clock_outlined, color: Colors.white),
-                      backgroundColor: Colors.red,
-                      label: 'Inizia intervento'.toUpperCase(),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => InizioInterventoPage(intervento: widget.intervento, utente: widget.utente),
-                        ),
-                      ),
-                    ),
+                    // SpeedDialChild(
+                    //   child: Icon(Icons.lock_clock_outlined, color: Colors.white),
+                    //   backgroundColor: Colors.red,
+                    //   label: 'Inizia intervento'.toUpperCase(),
+                    //   onTap: () => Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => InizioInterventoPage(intervento: widget.intervento, utente: widget.utente),
+                    //     ),
+                    //   ),
+                    // ),
                 if(widget.intervento.concluso == false && widget.intervento.orario_inizio != null &&  widget.intervento.utente?.id == widget.utente.id && widget.intervento.merce == null && (widget.utente.id == "9" || widget.utente.id == "4" || widget.intervento.id == "5"))
                   SpeedDialChild(
                     child: Icon(Icons.cases_outlined, color: Colors.white),

@@ -40,14 +40,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              TextFormField(
-                controller: _notaController,
-                maxLines: null, // Allow multiline input
-                decoration: InputDecoration(
-                  hintText: 'Inserisci qui la nota',
-                  border: OutlineInputBorder(),
-                ),
-              ),
+              _buildTextFormField(_notaController, "NOTA", "Inserire la nota"),
               SizedBox(height: 16), // Add some space between TextFormField and ElevatedButton
               ElevatedButton(
                 onPressed: () {
@@ -68,6 +61,50 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText,
+      {String? Function(String?)? validator}) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
+      child: TextFormField(
+        controller: controller,
+        maxLines: null, // Permette più righe
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ),
+        validator: validator, // Funzione di validazione
       ),
     );
   }

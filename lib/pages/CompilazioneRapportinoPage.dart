@@ -158,33 +158,87 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              DropdownButton<VeicoloModel>(
-                value: selectedVeicolo,
-                onChanged: (VeicoloModel? newValue) {
-                  setState(() {
-                    selectedVeicolo = newValue;
-                  });
-                },
-                items: allVeicoli.map((VeicoloModel veicolo) {
-                  return DropdownMenuItem<VeicoloModel>(
-                    value: veicolo,
-                    child: Text(veicolo.descrizione!), // Sostituisci 'nome' con il campo appropriato del tuo modello VeicoloModel
-                  );
-                }).toList(),
+              SizedBox(
+                width: 400,
+                child: DropdownButtonFormField<VeicoloModel>(
+                  value: selectedVeicolo,
+                  hint: Text(
+                    'SELEZIONA IL VEICOLO',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onChanged: (VeicoloModel? newValue) {
+                    setState(() {
+                      selectedVeicolo = newValue;
+                    });
+                  },
+                  items: allVeicoli
+                      .map<DropdownMenuItem<VeicoloModel>>(
+                        (VeicoloModel value) => DropdownMenuItem<VeicoloModel>(
+                      value: value,
+                      child: Text(
+                        value.descrizione!,
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                      ),
+                    ),
+                  )
+                      .toList(),
+                  decoration: InputDecoration(
+                    labelText: 'VEICOLO',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  ),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Selezionare un veicolo';
+                    }
+                    return null;
+                  },
+                ),
               ),
               const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  _showDestinazioniDialog();
-                },
-                child: SizedBox(
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(selectedDestinazione?.indirizzo ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
-                      const Icon(Icons.arrow_drop_down),
-                    ],
+              SizedBox(
+                width: 400,
+                child: GestureDetector(
+                  onTap: () {
+                    _showDestinazioniDialog();
+                  },
+                  child: SizedBox(
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(selectedDestinazione?.indirizzo ?? 'Seleziona Destinazione', style: const TextStyle(fontSize: 16)),
+                        const Icon(Icons.arrow_drop_down),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -194,15 +248,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              TextFormField(
-                controller: noteController,
-                maxLines: null,
-                onChanged: (value) {},
-                decoration: InputDecoration(
-                  hintText: 'Inserisci qui il rapportino...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
+              _buildTextFormField(noteController, "RAPPORTINO", "Inserisci il rapportino"),
               SizedBox(height: 20),
               Row(
                 children: [
@@ -630,6 +676,50 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
       });
     }
+  }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText,
+      {String? Function(String?)? validator}) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
+      child: TextFormField(
+        controller: controller,
+        maxLines: null, // Permette più righe
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ),
+        validator: validator, // Funzione di validazione
+      ),
+    );
   }
 
   Future<void> getAllVeicoli() async {

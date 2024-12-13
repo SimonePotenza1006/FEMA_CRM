@@ -63,62 +63,11 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(height: 12),
-                  SizedBox(
-                    width: 400,
-                    child: TextFormField(
-                      controller: _descrizioneController,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        hintText: 'A cosa si riferiscono le credenziali?'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      // Aggiungi validazione
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Questo campo è obbligatorio';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
+                  _buildTextFormField(_descrizioneController, "A cosa si riferiscono le credenziali?", "A cosa si riferiscono le credenziali?"),
                   SizedBox(height: 12),
-                  SizedBox(
-                    width: 400,
-                    child: TextFormField(
-                      controller: _usernameController,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        hintText: 'Inserisci username'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      // Aggiungi validazione
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Questo campo è obbligatorio';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
+                  _buildTextFormField(_usernameController, "Username", "Inserisci l'username"),
                   SizedBox(height: 12),
-                  SizedBox(
-                    width: 400,
-                    child: TextFormField(
-                      controller: _passwordController,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        hintText: 'Inserisci password'.toUpperCase(),
-                        border: OutlineInputBorder(),
-                      ),
-                      // Aggiungi validazione
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Questo campo è obbligatorio';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
+                  _buildTextFormField(_passwordController, "Password", "Inserisci la password"),
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -193,6 +142,50 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText,
+      {String? Function(String?)? validator}) {
+    return SizedBox(
+      width: 600, // Larghezza modificata
+      child: TextFormField(
+        controller: controller,
+        maxLines: null, // Permette più righe
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ),
+        validator: validator, // Funzione di validazione
       ),
     );
   }
