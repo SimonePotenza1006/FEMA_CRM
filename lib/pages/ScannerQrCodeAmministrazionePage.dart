@@ -143,7 +143,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     print(lottoSeriale);
     print(codiceDanea);
 
-    String apiUrl = '$ipaddressProva/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
+    String apiUrl = '$ipaddress/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
     final response =
         await http.get(Uri.parse(apiUrl)).timeout(Duration(seconds: 10));
 

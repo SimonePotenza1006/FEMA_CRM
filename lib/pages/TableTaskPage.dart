@@ -103,7 +103,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     bool allDeleted = true;
 
     for (var task in tasksToDelete) {
-      final String url = '$ipaddressProva/api/task/${task.id}';
+      final String url = '$ipaddress/api/task/${task.id}';
       try {
         final response = await http.delete(Uri.parse(url));
         if (response.statusCode == 200 || response.statusCode == 204) {
@@ -149,7 +149,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
       // Step 2: Elimina la tipologia
       print('Task eliminati. Procedo con l\'eliminazione della tipologia.');
-      final String url = '$ipaddressProva/api/tipoTask/${selectedTipoToDelete.id}';
+      final String url = '$ipaddress/api/tipoTask/${selectedTipoToDelete.id}';
       final response = await http.delete(Uri.parse(url));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -260,7 +260,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -302,7 +302,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -354,8 +354,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
     try {
       // Decidi l'endpoint in base al cognome dell'utente
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
-          ? Uri.parse('$ipaddressProva/api/task/allattivi')
-          : Uri.parse('$ipaddressProva/api/task/utente/' + widget.utente!.id!);
+          ? Uri.parse('$ipaddress/api/task/allattivi')
+          : Uri.parse('$ipaddress/api/task/utente/' + widget.utente!.id!);
       print('Chiamata API verso: $apiUrl');
       var response = await http.get(apiUrl);
       print('Risposta ricevuta con status code: ${response.statusCode}');
@@ -1194,7 +1194,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/tipoTask'),
+        Uri.parse('$ipaddress/api/tipoTask'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -1322,6 +1322,7 @@ class TaskDataSource extends DataGridSource{
   UtenteModel? selectedUtenteCondivisione;
   UtenteModel selectedUtente;
   int tipoIdGlobal;
+  TextEditingController _titoloController = TextEditingController();
 
   TaskDataSource(
       this.context,
@@ -1382,7 +1383,7 @@ class TaskDataSource extends DataGridSource{
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1423,7 +1424,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1464,7 +1465,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1504,7 +1505,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1545,10 +1546,58 @@ class TaskDataSource extends DataGridSource{
     }
   }
 
+  Future<void> rinominaTask(TaskModel task) async {
+    final formatter = DateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
+    var titolo = _titoloController.text.isNotEmpty ? _titoloController.text : "TASK DEL ${DateTime.now().day}/${DateTime.now().month} ORE ${DateTime.now().hour}:${DateTime.now().minute}";
+
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/task'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': task.id,
+          'data_creazione': task.data_creazione!.toIso8601String(),//DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
+          'data_conclusione': task.data_conclusione != null ? task.data_conclusione!.toIso8601String() : null,//task.data_conclusione!.toIso8601String(),//task.data_conclusione,//null,
+          'titolo' : titolo,//_titoloController.text,//task.titolo,//_titoloController.text,
+          'riferimento': task.riferimento,
+          'descrizione': task.descrizione,//_descrizioneController.text,
+          'concluso': task.concluso,
+          'condiviso': task.condiviso,//_condiviso,
+          'accettato': task.accettato,//false,
+          'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
+          'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
+          'utentecreate': task.utentecreate!.toMap(),
+          'attivo': task.attivo
+        }),
+      );
+      if(response.statusCode == 201){
+        //Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Task rinominato con successo!'.toUpperCase()),
+          ),
+        );
+        /*Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => TableTaskPage(
+              utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)),
+              (Route<dynamic> route) => false, // Rimuove tutte le pagine precedenti
+        );*/
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => TableTaskPage(
+                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
+      }
+    } catch (e) {
+      print('Errore durante la modifica del task $e');
+    }
+  }
+
   Future<void> getAllTask() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/allattivi')
-          : Uri.parse('$ipaddressProva/api/task/utente/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/allattivi')
+          : Uri.parse('$ipaddress/api/task/utente/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -1746,6 +1795,85 @@ class TaskDataSource extends DataGridSource{
         );
       } else {
         return GestureDetector(
+
+          onLongPress: () {
+
+            _titoloController = TextEditingController(text: task.titolo!.toUpperCase());
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
+                  builder: (BuildContext context, StateSetter setState) {
+                    return AlertDialog(
+                      title: Text('RINOMINA TASK\n\"'.toUpperCase()+task.titolo!.toUpperCase()+'\"'),
+                      //content: Text('RINOMINA TASK\n\"'.toUpperCase()+task.titolo!.toUpperCase()+'\"'),
+                      actions: [
+                        SizedBox(
+                          width: 600,
+                          child: TextFormField(
+                            controller: _titoloController,
+                            maxLines: null,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: 'Titolo'.toUpperCase(),
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[200],
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none, // Rimuove il bordo standard
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 2.0,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                  width: 1.0,
+                                ),
+                              ),
+                              hintText: "Inserisci il titolo",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Annulla'.toUpperCase()),
+                        ),
+                        ElevatedButton(
+
+                          onPressed: () {
+                            rinominaTask(task);
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('SALVA'.toUpperCase(), style: TextStyle(fontSize: 18)),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            );
+          },
             onTap: () {
               /*/SystemChrome.setPreferredOrientations([
                 DeviceOrientation.portraitUp,

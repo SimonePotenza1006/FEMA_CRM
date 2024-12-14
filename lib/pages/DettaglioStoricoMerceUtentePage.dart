@@ -103,7 +103,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> deleteRelazione(String? id) async{
     try{
-      final response = await http.delete(Uri.parse('$ipaddressProva/api/relazioneUtentiProdotti/$id'));
+      final response = await http.delete(Uri.parse('$ipaddress/api/relazioneUtentiProdotti/$id'));
       if(response.statusCode == 200){
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Nota eliminata con successo!')),
@@ -118,7 +118,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getRelazioni() async {
     try{
       var apiUrl = Uri.parse(
-        '$ipaddressProva/api/relazioneUtentiProdotti/utente/${widget.utente.id}'
+        '$ipaddress/api/relazioneUtentiProdotti/utente/${widget.utente.id}'
       );
       var response = await http.get(apiUrl);
 
