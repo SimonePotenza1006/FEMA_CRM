@@ -2316,6 +2316,8 @@ void mostraRicercaInterventiDialog({
             ? "In lavorazione"
             : (intervento.orario_inizio != null && intervento.orario_fine != null)
             ? "Concluso"
+            : (intervento.orario_inizio != null && intervento.orario_fine != null && intervento.saldato == true)
+            ? "Saldato"
             : "///";
         corrisponde = corrisponde && statoIntervento == stato;
       }
@@ -2324,16 +2326,22 @@ void mostraRicercaInterventiDialog({
     }).toList();
   }
 
+  String calcolaStatoIntervento(InterventoModel intervento) {
+    if (intervento.orario_inizio == null && intervento.orario_fine == null) {
+      return "Assegnato";
+    } else if (intervento.orario_inizio != null && intervento.orario_fine == null) {
+      return "In lavorazione";
+    } else if (intervento.saldato == true) {
+      return "Saldato";
+    } else if (intervento.orario_inizio != null && intervento.orario_fine != null) {
+      return "Concluso";
+    }
+    return "///";
+  }
+
   List<InterventoModel> filtraPerStato(List<InterventoModel> interventi, String stato) {
     return interventi.where((intervento) {
-      String? statoIntervento = (intervento.orario_inizio == null && intervento.orario_fine == null)
-          ? "Assegnato"
-          : (intervento.orario_inizio != null && intervento.orario_fine == null)
-          ? "In lavorazione"
-          : (intervento.orario_inizio != null && intervento.orario_fine != null)
-          ? "Concluso"
-          : "///";
-      return statoIntervento == stato;
+      return calcolaStatoIntervento(intervento) == stato;
     }).toList();
   }
 
@@ -2362,16 +2370,6 @@ void mostraRicercaInterventiDialog({
           intervento.data!.isAfter(startDate) &&
           intervento.data!.isBefore(endDate);
     }).toList();
-  }
-
-  String calcolaStatoIntervento(InterventoModel intervento) {
-    return (intervento.orario_inizio == null && intervento.orario_fine == null)
-        ? "Assegnato"
-        : (intervento.orario_inizio != null && intervento.orario_fine == null)
-        ? "In lavorazione"
-        : (intervento.orario_inizio != null && intervento.orario_fine != null)
-        ? "Concluso"
-        : "///";
   }
 
   List<InterventoModel> filtraPerUtenteEStato(List<InterventoModel> interventi, UtenteModel utente, String stato) {
@@ -2471,342 +2469,349 @@ void mostraRicercaInterventiDialog({
         builder: (context, setState) {
           return AlertDialog(
             title: Text('Cerca Interventi'),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: startDate ?? DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100),
-                            );
-                            if (pickedDate != null) {
-                              setState(() {
-                                startDate = pickedDate;
-                              });
-                            }
-                          },
-                          child: InputDecorator(
-                            decoration: InputDecoration(
-                              labelText: 'DATA INIZIO',
-                              labelStyle: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.bold,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[400]!,
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                  color: Colors.blueAccent,
-                                  width: 2.0,
-                                ),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                            ),
-                            child: Text(
-                              startDate == null
-                                  ? 'SELEZIONA'
-                                  : DateFormat('dd/MM/yyyy').format(startDate!),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: startDate == null ? Colors.grey[600] : Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: startDate ?? DateTime.now(),
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(2100),
-                            );
-                            if (pickedDate != null) {
-                              setState(() {
-                                startDate = pickedDate;
-                              });
-                            }
-                          },
-                          child: InputDecorator(
-                            decoration: InputDecoration(
-                              labelText: 'DATA INIZIO',
-                              labelStyle: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.bold,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[400]!,
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(
-                                  color: Colors.blueAccent,
-                                  width: 2.0,
-                                ),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                            ),
-                            child: Text(
-                              startDate == null
-                                  ? 'SELEZIONA'
-                                  : DateFormat('dd/MM/yyyy').format(startDate!),
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: startDate == null ? Colors.grey[600] : Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  DropdownButtonFormField<UtenteModel>(
-                    decoration: InputDecoration(
-                      labelText: 'SELEZIONA UTENTE',
-                      labelStyle: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.redAccent,
-                          width: 2.0,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1.0,
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                    ),
-                    value: selectedUtente,
-                    items: utenti.map((utente) {
-                      return DropdownMenuItem<UtenteModel>(
-                        value: utente,
-                        child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
-                      );
-                    }).toList(),
-                    onChanged: (UtenteModel? val) {
-                      setState(() {
-                        selectedUtente = val;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Seleziona un utente';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _clienteController,
-                    decoration: InputDecoration(
-                      labelText: 'CERCA CLIENTE',
-                      hintText: 'Inserisci denominazione, indirizzo, telefono, ecc.',
-                      labelStyle: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.redAccent,
-                          width: 2.0,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1.0,
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                    ),
-                    onChanged: (query) {
-                      setState(() {
-                        clientiFiltrati = clienti.where((cliente) {
-                          final searchQuery = query.toLowerCase();
-                          return (cliente.denominazione != null && cliente.denominazione!.toLowerCase().contains(searchQuery)) ||
-                              (cliente.cellulare != null && cliente.cellulare!.toLowerCase().contains(searchQuery)) ||
-                              (cliente.telefono != null && cliente.telefono!.toLowerCase().contains(searchQuery)) ||
-                              (cliente.citta != null && cliente.citta!.toLowerCase().contains(searchQuery)) ||
-                              (cliente.codice_fiscale != null && cliente.codice_fiscale!.toLowerCase().contains(searchQuery)) ||
-                              (cliente.partita_iva != null && cliente.partita_iva!.toLowerCase().contains(searchQuery)) ||
-                              (cliente.fax != null && cliente.fax!.toLowerCase().contains(searchQuery)) ||
-                              (cliente.email != null && cliente.email!.toLowerCase().contains(searchQuery));
-                        }).toList();
-                      });
-                    },
-                  ),
-                  if (clientiFiltrati.isNotEmpty)
-                    Container(
-                      constraints: BoxConstraints(maxHeight: 200), // Adjust as needed
-                      child: ListView.builder(
-                        itemCount: clientiFiltrati.length > 5 ? 5 : clientiFiltrati.length,
-                        itemBuilder: (context, index) {
-                          ClienteModel cliente = clientiFiltrati[index];
-                          return ListTile(
-                            title: Text(cliente.denominazione!),
-                            onTap: () {
-                              setState(() {
-                                selectedCliente = cliente;
-                                _clienteController.text = cliente.denominazione!; // Update the text of the controller
-                                clientiFiltrati = [];
-                              });
+            content: SingleChildScrollView(
+              child: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: startDate ?? DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2100),
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  startDate = pickedDate;
+                                });
+                              }
                             },
-                          );
-                        },
-                      ),
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                labelText: 'DATA INIZIO',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[400]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.blueAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              ),
+                              child: Text(
+                                startDate == null
+                                    ? 'SELEZIONA'
+                                    : DateFormat('dd/MM/yyyy').format(startDate!),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: startDate == null ? Colors.grey[600] : Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: endDate ?? DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2100),
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  endDate = pickedDate;
+                                });
+                              }
+                            },
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                labelText: 'DATA FINE',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[400]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.blueAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              ),
+                              child: Text(
+                                endDate == null
+                                    ? 'SELEZIONA'
+                                    : DateFormat('dd/MM/yyyy').format(endDate!),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: startDate == null ? Colors.grey[600] : Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  SizedBox(height: 20),
-                  DropdownButtonFormField<TipologiaInterventoModel>(
-                    decoration: InputDecoration(
-                      labelText: 'SELEZIONA TIPOLOGIA',
-                      labelStyle: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueAccent,
-                          width: 2.0,
+                    SizedBox(height: 20),
+                    DropdownButtonFormField<UtenteModel>(
+                      decoration: InputDecoration(
+                        labelText: 'SELEZIONA UTENTE',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1.0,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
                         ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      value: selectedUtente,
+                      items: utenti.map((utente) {
+                        return DropdownMenuItem<UtenteModel>(
+                          value: utente,
+                          child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
+                        );
+                      }).toList(),
+                      onChanged: (UtenteModel? val) {
+                        setState(() {
+                          selectedUtente = val;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Seleziona un utente';
+                        }
+                        return null;
+                      },
                     ),
-                    value: selectedTipologia,
-                    isExpanded: true,
-                    items: tipologie.map((tipologia) {
-                      return DropdownMenuItem<TipologiaInterventoModel>(
-                        value: tipologia,
-                        child: Text(
-                          tipologia.descrizione!,
-                          style: TextStyle(fontSize: 14),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _clienteController,
+                      decoration: InputDecoration(
+                        labelText: 'CERCA CLIENTE',
+                        hintText: 'Inserisci denominazione, indirizzo, telefono, ecc.',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      setState(() {
-                        selectedTipologia = val;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Seleziona una tipologia valida';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height : 10),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: 'SELEZIONA STATO',
-                      labelStyle: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueAccent,
-                          width: 2.0,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
                         ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1.0,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
+                          ),
                         ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      onChanged: (query) {
+                        setState(() {
+                          clientiFiltrati = clienti.where((cliente) {
+                            final searchQuery = query.toLowerCase();
+                            return (cliente.denominazione != null && cliente.denominazione!.toLowerCase().contains(searchQuery)) ||
+                                (cliente.cellulare != null && cliente.cellulare!.toLowerCase().contains(searchQuery)) ||
+                                (cliente.telefono != null && cliente.telefono!.toLowerCase().contains(searchQuery)) ||
+                                (cliente.citta != null && cliente.citta!.toLowerCase().contains(searchQuery)) ||
+                                (cliente.codice_fiscale != null && cliente.codice_fiscale!.toLowerCase().contains(searchQuery)) ||
+                                (cliente.partita_iva != null && cliente.partita_iva!.toLowerCase().contains(searchQuery)) ||
+                                (cliente.fax != null && cliente.fax!.toLowerCase().contains(searchQuery)) ||
+                                (cliente.email != null && cliente.email!.toLowerCase().contains(searchQuery));
+                          }).toList();
+                        });
+                      },
                     ),
-                    value: selectedStato,
-                    isExpanded: true,
-                    items: [
-                      DropdownMenuItem(value: 'Assegnato', child: Text('Assegnato')),
-                      DropdownMenuItem(value: 'In lavorazione', child: Text('In lavorazione')),
-                      DropdownMenuItem(value: 'Concluso', child: Text('Concluso')),
-                    ],
-                    onChanged: (val) {
-                      setState(() {
-                        selectedStato = val;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Seleziona uno stato valido';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
+                    if (clientiFiltrati.isNotEmpty)
+                      Container(
+                        constraints: BoxConstraints(
+                          maxHeight: 200, // Imposta una altezza massima ragionevole
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(), // Limita lo scrolling al container
+                          itemCount: clientiFiltrati.length,
+                          itemBuilder: (context, index) {
+                            ClienteModel cliente = clientiFiltrati[index];
+                            return ListTile(
+                              title: Text(cliente.denominazione!),
+                              onTap: () {
+                                setState(() {
+                                  selectedCliente = cliente;
+                                  _clienteController.text = cliente.denominazione!; // Update the text of the controller
+                                  clientiFiltrati = [];
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    SizedBox(height: 20),
+                    DropdownButtonFormField<TipologiaInterventoModel>(
+                      decoration: InputDecoration(
+                        labelText: 'SELEZIONA TIPOLOGIA',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      value: selectedTipologia,
+                      isExpanded: true,
+                      items: tipologie.map((tipologia) {
+                        return DropdownMenuItem<TipologiaInterventoModel>(
+                          value: tipologia,
+                          child: Text(
+                            tipologia.descrizione!,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          selectedTipologia = val;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Seleziona una tipologia valida';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height : 10),
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'SELEZIONA STATO',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.red,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      ),
+                      value: selectedStato,
+                      isExpanded: true,
+                      items: [
+                        DropdownMenuItem(value: 'Assegnato', child: Text('Assegnato')),
+                        DropdownMenuItem(value: 'In lavorazione', child: Text('In lavorazione')),
+                        DropdownMenuItem(value: 'Concluso', child: Text('Concluso')),
+                        DropdownMenuItem(value: 'Saldato', child: Text('Saldato'))
+                      ],
+                      onChanged: (val) {
+                        setState(() {
+                          selectedStato = val;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Seleziona uno stato valido';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -2910,9 +2915,29 @@ void mostraRicercaInterventiDialog({
                     );
                   }
 
+                  double sommaImporti = interventiFiltrati.fold(0, (prev, intervento) {
+                    return prev + (intervento.importo_intervento ?? 0);
+                  });
+                  Navigator.of(context).pop();
+
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Totale Importi'),
+                        content: Text('La somma degli importi degli interventi filtrati è: €${sommaImporti.toStringAsFixed(2)}'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
                   // Restituzione dei risultati filtrati
                   onFiltrati(interventiFiltrati);
-                  Navigator.of(context).pop();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
