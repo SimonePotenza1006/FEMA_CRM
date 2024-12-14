@@ -1799,7 +1799,7 @@ class TaskDataSource extends DataGridSource{
           onLongPress: () {
 
             _titoloController = TextEditingController(text: task.titolo!.toUpperCase());
-            utente.id == task.utentecreate ? showDialog(
+            utente.id == task.utentecreate!.id ? showDialog(
               context: context,
               builder: (BuildContext context) {
                 return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
