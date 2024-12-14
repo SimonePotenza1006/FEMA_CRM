@@ -46,7 +46,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/cliente'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -69,7 +69,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente'));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
@@ -224,7 +224,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<void> createMerce() async{
-    final url = Uri.parse('$ipaddress/api/merceInRiparazione');
+    final url = Uri.parse('$ipaddressProva/api/merceInRiparazione');
     final body = jsonEncode({
       'data' : DateTime.now().toIso8601String(),
       'articolo' : _articoloController.text,
@@ -304,7 +304,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   //         print('Percorso del file: ${image.path}');
   //         var request = http.MultipartRequest(
   //           'POST',
-  //           Uri.parse('$ipaddress/api/immagine/merce'),
+  //           Uri.parse('$ipaddressProva/api/immagine/merce'),
   //         );
   //         // Provide field name and file path to fromPath constructor
   //         request.files.add(
