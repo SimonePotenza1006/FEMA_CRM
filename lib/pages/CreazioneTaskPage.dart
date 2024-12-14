@@ -568,7 +568,7 @@ class _CreazioneTaskPageState
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white, backgroundColor: Colors.red,
                                 ),
-                                child: Text('Scatta Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                child: Text('Scatta\nFoto'.toUpperCase(), style: TextStyle(fontSize: 18.0), textAlign: TextAlign.center), // Aumenta la dimensione del testo del pulsante
                               ),
                             ),
                             SizedBox(width: 16,),
@@ -578,7 +578,7 @@ class _CreazioneTaskPageState
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white, backgroundColor: Colors.red,
                                 ),
-                                child: Text('Allega Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                                child: Text('Allega\nFoto'.toUpperCase(), style: TextStyle(fontSize: 18.0), textAlign: TextAlign.center), // Aumenta la dimensione del testo del pulsante
                               ),
                             ),
                           ],
@@ -721,7 +721,7 @@ class _CreazioneTaskPageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data_creazione': DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
@@ -765,7 +765,7 @@ class _CreazioneTaskPageState
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/task/${int.parse(task.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/task/${int.parse(task.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -814,7 +814,7 @@ class _CreazioneTaskPageState
           print('Percorso del file audio: ${file.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
+            Uri.parse('$ipaddressProva/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -850,7 +850,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -894,7 +894,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

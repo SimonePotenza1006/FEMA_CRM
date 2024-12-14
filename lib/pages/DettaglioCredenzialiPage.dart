@@ -28,7 +28,7 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/credenziali/${int.parse(widget.credenziale.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/credenziali/${int.parse(widget.credenziale.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
