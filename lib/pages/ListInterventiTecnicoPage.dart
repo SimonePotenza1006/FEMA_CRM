@@ -840,7 +840,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                   child: ListTile(
                                     contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                     title: Text(
-                                      '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                      '${singolaMerce.cliente!.denominazione!} - ${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
                                       style: textStyle,
                                     ),
                                     subtitle: Text(
@@ -1547,7 +1547,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
                                     child: ListTile(
                                       contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                       title: Text(
-                                        '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                        '${singolaMerce.cliente!.denominazione!} - ${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
                                         style: textStyle,
                                       ),
                                       subtitle: Text(
