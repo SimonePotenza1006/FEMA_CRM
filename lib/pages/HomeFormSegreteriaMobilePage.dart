@@ -310,7 +310,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginForm()),
+                MaterialPageRoute(builder: (context) => SplashScreen()),
               );
             },
           ),

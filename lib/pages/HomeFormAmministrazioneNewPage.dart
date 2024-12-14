@@ -996,7 +996,7 @@ class _HomeFormAmministrazioneNewPageState
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginForm()),
+                MaterialPageRoute(builder: (context) => SplashScreen()),
               );
             },
           ),
@@ -1149,7 +1149,7 @@ class _HomeFormAmministrazioneNewPageState
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginForm()),
+                  MaterialPageRoute(builder: (context) => SplashScreen()),
                 );
               },
             ),

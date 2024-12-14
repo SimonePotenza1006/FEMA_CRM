@@ -130,14 +130,14 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward();
 
     // Naviga verso la schermata di login dopo 3 secondi
+    // SplashScreen
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          transitionDuration: Duration(seconds: 1), // Durata della transizione
-          pageBuilder: (context, animation, secondaryAnimation) => LoginForm(),
+          transitionDuration: Duration(seconds: 1),
+          pageBuilder: (context, animation, secondaryAnimation) => LoginForm(initialScale: 1.3),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            // Definisce una dissolvenza
             return FadeTransition(
               opacity: animation,
               child: child,
@@ -179,7 +179,9 @@ ThemeData myThemeData() {
 }
 
 class LoginForm extends StatefulWidget {
-  LoginForm({Key? key});
+
+  final double initialScale;
+  LoginForm({Key? key, required this.initialScale});
 
   @override
   _LoginFormState createState() => _LoginFormState();
@@ -582,24 +584,21 @@ class _LoginFormState extends State<LoginForm> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
+          Transform.scale(
+              scale: widget.initialScale,
+            child: Container(
+              decoration: BoxDecoration(
 
-              image: DecorationImage(
+                image: DecorationImage(
                   image: ExactAssetImage("assets/images/background_login_1_1.jpg"),
                   fit: BoxFit.cover,
+                  scale: 1.3,
                   //opacity: 0.8
+                ),
               ),
             ),
           ),
           Container(
-            // decoration: BoxDecoration(
-            //   gradient: LinearGradient(
-            //     begin: Alignment.topCenter,
-            //     end: Alignment.bottomCenter,
-            //     colors: [Colors.white10, Colors.red.shade500],
-            //   ),
-            // ),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

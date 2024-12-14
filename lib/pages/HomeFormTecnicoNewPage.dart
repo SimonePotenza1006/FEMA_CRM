@@ -606,7 +606,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginForm()),
+                MaterialPageRoute(builder: (context) => SplashScreen()),
               );
             },
           ),
@@ -1254,7 +1254,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                   child: ListTile(
                                     contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                     title: Text(
-                                      '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                      '${singolaMerce.cliente!.denominazione!} - ${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
                                       style: textStyle,
                                     ),
                                     subtitle: Text(
@@ -1281,7 +1281,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                         builder: (context) => AlertDialog(//contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                                           title: new Text(''+singolaMerce.titolo.toString(), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                                           content: new Text('Cliente: '+singolaMerce.cliente!.denominazione!+' - '+singolaMerce!.destinazione!.indirizzo!+'\n'
-                                              +'\n'+singolaMerce.merce!.articolo!+' - '+singolaMerce.merce!.difetto_riscontrato!+'\n\nData: '+
+                                              +'\n'+ singolaMerce.merce!.articolo!+' - '+singolaMerce.merce!.difetto_riscontrato!+'\n\nData: '+
                                               (singolaMerce.data != null
                                                   ? '${singolaMerce.data!.day.toString().padLeft(2, '0')}/${singolaMerce.data!.month.toString().padLeft(2, '0')}/${singolaMerce.data!.year}'
                                                   : 'N.D.')+
@@ -2193,7 +2193,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
                                     child: ListTile(
                                       contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                                       title: Text(
-                                        '${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
+                                        '${singolaMerce.cliente!.denominazione!} - ${singolaMerce.merce?.articolo ?? "Articolo non specificato"}',
                                         style: textStyle,
                                       ),
                                       subtitle: Text(
