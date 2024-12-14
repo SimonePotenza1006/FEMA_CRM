@@ -1799,7 +1799,7 @@ class TaskDataSource extends DataGridSource{
           onLongPress: () {
 
             _titoloController = TextEditingController(text: task.titolo!.toUpperCase());
-            showDialog(
+            utente.id == task.utentecreate ? showDialog(
               context: context,
               builder: (BuildContext context) {
                 return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
@@ -1872,7 +1872,7 @@ class TaskDataSource extends DataGridSource{
                   },
                 );
               },
-            );
+            ) : null;
           },
             onTap: () {
               /*/SystemChrome.setPreferredOrientations([
