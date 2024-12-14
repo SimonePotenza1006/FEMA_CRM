@@ -146,7 +146,7 @@ class _AggiuntaPdfTecnicoPageState extends State<AggiuntaPdfTecnicoPage> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/intervento'),
+        Uri.parse('$ipaddressProva/pdfu/intervento'),
       );
       request.fields['intervento'] = widget.intervento.id!;
       request.files.add(

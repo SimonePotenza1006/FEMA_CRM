@@ -408,7 +408,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddress/api/utente/ulogin'),
+          Uri.parse('$ipaddressProva/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -718,7 +718,7 @@ class _LoginFormState extends State<LoginForm> {
                           Spacer(),
                           Align(
                             alignment: Alignment.bottomRight,
-                            child: Text('REL. 13.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
+                            child: Text('REL. 14.12.24', textAlign: TextAlign.end, style: TextStyle(fontSize: 12))
                           )
 
                         ],
