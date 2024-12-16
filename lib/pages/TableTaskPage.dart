@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:fema_crm/pages/CreazioneTaskPage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneAmministrazionePage.dart';
 import 'package:fema_crm/pages/HomeFormAmministrazioneNewPage.dart';
@@ -103,7 +103,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     bool allDeleted = true;
 
     for (var task in tasksToDelete) {
-      final String url = '$ipaddressProva/api/task/${task.id}';
+      final String url = '$ipaddress/api/task/${task.id}';
       try {
         final response = await http.delete(Uri.parse(url));
         if (response.statusCode == 200 || response.statusCode == 204) {
@@ -149,7 +149,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
       // Step 2: Elimina la tipologia
       print('Task eliminati. Procedo con l\'eliminazione della tipologia.');
-      final String url = '$ipaddressProva/api/tipoTask/${selectedTipoToDelete.id}';
+      final String url = '$ipaddress/api/tipoTask/${selectedTipoToDelete.id}';
       final response = await http.delete(Uri.parse(url));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -226,10 +226,11 @@ class _TableTaskPageState extends State<TableTaskPage>{
       //List<String> ids = [];
 
       // Verifica se almeno un elemento soddisfa la condizione e aggiungi gli id
-      if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && element.accettato == false && element.utentecreate?.id != widget.utente.id)) {
+
         tipotaskdaacc = _allCommissioni
-            .where((element) => element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
-            .map((element) => element.tipologia!.id).cast<String>()
+            .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && element.accettato == false && element.utentecreate?.id != widget.utente.id)
+            .map((element) => element.tipologia?.id).cast<String>()
             .toList();
       }
       _filteredCommissioni.sort((a, b) {
@@ -253,17 +254,17 @@ class _TableTaskPageState extends State<TableTaskPage>{
       //_filteredCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id ? element.tipologia.id));
       _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, List.from(allUtenti), selectedUtente!, tipoIdGlobal!);
 
-      print(tipotaskdaacc!.length.toString()+' Datasource inizializzato con ${_filteredCommissioni.length} task.');
+      print(tipotaskdaacc!.first.toString()+' Datasource inizializzato con ${_filteredCommissioni.last.id} task.'+widget.utente.id.toString());
     });
     print('Inizializzazione completata.');
   }
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
@@ -302,10 +303,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
           if (widget.utente.cognome! == "Mazzei" ||
@@ -354,16 +355,18 @@ class _TableTaskPageState extends State<TableTaskPage>{
     try {
       // Decidi l'endpoint in base al cognome dell'utente
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
-          ? Uri.parse('$ipaddressProva/api/task/allattivi')
-          : Uri.parse('$ipaddressProva/api/task/utente/' + widget.utente!.id!);
+          ? Uri.parse('$ipaddress/api/task/allattivi')
+          : Uri.parse('$ipaddress/api/task/utente/' + widget.utente!.id!);
       print('Chiamata API verso: $apiUrl');
-      var response = await http.get(apiUrl);
+      final response = await http.get(apiUrl);
       print('Risposta ricevuta con status code: ${response.statusCode}');
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-        print('Dati ricevuti: ${jsonData.length} elementi trovati.');
+
+        var jsonData = json.decode(utf8.decode(response.bodyBytes));
+        print(response.body.toString()+' Dati ricevuti: ${jsonData.length} elementi trovati. '+jsonData.toString());
         List<TaskModel> commissioni = [];
         for (var item in jsonData) {
+
           commissioni.add(TaskModel.fromJson(item));
         }
         print('Numero di task convertiti: ${commissioni.length}');
@@ -384,9 +387,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
             _filteredCommissioni = commissioni;
             print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
           }*/
-          if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+          if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
             tipotaskdaacc = _allCommissioni
-                .where((element) => element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
+                .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
                 .map((element) => element.tipologia!.id).cast<String>()
                 .toList();
           }
@@ -440,7 +443,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         child: Scaffold(
           appBar: AppBar(
             title: Text('LISTA TASK', style: TextStyle(color: Colors.white)),
-            centerTitle: true,
+            centerTitle: Platform.isAndroid ? false : true,
             backgroundColor: Colors.red,
             actions: [
               if(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
@@ -523,7 +526,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   ),
                 );
               }) : Container(),
-              IconButton(
+              (widget.utente.id == "2" && Platform.isAndroid) ? Container() : IconButton(
                 icon: Icon(
                   Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
                   color: Colors.white,
@@ -797,7 +800,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
-                          width: (constraints.maxWidth < 460) ? 120 : 300,//_columnWidths['utente']?? double.nan,
+                          width: (constraints.maxWidth < 460) ? 140 : 300,//_columnWidths['utente']?? double.nan,
                           minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 300 : 0,
                         ),
                         GridColumn(
@@ -930,7 +933,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                                     ],
                                                   ),
                                                 ),
-                                                if (tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id))
+                                                if (selectedUtente!.id == widget.utente.id && tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id))
                                                   Positioned(
                                                     right: -5, // Posizione migliore senza taglio
                                                     top: -1, // Posizione migliore senza taglio
@@ -1194,7 +1197,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/tipoTask'),
+        Uri.parse('$ipaddress/api/tipoTask'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -1244,9 +1247,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
       }
 
       print('Filtered _filteredCommissioni count: ${_filteredCommissioni.length}'); // Debug
-      if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
         tipotaskdaacc = _allCommissioni
-            .where((element) => element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
+            .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
             .map((element) => element.tipologia!.id).cast<String>()
             .toList();
       }
@@ -1283,9 +1286,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
         print('Filtering task by user: $taskUserId matches: $matches'); // Debug
         return matches;
       }).toList();
-      if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
         tipotaskdaacc = _allCommissioni
-            .where((element) => element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
+            .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
             .map((element) => element.tipologia!.id).cast<String>()
             .toList();
       }
@@ -1349,7 +1352,9 @@ class TaskDataSource extends DataGridSource{
   List<DataGridRow> get rows{
     List<DataGridRow> rows =[];
     for(int i = 0; i < commissioniFiltrate.length; i++){
+
       TaskModel task = commissioniFiltrate[i];
+      print('tiiiiiiiiiiiii '+task.titolo.toString());
       String? concluso = task.concluso != null ? (task.concluso != true ? "NO" : "SI") : "ERRORE";
       String? dataCreazione = DateFormat('dd/MM/yyyy').format(task.data_creazione!);
       String? dataConclusione = task.data_conclusione != null ? (DateFormat('dd/MM/yyyy HH:mm').format(task.data_conclusione!)) : "NON CONCLUSO";
@@ -1366,8 +1371,8 @@ class TaskDataSource extends DataGridSource{
           DataGridCell<String>(columnName: 'riferimento', value: task.riferimento != null && task.riferimento != '' ? task.riferimento!.toUpperCase() : '//'),
           //DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
           DataGridCell<String>(columnName: 'utente', value: task.condiviso == true ?
-            "${task.utentecreate?.nome!} ${task.utentecreate?.cognome?.substring(0,1)}. ${String.fromCharCode(10132)} ${task.utente?.nome!} ${task.utente?.cognome?.substring(0,1)}." :
-            "${utente.nomeCompleto()}"),
+            "${task.utentecreate?.nome!} ${task.utentecreate?.cognome?.substring(0,1)}.${String.fromCharCode(10132)}${task.utente?.nome!} ${task.utente?.cognome?.substring(0,1)}." :
+            "${selectedUtente.nomeCompleto()}"),
           DataGridCell<String>(columnName: 'accettato', value: accettato),
           DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
         ]
@@ -1383,7 +1388,7 @@ class TaskDataSource extends DataGridSource{
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1404,7 +1409,7 @@ class TaskDataSource extends DataGridSource{
       if(response.statusCode == 201){
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Stato Task aggiornato con successo!'.toUpperCase()),
+            content: Text('Stato Task aggiornato con successo! '.toUpperCase()),
           ),
         );
         //await Future.delayed(Duration(seconds: 2));
@@ -1424,7 +1429,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1465,7 +1470,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1505,7 +1510,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1553,7 +1558,7 @@ class TaskDataSource extends DataGridSource{
 
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1596,11 +1601,11 @@ class TaskDataSource extends DataGridSource{
 
   Future<void> getAllTask() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddressProva/api/task/allattivi')
-          : Uri.parse('$ipaddressProva/api/task/utente/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/allattivi')
+          : Uri.parse('$ipaddress/api/task/utente/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TaskModel> commissioni = [];
         for(var item in jsonData){
           commissioni.add(TaskModel.fromJson(item));

@@ -181,7 +181,7 @@ class _ModificaTaskPageState
               children: [
                 CircularProgressIndicator(),
                 SizedBox(width: 20),
-                Text("Caricamento in corso...".toUpperCase()),
+                Text("Caricamento\nin corso...".toUpperCase()),
               ],
             ),
           );
@@ -191,7 +191,7 @@ class _ModificaTaskPageState
         if(image.path.isNotEmpty){
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -211,7 +211,8 @@ class _ModificaTaskPageState
         }
       }
       pickedImages.clear();
-      showDialog(
+      Navigator.pop(context);
+      /*showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -227,7 +228,7 @@ class _ModificaTaskPageState
             ],
           );
         },
-      );
+      );*/
     } catch(e){
       Navigator.pop(context); // Chiudi il dialog di caricamento in caso di errore
       print('Errore durante l\'invio del file: $e');
@@ -238,7 +239,7 @@ class _ModificaTaskPageState
     final dir = await getApplicationDocumentsDirectory();
     String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
     final player = ap.AudioPlayer();
-    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
+    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
     http.Response? response;
     try {
 
@@ -271,7 +272,7 @@ class _ModificaTaskPageState
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddressProva/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
+    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -298,10 +299,10 @@ class _ModificaTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
           if (widget.utente.cognome! == "Mazzei" ||
@@ -454,8 +455,33 @@ class _ModificaTaskPageState
               if(selectedDate != null)
                 Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
               const SizedBox(height: 20.0),*/
-                          SizedBox(height: 20),
-                          // Description Field
+                          //SizedBox(height: 2),
+                          _accettato == false ? Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child:
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+
+                                    WidgetSpan(
+                                      child: Icon(
+                                        Icons.warning_outlined,
+                                        color: Colors.orange,
+                                        size: 18,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: " Attenzione: Il task non risulta accettato, clicca nella checkbox \"accettato\" per confermare "
+                                          "la presa visione del task".toUpperCase(),
+                                      style: TextStyle(color: Colors.black54, fontSize: 15, ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              //Text('Almeno un documento tra carta d\'identità e passaporto è obbligatorio'),
+
+                          ) : Container(),
+                          SizedBox(height: 10),
                           SizedBox(
                             width: 600,
                             child: TextFormField(
@@ -746,7 +772,8 @@ class _ModificaTaskPageState
                             ),
                           ),
                           SizedBox(height: 10),
-                          !(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? SizedBox(
+                          //!(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ?
+                          SizedBox(
                             width: 400,
                             child: CheckboxListTile(
                               title: Text(
@@ -769,13 +796,13 @@ class _ModificaTaskPageState
                               controlAffinity: ListTileControlAffinity.leading,
                               activeColor: Colors.redAccent,
                               checkColor: Colors.white,
-                              tileColor: Colors.grey[200],
+                              tileColor: _accettato == false ? Colors.red[50] : Colors.grey[200],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
-                          ) : Container(),
+                          ),// : Container(),
                           SizedBox(height: 10),
                           SizedBox(
                             width: 400,
@@ -962,8 +989,8 @@ class _ModificaTaskPageState
                           ElevatedButton(
                             onPressed: _selectedTipo != null ? () {
                               if(pickedImages.isNotEmpty){
-                                savePics();
-                                salvaTask();
+                                savePics().whenComplete(() =>
+                                salvaTask());
                               } else {
                                 salvaTask();
                               }
@@ -991,7 +1018,7 @@ class _ModificaTaskPageState
       final body = jsonEncode({
         'id': widget.task.id,
         'data_creazione': widget.task.data_creazione!.toIso8601String(),
-        'data_conclusione': widget.task.data_conclusione != null
+        'data_conclusione': widget.task.concluso == false && _concluso == true ? DateTime.now().toIso8601String() : widget.task.data_conclusione != null
             ? widget.task.data_conclusione!.toIso8601String()
             : null,
         'titolo': _titoloController.text,
@@ -1000,7 +1027,7 @@ class _ModificaTaskPageState
         'concluso': _concluso,
         'condiviso': _condiviso,
         'accettato': _condiviso
-            ? (selectedUtente != null && selectedUtente?.toMap() != widget.task.utente)
+            ? (selectedUtente != null && selectedUtente?.id != widget.task.utente?.id)
             ? false
             : _accettato
             : true,
@@ -1010,7 +1037,7 @@ class _ModificaTaskPageState
         'attivo': widget.task.attivo,
       });
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
@@ -1033,10 +1060,10 @@ class _ModificaTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));

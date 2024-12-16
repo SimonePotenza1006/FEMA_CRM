@@ -507,7 +507,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> saveNota() async{
     try{
-      final response = await http.post(Uri.parse('$ipaddressProva/api/noteTecnico'),
+      final response = await http.post(Uri.parse('$ipaddress/api/noteTecnico'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'utente' : widget.intervento.utente!.toMap(),
@@ -528,7 +528,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveIntervento() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -631,7 +631,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/${intervento}'),
+            Uri.parse('$ipaddress/api/immagine/${intervento}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -659,7 +659,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddressProva/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
+          '$ipaddress/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -724,7 +724,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllVeicoli() async {
     http.Response response =
-        await http.get(Uri.parse('$ipaddressProva/api/veicolo'));
+        await http.get(Uri.parse('$ipaddress/api/veicolo'));
     var responseData = json.decode(response.body.toString());
     if (response.statusCode == 200) {
       List<VeicoloModel> veicoli = [];

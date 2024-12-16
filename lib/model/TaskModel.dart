@@ -94,6 +94,7 @@ class TaskModel {
   };
 
   factory TaskModel.fromJson(Map<String, dynamic> json){
+    print(json['titolo']+' ZZZ '+json['titolo'].toString());
     return TaskModel(
       json['id']?.toString(),
       json['titolo'],
