@@ -75,7 +75,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> deleteNota(String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/noteTecnico/$id'),
+        Uri.parse('$ipaddressProva/api/noteTecnico/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

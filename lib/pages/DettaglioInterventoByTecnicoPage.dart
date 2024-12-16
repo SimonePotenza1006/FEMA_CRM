@@ -87,7 +87,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -185,7 +185,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.get(
-        Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
+        Uri.parse('$ipaddressProva/api/ddt/intervento/${widget.intervento.id}'));
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
           DDTModel ddt = DDTModel.fromJson(jsonData);
@@ -205,7 +205,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     late http.Response response;
     try{
       response = await http.get(
-          Uri.parse('$ipaddress/api/intervento/${widget.intervento.id}'));
+          Uri.parse('$ipaddressProva/api/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
         InterventoModel intervento = InterventoModel.fromJson(jsonData);
@@ -223,7 +223,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/intervento'),
+        Uri.parse('$ipaddressProva/pdfu/intervento'),
       );
       request.fields['intervento'] = widget.intervento.id!;
       request.files.add(
@@ -270,7 +270,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       print('Inizio richiesta al server per intervento ID: ${widget.intervento.id}'); // Debug
 
-      final response = await http.get(Uri.parse('$ipaddress/pdfu/intervento/${widget.intervento.id.toString()}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/pdfu/intervento/${widget.intervento.id.toString()}'));
       print('Risposta ricevuta con status code: ${response.statusCode}'); // Debug
 
       switch (response.statusCode) {
@@ -327,7 +327,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       }
       final ddt = DDTModel.fromJson(jsonDecode(data.body));
       try{
-        var apiUrl = Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}');
+        var apiUrl = Uri.parse('$ipaddressProva/api/relazioneDDTProdotto/ddt/${ddt.id}');
         var response = await http.get(apiUrl);
         if(response.statusCode == 200){
           var jsonData = jsonDecode(response.body);
@@ -351,7 +351,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -371,7 +371,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllNoteByIntervento() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}');
+      var apiUrl = Uri.parse('$ipaddressProva/api/noteTecnico/intervento/${widget.intervento.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -400,7 +400,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaOrarioInizio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -1035,7 +1035,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> _openPdfFile(BuildContext context, String interventoId, String fileName) async {
     // Costruisci l'URL dell'endpoint
-    final pdfUrl = '$ipaddress/pdfu/intervento/$interventoId/$fileName';
+    final pdfUrl = '$ipaddressProva/pdfu/intervento/$interventoId/$fileName';
     print('PDF URL: $pdfUrl'); // Debug
 
     try {

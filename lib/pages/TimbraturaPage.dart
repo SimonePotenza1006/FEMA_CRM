@@ -116,7 +116,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<List<UtenteModel>?> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/utente'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<UtenteModel> utenti = [];
@@ -594,7 +594,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         if (tipoTimbratura == "INGRESSO") {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'gps': _indirizzo.toString(),
@@ -615,7 +615,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,
@@ -684,7 +684,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMarcatempoDataUtente(DateTime data, String utenteid) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -725,7 +725,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMarcatempoToday() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/pres/1/2');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo/pres/1/2');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -771,7 +771,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllMarcatempoMonth(int current) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -816,7 +816,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getMarcatempoOggi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/oggi/${widget.utente.id}/2');
+      var apiUrl = Uri.parse('$ipaddressProva/marcatempo/oggi/${widget.utente.id}/2');
       var response = await http.get(apiUrl);
       var jsonData = jsonDecode(response.body);
       if (response.statusCode == 200) {

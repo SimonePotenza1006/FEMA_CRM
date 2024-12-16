@@ -51,7 +51,7 @@ class _TableCommissioniPageState extends State<TableCommissioniPage>{
       isLoading = true; // Inizio del caricamento
     });
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/commissione/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva/api/commissione/ordered');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);

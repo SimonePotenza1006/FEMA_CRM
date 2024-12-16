@@ -46,7 +46,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
 
   Future<void> getAllTickets() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/ticket');
+      var apiUrl = Uri.parse('$ipaddressProva/api/ticket');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);

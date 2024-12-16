@@ -26,7 +26,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddressProva/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -136,7 +136,8 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Immagine'),
+        backgroundColor: Colors.red,
+        title: Text(''),
       ),
       body: Stack(
         children: [
