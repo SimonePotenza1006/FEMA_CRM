@@ -129,7 +129,7 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                          MaterialPageRoute(builder: (context) => TableInterventiPage(utente : widget.utente)),
                         );
                       },
                     ),
@@ -141,7 +141,7 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => TableGruppiPage()),
+                          MaterialPageRoute(builder: (context) => TableGruppiPage(utente : widget.utente)),
                         );
                       },
                     ),
@@ -234,7 +234,7 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
       case 0:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => TableInterventiPage()),
+          MaterialPageRoute(builder: (context) => TableInterventiPage(utente: widget.utente)),
         );
         break;
       case 1:
@@ -247,7 +247,7 @@ class _MenuInterventiPageState extends State<MenuInterventiPage>{
       case 2: Navigator.push(
           context,
           MaterialPageRoute(builder: (context) =>
-              TableGruppiPage()),
+              TableGruppiPage(utente : widget.utente)),
         );
         break;
       }

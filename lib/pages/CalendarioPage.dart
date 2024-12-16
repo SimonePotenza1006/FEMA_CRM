@@ -13,9 +13,13 @@ import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class CalendarioPage extends StatefulWidget {
+  final UtenteModel utente;
+
+  CalendarioPage({Key? key, required this.utente});
+
+
   @override
   _CalendarioPageState createState() => _CalendarioPageState();
 }
@@ -51,7 +55,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -73,7 +77,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getAllCommissioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/commissione');
+      var apiUrl = Uri.parse('$ipaddress/api/commissione');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -96,7 +100,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getTipologieIntervento() async {
     print('getTipologieIntervento chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -121,7 +125,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> getAllInterventi() async {
     print('getAllInterventi chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -393,10 +397,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 builder: (context) {
                                   if (appointment.recurrenceId is InterventoModel) {
                                     InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                    return DettaglioInterventoNewPage(intervento: intervento);
+                                    return DettaglioInterventoNewPage(intervento: intervento, utente: widget.utente);
                                   } else {
                                     CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
-                                    return DettaglioCommissioneAmministrazionePage(commissione: commissione);
+                                    return DettaglioCommissioneAmministrazionePage(commissione: commissione, utente : widget.utente);
                                   }
                                 },
                               ),

@@ -15,8 +15,6 @@ import '../model/TicketModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneInterventoByAmministrazionePage.dart';
 import 'DettaglioTicketPage.dart';
-import 'ListaClientiPage.dart';
-import 'DettaglioInterventoPage.dart';
 import 'CreazioneTicketTecnicoPage.dart';
 
 class TableTicketPage extends StatefulWidget{
@@ -48,7 +46,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
 
   Future<void> getAllTickets() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/ticket');
+      var apiUrl = Uri.parse('$ipaddress/api/ticket');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);

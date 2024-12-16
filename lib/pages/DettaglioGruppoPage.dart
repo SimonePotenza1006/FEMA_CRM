@@ -4,13 +4,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../model/UtenteModel.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class DettaglioGruppoPage extends StatefulWidget {
   final GruppoInterventiModel gruppo;
+  final UtenteModel utente;
 
-  DettaglioGruppoPage({required this.gruppo});
+  DettaglioGruppoPage({required this.gruppo, required this.utente});
 
   @override
   _DettaglioGruppoPageState createState() => _DettaglioGruppoPageState();
@@ -31,7 +32,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getInterventi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/gruppo/${widget.gruppo.id}');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/${widget.gruppo.id}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -53,7 +54,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void modificaDescrizione() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/gruppi'),
+        Uri.parse('$ipaddress/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.gruppo.id,
@@ -231,7 +232,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
+                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : widget.utente),
                 ),
               );
             }

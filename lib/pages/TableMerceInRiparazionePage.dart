@@ -14,11 +14,13 @@ import '../model/UtenteModel.dart';
 import 'CreazioneInterventoByAmministrazionePage.dart';
 import 'DettaglioInterventoNewPage.dart';
 import 'ListaClientiPage.dart';
-import 'DettaglioInterventoPage.dart';
 import 'TableInterventiPage.dart';
 
 class TableMerceInRiparazionePage extends StatefulWidget{
-  TableMerceInRiparazionePage({Key? key}) : super(key : key);
+  final UtenteModel utente;
+
+
+  TableMerceInRiparazionePage({Key? key, required this.utente}) : super(key : key);
 
   @override
   _TableMerceInRiparazionePageState createState() => _TableMerceInRiparazionePageState();
@@ -54,7 +56,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
   @override
   void initState() {
     super.initState();
-    _dataSource = InterventoDataSource(context, _filteredInterventi);
+    _dataSource = InterventoDataSource(context, widget.utente ,_filteredInterventi);
     getAllMerci();
     _filteredInterventi = _allInterventi.toList();
   }
@@ -118,7 +120,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
       isLoading = true; // Inizio del caricamento
     });
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/withMerce');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/withMerce');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -130,7 +132,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
           _isLoading = false;
           _allInterventi = interventi;
           _filteredInterventi = interventi;
-          _dataSource = InterventoDataSource(context, _filteredInterventi);
+          _dataSource = InterventoDataSource(context, widget.utente,_filteredInterventi);
         });
       } else {
         _isLoading = false;
@@ -164,7 +166,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
             onPressed: () {
               Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage()));
+                  MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage(utente : widget.utente)));
             },
           ),
         ],
@@ -542,6 +544,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
 }
 
 class InterventoDataSource extends DataGridSource{
+  UtenteModel utente;
   List<InterventoModel> _interventions = [];
   List<InterventoModel> interventiFiltrati = [];
   BuildContext context;
@@ -552,6 +555,7 @@ class InterventoDataSource extends DataGridSource{
 
   InterventoDataSource(
       this.context,
+      this.utente,
       List<InterventoModel> interventions,
       ) {
     _interventions = List.from(interventions);
@@ -667,7 +671,7 @@ class InterventoDataSource extends DataGridSource{
                                     saveCodice(intervento).then((_) {
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) => TableInterventiPage()),
+                                        MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage(utente : utente)),
                                       );
                                     });
                                   },
@@ -728,7 +732,7 @@ class InterventoDataSource extends DataGridSource{
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -832,7 +836,7 @@ class InterventoDataSource extends DataGridSource{
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        DettaglioInterventoNewPage(intervento: intervento),
+                        DettaglioInterventoNewPage(intervento: intervento, utente : utente),
                   ),
                 );
               },

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fema_crm/model/TipologiaInterventoModel.dart';
 import 'package:fema_crm/pages/DettaglioInterventoNewPage.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -14,10 +15,10 @@ import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneInterventoByAmministrazionePage.dart';
 import 'ListaClientiPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class TableInterventiPage extends StatefulWidget {
-  TableInterventiPage({Key? key}) : super(key: key);
+  final UtenteModel utente;
+  TableInterventiPage({Key? key, required this.utente}) : super(key: key);
 
   @override
   _TableInterventiPageState createState() => _TableInterventiPageState();
@@ -76,12 +77,12 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
     //_dataSource.updateData();
     Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => TableInterventiPage()));
+        MaterialPageRoute(builder: (context) => TableInterventiPage(utente: widget.utente)));
   }
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -102,7 +103,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -123,7 +124,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -144,7 +145,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -177,7 +178,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
     try {
       while (!allDataLoaded) {
-        var apiUrl = Uri.parse('$ipaddressProva/api/intervento/paged?page=$currentPage&size=$size');
+        var apiUrl = Uri.parse('$ipaddress/api/intervento/paged?page=$currentPage&size=$size');
         print('Chiamata API alla pagina $currentPage con size $size');
         var response = await http.get(apiUrl);
 
@@ -205,7 +206,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 .toList();
 
             // Aggiorna la sorgente dati
-            _dataSource = InterventoDataSource(context, _filteredInterventi, filteredGruppi);
+            _dataSource = InterventoDataSource(context, widget.utente,_filteredInterventi, filteredGruppi);
           });
 
           // Controlla se hai finito di caricare i dati
@@ -237,7 +238,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -510,7 +511,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   void initState() {
     super.initState();
     // Inizializza il data source vuoto (senza dati)
-    _dataSource = InterventoDataSource(context, _filteredInterventi, filteredGruppi);
+    _dataSource = InterventoDataSource(context, widget.utente,_filteredInterventi, filteredGruppi);
     // Carica i dati asincroni
     getAllInterventi(page: 0, size: 20, loadAll: true).then((_) {
       setState(() {
@@ -746,7 +747,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
               onPressed: () {
                 Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => TableInterventiPage()));
+                    MaterialPageRoute(builder: (context) => TableInterventiPage(utente: widget.utente)));
               },
             ),
           ],
@@ -1366,6 +1367,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             FloatingActionButton(
               onPressed: () {
                 mostraRicercaInterventiDialog(
+                  utente : widget.utente,
                   context: context,
                   utenti: utentiList,
                   clienti: clientiList,
@@ -1388,7 +1390,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddressProva/api/gruppi'),
+          Uri.parse('$ipaddress/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1413,6 +1415,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 }
 
 class InterventoDataSource extends DataGridSource {
+  UtenteModel utente;
   List<InterventoModel> _interventions = [];
   List<InterventoModel> interventiFiltrati = [];
   //Map<int, List<UtenteModel>> _interventoUtentiMap = {};
@@ -1434,6 +1437,7 @@ class InterventoDataSource extends DataGridSource {
 
   InterventoDataSource(
       this.context,
+      this.utente,
       List<InterventoModel> interventions,
       //Map<int, List<UtenteModel>> interventoUtentiMap,
       List<GruppoInterventiModel> gruppi
@@ -1920,7 +1924,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1973,7 +1977,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2033,7 +2037,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2179,7 +2183,7 @@ class InterventoDataSource extends DataGridSource {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
+                    builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : utente),
                   ),
                 );
               },
@@ -2251,6 +2255,7 @@ class InterventoDataSource extends DataGridSource {
 }
 
 void mostraRicercaInterventiDialog({
+  required UtenteModel utente,
   required BuildContext context,
   required List<UtenteModel> utenti,
   required List<ClienteModel> clienti,
@@ -2440,6 +2445,68 @@ void mostraRicercaInterventiDialog({
           intervento.data!.isBefore(endDate) &&
           calcolaStatoIntervento(intervento) == stato;
     }).toList();
+  }
+
+  void showCustomToast(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        bottom: 50.0,
+        left: MediaQuery.of(context).size.width * 0.1,
+        right: MediaQuery.of(context).size.width * 0.1,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedOpacity(
+            opacity: 1.0,
+            duration: Duration(milliseconds: 300),
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.0),
+                border: Border.all(
+                  color: Colors.red,
+                  width: 2.0, // Spessore del bordo
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w400
+                    ),
+                  ),
+                ],
+              )
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Mostra il toast
+    overlay.insert(overlayEntry);
+
+    // Rimuove il toast dopo un po' di tempo con un effetto dissolvenza
+    Future.delayed(Duration(seconds: 4), () {
+      overlayEntry.markNeedsBuild();
+      Future.delayed(Duration(milliseconds: 3000), () {
+        overlayEntry.remove();
+      });
+    });
   }
 
 // Funzione helper per calcolare lo stato dell'intervent
@@ -2918,24 +2985,32 @@ void mostraRicercaInterventiDialog({
                   double sommaImporti = interventiFiltrati.fold(0, (prev, intervento) {
                     return prev + (intervento.importo_intervento ?? 0);
                   });
+
+                  int totaleInterventi = interventiFiltrati.length;
+
+                  // Numero di interventi con importo = 0 o null
+                  int interventiZeroONull = interventiFiltrati.where(
+                        (intervento) => (intervento.importo_intervento ?? 0) == 0,
+                  ).length;
+
+                  // Numero di interventi con importo != 0 o null
+                  int interventiNonZero = totaleInterventi - interventiZeroONull;
+
+                  // Genera il messaggio articolato
+                  String messaggio = '''
+                  Totale interventi: $totaleInterventi
+                  Interventi con importo pari a 0 o non inserito: $interventiZeroONull
+                  Interventi con importo diverso 0: $interventiNonZero
+                  Somma importi: €${sommaImporti.toStringAsFixed(2)}
+                  ''';
+
+                  // Chiudi il dialog corrente
                   Navigator.of(context).pop();
 
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Totale Importi'),
-                        content: Text('La somma degli importi degli interventi filtrati è: €${sommaImporti.toStringAsFixed(2)}'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-
+                  // Mostra il messaggio con il toast solo per l'utente Mazzei
+                  if (utente.cognome == "Mazzei") {
+                    showCustomToast(context, messaggio);
+                  }
                   // Restituzione dei risultati filtrati
                   onFiltrati(interventiFiltrati);
                 },

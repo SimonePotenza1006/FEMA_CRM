@@ -6,14 +6,15 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../model/InterventoModel.dart';
+import '../model/UtenteModel.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class DettaglioGruppoInterventiPage extends StatefulWidget {
   final GruppoInterventiModel gruppo;
+  final UtenteModel utente;
 
   const DettaglioGruppoInterventiPage(
-      {Key? key, required this.gruppo}) : super(key : key);
+      {Key? key, required this.gruppo, required this.utente}) : super(key : key);
 
   @override
   _DettaglioGruppoInterventiPageState createState() =>
@@ -92,7 +93,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> concludiGruppo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/gruppi'),
+        Uri.parse('$ipaddress/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id' : widget.gruppo.id,
@@ -133,7 +134,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveImporto(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -465,7 +466,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
+                                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: widget.utente),
                                 ),
                               );
                             }
@@ -510,7 +511,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<void> getInterventiByGruppo() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva/api/intervento/gruppo/${int.parse(widget.gruppo.id.toString())}');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/${int.parse(widget.gruppo.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

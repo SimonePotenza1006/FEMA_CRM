@@ -1,12 +1,15 @@
 import 'package:fema_crm/pages/TableCommissioniPage.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import '../model/UtenteModel.dart';
 import 'AssegnazioneCommissionePage.dart';
 import 'ReportCommissioniPage.dart';
 import 'ReportCommissioniPerAgentePage.dart';
 
 class MenuCommissioniPage extends StatefulWidget {
-  const MenuCommissioniPage ({Key? key}) : super(key: key);
+  final UtenteModel utente;
+
+  const MenuCommissioniPage ({Key? key, required this.utente}) : super(key: key);
 
   @override
   _MenuCommissioniPageState createState() => _MenuCommissioniPageState();
@@ -94,7 +97,7 @@ class _MenuCommissioniPageState extends State<MenuCommissioniPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => TableCommissioniPage()),
+                          MaterialPageRoute(builder: (context) => TableCommissioniPage(utente : widget.utente)),
                         );
                       },
                     ),
@@ -188,7 +191,7 @@ class _MenuCommissioniPageState extends State<MenuCommissioniPage> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) =>
-              TableCommissioniPage()),
+              TableCommissioniPage(utente: widget.utente)),
         );
         break;
       case 2:
