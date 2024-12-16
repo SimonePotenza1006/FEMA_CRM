@@ -6,14 +6,15 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../model/InterventoModel.dart';
+import '../model/UtenteModel.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class DettaglioGruppoInterventiPage extends StatefulWidget {
   final GruppoInterventiModel gruppo;
+  final UtenteModel utente;
 
   const DettaglioGruppoInterventiPage(
-      {Key? key, required this.gruppo}) : super(key : key);
+      {Key? key, required this.gruppo, required this.utente}) : super(key : key);
 
   @override
   _DettaglioGruppoInterventiPageState createState() =>
@@ -465,7 +466,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
+                                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: widget.utente),
                                 ),
                               );
                             }

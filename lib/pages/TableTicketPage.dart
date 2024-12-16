@@ -15,8 +15,6 @@ import '../model/TicketModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneInterventoByAmministrazionePage.dart';
 import 'DettaglioTicketPage.dart';
-import 'ListaClientiPage.dart';
-import 'DettaglioInterventoPage.dart';
 import 'CreazioneTicketTecnicoPage.dart';
 
 class TableTicketPage extends StatefulWidget{

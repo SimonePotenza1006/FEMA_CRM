@@ -136,7 +136,8 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Immagine'),
+        backgroundColor: Colors.red,
+        title: Text(''),
       ),
       body: Stack(
         children: [

@@ -11,15 +11,15 @@ import 'package:intl/intl.dart';
 
 import '../model/InterventoModel.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 import 'GalleriaFotoInterventoPage.dart';
 
 class DettaglioMerceInRiparazioneAmministrazionePage extends StatefulWidget{
   final MerceInRiparazioneModel merce;
   final VoidCallback? onNavigateBack;
+  final UtenteModel utente;
 
   const DettaglioMerceInRiparazioneAmministrazionePage(
-      {Key? key, required this.merce, this.onNavigateBack}
+      {Key? key, required this.merce, this.onNavigateBack, required this.utente}
       ): super(key: key);
 
   @override
@@ -292,7 +292,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DettaglioInterventoNewPage(intervento: interventoAssociato!),
+                                      builder: (context) => DettaglioInterventoNewPage(intervento: interventoAssociato!, utente: widget.utente),
                                     ),
                                   );
                                 }

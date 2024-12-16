@@ -10,8 +10,9 @@ import '../model/UtenteModel.dart';
 
 class DettaglioCommissioneAmministrazionePage extends StatefulWidget {
   final CommissioneModel commissione;
+  final UtenteModel utente;
 
-  DettaglioCommissioneAmministrazionePage({Key? key, required this.commissione})
+  DettaglioCommissioneAmministrazionePage({Key? key, required this.commissione, required this.utente})
       : super(key: key);
 
   @override
@@ -242,7 +243,7 @@ class _DettaglioCommissioneAmministrazionePageState
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => TableCommissioniPage(),
+            builder: (context) => TableCommissioniPage(utente : widget.utente),
           ),
         );
         ScaffoldMessenger.of(context).showSnackBar(

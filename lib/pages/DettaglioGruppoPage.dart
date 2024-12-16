@@ -4,13 +4,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../model/UtenteModel.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class DettaglioGruppoPage extends StatefulWidget {
   final GruppoInterventiModel gruppo;
+  final UtenteModel utente;
 
-  DettaglioGruppoPage({required this.gruppo});
+  DettaglioGruppoPage({required this.gruppo, required this.utente});
 
   @override
   _DettaglioGruppoPageState createState() => _DettaglioGruppoPageState();
@@ -231,7 +232,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
+                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : widget.utente),
                 ),
               );
             }

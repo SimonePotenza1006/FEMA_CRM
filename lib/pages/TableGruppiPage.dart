@@ -10,10 +10,13 @@ import 'dart:io';
 
 import '../model/GruppoInterventiModel.dart';
 import '../model/InterventoModel.dart';
+import '../model/UtenteModel.dart';
 import 'DettaglioGruppoPage.dart';
 
 class TableGruppiPage extends StatefulWidget{
-  TableGruppiPage({Key? key}) : super(key:key);
+  final UtenteModel utente;
+
+  TableGruppiPage({Key? key, required this.utente}) : super(key:key);
 
   @override
   _TableGruppiPageState createState() => _TableGruppiPageState();
@@ -37,7 +40,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   void initState(){
     super.initState();
     getAllGruppi();
-    _dataSource = GruppoDataSource(context, allGruppi);
+    _dataSource = GruppoDataSource(context, widget.utente, allGruppi);
   }
 
   Future<void> getAllGruppi() async{
@@ -52,7 +55,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         }
         setState(() {
           allGruppi = gruppi;
-          _dataSource = GruppoDataSource(context, allGruppi);
+          _dataSource = GruppoDataSource(context, widget.utente,allGruppi);
         });
       }
     } catch(e){
@@ -243,13 +246,14 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 }
 
 class GruppoDataSource extends DataGridSource{
+  UtenteModel utente;
   List<GruppoInterventiModel> _gruppi =[];
   BuildContext context;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
 String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   TextEditingController importoController = TextEditingController();
 
-  GruppoDataSource(this.context, List<GruppoInterventiModel> gruppi){
+  GruppoDataSource(this.context, this.utente,List<GruppoInterventiModel> gruppi){
     _gruppi = gruppi;
   }
 
@@ -319,7 +323,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                   saveImporto(gruppo).then((_) {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => TableGruppiPage()),
+                                      MaterialPageRoute(builder: (context) => TableGruppiPage(utente: utente,)),
                                     );
                                   });
                                 },
@@ -434,7 +438,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DettaglioGruppoPage(gruppo: gruppo),
+                  builder: (context) => DettaglioGruppoPage(gruppo: gruppo, utente: utente),
                 ),
               );
             },

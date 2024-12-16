@@ -15,7 +15,7 @@ import '../model/UtenteModel.dart';
 import 'AcquistoFornitorePage.dart';
 import 'AggiungiMovimentoPage.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
+import 'DettaglioSpesaFornitorePage.dart';
 import 'FemaShopPage.dart';
 import 'ModificaMovimentazionePage.dart';
 
@@ -327,7 +327,43 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                         ),
                         DataCell(Text(movimento.importo != null ? movimento.importo!.toStringAsFixed(2) + '€' : '')),
                         DataCell(Text(movimento.cliente != null ? movimento.cliente!.denominazione! : '///')),
-                        DataCell(Text(movimento.fornitore != null ? movimento.fornitore!.denominazione! : '///')),
+                        DataCell(
+                          GestureDetector(
+                            onTap: () {
+                              if (movimento.fornitore != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioSpesaFornitorePage(movimento: movimento),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 1.0), // Aggiunge spazio tra testo e underline
+                                  child: Text(
+                                    movimento.fornitore != null ? movimento.fornitore!.denominazione! : '///',
+                                    style: TextStyle(
+                                      color: movimento.fornitore != null ? Colors.blue : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                if (movimento.fornitore != null)
+                                  Positioned(
+                                    bottom: 0, // Posiziona la linea esattamente sotto il testo
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      height: 1, // Altezza della linea di sottolineatura
+                                      color: Colors.blue, // Colore della linea di sottolineatura
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
                         DataCell(
                           GestureDetector(
                             onTap: () {
@@ -335,7 +371,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => DettaglioInterventoNewPage(intervento: movimento.intervento!),
+                                    builder: (context) => DettaglioInterventoNewPage(intervento: movimento.intervento!, utente: widget.userData,),
                                   ),
                                 );
                               }

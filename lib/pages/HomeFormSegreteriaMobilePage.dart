@@ -356,7 +356,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => CalendarioPage()),
+                        MaterialPageRoute(builder: (context) => CalendarioPage(utente: widget.userData!)),
                       );
                     },
                   ),
@@ -422,7 +422,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
+                        MaterialPageRoute(builder: (context) => MenuCommissioniPage(utente : widget.userData!)),
                       );
                     },
                   ),

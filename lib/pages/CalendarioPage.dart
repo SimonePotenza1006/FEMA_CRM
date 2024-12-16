@@ -13,9 +13,13 @@ import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class CalendarioPage extends StatefulWidget {
+  final UtenteModel utente;
+
+  CalendarioPage({Key? key, required this.utente});
+
+
   @override
   _CalendarioPageState createState() => _CalendarioPageState();
 }
@@ -393,10 +397,10 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                                 builder: (context) {
                                   if (appointment.recurrenceId is InterventoModel) {
                                     InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                    return DettaglioInterventoNewPage(intervento: intervento);
+                                    return DettaglioInterventoNewPage(intervento: intervento, utente: widget.utente);
                                   } else {
                                     CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
-                                    return DettaglioCommissioneAmministrazionePage(commissione: commissione);
+                                    return DettaglioCommissioneAmministrazionePage(commissione: commissione, utente : widget.utente);
                                   }
                                 },
                               ),

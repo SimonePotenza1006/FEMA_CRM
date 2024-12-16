@@ -147,7 +147,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     } catch (e) {
       print('Errore durante la chiamata al server: $e');
       if (response!= null) {
-        //print('Risposta del server: ${response.body}');
+
       }
       throw e; // rethrow the exception
     }

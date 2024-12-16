@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'dart:io';
 import 'package:fema_crm/model/FornitoreModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import '../model/MovimentiModel.dart';
 import '../model/UtenteModel.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http_parser/http_parser.dart';
 
 class AcquistoFornitorePage extends StatefulWidget{
   final UtenteModel utente;
@@ -29,6 +32,60 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
   List<FornitoreModel> filteredFornitoriList = [];
   List<UtenteModel> allUtenti = [];
   UtenteModel? selectedUtente;
+  List<XFile> pickedImages =  [];
+
+  Future<void> takePicture() async {
+    final ImagePicker _picker = ImagePicker();
+
+    // Verifica se sei su Android
+    if (Platform.isAndroid) {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+      if (pickedFile != null) {
+        setState(() {
+          pickedImages.add(pickedFile);
+        });
+      }
+    }
+    // Verifica se sei su Windows
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
+    }
+  }
+
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    setState(() {
+                      pickedImages.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   void initState(){
@@ -38,30 +95,76 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
     selectedDate = DateTime.now();
   }
 
-  Future<void> getAllUtenti() async{
-    try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+  Future<void> getAllUtenti() async {
+    try {
+      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
       var response = await http.get(apiUrl);
-      if(response.statusCode == 200){
+      if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
         List<UtenteModel> utenti = [];
-        for(var item in jsonData){
+        for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
         }
         setState(() {
           allUtenti = utenti;
         });
       } else {
-        throw Exception('Failed to load utenti data from API: ${response.statusCode}');
+        throw Exception(
+            'Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Qualcosa non va utenti : $e');
+    }
+  }
+
+  Future<void> saveMovimentoPlusPics() async{
+    final data = await addMovimento();
+    try{
+      if(data == null){
+        throw Exception('Dati del movimento non disponibili.');
+      }
+      final movimento = MovimentiModel.fromJson(jsonDecode(data.body));
+      try{
+        for(var image in pickedImages){
+          if(image.path.isNotEmpty){
+            print('Percorso del file: ${image.path}');
+            var request = http.MultipartRequest(
+              'POST',
+              Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+            );
+            request.files.add(
+              await http.MultipartFile.fromPath(
+                'movimento',
+                image.path,
+                contentType: MediaType('image', 'jpeg')
+              )
+            );
+            var response = await request.send();
+            if (response.statusCode == 200) {
+              print('File inviato con successo');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Foto salvata!'),
+                ),
+              );
+            } else {
+              print('Errore durante l\'invio del file: ${response.statusCode}');
+            }
+          }
+          pickedImages.clear();
+          Navigator.pop(context);
+        }
+      } catch(e){
+        print('Errore 1 durante l\'invio del file: $e');
       }
     } catch(e){
-      print('Qualcosa non va utenti : $e');
+      print('Errore 2 durante l\'invio del file: $e');
     }
   }
 
   Future<void> getAllFornitori() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];
@@ -197,7 +300,11 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
             TextButton(
               onPressed: () { // Convalida il form
                 if(_passwordController.text == selectedUtente?.password){
-                  addMovimento();
+                  if(pickedImages.length >0){
+                    saveMovimentoPlusPics();
+                  } else{
+                    addMovimento();
+                  }
                   Navigator.pop(context);
                 } else {
                   showPasswordErrorDialog(context);
@@ -315,6 +422,14 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
         title: Text('Pagamento fornitore', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.attach_file, color: Colors.white),
+            onPressed: (){
+              takePicture();
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -465,13 +580,25 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
                               ])
                       ),
                     ),
-                    SizedBox(height: 15),
+                    SizedBox(height: 10),
+                    if(pickedImages.length > 0)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildImagePreview()
+                        ],
+                      ),
+                    SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: () {
                         if(widget.utente.nome == "Segreteria"){
                           _showVerificaDialog();
                         } else {
-                          addMovimento();
+                          if(pickedImages.length > 0){
+                            saveMovimentoPlusPics();
+                          } else {
+                            addMovimento();
+                          }
                         }
                       },
                       style: ButtonStyle(
@@ -493,11 +620,12 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
   }
 
 
-  Future<void> addMovimento() async{
+  Future<http.Response?> addMovimento() async{
+    late http.Response response;
     try{
       String prioritaString = TipoMovimentazione.Uscita.toString().split('.').last;
-      final response = await http.post(
-          Uri.parse('$ipaddress/api/movimenti'),
+      response = await http.post(
+          Uri.parse('$ipaddressProva/api/movimenti'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'data' : selectedDate.toIso8601String(),
@@ -514,10 +642,12 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
             content: Text('Movimentazione salvata con successo!'),
           ),
         );
-        Navigator.pop(context);
+        return response;
       }
     } catch(e){
       print('errore:$e');
+      return null;
     }
+    return null;
   }
 }

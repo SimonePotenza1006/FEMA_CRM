@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../model/InterventoModel.dart';
-import 'DettaglioInterventoPage.dart';
 import 'GalleriaFotoInterventoPage.dart';
 
 class DettaglioRMAAmministrazionePage extends StatefulWidget{

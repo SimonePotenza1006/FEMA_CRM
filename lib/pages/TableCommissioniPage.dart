@@ -7,11 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../model/CommissioneModel.dart';
 import '../model/InterventoModel.dart';
+import '../model/UtenteModel.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 
 class TableCommissioniPage extends StatefulWidget{
-  TableCommissioniPage({Key? key}) : super(key : key);
+  final UtenteModel utente;
+
+  TableCommissioniPage({Key? key, required this.utente}) : super(key : key);
 
   @override
   _TableCommissioniPageState createState() => _TableCommissioniPageState();
@@ -39,7 +41,7 @@ class _TableCommissioniPageState extends State<TableCommissioniPage>{
   @override
   void initState() {
     super.initState();
-    _dataSource = CommissioneDataSource(context, _filteredCommissioni);
+    _dataSource = CommissioneDataSource(context, widget.utente, _filteredCommissioni);
     getAllCommissioni();
     _filteredCommissioni = _allCommissioni.toList();
   }
@@ -61,7 +63,7 @@ class _TableCommissioniPageState extends State<TableCommissioniPage>{
           _isLoading = false;
           _allCommissioni = commissioni;
           _filteredCommissioni = commissioni;
-          _dataSource = CommissioneDataSource(context, _filteredCommissioni);
+          _dataSource = CommissioneDataSource(context,widget.utente, _filteredCommissioni);
         });
       } else {
         _isLoading = false;
@@ -94,7 +96,7 @@ class _TableCommissioniPageState extends State<TableCommissioniPage>{
             onPressed: () {
               Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => TableCommissioniPage()));
+                  MaterialPageRoute(builder: (context) => TableCommissioniPage(utente: widget.utente)));
             },
           ),
         ],
@@ -300,6 +302,7 @@ class _TableCommissioniPageState extends State<TableCommissioniPage>{
 }
 
 class CommissioneDataSource extends DataGridSource{
+  UtenteModel utente;
   List<CommissioneModel> _commissioni = [];
   List<CommissioneModel> commissioniFiltrate = [];
   BuildContext context;
@@ -308,6 +311,7 @@ class CommissioneDataSource extends DataGridSource{
 
   CommissioneDataSource(
       this.context,
+      this.utente,
       List<CommissioneModel> commissioni,
       ){
     _commissioni = List.from(commissioni);
@@ -364,7 +368,7 @@ class CommissioneDataSource extends DataGridSource{
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DettaglioInterventoNewPage(intervento: intervento),
+                        builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: utente,),
                       ),
                     );
                   }
@@ -403,7 +407,7 @@ class CommissioneDataSource extends DataGridSource{
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      DettaglioCommissioneAmministrazionePage(commissione: commissione),
+                      DettaglioCommissioneAmministrazionePage(commissione: commissione, utente : utente),
                 ),
               );
             },

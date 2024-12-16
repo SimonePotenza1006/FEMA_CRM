@@ -49,7 +49,6 @@ import 'DettaglioCommissioneAmministrazionePage.dart';
 import 'DettaglioCommissioneTecnicoPage.dart';
 import 'DettaglioInterventoByTecnicoPage.dart';
 import 'DettaglioInterventoNewPage.dart';
-import 'DettaglioInterventoPage.dart';
 import 'DettaglioMerceInRiparazioneByTecnicoPage.dart';
 import 'ListaNoteUtentiPage.dart';
 import 'ListaUtentiPage.dart';
@@ -1243,7 +1242,7 @@ class _HomeFormAmministrazioneNewPageState
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => CalendarioPage()),
+                                        MaterialPageRoute(builder: (context) => CalendarioPage(utente: widget.userData)),
                                       );
                                     },
                                   ),
@@ -1285,7 +1284,7 @@ class _HomeFormAmministrazioneNewPageState
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage()),
+                                        MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage(utente : widget.userData)),
                                       );
                                     },
                                   ),
@@ -1313,7 +1312,7 @@ class _HomeFormAmministrazioneNewPageState
                                     onPressed: () {
                                       Navigator.push(
                                         context,
-                                        MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
+                                        MaterialPageRoute(builder: (context) => MenuCommissioniPage(utente : widget.userData)),
                                       );
                                     },
                                   ),
@@ -1614,10 +1613,10 @@ class _HomeFormAmministrazioneNewPageState
                                                         builder: (context) {
                                                           if (appointment.recurrenceId is InterventoModel) {
                                                             InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                                            return DettaglioInterventoNewPage(intervento: intervento);
+                                                            return DettaglioInterventoNewPage(intervento: intervento, utente: widget.userData);
                                                           } else {
                                                             CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
-                                                            return DettaglioCommissioneAmministrazionePage(commissione: commissione);
+                                                            return DettaglioCommissioneAmministrazionePage(commissione: commissione, utente: widget.userData);
                                                           }
                                                         },
                                                       ),
@@ -2074,7 +2073,7 @@ class _HomeFormAmministrazioneNewPageState
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   DettaglioCommissioneAmministrazionePage(
-                                                      commissione: commissione),
+                                                      commissione: commissione, utente : widget.userData),
                                             ),
                                           );
                                         },
@@ -2272,10 +2271,10 @@ class _HomeFormAmministrazioneNewPageState
                                                       builder: (context) {
                                                         if (appointment.recurrenceId is InterventoModel) {
                                                           InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                                          return DettaglioInterventoNewPage(intervento: intervento);
+                                                          return DettaglioInterventoNewPage(intervento: intervento, utente: widget.userData);
                                                         } else {
                                                           CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
-                                                          return DettaglioCommissioneAmministrazionePage(commissione: commissione);
+                                                          return DettaglioCommissioneAmministrazionePage(commissione: commissione, utente : widget.userData);
                                                         }
                                                       },
                                                     ),
@@ -2384,7 +2383,7 @@ class _HomeFormAmministrazioneNewPageState
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => CalendarioPage()),
+                                          MaterialPageRoute(builder: (context) => CalendarioPage(utente: widget.userData)),
                                         );
                                       },
                                     ),
@@ -2424,7 +2423,7 @@ class _HomeFormAmministrazioneNewPageState
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage()),
+                                          MaterialPageRoute(builder: (context) => TableMerceInRiparazionePage(utente : widget.userData)),
                                         );
                                       },
                                     ),
@@ -2452,7 +2451,7 @@ class _HomeFormAmministrazioneNewPageState
                                       onPressed: () {
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => MenuCommissioniPage()),
+                                          MaterialPageRoute(builder: (context) => MenuCommissioniPage(utente : widget.userData)),
                                         );
                                       },
                                     ),

@@ -33,8 +33,9 @@ import 'PDFInterventoPage.dart';
 
 class DettaglioInterventoNewPage extends StatefulWidget {
   final InterventoModel intervento;
+  final UtenteModel utente;
 
-  DettaglioInterventoNewPage({required this.intervento});
+  DettaglioInterventoNewPage({required this.intervento, required this.utente});
 
   @override
   _DettaglioInterventoNewPageState createState() => _DettaglioInterventoNewPageState();
@@ -2158,11 +2159,13 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                       width: 170,
                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
                       child: FloatingActionButton(
-                        onPressed: () {
+                        onPressed: widget.utente.cognome == "Mazzei"
+                            ? () {
                           annullaIntervento();
-                        },
+                        }
+                            : null, // Il pulsante è disabilitato se onPressed è null
                         heroTag: "TagAnnullamento",
-                        backgroundColor: Colors.red,
+                        backgroundColor: widget.utente.cognome == "Mazzei" ? Colors.red : Colors.grey, // Colore condizionale
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -2170,7 +2173,10 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                             Flexible( // Permette al testo di adattarsi alla dimensione
                               child: Text(
                                 'Annulla intervento'.toUpperCase(),
-                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
                                 textAlign: TextAlign.center, // Centra il testo
                                 softWrap: true, // Permette al testo di andare a capo
                               ),
@@ -3786,6 +3792,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           MaterialPageRoute(
             builder: (context) => DettaglioInterventoNewPage(
               intervento: widget.intervento,
+              utente: widget.utente,
             ),
           ),
         );
@@ -4761,7 +4768,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DettaglioInterventoNewPage(intervento: InterventoModel.fromJson(jsonDecode(response.body)))),
+          MaterialPageRoute(builder: (context) => DettaglioInterventoNewPage(intervento: InterventoModel.fromJson(jsonDecode(response.body)), utente: widget.utente)),
         );
       } else {
         print('Errore nella richiesta: ${response.statusCode}');
@@ -4853,7 +4860,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => TableInterventiPage(),
+          builder: (context) => TableInterventiPage(utente:widget.utente),
         ),
       );
     } catch(e){
