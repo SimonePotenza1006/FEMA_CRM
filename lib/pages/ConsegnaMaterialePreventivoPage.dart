@@ -177,7 +177,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       );
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<AziendaModel> aziende = [];
         for(var item in jsonData){
           aziende.add(AziendaModel.fromJson(item));
@@ -219,7 +219,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
       if (response.statusCode == 200) {
         debugPrint('JSON ricevuto: ${response.body}', wrapWidth: 1024);
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<RelazionePreventivoProdottiModel> prodotti = [];
         for (var item in jsonData) {
           prodotti.add(RelazionePreventivoProdottiModel.fromJson(item));

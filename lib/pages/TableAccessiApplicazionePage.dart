@@ -32,7 +32,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/ingresso/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<IngressoModel> ingressi = [];
         for (var item in jsonData) {
           ingressi.add(IngressoModel.fromJson(item));

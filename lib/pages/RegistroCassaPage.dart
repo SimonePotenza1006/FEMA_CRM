@@ -66,7 +66,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for(var item in jsonData){
           utenti.add(UtenteModel.fromJson(item));
@@ -694,7 +694,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       var apiUrl = Uri.parse('$ipaddress/api/movimenti');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<MovimentiModel> movimenti = [];
         DateTime? lastChiusuraDate;
         // Primo loop per trovare la data dell'ultimo movimento di tipo "Chiusura"
@@ -731,7 +731,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<MovimentiModel> movimenti = [];
         dateChiusure.clear(); // Usa la lista globale e svuotala prima di aggiungere nuovi valori
 

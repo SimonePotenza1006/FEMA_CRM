@@ -119,7 +119,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/tipologiaSpesaVeicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaSpesaVeicoloModel> tipologie = [];
         for (var item in jsonData) {
           tipologie.add(TipologiaSpesaVeicoloModel.fromJson(item));
@@ -159,7 +159,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/veicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<VeicoloModel> veicoli = [];
         for (var item in jsonData) {
           VeicoloModel veicolo = VeicoloModel.fromJson(item);
@@ -202,7 +202,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/spesaVeicolo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<SpesaVeicoloModel> spese = [];
         for (var item in jsonData) {
           spese.add(SpesaVeicoloModel.fromJson(item));

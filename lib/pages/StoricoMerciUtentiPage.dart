@@ -31,7 +31,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
@@ -59,7 +59,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/relazioneUtentiProdotti/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<RelazioneUtentiProdottiModel> relazioni = [];
         for (var item in jsonData) {
           relazioni.add(RelazioneUtentiProdottiModel.fromJson(item));

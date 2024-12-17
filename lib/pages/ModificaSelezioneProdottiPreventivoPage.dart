@@ -647,7 +647,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
             var apiUrl = Uri.parse('$ipaddress/api/relazionePreventivoProdotto/preventivo/${preventivo.id}');
             var response = await http.get(apiUrl);
             if (response.statusCode == 200) {
-              var jsonData = jsonDecode(response.body);
+              var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
               List<RelazionePreventivoProdottiModel> prodotti = [];
               for (var item in jsonData) {
                 var relazione = RelazionePreventivoProdottiModel.fromJson(item);
@@ -677,7 +677,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/preventivo/cliente/${widget.preventivo.cliente?.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<PreventivoModel> preventivi = [];
         for(var item in jsonData){
           preventivi.add(PreventivoModel.fromJson(item));
@@ -703,7 +703,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
       if (response.statusCode == 200) {
         debugPrint('JSON ricevuto: ${response.body}', wrapWidth: 1024);
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<RelazionePreventivoProdottiModel> prodotti = [];
         for (var item in jsonData) {
           prodotti.add(RelazionePreventivoProdottiModel.fromJson(item));

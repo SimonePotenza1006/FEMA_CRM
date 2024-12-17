@@ -522,7 +522,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
       var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
 
         // Converti i dati ricevuti in oggetti TipologiaInterventoModel
@@ -555,7 +555,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for (var item in jsonData) {
           clienti.add(ClienteModel.fromJson(item));

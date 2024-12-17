@@ -226,7 +226,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/intervento/cliente/$clientId'));
       if (response.statusCode == 200) {
-        final List<dynamic> responseData = json.decode(response.body);
+        final List<dynamic> responseData = jsonDecode(utf8.decode(response.bodyBytes));
         setState(() {
           interventi = responseData.map((data) => InterventoModel.fromJson(data)).toList();
         });
@@ -243,7 +243,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
 
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for (var item in jsonData) {
           clienti.add(ClienteModel.fromJson(item));
@@ -941,7 +941,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for(var item in jsonData){
           utenti.add(UtenteModel.fromJson(item));
@@ -963,7 +963,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
       var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for(var item in jsonData){
           utenti.add(UtenteModel.fromJson(item));

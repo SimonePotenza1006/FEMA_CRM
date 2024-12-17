@@ -85,7 +85,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for(var item in jsonData){
           utenti.add(UtenteModel.fromJson(item));
@@ -106,7 +106,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
         for(var item in jsonData){
           tipologie.add(TipologiaInterventoModel.fromJson(item));
@@ -127,7 +127,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for(var item in jsonData){
           clienti.add(ClienteModel.fromJson(item));
@@ -148,7 +148,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<GruppoInterventiModel> gruppiNonConclusi = [];
         List<GruppoInterventiModel> gruppiConclusi = [];
         for(var item in jsonData) {
@@ -183,7 +183,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         var response = await http.get(apiUrl);
 
         if (response.statusCode == 200) {
-          var jsonData = jsonDecode(response.body);
+          var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
 
           // Mappa i dati in una lista di oggetti InterventoModel
           List<InterventoModel> interventi = (jsonData as List)

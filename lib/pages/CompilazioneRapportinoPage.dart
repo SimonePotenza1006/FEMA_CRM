@@ -662,6 +662,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
           '$ipaddress/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
+
         setState(() {
           allDestinazioniByCliente = responseData
               .map((data) => DestinazioneModel.fromJson(data))

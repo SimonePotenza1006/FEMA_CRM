@@ -44,7 +44,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/intervento/merce/${int.parse(widget.merce.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         if (jsonData is List && jsonData.isNotEmpty) {
           var firstElement = jsonData[0];
           InterventoModel intervento = InterventoModel.fromJson(firstElement);
@@ -81,7 +81,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       try {
         response = await http.get(Uri.parse(url));
         if (response.statusCode == 200) {
-          final jsonData = jsonDecode(response.body);
+          var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           if (jsonData is List) {
             final images = jsonData.map<Uint8List>((imageData) {
 

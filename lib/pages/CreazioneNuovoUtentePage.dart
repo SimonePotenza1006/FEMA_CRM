@@ -264,7 +264,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
         for (var item in jsonData) {
           tipologie.add(TipologiaInterventoModel.fromJson(item));
@@ -300,7 +300,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/ruolo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<RuoloUtenteModel> ruoli = [];
         for (var item in jsonData) {
           ruoli.add(RuoloUtenteModel.fromJson(item));

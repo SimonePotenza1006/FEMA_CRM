@@ -64,7 +64,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> noteByUtente = [];
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         for (var item in jsonData) {
           noteByUtente.add(NotaTecnicoModel.fromJson(item));
         }
@@ -84,7 +84,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
         }
@@ -105,7 +105,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> note = [];
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         for (var item in jsonData) {
           note.add(NotaTecnicoModel.fromJson(item));
         }

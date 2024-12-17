@@ -54,7 +54,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
     try{
       final response = await http.get(Uri.parse('$ipaddress/api/relazioniClientiProdotti/cliente/$clienteId'));
       if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<RelazioneClientiProdottiModel> relazioni = [];
         for(var item in jsonData){
           relazioni.add(RelazioneClientiProdottiModel.fromJson(item));
@@ -75,7 +75,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
       var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for(var item in jsonData){
           utenti.add(UtenteModel.fromJson(item));
@@ -96,7 +96,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for (var item in jsonData) {
           clienti.add(ClienteModel.fromJson(item));
@@ -361,7 +361,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ProdottoModel> prodotti = [];
         for (var item in jsonData) {
           prodotti.add(ProdottoModel.fromJson(item));

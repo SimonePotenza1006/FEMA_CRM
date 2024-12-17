@@ -120,7 +120,7 @@ class _HomeFormAmministrazioneNewPageState
       var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
           if (widget.userData.cognome! == "Mazzei" ||
@@ -242,7 +242,7 @@ class _HomeFormAmministrazioneNewPageState
       var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
           if (InterventoModel.fromJson(item).data != null && InterventoModel.fromJson(item).utente != null && InterventoModel.fromJson(item).utente?.id.toString() != widget.userData?.id.toString() && (InterventoModel.fromJson(item).concluso != true)) //solo gli interventi con data e utente
@@ -291,7 +291,7 @@ class _HomeFormAmministrazioneNewPageState
       var apiUrl = Uri.parse('$ipaddress/api/ordine');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<OrdinePerInterventoModel> ordini = [];
         for(var item in jsonData){
           var ordine = OrdinePerInterventoModel.fromJson(item);
@@ -389,7 +389,7 @@ class _HomeFormAmministrazioneNewPageState
       var apiUrl = Uri.parse('$ipaddress/api/veicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<VeicoloModel> veicoli = [];
         for (var item in jsonData) {
           VeicoloModel veicolo = VeicoloModel.fromJson(item);
@@ -638,7 +638,7 @@ class _HomeFormAmministrazioneNewPageState
       var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
@@ -660,7 +660,7 @@ class _HomeFormAmministrazioneNewPageState
       var apiUrl = Uri.parse('$ipaddress/api/commissione');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<CommissioneModel> commissioni = [];
         for (var item in jsonData) {
           commissioni.add(CommissioneModel.fromJson(item));
@@ -685,7 +685,7 @@ class _HomeFormAmministrazioneNewPageState
 
       if (response.statusCode == 200) {
         print('getTipologieIntervento: chiamata API riuscita');
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
         for (var item in jsonData) {
           tipologie.add(TipologiaInterventoModel.fromJson(item));
@@ -710,7 +710,7 @@ class _HomeFormAmministrazioneNewPageState
 
       if (response.statusCode == 200) {
         print('getAllInterventi: chiamata API riuscita');
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
           try {
