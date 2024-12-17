@@ -428,7 +428,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<MarcaTempoModel> allMarcatemposDU = [];
 
         for (var item in jsonData) {
@@ -469,7 +469,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/marcatempo/pres/1/2');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<MarcaTempoModel> allMarcatempos = [];
 
         DateTime now = DateTime.now();
@@ -515,7 +515,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<MarcaTempoModel> allMarcatempos = [];
 
         DateTime now = DateTime.now();
@@ -560,7 +560,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/marcatempo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<MarcaTempoModel> allMarcatempos = [];
 
         DateTime now = DateTime.now();
@@ -853,7 +853,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/utente'));
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
@@ -878,7 +878,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/utente'));
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           if (UtenteModel.fromJson(item).cognome != 'Mazzei' && UtenteModel.fromJson(item).cognome != 'Chiriatti' && UtenteModel.fromJson(item).nome != 'Segreteria')
@@ -903,7 +903,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/utente'));
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           allUtenti.add(UtenteModel.fromJson(item));

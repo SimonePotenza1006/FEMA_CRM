@@ -123,7 +123,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
       var apiUrl = Uri.parse('$ipaddress/api/intervento/withMerce');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<InterventoModel> interventi = [];
         for(var item in jsonData){
           interventi.add(InterventoModel.fromJson(item));

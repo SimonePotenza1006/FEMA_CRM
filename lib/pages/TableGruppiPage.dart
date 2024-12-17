@@ -48,7 +48,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/gruppi');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<GruppoInterventiModel> gruppi =[];
         for(var item in jsonData){
           gruppi.add(GruppoInterventiModel.fromJson(item));
@@ -262,7 +262,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/$gruppoId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
           interventi.add(InterventoModel.fromJson(item));

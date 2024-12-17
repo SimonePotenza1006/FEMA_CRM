@@ -89,7 +89,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       try {
         response = await http.get(Uri.parse(url));
         if (response.statusCode == 200) {
-          final jsonData = jsonDecode(response.body);
+          var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           if (jsonData is List) {
             final images = jsonData.map<Uint8List>((imageData) {
 
@@ -134,7 +134,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
 
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           if (UtenteModel.fromJson(item).nome != 'Segreteria')

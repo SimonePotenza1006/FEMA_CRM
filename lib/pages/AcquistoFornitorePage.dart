@@ -100,7 +100,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
       var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for (var item in jsonData) {
           utenti.add(UtenteModel.fromJson(item));
@@ -166,7 +166,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
     try{
       final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
       if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<FornitoreModel> fornitori = [];
         for(var item in jsonData){
           fornitori.add(FornitoreModel.fromJson(item));

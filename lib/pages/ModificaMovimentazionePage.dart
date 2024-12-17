@@ -1,11 +1,13 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:fema_crm/model/MovimentiModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../model/ClienteModel.dart';
@@ -20,8 +22,8 @@ class ModificaMovimentazionePage extends StatefulWidget{
 }
 
 class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>{
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<UtenteModel> allUtenti = [];
   late UtenteModel? _selectedUtente = widget.movimento.utente;
   ClienteModel? selectedCliente;
@@ -32,96 +34,122 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late TipoMovimentazione selectedTipologia;
   late DateTime? _selectedDate = widget.movimento.data;
   TipoMovimentazione? _selectedTipoMovimentazione;
+  List<XFile> pickedImages =  [];
 
   @override
   void initState(){
     super.initState();
     getAllClienti();
-    _importoController = TextEditingController(text: widget.movimento.importo.toString());
+    _importoController = TextEditingController(text: widget.movimento.importo!.toStringAsFixed(2));
     _descrizioneController = TextEditingController(text: widget.movimento.descrizione);
+  }
+
+  Future<void> takePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    if (Platform.isAndroid) {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+      if (pickedFile != null) {
+        setState(() {
+          pickedImages.add(pickedFile);
+        });
+      }
+    }
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
+    }
+  }
+
+  Future<void> savePics() async{
+    final movimento = widget.movimento;
+    try{
+      for(var image in pickedImages){
+        if(image.path.isNotEmpty){
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+          );
+          request.files.add(
+              await http.MultipartFile.fromPath(
+                  'movimento',
+                  image.path,
+                  contentType: MediaType('image', 'jpeg')
+              )
+          );
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Foto salvata!'),
+              ),
+            );
+          } else {
+            print('Errore durante l\'invio del file: ${response.statusCode}');
+          }
+        }
+      }
+    } catch(e){
+      print('Errore 1 durante l\'invio del file: $e');
+    } finally{
+      pickedImages.clear();
+    }
   }
 
   @override
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: Text('Modifica movimento ${widget.movimento.descrizione}',
+        title: Text('${widget.movimento.descrizione}',
             style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.red,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.attach_file, color: Colors.white),
+            onPressed: (){
+              takePicture();
+            },
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Center(
           child: Column(
             children: [
-              SizedBox(
-                width: 350,
-                child: GestureDetector(
-                  onTap: () {
-                    showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate ?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    ).then((date) {
-                      setState(() {
-                        _selectedDate = date;
-                      });
-                    });
-                  },
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: 'Data della movimentazione',
-                      ),
-                      controller: TextEditingController(text: _selectedDate != null? DateFormat('dd/MM/yyyy').format(_selectedDate!) : ''),
-                    ),
-                  ),
-                ),
+              _buildDatePickerField(
+                context,
+                TextEditingController(
+                    text: _selectedDate != null
+                        ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+                        : ''),
+                'Data Tagliando'.toUpperCase(),
+                initialDate: _selectedDate ?? DateTime.now().add(Duration(days: 1)),
+                firstDate: DateTime.now().add(Duration(days: 1)),
+                lastDate: DateTime(2100),
+                onDateSelected: (date) {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
               ),
+              SizedBox(height: 10),
+              _buildTextFormField(_descrizioneController, "Descrizione", "Inserisci la descrizione"),
+              SizedBox(height: 10),
+              _buildTextFormField(_importoController, "Importo", "Inserisci importo"),
+              SizedBox(height :10),
               SizedBox(
-                width: 350,
-                child: TextFormField(
-                  controller: _descrizioneController,
-                  decoration: InputDecoration(
-                    labelText: 'Descrizione',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Inserisci una descrizione';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 350,
-                child: TextFormField(
-                  controller: _importoController,
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // consenti solo numeri e fino a 2 decimali
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Importo',
-                  ),
-                  validator: (value) {
-                    if (value == null || double.tryParse(value) == null) {
-                      return 'Inserisci un importo valido';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              SizedBox(
-                width: 350,
+                width: 450,
                 child: DropdownButtonFormField<TipoMovimentazione>(
                   value: _selectedTipoMovimentazione,
                   onChanged: (TipoMovimentazione? newValue) {
                     setState(() {
                       _selectedTipoMovimentazione = newValue;
-                      selectedTipologia = newValue!; // Initialize selectedTipologia here
                     });
                   },
                   items: TipoMovimentazione.values.map<DropdownMenuItem<TipoMovimentazione>>((TipoMovimentazione value) {
@@ -141,15 +169,44 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                     }
                     return DropdownMenuItem<TipoMovimentazione>(
                       value: value,
-                      child: Text(label),
+                      child: Text(
+                        label,
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                      ),
                     );
                   }).toList(),
                   decoration: InputDecoration(
-                    labelText: 'Tipo Movimentazione',
+                    labelText: 'TIPO MOVIMENTAZIONE',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   ),
                   validator: (value) {
                     if (value == null) {
-                      return 'Seleziona il tipo di movimentazione';
+                      return 'Selezionare il tipo di movimentazione';
                     }
                     return null;
                   },
@@ -173,11 +230,18 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
                   ),
                 ),
               ),
+              SizedBox(height: 10),
+              if(pickedImages.length > 0)
+                _buildImagePreview(),
               SizedBox(height: 34),
               Center(
                 child:ElevatedButton(
                   onPressed: () {
-                    updateMovimento();
+                    if(pickedImages.length > 0){
+                      savePics().whenComplete(() => updateMovimento().whenComplete(() => Navigator.pop(context)));
+                    } else {
+                      updateMovimento().whenComplete(() => Navigator.pop(context));
+                    }
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
@@ -195,6 +259,35 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: pickedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Image.file(File(pickedImages[index].path)),
+                IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    setState(() {
+                      pickedImages.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -208,7 +301,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       });
     }
   }
-
 
   void _showClientiDialog() {
     TextEditingController searchController = TextEditingController(); // Aggiungi un controller
@@ -276,7 +368,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
 
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for (var item in jsonData) {
           clienti.add(ClienteModel.fromJson(item));
@@ -324,4 +416,105 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     }
   }
 
+  Widget _buildDatePickerField(
+      BuildContext context, TextEditingController controller, String label,
+      {DateTime? initialDate, DateTime? firstDate, DateTime? lastDate, void Function(DateTime?)? onDateSelected}) {
+    return SizedBox(
+      width: 450, // Larghezza modificata
+      child: GestureDetector(
+        onTap: () {
+          showDatePicker(
+            context: context,
+            initialDate: initialDate ?? DateTime.now(),
+            firstDate: firstDate ?? DateTime.now(),
+            lastDate: lastDate ?? DateTime(2100),
+          ).then((selectedDate) {
+            if (selectedDate != null && onDateSelected != null) {
+              onDateSelected(selectedDate);
+            }
+          });
+        },
+        child: AbsorbPointer(
+          child: TextFormField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: label,
+              labelStyle: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.bold,
+              ),
+              hintText: 'Seleziona una data', // Testo suggerimento
+              filled: true,
+              fillColor: Colors.grey[200], // Sfondo riempito
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none, // Nessun bordo di default
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.redAccent,
+                  width: 2.0, // Larghezza bordo focale
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Colors.grey[300]!,
+                  width: 1.0, // Larghezza bordo abilitato
+                ),
+              ),
+              contentPadding:
+              EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String hintText,
+      {String? Function(String?)? validator}) {
+    return SizedBox(
+      width: 450, // Larghezza modificata
+      child: TextFormField(
+        controller: controller,
+        maxLines: null, // Permette più righe
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.bold,
+          ),
+          hintText: hintText,
+          filled: true,
+          fillColor: Colors.grey[200], // Sfondo riempito
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none, // Nessun bordo di default
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.redAccent,
+              width: 2.0, // Larghezza bordo focale
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.grey[300]!,
+              width: 1.0, // Larghezza bordo abilitato
+            ),
+          ),
+          contentPadding:
+          EdgeInsets.symmetric(vertical: 15, horizontal: 10), // Padding contenuto
+        ),
+        validator: validator, // Funzione di validazione
+      ),
+    );
+  }
 }

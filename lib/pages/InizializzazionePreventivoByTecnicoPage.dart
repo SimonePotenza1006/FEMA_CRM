@@ -297,7 +297,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for (var item in jsonData) {
           clienti.add(ClienteModel.fromJson(item));
@@ -461,7 +461,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<AgenteModel> agenti = [];
         for (var item in jsonData) {
           agenti.add(AgenteModel.fromJson(item));
@@ -484,7 +484,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<AziendaModel> aziende = [];
         for (var item in jsonData) {
           aziende.add(AziendaModel.fromJson(item));

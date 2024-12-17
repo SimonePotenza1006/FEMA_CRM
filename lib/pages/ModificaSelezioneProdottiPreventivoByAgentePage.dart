@@ -349,7 +349,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
       if (response.statusCode == 200) {
         debugPrint('JSON ricevuto: ${response.body}', wrapWidth: 1024);
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<RelazionePreventivoProdottiModel> prodotti = [];
         for (var item in jsonData) {
           prodotti.add(RelazionePreventivoProdottiModel.fromJson(item));

@@ -30,7 +30,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse("$ipaddress/api/cartella");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<CartellaModel> cartelle = [];
         for (var item in jsonData) {
           var cartella = CartellaModel.fromJson(item);

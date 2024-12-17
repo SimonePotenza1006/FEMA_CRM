@@ -260,7 +260,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
       var apiUrl = Uri.parse('$ipaddress/api/licenza/all');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<LicenzaModel> licenze = [];
         for (var item in jsonData) {
           licenze.add(LicenzaModel.fromJson(item));

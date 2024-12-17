@@ -69,6 +69,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   bool isLoading = true;
   bool _isLoading = true;
+  bool dropdown = false;
 
   Future<void> _refreshData() async {
     // Simula un caricamento dei dati
@@ -85,7 +86,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
         for(var item in jsonData){
           utenti.add(UtenteModel.fromJson(item));
@@ -106,7 +107,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
         for(var item in jsonData){
           tipologie.add(TipologiaInterventoModel.fromJson(item));
@@ -127,7 +128,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for(var item in jsonData){
           clienti.add(ClienteModel.fromJson(item));
@@ -148,7 +149,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<GruppoInterventiModel> gruppiNonConclusi = [];
         List<GruppoInterventiModel> gruppiConclusi = [];
         for(var item in jsonData) {
@@ -183,7 +184,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
         var response = await http.get(apiUrl);
 
         if (response.statusCode == 200) {
-          var jsonData = jsonDecode(response.body);
+          var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
 
           // Mappa i dati in una lista di oggetti InterventoModel
           List<InterventoModel> interventi = (jsonData as List)
@@ -212,12 +213,14 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           // Controlla se hai finito di caricare i dati
           if (interventi.length < size || !loadAll) {
             allDataLoaded = true;
-
             // Mostra messaggio di completamento del caricamento
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Caricamento completato!')),
               );
+            });
+            setState((){
+              dropdown = true;
             });
           } else {
             // Passa alla pagina successiva
@@ -234,7 +237,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       );
     }
   }
-
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
@@ -546,6 +548,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             Row(
               children: [
                 PopupMenuButton<TipologiaInterventoModel>(
+                  enabled: dropdown,
                   icon: Icon(Icons.filter_alt_outlined, color: Colors.white), // Icona della casa
                   onSelected: (TipologiaInterventoModel tipologia) {
                     setState(() {

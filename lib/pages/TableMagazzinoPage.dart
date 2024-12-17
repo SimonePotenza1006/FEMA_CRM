@@ -118,7 +118,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       if(response.statusCode == 200){
         print('API call successful, status code: ${response.statusCode}');
 
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ProdottoModel> prodotti = [];
         for(var item in jsonData){
           prodotti.add(ProdottoModel.fromJson(item));

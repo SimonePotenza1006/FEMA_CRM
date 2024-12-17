@@ -45,7 +45,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
       if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
         for(var item in jsonData){
           clienti.add(ClienteModel.fromJson(item));
@@ -65,7 +65,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
         for(var item in jsonData){
           tipologie.add(TipologiaInterventoModel.fromJson(item));
@@ -85,7 +85,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try{
       final response = await http.get(Uri.parse('$ipaddress/api/azienda'));
       if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<AziendaModel> aziende = [];
         for(var item in jsonData){
           aziende.add(AziendaModel.fromJson(item));

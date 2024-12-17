@@ -104,7 +104,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
       var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
           if (widget.userData!.cognome! == "Mazzei" ||

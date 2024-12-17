@@ -97,7 +97,7 @@ class _DettaglioSpesaFornitorePageState extends State<DettaglioSpesaFornitorePag
     try{
       response = await http.get(Uri.parse(url));
       if(response.statusCode == 200){
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final images = jsonData.map<Uint8List>((imageData) {
           final base64String = imageData['imageData'];
           final bytes = base64Decode(base64String);

@@ -49,7 +49,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
       var apiUrl = Uri.parse('$ipaddress/api/ticket');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TicketModel> tickets = [];
         for(var item in jsonData){
           tickets.add(TicketModel.fromJson(item));

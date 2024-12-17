@@ -139,7 +139,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ProdottoModel> prodotti = [];
         for (var item in jsonData) {
           prodotti.add(ProdottoModel.fromJson(item));

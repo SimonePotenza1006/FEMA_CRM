@@ -426,7 +426,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
           if (InterventoModel.fromJson(item).data != null && InterventoModel.fromJson(item).utente != null && InterventoModel.fromJson(item).utente?.id.toString() != widget.userData?.id.toString() && (InterventoModel.fromJson(item).concluso != true)) //solo gli interventi con data e utente
@@ -450,7 +450,7 @@ class _HomeFormTecnicoNewPageState extends State<HomeFormTecnicoNewPage>{
       var apiUrl = Uri.parse('$ipaddress/api/intervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<InterventoModel> interventi = [];
         for (var item in jsonData) {
           if (InterventoModel.fromJson(item).utente != null && (InterventoModel.fromJson(item).concluso != true)) //solo gli interventi con data e utente

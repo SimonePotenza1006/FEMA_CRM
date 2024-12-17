@@ -42,7 +42,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     try {
       response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         final images = jsonData.map<Map<String, dynamic>>((imageData) {
           final base64String = imageData['imageData'];
           final bytes = base64Decode(base64String);
@@ -70,7 +70,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse("$ipaddress/api/cartella/parent/${int.parse(widget.cartella.id.toString())}");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<CartellaModel> cartelle = [];
         for (var item in jsonData) {
           cartelle.add(CartellaModel.fromJson(item));

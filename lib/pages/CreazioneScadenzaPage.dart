@@ -134,7 +134,6 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
     );
   }
 
-
   Future<void> _selectDate(BuildContext context, TextEditingController controller, DateTime? selectedDate, void Function(DateTime?) setSelectedDate) async {
     // Inizializza l'initialDate con un anno da oggi
     final DateTime initialDate = selectedDate ?? DateTime.now().add(Duration(days: 365));
@@ -247,6 +246,5 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       print('Qualcosa non va: $e');
     }
   }
-
 
 }

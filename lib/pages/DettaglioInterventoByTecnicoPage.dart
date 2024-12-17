@@ -187,7 +187,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       response = await http.get(
         Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
         if(response.statusCode == 200){
-          var jsonData = jsonDecode(response.body);
+          var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           DDTModel ddt = DDTModel.fromJson(jsonData);
           setState(() {
             finalDdt = ddt;
@@ -207,7 +207,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       response = await http.get(
           Uri.parse('$ipaddress/api/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         InterventoModel intervento = InterventoModel.fromJson(jsonData);
 
         return intervento;
@@ -330,7 +330,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
         var apiUrl = Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}');
         var response = await http.get(apiUrl);
         if(response.statusCode == 200){
-          var jsonData = jsonDecode(response.body);
+          var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           List<RelazioneDdtProdottoModel> relazioni = [];
           for(var item in jsonData){
             relazioni.add(RelazioneDdtProdottoModel.fromJson(item));
@@ -374,7 +374,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
       var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
-        var jsonData = jsonDecode(response.body);
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<NotaTecnicoModel> note = [];
         for(var item in jsonData) {
           note.add(NotaTecnicoModel.fromJson(item));
