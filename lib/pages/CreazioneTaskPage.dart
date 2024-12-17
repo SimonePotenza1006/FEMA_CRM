@@ -62,6 +62,8 @@ class _CreazioneTaskPageState
   double _totalDuration = 0;
   Timer? _timer;
   int _elapsedSeconds = 0;
+  bool _condivisoTipo = false;
+  UtenteModel? selectedUtenteTipo;
 
   @override
   void initState() {
@@ -234,6 +236,29 @@ class _CreazioneTaskPageState
         },
       ),
     );
+  }
+
+  Future<void> saveTipologia() async{
+    try{
+      final response = await http.post(
+          Uri.parse('$ipaddress/api/tipoTask'),
+          headers: {'Content-Type' : 'application/json'},
+          body: jsonEncode({
+            'descrizione' : _descrizioneController.text,
+            'utente' : _condivisoTipo ? selectedUtenteTipo : null,
+            'utentecreate' : widget.utente
+          })
+      );
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Nuova tipologia registrata con successo!'.toUpperCase()),
+        ),
+      );
+      getAllTipi();
+    } catch(e){
+      print('Errore: $e');
+    }
   }
 
   @override
@@ -416,20 +441,298 @@ class _CreazioneTaskPageState
                           ),
                         ),
                         SizedBox(height: 20),
-                        SizedBox(
-                          width: 400,
+                        Row(children: [
+                          ElevatedButton(
+                            onPressed:  () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                        builder: (BuildContext context, StateSetter setState) {
+                                          return  AlertDialog(
+
+                                            title: Text(
+                                              'CREA NUOVA TIPOLOGIA',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(height: 10),
+                                                TextFormField(
+                                                  controller: _descrizioneController,
+                                                  onChanged: (value) {
+                                                    // Aggiorna lo stato del dialogo
+                                                    setState(() {});
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    labelText: 'NOME NUOVA TIPOLOGIA',
+                                                    border: OutlineInputBorder(),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 12),
+                                                SizedBox(
+                                                  width: 200,
+                                                  child: CheckboxListTile(
+                                                    title: Text('CONDIVIDI'),
+                                                    value: _condivisoTipo,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _condivisoTipo = value!;
+                                                        /*if (_condiviso) {
+                                            _condivisoController.clear();
+                                          }*/
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                                SizedBox(height: 15),// But
+                                                if (_condivisoTipo) SizedBox(
+                                                  //width: 400,
+                                                  child: DropdownButtonFormField<UtenteModel>(
+                                                    value: selectedUtenteTipo,
+                                                    onChanged: (UtenteModel? newValue) {
+                                                      setState(() {
+                                                        selectedUtenteTipo = newValue;
+                                                      });
+                                                    },
+                                                    items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
+                                                      return DropdownMenuItem<UtenteModel>(
+                                                        value: utente,
+                                                        child: Text(
+                                                          utente.nomeCompleto()!.toUpperCase(),
+                                                          style: TextStyle(fontSize: 14, color: Colors.black87),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    decoration: InputDecoration(
+                                                      labelText: 'SELEZIONA UTENTE',
+                                                      labelStyle: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.grey[600],
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                      filled: true,
+                                                      fillColor: Colors.grey[200],
+                                                      border: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide.none,
+                                                      ),
+                                                      focusedBorder: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide(
+                                                          color: Colors.redAccent,
+                                                          width: 2.0,
+                                                        ),
+                                                      ),
+                                                      enabledBorder: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide(
+                                                          color: Colors.grey[300]!,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                                    ),
+                                                    validator: (value) {
+                                                      if (value == null) {
+                                                        return 'SELEZIONA UN UTENTE';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                ),
+
+
+                                              ],
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: _descrizioneController.text.isNotEmpty
+                                                    ? () {
+                                                  saveTipologia();
+                                                }
+                                                    : null, // Disabilita il pulsante se il testo è vuoto
+                                                child: Text('SALVA TIPOLOGIA'),
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  });
+                            },
+                            child: Text('+', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey[600]) ),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          /*IconButton(
+                            //color: Colors.grey[600],
+                            icon: Icon(Icons.add),
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                        builder: (BuildContext context, StateSetter setState) {
+                                          return  AlertDialog(
+
+                                            title: Text(
+                                              'CREA NUOVA TIPOLOGIA',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SizedBox(height: 10),
+                                                TextFormField(
+                                                  controller: _descrizioneController,
+                                                  onChanged: (value) {
+                                                    // Aggiorna lo stato del dialogo
+                                                    setState(() {});
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    labelText: 'NOME NUOVA TIPOLOGIA',
+                                                    border: OutlineInputBorder(),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 12),
+                                                SizedBox(
+                                                  width: 200,
+                                                  child: CheckboxListTile(
+                                                    title: Text('CONDIVIDI'),
+                                                    value: _condivisoTipo,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _condivisoTipo = value!;
+                                                        /*if (_condiviso) {
+                                            _condivisoController.clear();
+                                          }*/
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                                SizedBox(height: 15),// But
+                                                if (_condivisoTipo) SizedBox(
+                                                  //width: 400,
+                                                  child: DropdownButtonFormField<UtenteModel>(
+                                                    value: selectedUtenteTipo,
+                                                    onChanged: (UtenteModel? newValue) {
+                                                      setState(() {
+                                                        selectedUtenteTipo = newValue;
+                                                      });
+                                                    },
+                                                    items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
+                                                      return DropdownMenuItem<UtenteModel>(
+                                                        value: utente,
+                                                        child: Text(
+                                                          utente.nomeCompleto()!.toUpperCase(),
+                                                          style: TextStyle(fontSize: 14, color: Colors.black87),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    decoration: InputDecoration(
+                                                      labelText: 'SELEZIONA UTENTE',
+                                                      labelStyle: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.grey[600],
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                      filled: true,
+                                                      fillColor: Colors.grey[200],
+                                                      border: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide.none,
+                                                      ),
+                                                      focusedBorder: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide(
+                                                          color: Colors.redAccent,
+                                                          width: 2.0,
+                                                        ),
+                                                      ),
+                                                      enabledBorder: OutlineInputBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                        borderSide: BorderSide(
+                                                          color: Colors.grey[300]!,
+                                                          width: 1.0,
+                                                        ),
+                                                      ),
+                                                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                                    ),
+                                                    validator: (value) {
+                                                      if (value == null) {
+                                                        return 'SELEZIONA UN UTENTE';
+                                                      }
+                                                      return null;
+                                                    },
+                                                  ),
+                                                ),
+
+
+                                              ],
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: _descrizioneController.text.isNotEmpty
+                                                    ? () {
+                                                  saveTipologia();
+                                                }
+                                                    : null, // Disabilita il pulsante se il testo è vuoto
+                                                child: Text('SALVA TIPOLOGIA'),
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  });
+                            },
+                            tooltip: 'Crea nuova tipologia',
+                          ),*/
+                          ElevatedButton(
+                            onPressed: () {
+                              // Azione da eseguire quando il bottone viene premuto
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.black87, backgroundColor: Colors.grey[200],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: BorderSide(color: Colors.grey[300]!), // Bordo
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.add, color: Colors.black87), // Icona +
+                                SizedBox(width: 8), // Spazio tra l'icona e il testo
+                                Text(
+                                  'AGGIUNGI', // Testo del bottone
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 4,),
+                          SizedBox(
+                          width: 250,
                           child: DropdownButtonFormField<TipoTaskModel>(
                             value: _selectedTipo,
                             onChanged: (TipoTaskModel? newValue) {
                               setState(() {
-                                _selectedTipo = newValue;
-                                _selectedTipo?.utente != null ?
-                                  selectedUtente = allUtenti.firstWhere((element) =>
-                                  element.id== (_selectedTipo?.utente!.id != widget.utente.id ? _selectedTipo?.utente!.id! : _selectedTipo?.utentecreate!.id!)) : null;
-                                _selectedTipo?.utente != null ? _condiviso = true : null;
+
+                                    _selectedTipo = newValue;
+                                    _selectedTipo?.utente != null ?
+                                      selectedUtente = allUtenti.firstWhere((element) =>
+                                      element.id== (_selectedTipo?.utente!.id != widget.utente.id ? _selectedTipo?.utente!.id! : _selectedTipo?.utentecreate!.id!)) : null;
+                                    _selectedTipo?.utente != null ? _condiviso = true : null;
+
+
                               });
                             },
-                            items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
+                            items: [
+                              ...allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
                               return DropdownMenuItem<TipoTaskModel>(
                                 value: tipologia,
                                 child: Text(
@@ -438,6 +741,8 @@ class _CreazioneTaskPageState
                                 ),
                               );
                             }).toList(),
+
+                            ],
                             decoration: InputDecoration(
                               labelText: 'TIPOLOGIA TASK',
                               labelStyle: TextStyle(
@@ -469,12 +774,14 @@ class _CreazioneTaskPageState
                             ),
                             validator: (value) {
                               if (value == null) {
-                                return 'Selezionare una tipologia di task'.toUpperCase();
+                                return 'Selezionare'.toUpperCase();
                               }
                               return null;
                             },
                           ),
                         ),
+
+                        ],),
                         SizedBox(height: 20),
                         SizedBox(
                           width: 200,
@@ -856,7 +1163,7 @@ class _CreazioneTaskPageState
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
-          if (widget.utente.cognome! == "Mazzei" ||
+          if (//widget.utente.cognome! == "Mazzei" ||
               (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id)
               || TipoTaskModel.fromJson(item).utente == null
               || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
@@ -865,6 +1172,7 @@ class _CreazioneTaskPageState
         setState(() {
           allTipi = tipi;
         });
+
       } else {
         throw Exception(
             'Failed to load tipi task data from API: ${response.statusCode}');

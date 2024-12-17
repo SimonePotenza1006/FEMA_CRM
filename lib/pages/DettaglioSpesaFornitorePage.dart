@@ -92,7 +92,7 @@ class _DettaglioSpesaFornitorePageState extends State<DettaglioSpesaFornitorePag
   }
 
   Future<List<Uint8List>> fetchImages() async{
-    final url = '$ipaddressProva/api/immagine/movimenti/${int.parse(widget.movimento.id.toString())}/images';
+    final url = '$ipaddress/api/immagine/movimenti/${int.parse(widget.movimento.id.toString())}/images';
     http.Response? response;
     try{
       response = await http.get(Uri.parse(url));
@@ -248,7 +248,7 @@ class _DettaglioSpesaFornitorePageState extends State<DettaglioSpesaFornitorePag
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(widget.movimento.id!.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(widget.movimento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(

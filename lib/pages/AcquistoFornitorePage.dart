@@ -97,7 +97,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -130,7 +130,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddressProva/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+              Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -164,7 +164,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
 
   Future<void> getAllFornitori() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];
@@ -625,7 +625,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
     try{
       String prioritaString = TipoMovimentazione.Uscita.toString().split('.').last;
       response = await http.post(
-          Uri.parse('$ipaddressProva/api/movimenti'),
+          Uri.parse('$ipaddress/api/movimenti'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'data' : selectedDate.toIso8601String(),
