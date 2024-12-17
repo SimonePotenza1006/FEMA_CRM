@@ -69,6 +69,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Map<int, List<UtenteModel>> _interventoUtentiMap = {};
   bool isLoading = true;
   bool _isLoading = true;
+  bool dropdown = false;
 
   Future<void> _refreshData() async {
     // Simula un caricamento dei dati
@@ -212,12 +213,14 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
           // Controlla se hai finito di caricare i dati
           if (interventi.length < size || !loadAll) {
             allDataLoaded = true;
-
             // Mostra messaggio di completamento del caricamento
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Caricamento completato!')),
               );
+            });
+            setState((){
+              dropdown = true;
             });
           } else {
             // Passa alla pagina successiva
@@ -234,7 +237,6 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
       );
     }
   }
-
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
@@ -546,6 +548,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             Row(
               children: [
                 PopupMenuButton<TipologiaInterventoModel>(
+                  enabled: dropdown,
                   icon: Icon(Icons.filter_alt_outlined, color: Colors.white), // Icona della casa
                   onSelected: (TipologiaInterventoModel tipologia) {
                     setState(() {

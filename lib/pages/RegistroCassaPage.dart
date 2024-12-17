@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:fema_crm/pages/PDFPrelievoCassaPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -60,6 +63,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   final TextEditingController _causaleVersamentoController = TextEditingController();
   GlobalKey<SfSignaturePadState> _signaturePadKey =
   GlobalKey<SfSignaturePadState>();
+  Map<int, List<Uint8List>> immaginiMovimentiMap = {};
 
   Future<void> getAllUtenti() async{
     try{
@@ -272,11 +276,98 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                     DataColumn(label: Text('')),
                   ],
                   rows: movimentiList.map((movimento) {
+                    final hasImages = immaginiMovimentiMap[int.tryParse(movimento.id ?? '')]?.isNotEmpty ?? false;
                     return DataRow(
                       cells: [
-                        DataCell(Text(DateFormat('yyyy-MM-dd HH:mm').format(movimento.dataCreazione!))),
+                        DataCell(Text(DateFormat('yyyy-MM-dd  HH:mm').format(movimento.dataCreazione!))),
                         DataCell(Text(DateFormat('yyyy-MM-dd').format(movimento.data!))),
-                        DataCell(Text(movimento.descrizione ?? '')),
+                        DataCell(
+                          GestureDetector(
+                            onTap: () {
+                              final images = immaginiMovimentiMap[int.tryParse(movimento.id ?? '')];
+                              if (images != null && images.isNotEmpty) {
+                                // Controllore per gestire il cambio pagina
+                                final PageController pageController = PageController();
+
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return AlertDialog(
+                                          title: Text('Anteprima Immagini'),
+                                          content: SizedBox(
+                                            height: 600,
+                                            width: 600,
+                                            child: Stack(
+                                              children: [
+                                                // PageView per visualizzare immagini
+                                                PageView.builder(
+                                                  controller: pageController,
+                                                  itemCount: images.length,
+                                                  itemBuilder: (context, index) {
+                                                    return Image.memory(images[index], fit: BoxFit.contain);
+                                                  },
+                                                ),
+                                                // Mostra il pulsante "Indietro" solo se ci sono più di una immagine
+                                                if (images.length > 1)
+                                                  Positioned(
+                                                    left: 10,
+                                                    top: 250,
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.arrow_back, size: 40, color: Colors.red),
+                                                      onPressed: () {
+                                                        if (pageController.page! > 0) {
+                                                          pageController.previousPage(
+                                                            duration: Duration(milliseconds: 300),
+                                                            curve: Curves.easeInOut,
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                // Mostra il pulsante "Avanti" solo se ci sono più di una immagine
+                                                if (images.length > 1)
+                                                  Positioned(
+                                                    right: 10,
+                                                    top: 250,
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.arrow_forward, size: 40, color: Colors.red),
+                                                      onPressed: () {
+                                                        if (pageController.page! < images.length - 1) {
+                                                          pageController.nextPage(
+                                                            duration: Duration(milliseconds: 300),
+                                                            curve: Curves.easeInOut,
+                                                          );
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(),
+                                              child: Text('Chiudi'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            child: Text(
+                              movimento.descrizione ?? "//",
+                              style: TextStyle(
+                                color: hasImages ? Colors.blue : Colors.black, // Testo blu se ci sono immagini
+                                decoration: hasImages ? TextDecoration.underline : TextDecoration.none, // Sottolineato se ci sono immagini
+                              ),
+                            ),
+                          ),
+                        ),
                         DataCell(
                           movimento.tipo_movimentazione == TipoMovimentazione.Prelievo
                               ? GestureDetector(
@@ -327,43 +418,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                         ),
                         DataCell(Text(movimento.importo != null ? movimento.importo!.toStringAsFixed(2) + '€' : '')),
                         DataCell(Text(movimento.cliente != null ? movimento.cliente!.denominazione! : '///')),
-                        DataCell(
-                          GestureDetector(
-                            onTap: () {
-                              if (movimento.fornitore != null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DettaglioSpesaFornitorePage(movimento: movimento),
-                                  ),
-                                );
-                              }
-                            },
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 1.0), // Aggiunge spazio tra testo e underline
-                                  child: Text(
-                                    movimento.fornitore != null ? movimento.fornitore!.denominazione! : '///',
-                                    style: TextStyle(
-                                      color: movimento.fornitore != null ? Colors.blue : Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                if (movimento.fornitore != null)
-                                  Positioned(
-                                    bottom: 0, // Posiziona la linea esattamente sotto il testo
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 1, // Altezza della linea di sottolineatura
-                                      color: Colors.blue, // Colore della linea di sottolineatura
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        DataCell(Text(movimento.fornitore != null ? movimento.fornitore!.denominazione! : "///" )),
                         DataCell(
                           GestureDetector(
                             onTap: () {
@@ -733,15 +788,15 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<MovimentiModel> movimenti = [];
-        dateChiusure.clear(); // Usa la lista globale e svuotala prima di aggiungere nuovi valori
+        dateChiusure.clear();
 
-        // Individua tutte le date di "Chiusura"
+        // Identificazione di tutte le date "Chiusura"
         for (var item in jsonData) {
           MovimentiModel movimento = MovimentiModel.fromJson(item);
           if (movimento.tipo_movimentazione == TipoMovimentazione.Chiusura) {
             dateChiusure.add(movimento.dataCreazione!);
           } else {
-            movimenti.add(movimento); // Aggiungi solo movimenti non di chiusura
+            movimenti.add(movimento);
           }
         }
 
@@ -754,7 +809,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         DateTime? terzultimaChiusura = dateChiusure.length > 2 ? dateChiusure[2] : null;
         DateTime? quartultimaChiusura = dateChiusure.length > 3 ? dateChiusure[3] : null;
 
-        // Filtra i movimenti per le varie liste
+        // Filtraggio dei movimenti
         List<MovimentiModel> movimentiDopoUltimaChiusura = [];
         List<MovimentiModel> movimentiTraUltimaESeconda = [];
         List<MovimentiModel> movimentiTraSecondaETerza = [];
@@ -778,13 +833,35 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
           }
         }
 
-        // Aggiorna lo stato con le liste calcolate
+        // MAPPA PER LE IMMAGINI ASSOCIATE AI MOVIMENTI
+        Map<int, List<Uint8List>> immaginiMovimenti = {};
+
+        print('DEBUG: Inizio caricamento immagini per i movimenti.');
+
+        // Scarica immagini in parallelo per ogni movimento
+        await Future.wait(movimenti.map((movimento) async {
+          try {
+            final images = await fetchImagesByMovimentoId(int.parse(movimento.id!));
+            if (images.isNotEmpty) {
+              immaginiMovimenti[int.parse(movimento.id!)] = images; // Associa le immagini al movimento
+            } else {
+              print('DEBUG: MovimentoId ${movimento.id} -> Nessuna immagine trovata.');
+            }
+          } catch (e) {
+            print('ERRORE: Caricamento immagini per movimentoId ${movimento.id} -> $e');
+          }
+        }));
+
+        print('DEBUG: Caricamento immagini completato.');
+
+        // Aggiorna lo stato con le liste calcolate e immagini
         setState(() {
           fondoCassa = calcolaFondoCassa(movimentiDopoUltimaChiusura);
           movimentiList = movimentiDopoUltimaChiusura;
           movimentiListPreviousWeek = movimentiTraUltimaESeconda;
           movimentiListPreviousWeek2 = movimentiTraSecondaETerza;
           movimentiListPreviousWeek3 = movimentiTraTerzaEQuarta;
+          immaginiMovimentiMap = immaginiMovimenti; // Nuova mappa globale
         });
 
         calcolaFondiCassaSettimanePrecedenti();
@@ -813,6 +890,44 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
       );
     }
   }
+
+
+// Funzione helper per scaricare immagini dato l'ID del movimento
+  Future<List<Uint8List>> fetchImagesByMovimentoId(int? movimentoId) async {
+    final url = '$ipaddress/api/immagine/movimenti/$movimentoId/images';
+    print('DEBUG: Inizio fetchImagesByMovimentoId per movimentoId = $movimentoId');
+    print('DEBUG: URL chiamata API -> $url');
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      print('DEBUG: Stato risposta HTTP -> ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+
+        if (jsonData.isNotEmpty) {
+          print('DEBUG: MovimentoId $movimentoId -> ${jsonData.length} immagini trovate');
+        } else {
+          print('DEBUG: MovimentoId $movimentoId -> Nessuna immagine trovata');
+        }
+
+        final images = jsonData.map<Uint8List>((imageData) {
+          return base64Decode(imageData['imageData']);
+        }).toList();
+
+        return images;
+      } else {
+        print('ERRORE: MovimentoId $movimentoId -> Stato HTTP non OK (${response.statusCode})');
+        return [];
+      }
+    } catch (e) {
+      print('ERRORE: MovimentoId $movimentoId -> Eccezione catturata: $e');
+      return [];
+    }
+  }
+
+
+
 
 
   void _showConfirmationDialog() {
@@ -1101,6 +1216,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
           content: Form( // Avvolgi tutto dentro un Form
             key: _formKeyPrelievo,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextFormField(
@@ -1372,173 +1488,25 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('INSERISCI L\'IMPORTO DEL VERSAMENTO E LA CAUSALE'),
-          content: Form( // Avvolgi tutto dentro un Form
-            key: _formKeyVersamento,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextFormField(
-                  controller: _causaleVersamentoController,
-                  decoration: InputDecoration(
-                    labelText: 'CAUSALE VERSAMENTO',
-                    labelStyle: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.bold,
-                    ),
-                    hintText: 'Inserisci la causale del versamento',
-                    hintStyle: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[400],
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Colors.redAccent,
-                        width: 2.0,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Colors.grey[300]!,
-                        width: 1.0,
-                      ),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Inserisci una causale valida';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 12),
-                TextFormField(
-                  controller: _versamentoController,
-                  decoration: InputDecoration(
-                    labelText: 'IMPORTO VERSAMENTO',
-                    labelStyle: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.bold,
-                    ),
-                    hintText: 'Inserisci l\'importo del versamento',
-                    hintStyle: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[400],
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Colors.redAccent,
-                        width: 2.0,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(
-                        color: Colors.grey[300]!,
-                        width: 1.0,
-                      ),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                  ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // Consenti solo numeri e fino a 2 decimali
-                  ],
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Inserisci un importo valido';
-                    }
-                    try {
-                      double.parse(value);  // Verifica che il valore sia un numero
-                    } catch (e) {
-                      return 'Inserisci un importo numerico valido';
-                    }
-                    return null;
-                  },
-                ),
-                if(widget.userData.nome == "Segreteria")
-                  Column(
-                    children: [
-                      SizedBox(height: 12),
-                      DropdownButtonFormField<UtenteModel>(
-                        decoration: InputDecoration(
-                          labelText: 'SELEZIONA UTENTE',
-                          labelStyle: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.bold,
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[200],
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Colors.redAccent,
-                              width: 2.0,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Colors.grey[300]!,
-                              width: 1.0,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                        ),
-                        value: selectedUtente,
-                        items: allUtenti.map((utente) {
-                          return DropdownMenuItem<UtenteModel>(
-                            value: utente,
-                            child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
-                          );
-                        }).toList(),
-                        onChanged: (UtenteModel? val) {
-                          setState(() {
-                            selectedUtente = val;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Seleziona un utente';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 12),
+        return StatefulBuilder(
+            builder: (BuildContext context, setStateDialog){
+              return AlertDialog(
+                title: Text('INSERISCI L\'IMPORTO DEL VERSAMENTO E LA CAUSALE'),
+                content: Form( // Avvolgi tutto dentro un Form
+                  key: _formKeyVersamento,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
                       TextFormField(
-                        controller: _passwordController,
+                        controller: _causaleVersamentoController,
                         decoration: InputDecoration(
-                          labelText: 'PASSWORD UTENTE',
+                          labelText: 'CAUSALE VERSAMENTO',
                           labelStyle: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
                             fontWeight: FontWeight.bold,
                           ),
-                          hintText: 'Inserire la password dell\'utente',
+                          hintText: 'Inserisci la causale del versamento',
                           hintStyle: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[400],
@@ -1567,38 +1535,190 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Inserisci una password valida';
+                            return 'Inserisci una causale valida';
                           }
                           return null;
                         },
                       ),
+                      SizedBox(height: 12),
+                      TextFormField(
+                        controller: _versamentoController,
+                        decoration: InputDecoration(
+                          labelText: 'IMPORTO VERSAMENTO',
+                          labelStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                          hintText: 'Inserisci l\'importo del versamento',
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[400],
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.redAccent,
+                              width: 2.0,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.grey[300]!,
+                              width: 1.0,
+                            ),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')), // Consenti solo numeri e fino a 2 decimali
+                        ],
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Inserisci un importo valido';
+                          }
+                          try {
+                            double.parse(value);  // Verifica che il valore sia un numero
+                          } catch (e) {
+                            return 'Inserisci un importo numerico valido';
+                          }
+                          return null;
+                        },
+                      ),
+                      if(widget.userData.nome == "Segreteria")
+                        Column(
+                          children: [
+                            SizedBox(height: 12),
+                            DropdownButtonFormField<UtenteModel>(
+                              decoration: InputDecoration(
+                                labelText: 'SELEZIONA UTENTE',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              ),
+                              value: selectedUtente,
+                              items: allUtenti.map((utente) {
+                                return DropdownMenuItem<UtenteModel>(
+                                  value: utente,
+                                  child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
+                                );
+                              }).toList(),
+                              onChanged: (UtenteModel? val) {
+                                setState(() {
+                                  selectedUtente = val;
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Seleziona un utente';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 12),
+                            TextFormField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'PASSWORD UTENTE',
+                                labelStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: 'Inserire la password dell\'utente',
+                                hintStyle: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[400],
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.redAccent,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Colors.grey[300]!,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Inserisci una password valida';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
                     ],
-                  )
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                if (_formKeyVersamento.currentState!.validate()) {
-                  if(widget.userData.nome == "Segreteria"){
-                    if(_passwordController.text == selectedUtente?.password){
-                      addVersamento(_versamentoController.text);
-                      setState(() {
-                        selectedUtente = null;
-                        _passwordController.clear();
-                      });
-                    } else {
-                      showPasswordErrorDialog(context);
-                    }
-                  } else {
-                    addVersamento(_versamentoController.text);
-                  }
-                }
-              },
-              child: Text('Conferma versamento'.toUpperCase()),
-            ),
-          ],
+                  ),
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      if (_formKeyVersamento.currentState!.validate()) {
+                        if(widget.userData.nome == "Segreteria"){
+                          if(_passwordController.text == selectedUtente?.password){
+                            addVersamento(_versamentoController.text);
+                            setState(() {
+                              selectedUtente = null;
+                              _passwordController.clear();
+                            });
+                          } else {
+                            showPasswordErrorDialog(context);
+                          }
+                        } else {
+                          addVersamento(_versamentoController.text);
+                        }
+                      }
+                    },
+                    child: Text('Conferma versamento'.toUpperCase()),
+                  ),
+                ],
+              );
+            }
         );
       },
     );
