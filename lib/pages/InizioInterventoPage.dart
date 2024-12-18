@@ -21,6 +21,8 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
   late String _gps;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   TextEditingController _gpsController = TextEditingController();
   TextEditingController _notaClienteController = TextEditingController();
   TextEditingController _notaDestinazioneController = TextEditingController();
@@ -46,7 +48,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddress2/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -73,7 +75,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddress2/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -267,7 +269,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
       final now = DateTime.now();
 
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddress2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,

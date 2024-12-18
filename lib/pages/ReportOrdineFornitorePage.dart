@@ -19,6 +19,8 @@ class ReportOrdineFornitorePage extends StatefulWidget {
 class _ReportOrdineFornitorePageState extends State<ReportOrdineFornitorePage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   bool _isSearchActive = false;
   String? _filterValue;
   TextEditingController _searchController = TextEditingController();
@@ -305,7 +307,7 @@ class _ReportOrdineFornitorePageState extends State<ReportOrdineFornitorePage> {
 
   Future<void> getAllOrdini() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/ordine/ordered');
+      var apiUrl = Uri.parse('$ipaddress2/api/ordine/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

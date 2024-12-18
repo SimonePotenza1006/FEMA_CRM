@@ -38,8 +38,8 @@ class DettaglioTicketPage extends StatefulWidget{
 class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   Future<List<Uint8List>>? _futureImages;
   bool conversioneIntervento = false;
   bool conversioneTask = false;
@@ -71,7 +71,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllTipiTask() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress2/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -92,7 +92,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress2/api/utente/attivo');
       var response =await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -113,7 +113,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -134,7 +134,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress2/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -227,7 +227,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
     final dir = await getApplicationDocumentsDirectory();
     String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
     final player = ap.AudioPlayer();
-    final url = '$ipaddress/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/audio';
+    final url = '$ipaddress2/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/audio';
     http.Response? response;
     try {
 
@@ -260,7 +260,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
+    final url = '$ipaddress2/api/immagine/ticket/${int.parse(widget.ticket.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -305,7 +305,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
       for(var imageBytes in images){
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddress/api/immagine/task/$taskId'),
+          Uri.parse('$ipaddress2/api/immagine/task/$taskId'),
         );
         request.files.add(http.MultipartFile.fromBytes(
           'task', // Nome del campo nel form
@@ -367,7 +367,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         // Converte Uint8List in MultipartFile
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddress/api/immagine/$interventoId'),
+          Uri.parse('$ipaddress2/api/immagine/$interventoId'),
         );
         request.files.add(http.MultipartFile.fromBytes(
           'intervento', // Nome del campo nel form
@@ -1341,7 +1341,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   Future<void> deleteTicket(int ticketId) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/ticket/$ticketId'),
+        Uri.parse('$ipaddress2/api/ticket/$ticketId'),
         headers: {'Content-Type': 'application/json'},
       );
       print(response.statusCode);
@@ -1397,7 +1397,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         },
       );
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddress2/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : selectedUtente?.toMap(),
@@ -1422,7 +1422,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
             'Errore durante la creazione dell\'intervento: ${response.statusCode}');
       }
       final response2 = await http.post(
-        Uri.parse('$ipaddress/api/ticket'),
+        Uri.parse('$ipaddress2/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ticket.id,
@@ -1473,7 +1473,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
         },
       );
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddress2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'attivo': true,
@@ -1500,7 +1500,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
       }
 
       final response2 = await http.post(
-        Uri.parse('$ipaddress/api/ticket'),
+        Uri.parse('$ipaddress2/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ticket.id,
@@ -1679,7 +1679,7 @@ class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

@@ -35,8 +35,8 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   final _noteController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   int? activeSaveIndex;
   Map<String, TextEditingController> _noteControllers = {};
   Map<String, ValueNotifier<bool>> _isSaveEnabled = {};
@@ -259,7 +259,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<List<LicenzaModel>> futureLicenze() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/licenza/all');
+      var apiUrl = Uri.parse('$ipaddress2/api/licenza/all');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -325,7 +325,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
 
   Future<void> noteLicenza(LicenzaModel licenza, String note) async {
     print(licenza.note.toString()+' '+note);
-    final url = Uri.parse('$ipaddress/api/licenza/nuova');
+    final url = Uri.parse('$ipaddress2/api/licenza/nuova');
     final body = jsonEncode({
       'id': licenza.id!,
       'descrizione': licenza.descrizione,
@@ -361,7 +361,7 @@ class _CreazioneLicenzaPageState extends State<CreazioneLicenzaPage> {
   }
 
   Future<void> createNewLicenza() async {
-    final url = Uri.parse('$ipaddress/api/licenza/nuova');
+    final url = Uri.parse('$ipaddress2/api/licenza/nuova');
     final body = jsonEncode({
       'descrizione': _licenzaController.text,
       'utilizzato': false

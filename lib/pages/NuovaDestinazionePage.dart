@@ -28,6 +28,8 @@ class _NuovaDestinazionePageState extends State<NuovaDestinazionePage> {
   final _cellulareController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   DbHelper? dbHelper;
   bool isLoading = true;
@@ -160,7 +162,7 @@ class _NuovaDestinazionePageState extends State<NuovaDestinazionePage> {
       String cellulare,
       ClienteModel cliente) async {
     print('${widget.cliente}');
-    final url = Uri.parse('$ipaddress/api/destinazione');
+    final url = Uri.parse('$ipaddress2/api/destinazione');
     final body = jsonEncode({
       'denominazione': denominazione,
       'indirizzo': indirizzo,

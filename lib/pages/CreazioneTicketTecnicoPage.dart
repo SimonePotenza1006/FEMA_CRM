@@ -37,8 +37,8 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
 
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   TextEditingController _descrizioneController = TextEditingController();
   TextEditingController _notaController = TextEditingController();
   TextEditingController _titoloController = TextEditingController();
@@ -732,7 +732,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
     var descrizione = _descrizioneController.text.isNotEmpty ? _descrizioneController.text : null;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/ticket'),
+        Uri.parse('$ipaddress2/api/ticket'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'titolo' : titolo,
@@ -787,7 +787,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
+            Uri.parse('$ipaddress2/api/immagine/ticket/${int.parse(ticket.id.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -818,7 +818,7 @@ class _CreazioneTicketTecnicoPageState extends State<CreazioneTicketTecnicoPage>
         print('Percorso del file audio: ${file.path}');
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('$ipaddress/api/immagine/ticketaudio/${int.parse(ticket.id!.toString())}'),
+          Uri.parse('$ipaddress2/api/immagine/ticketaudio/${int.parse(ticket.id!.toString())}'),
         );
         request.files.add(
           await http.MultipartFile.fromPath(

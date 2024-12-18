@@ -23,6 +23,8 @@ class _ConsegnaMaterialePreventivoPageState
     extends State<ConsegnaMaterialePreventivoPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<DestinazioneModel> allDestinazioniByCliente = [];
   List<AziendaModel> allAziende = [];
   AziendaModel? selectedAzienda;
@@ -173,7 +175,7 @@ class _ConsegnaMaterialePreventivoPageState
   Future<void> getAziende() async{
     try{
       var apiUrl = Uri.parse(
-        '$ipaddress/api/azienda'
+        '$ipaddress2/api/azienda'
       );
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
@@ -214,7 +216,7 @@ class _ConsegnaMaterialePreventivoPageState
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress2/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -339,7 +341,7 @@ class _ConsegnaMaterialePreventivoPageState
       late http.Response response;
       try {
         response = await http.post(
-          Uri.parse('$ipaddress/api/preventivo'),
+          Uri.parse('$ipaddress2/api/preventivo'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -380,7 +382,7 @@ class _ConsegnaMaterialePreventivoPageState
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddress/api/destinazione/cliente/${widget.preventivo.cliente?.id}'));
+          '$ipaddress2/api/destinazione/cliente/${widget.preventivo.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

@@ -17,6 +17,8 @@ class ModificaRelazioneRapportinoPage extends StatefulWidget{
 class _ModificaRelazioneRapportinoPageState extends State<ModificaRelazioneRapportinoPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   TextEditingController _relazioneController = TextEditingController();
 
   @override
@@ -86,7 +88,7 @@ class _ModificaRelazioneRapportinoPageState extends State<ModificaRelazioneRappo
   Future<void> saveIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddress2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,

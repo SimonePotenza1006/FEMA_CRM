@@ -23,8 +23,8 @@ class AcquistoFornitorePage extends StatefulWidget{
 class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   late DateTime selectedDate;
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _importoController = TextEditingController();
@@ -99,7 +99,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress2/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -132,7 +132,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+              Uri.parse('$ipaddress2/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -166,7 +166,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
 
   Future<void> getAllFornitori() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/fornitore'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<FornitoreModel> fornitori = [];
@@ -627,7 +627,7 @@ class _AcquistoFornitorePageState extends State<AcquistoFornitorePage>{
     try{
       String prioritaString = TipoMovimentazione.Uscita.toString().split('.').last;
       response = await http.post(
-          Uri.parse('$ipaddress/api/movimenti'),
+          Uri.parse('$ipaddress2/api/movimenti'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'data' : selectedDate.toIso8601String(),

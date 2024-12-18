@@ -21,6 +21,8 @@ class CreazioneFaseRiparazionePage extends StatefulWidget{
 class _CreazioneFaseRiparazionePageState extends State<CreazioneFaseRiparazionePage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   TextEditingController _descrizioneController = TextEditingController();
 
   @override
@@ -83,7 +85,7 @@ class _CreazioneFaseRiparazionePageState extends State<CreazioneFaseRiparazioneP
     try {
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/fasi'),
+        Uri.parse('$ipaddress2/api/fasi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,

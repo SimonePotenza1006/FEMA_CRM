@@ -26,6 +26,8 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
       false; // New variable to manage filter and download button state
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -396,7 +398,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
 
   Future<void> getAllPreventivi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/preventivo/ordered');
+      var apiUrl = Uri.parse('$ipaddress2/api/preventivo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

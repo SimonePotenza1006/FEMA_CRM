@@ -33,6 +33,8 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   String dataOdierna = DateFormat('dd-MM-yyyy, HH:mm').format(DateTime.now()).toString();
   late String nomeUtente = "${widget.utente.nome} ${widget.utente.cognome}";
   String tipoTimbratura = "";
@@ -116,7 +118,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   Future<List<UtenteModel>?> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/utente'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
@@ -594,7 +596,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
         if (tipoTimbratura == "INGRESSO") {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddress2/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'gps': _indirizzo.toString(),
@@ -615,7 +617,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddress2/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,
@@ -684,7 +686,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   Future<void> getAllMarcatempoDataUtente(DateTime data, String utenteid) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddress2/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -725,7 +727,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   Future<void> getAllMarcatempoToday() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/pres/1/2');
+      var apiUrl = Uri.parse('$ipaddress2/marcatempo/pres/1/2');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -771,7 +773,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   Future<void> getAllMarcatempoMonth(int current) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddress2/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -816,7 +818,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
 
   Future<void> getMarcatempoOggi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/oggi/${widget.utente.id}/2');
+      var apiUrl = Uri.parse('$ipaddress2/marcatempo/oggi/${widget.utente.id}/2');
       var response = await http.get(apiUrl);
       var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
       if (response.statusCode == 200) {

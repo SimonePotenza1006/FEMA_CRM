@@ -42,6 +42,8 @@ class _ModificaSelezioneProdottiPreventivoPageState
   Map<int, double> lastPrices = {};
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<RelazionePreventivoProdottiModel> allProdotti = [];
   List<PreventivoModel> allPreventivi = [];
   List<RelazionePreventivoProdottiModel> pastProdotti = [];
@@ -644,7 +646,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
       for (var preventivo in preventivi) {
         if (preventivo.id != excludeId) {
           try {
-            var apiUrl = Uri.parse('$ipaddress/api/relazionePreventivoProdotto/preventivo/${preventivo.id}');
+            var apiUrl = Uri.parse('$ipaddress2/api/relazionePreventivoProdotto/preventivo/${preventivo.id}');
             var response = await http.get(apiUrl);
             if (response.statusCode == 200) {
               var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -674,7 +676,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
 
   Future<http.Response?> getPreventiviByCliente() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/preventivo/cliente/${widget.preventivo.cliente?.id}');
+      var apiUrl = Uri.parse('$ipaddress2/api/preventivo/cliente/${widget.preventivo.cliente?.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -698,7 +700,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress2/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -746,7 +748,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
     try {
       // Chiamata POST per aggiornare il preventivo
       response = await http.post(
-        Uri.parse('$ipaddress/api/preventivo'),
+        Uri.parse('$ipaddress2/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -785,7 +787,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
           final prezzo = double.tryParse(prezziControllers[i].text);
 
           response = await http.post(
-            Uri.parse('$ipaddress/api/relazionePreventivoProdotto'),
+            Uri.parse('$ipaddress2/api/relazionePreventivoProdotto'),
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json"

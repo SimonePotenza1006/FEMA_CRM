@@ -24,6 +24,8 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   List<PosizioneGPSModel> allPosizioni = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -34,7 +36,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   Future<void> getPosizioni() async{
     try{
       final response = await http.get(
-        Uri.parse('$ipaddress/api/posizioni/cliente/${widget.cliente.id}'));
+        Uri.parse('$ipaddress2/api/posizioni/cliente/${widget.cliente.id}'));
         var responseData = json.decode(response.body);
         if(response.statusCode == 200){
           List<PosizioneGPSModel> posizioni = [];
@@ -263,7 +265,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   Future<void> deleteCliente(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/cliente/$id'),
+        Uri.parse('$ipaddress2/api/cliente/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

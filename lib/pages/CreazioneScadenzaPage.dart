@@ -20,6 +20,8 @@ class CreazioneScadenzaPage extends StatefulWidget{
 class _CreazioneScadenzaPageState extends State<CreazioneScadenzaPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _dataController = TextEditingController();
   DateTime? _selectedDate;
@@ -223,7 +225,7 @@ class _CreazioneScadenzaPageState extends State<CreazioneScadenzaPage>{
   Future<void> saveScadenza() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/scadenza'),
+        Uri.parse('$ipaddress2/api/scadenza'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : _selectedDate?.toIso8601String(),

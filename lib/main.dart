@@ -193,6 +193,8 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   final _conUserId = TextEditingController();
   final _conPassword = TextEditingController();
   final _conLicenza = TextEditingController();
@@ -410,7 +412,7 @@ class _LoginFormState extends State<LoginForm> {
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddress/api/utente/ulogin'),
+          Uri.parse('$ipaddress2/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"

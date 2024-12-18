@@ -38,8 +38,8 @@ class _ModificaTaskPageState
   TextEditingController _riferimentoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   UtenteModel? selectedUtente;
   List<TipoTaskModel> allTipi = [];
   DateTime _dataOdierna = DateTime.now();
@@ -193,7 +193,7 @@ class _ModificaTaskPageState
         if(image.path.isNotEmpty){
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}'),
+            Uri.parse('$ipaddress2/api/immagine/task/${int.parse(widget.task.id.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -241,7 +241,7 @@ class _ModificaTaskPageState
     final dir = await getApplicationDocumentsDirectory();
     String filePath = '${dir.path}/audioget_${DateTime.now().millisecondsSinceEpoch}.mp3';
     final player = ap.AudioPlayer();
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
+    final url = '$ipaddress2/api/immagine/task/${int.parse(widget.task.id.toString())}/audio';
     http.Response? response;
     try {
 
@@ -274,7 +274,7 @@ class _ModificaTaskPageState
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
+    final url = '$ipaddress2/api/immagine/task/${int.parse(widget.task.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -301,7 +301,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress2/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -1039,7 +1039,7 @@ class _ModificaTaskPageState
         'attivo': widget.task.attivo,
       });
       final response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddress2/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
@@ -1062,7 +1062,7 @@ class _ModificaTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress2/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

@@ -18,6 +18,8 @@ class DettaglioSpesaVeicoloPage extends StatefulWidget{
 class _DettaglioSpesaSivisPageState extends State<DettaglioSpesaVeicoloPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<Uint8List>? _images;
 
   @override
@@ -35,7 +37,7 @@ class _DettaglioSpesaSivisPageState extends State<DettaglioSpesaVeicoloPage> {
 
   Future<List<Uint8List>> loadImages() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/immagine/spesa/${widget.spesa.idSpesaVeicolo}/images'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/immagine/spesa/${widget.spesa.idSpesaVeicolo}/images'));
       if (response.statusCode == 200) {
         // Decodifica la lista di immagini JSON
         List<dynamic> imagesJson = jsonDecode(response.body);
@@ -52,7 +54,7 @@ class _DettaglioSpesaSivisPageState extends State<DettaglioSpesaVeicoloPage> {
 
   Future<Uint8List> getImageSpesa(String idspesa) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {

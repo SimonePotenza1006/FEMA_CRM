@@ -34,6 +34,8 @@ class _CreazioneClientePageState extends State<CreazioneClientePage> {
   final _daneaController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -173,7 +175,7 @@ class _CreazioneClientePageState extends State<CreazioneClientePage> {
   }
 
   Future<void> createNewCliente() async {
-    final url = Uri.parse('$ipaddress/api/cliente');
+    final url = Uri.parse('$ipaddress2/api/cliente');
     final body = jsonEncode({
       'codice_fiscale': _codiceFiscaleController.text,
       'cod_danea' : _daneaController.text,

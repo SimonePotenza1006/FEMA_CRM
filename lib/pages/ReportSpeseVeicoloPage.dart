@@ -18,6 +18,8 @@ class ReportSpeseVeicoloPage extends StatefulWidget {
 class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<SpesaVeicoloModel> speseList = [];
   List<SpesaVeicoloModel> originalSpeseList = [];
   List<TipologiaSpesaVeicoloModel> tipologieList = [];
@@ -193,7 +195,7 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
 
   Future<void> getAllTipologieSpesa() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaSpesaVeicolo');
+      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaSpesaVeicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -233,7 +235,7 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
 
   Future<void> getAllSpese() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/spesaVeicolo/ordered');
+      var apiUrl = Uri.parse('$ipaddress2/api/spesaVeicolo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
