@@ -48,6 +48,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
   bool _condivisoTipo = false;
   int? tipoIdGlobal;
   List<String>? tipotaskdaacc = [];
+  List<String>? tipotaskpiene = [];
+  TextEditingController _titoloControllerTip = TextEditingController();
 
   @override
   void dispose() {
@@ -159,12 +161,56 @@ class _TableTaskPageState extends State<TableTaskPage>{
         allTipi.remove(selectedTipoToDelete);
         getAllTipi();
         getAllTask();
+
       } else {
         print('Errore nell\'eliminazione della tipologia "${selectedTipoToDelete.descrizione}": '
             '${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       print('Eccezione durante l\'eliminazione della tipologia "${selectedTipoToDelete.descrizione}": $e');
+    }
+  }
+
+  Future<void> rinominaTipoTask(TipoTaskModel tipotask) async {
+    final formatter = DateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
+    var titolotip = _titoloControllerTip.text.isNotEmpty ? _titoloControllerTip.text : "TIPO TASK DEL ${DateTime.now().day}/${DateTime.now().month} ORE ${DateTime.now().hour}:${DateTime.now().minute}";
+
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/tipoTask'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id' : tipotask.id,
+          'descrizione' : titolotip,//_titoloControllerTip.text,
+          'utente' : tipotask.utente != null ? tipotask.utente?.toMap() : null,
+          'utentecreate' : tipotask.utentecreate?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        //Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tipologia Task rinominato con successo!'.toUpperCase()),
+          ),
+        );
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => TableTaskPage(
+              utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,)));
+        /*Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => TableTaskPage(
+              utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)),
+              (Route<dynamic> route) => false, // Rimuove tutte le pagine precedenti
+        );*/
+        /*Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => TableTaskPage(
+                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));*/
+      }
+    } catch (e) {
+      print('Errore durante la modifica del task $e');
     }
   }
 
@@ -209,6 +255,14 @@ class _TableTaskPageState extends State<TableTaskPage>{
     print('Task caricati con successo.');
 
     setState(() {
+      if (_allCommissioni.any((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+        tipotaskpiene = _allCommissioni
+            .where((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+            .map((element) => element.tipologia?.id).cast<String>()
+            .toList();
+      }
+      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal)) tipoIdGlobal = int.parse(tipotaskpiene!.first);
       print('Inizio filtraggio delle commissioni...');
       //if (widget.utente.cognome! == "Mazzei") {
         print('Utente Mazzei rilevato. Applicazione del filtro per tipologia id = 9 e cognome Mazzei...');
@@ -216,7 +270,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
           print(
               'Task: ${task.titolo}, Tipologia ID: ${widget.tipoIdGlobal}, Utente : ${selectedUtente!.id}');
 
-          return task.attivo == true && task.tipologia?.id! == widget.tipoIdGlobal.toString() &&
+          return task.attivo == true && task.tipologia?.id! == tipoIdGlobal.toString() &&
               (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
           //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
         }).toList();
@@ -235,6 +289,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
             .map((element) => element.tipologia?.id).cast<String>()
             .toList();
       }
+
       _filteredCommissioni.sort((a, b) {
         if (a.concluso! == b.concluso!) {
           return b.data_conclusione != null && a.data_conclusione != null ? b.data_conclusione!.compareTo(a.data_conclusione!) : -1;
@@ -256,9 +311,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
       //_filteredCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id ? element.tipologia.id));
       _dataSource = TaskDataSource(context, _filteredCommissioni, widget.utente, List.from(allUtenti), selectedUtente!, tipoIdGlobal!);
 
-      print(tipotaskdaacc!.first.toString()+' Datasource inizializzato con ${_filteredCommissioni.last.id} task.'+widget.utente.id.toString());
+      //print(tipotaskdaacc!.first.toString()+' Datasource inizializzato con ${_filteredCommissioni.last.id} task.'+widget.utente.id.toString());
     });
-    print('Inizializzazione completata.');
+    print('Inizializzazione completata. '+tipotaskpiene.toString());
   }
 
   Future<void> getAllUtenti() async {
@@ -375,6 +430,14 @@ class _TableTaskPageState extends State<TableTaskPage>{
         setState(() {
           _isLoading = false;
           _allCommissioni = commissioni;
+          if (_allCommissioni.any((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+            tipotaskpiene = _allCommissioni
+                .where((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+                .map((element) => element.tipologia?.id).cast<String>()
+                .toList();
+          }
+          if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal)) tipoIdGlobal = int.parse(tipotaskpiene!.first);
           print('Tutte le commissioni assegnate a _allCommissioni: ${_allCommissioni.length} task.');
           // Applica il filtro iniziale per filteredCommissioni se l'utente è Mazzei
           //if (widget.utente.cognome! == "Mazzei") {
@@ -395,6 +458,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                 .map((element) => element.tipologia!.id).cast<String>()
                 .toList();
           }
+
           _filteredCommissioni.sort((a, b) {
             if (a.concluso! == b.concluso!) {
               return b.data_conclusione != null && a.data_conclusione != null ? b.data_conclusione!.compareTo(a.data_conclusione!) : -1;
@@ -879,7 +943,93 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                   children: allTipi.map((tipo) {
                                     print(tipoIdGlobal.toString()+' mmm '+tipo.id!);
                                     final isSelected = tipoIdGlobal == int.parse(tipo.id!);
-                                    return Padding(
+                                    return (tipotaskpiene!.isNotEmpty && tipotaskpiene!.contains(tipo.id)) ?
+                                      GestureDetector(
+                                      onLongPress: () {
+
+                                        _titoloControllerTip = TextEditingController(text: tipo.descrizione!.toUpperCase());
+                                        //utente.id == task.utentecreate!.id ?
+                                        tipo.utentecreate!.id == widget.utente.id ? showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
+                                              builder: (BuildContext context, StateSetter setState) {
+                                                return AlertDialog(
+                                                  title: Text('RINOMINA TIPOLOGIA TASK \n\"'.toUpperCase()+tipo.descrizione!.toUpperCase()+'\"',
+                                                  style: TextStyle(
+                                                    fontSize: 17,
+                                                  ),),
+                                                  //content: Text('RINOMINA TASK\n\"'.toUpperCase()+task.titolo!.toUpperCase()+'\"'),
+                                                  actions: [
+                                                    SizedBox(
+                                                      width: 600,
+                                                      child: TextFormField(
+                                                        controller: _titoloControllerTip,
+                                                        maxLines: null,
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: Colors.black87,
+                                                        ),
+                                                        decoration: InputDecoration(
+                                                          labelText: 'Titolo'.toUpperCase(),
+                                                          labelStyle: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors.grey[600],
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                          filled: true,
+                                                          fillColor: Colors.grey[200],
+                                                          border: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderSide: BorderSide.none, // Rimuove il bordo standard
+                                                          ),
+                                                          focusedBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderSide: BorderSide(
+                                                              color: Colors.redAccent,
+                                                              width: 2.0,
+                                                            ),
+                                                          ),
+                                                          enabledBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            borderSide: BorderSide(
+                                                              color: Colors.grey[300]!,
+                                                              width: 1.0,
+                                                            ),
+                                                          ),
+                                                          hintText: "Inserisci il titolo",
+                                                          hintStyle: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors.grey[500],
+                                                          ),
+                                                          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop();
+                                                      },
+                                                      child: Text('Annulla'.toUpperCase()),
+                                                    ),
+                                                    ElevatedButton(
+
+                                                      onPressed: () {
+                                                        rinominaTipoTask(tipo);
+                                                        Navigator.of(context).pop();
+                                                      },
+                                                      child: Text('SALVA'.toUpperCase(), style: TextStyle(fontSize: 18)),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        ) : null;// : null;
+                                      },
+                                    child:
+
+                                      Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                       child: Container(
                                         //width: 120, // Larghezza del pulsante
@@ -964,7 +1114,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                               ],
                                             ),
                                           )),
-                                    );
+                                    )) : Container();
                                   }).toList(),
                                 ),
                               ),
@@ -977,9 +1127,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
               ],
             ),
           );}),
-            floatingActionButton: (widget.utente.cognome == "Mazzei" ||
-                widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3') ?
-            Column(
+            //floatingActionButton: (widget.utente.cognome == "Mazzei" ||
+            //    widget.utente.cognome == "Chiriatti" || widget.utente.ruolo!.id == '3') ?
+          floatingActionButton: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children : [
@@ -996,11 +1146,15 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                 'Scegliere una tipologia da eliminare'.toUpperCase(),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              content: Column(
+                              content: SingleChildScrollView( // Aggiungi SingleChildScrollView qui
+                            child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: allTipi.map((tipo) {
                                   return RadioListTile<TipoTaskModel>(
-                                    title: Text(tipo.descrizione!.toUpperCase()),
+                                    title: Text(tipo.descrizione!.toUpperCase(),
+                                        softWrap: true,
+                                        overflow: TextOverflow.ellipsis,
+                                    ),
                                     value: tipo,
                                     groupValue: selectedTipoToDelete,
                                     onChanged: (TipoTaskModel? value) {
@@ -1010,7 +1164,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                     },
                                   );
                                 }).toList(),
-                              ),
+                              )),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: selectedTipoToDelete == null
@@ -1191,7 +1345,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                 ),
                 SizedBox(height: 50),
               ]
-            ) : Container(),
+            ),// : Container(),
         )
         );
   }
@@ -1255,6 +1409,13 @@ class _TableTaskPageState extends State<TableTaskPage>{
             .map((element) => element.tipologia!.id).cast<String>()
             .toList();
       }
+      if (_allCommissioni.any((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+        tipotaskpiene = _allCommissioni
+            .where((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+            .map((element) => element.tipologia?.id).cast<String>()
+            .toList();
+      }
       // Aggiorna la tabella
       _filteredCommissioni.sort((a, b) {
         if (a.concluso! == b.concluso!) {
@@ -1275,6 +1436,14 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   void filterTasksByUtente(UtenteModel utente) {
     setState(() {
+      if (_allCommissioni.any((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+        tipotaskpiene = _allCommissioni
+            .where((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+            .map((element) => element.tipologia?.id).cast<String>()
+            .toList();
+      }
+      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal)) tipoIdGlobal = int.parse(tipotaskpiene!.first);
       // Filtra le commissioni in base all'ID dell'utente
       _filteredCommissioni = _allCommissioni.where((commissione) {
         final taskId = commissione.tipologia?.id?.toString(); // Converte l'ID del task in stringa
@@ -1294,6 +1463,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
             .map((element) => element.tipologia!.id).cast<String>()
             .toList();
       }
+
       // Aggiorna i dati nella data source
       _filteredCommissioni.sort((a, b) {
         if (a.concluso! == b.concluso!) {
@@ -1330,6 +1500,7 @@ class TaskDataSource extends DataGridSource{
   UtenteModel selectedUtente;
   int tipoIdGlobal;
   TextEditingController _titoloController = TextEditingController();
+
 
   TaskDataSource(
       this.context,
@@ -1603,7 +1774,7 @@ class TaskDataSource extends DataGridSource{
     }
   }
 
-  Future<void> getAllTask() async{
+  Future<void> getAllTaskNO() async{
     try{
       var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/allattivi')
           : Uri.parse('$ipaddress/api/task/utente/'+utente.id!);
@@ -1673,11 +1844,11 @@ class TaskDataSource extends DataGridSource{
         );
       } else if (dataGridCell.columnName == 'accettatoicon') {
         print('nnn cccc '+utente.nomeCompleto()!);
-        return IconButton(tooltip: !task.accettato! && task.utentecreate!.id != utente.id ? 'CLICCA QUI PER ACCETTARE IL TASK' : '',//'TASK GIA\' ACCETTATO' : ,
+        return IconButton(tooltip: !task.accettato! && task.utentecreate!.id != utente.id && task.utente!.id == utente.id ? 'CLICCA QUI PER ACCETTARE IL TASK' : '',//'TASK GIA\' ACCETTATO' : ,
             icon: Icon(size: 27,
-            !task.accettato! && task.utentecreate!.id != utente.id ? Icons.warning : null,//Icons.warning,
+            !task.accettato! && task.utentecreate!.id != utente.id && task.utente!.id == utente.id ? Icons.warning : null,//Icons.warning,
             color: task.accettato! ? Colors.grey : Colors.orange,
-          ), onPressed: () { !task.accettato! && task.utentecreate!.id != utente.id ? showDialog(
+          ), onPressed: () { !task.accettato! && task.utentecreate!.id != utente.id && task.utente!.id == utente.id ? showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
