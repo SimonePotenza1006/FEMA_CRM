@@ -18,8 +18,9 @@ import 'PDFTaskPage.dart';
 
 class CestinoTaskPage extends StatefulWidget{
   final UtenteModel utente;
-
-  const CestinoTaskPage({Key? key, required this.utente}) : super(key: key);
+  final UtenteModel selectedUtente;
+  final int tipoIdGlobal;
+  const CestinoTaskPage({Key? key, required this.utente, required this.selectedUtente, required this.tipoIdGlobal}) : super(key: key);
 
   @override
   _CestinoTaskPageState createState() => _CestinoTaskPageState();
@@ -46,6 +47,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
   bool _condivisoTipo = false;
   int? tipoIdGlobal;
   List<String>? tipotaskdaacc = [];
+  List<String>? tipotaskpiene = [];
 
   @override
   void dispose() {
@@ -67,7 +69,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => CestinoTaskPage(
-          utente: widget.utente)));
+            utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!)));
     /*getAllTask();
     getAllTipi();
     getAllUtenti();*/
@@ -103,7 +105,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
     bool allDeleted = true;
 
     for (var task in tasksToDelete) {
-      final String url = '$ipaddress2/api/task/${task.id}';
+      final String url = '$ipaddress/api/task/${task.id}';
       try {
         final response = await http.delete(Uri.parse(url));
         if (response.statusCode == 200 || response.statusCode == 204) {
@@ -149,7 +151,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
 
       // Step 2: Elimina la tipologia
       print('Task eliminati. Procedo con l\'eliminazione della tipologia.');
-      final String url = '$ipaddress2/api/tipoTask/${selectedTipoToDelete.id}';
+      final String url = '$ipaddress/api/tipoTask/${selectedTipoToDelete.id}';
       final response = await http.delete(Uri.parse(url));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -174,7 +176,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
       'task': 0,
       //'accettatoicon': 60,//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
       'ripristina': 60,
-      'delete': 60,
+      'delete': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
       //'condividi': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
       'data_creazione': 150,
       'titolo': 300,
@@ -207,6 +209,19 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
     print('Task caricati con successo.');
 
     setState(() {
+      selectedUtente = widget.selectedUtente;//allUtenti.firstWhere((element) => element.id == widget.utente.id);
+      //if(widget.utente.cognome == "Mazzei"){
+      tipoIdGlobal = widget.tipoIdGlobal;//9;
+      if (_allCommissioni.any((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+        tipotaskpiene = _allCommissioni
+            .where((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+            .map((element) => element.tipologia?.id).cast<String>()
+            .toList();
+      }
+      print(tipotaskpiene.toString()+' '+tipoIdGlobal!.toString());
+      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal.toString())) tipoIdGlobal = int.parse(tipotaskpiene!.first);
+
       print('Inizio filtraggio delle commissioni...');
       //if (widget.utente.cognome! == "Mazzei") {
         print('Utente Mazzei rilevato. Applicazione del filtro per tipologia id = 9 e cognome Mazzei...');
@@ -214,7 +229,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
           print(
               'Task: ${task.titolo}, Tipologia ID: ${tipoIdGlobal}, Utente : ${selectedUtente!.id}');
 
-          return task.tipologia?.id! == tipoIdGlobal.toString() &&
+          return task.attivo == false && task.tipologia?.id! == tipoIdGlobal.toString() &&
               (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
           //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
         }).toList();
@@ -226,12 +241,16 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
       //List<String> ids = [];
 
       // Verifica se almeno un elemento soddisfa la condizione e aggiungi gli id
-      if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == false && element.accettato == false &&
+          element.utentecreate!.id != widget.utente.id)) {
+
         tipotaskdaacc = _allCommissioni
-            .where((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)
+            .where((element) => element.utente!.id == widget.utente.id && element.attivo == false && element.accettato == false &&
+            element.utentecreate!.id != widget.utente.id)
             .map((element) => element.tipologia!.id).cast<String>()
             .toList();
       }
+
       _filteredCommissioni.sort((a, b) {
         if (a.concluso! == b.concluso!) {
           return b.data_conclusione != null && a.data_conclusione != null ? b.data_conclusione!.compareTo(a.data_conclusione!) : -1;
@@ -260,7 +279,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -270,7 +289,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
         }
         setState(() {
           allUtenti = utenti;
-          selectedUtente = utenti.firstWhere((element) => element.id == widget.utente.id);
+          //selectedUtente = utenti.firstWhere((element) => element.id == widget.utente.id);
           //if (widget.utente.cognome! == "Mazzei")
             //selectedUtente = widget.selectedUtente;//utenti.firstWhere((element) => element.id == widget.utente.id);
         });
@@ -303,7 +322,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -355,8 +374,8 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
     try {
       // Decidi l'endpoint in base al cognome dell'utente
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
-          ? Uri.parse('$ipaddress2/api/task/alldisattivi')
-          : Uri.parse('$ipaddress2/api/task/utentearchivio/' + widget.utente!.id!);
+          ? Uri.parse('$ipaddress/api/task/alldisattivi')
+          : Uri.parse('$ipaddress/api/task/utentearchivio/' + widget.utente!.id!);
       print('Chiamata API verso: $apiUrl');
       var response = await http.get(apiUrl);
       print('Risposta ricevuta con status code: ${response.statusCode}');
@@ -371,13 +390,22 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
         setState(() {
           _isLoading = false;
           _allCommissioni = commissioni;
+          if (_allCommissioni.any((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+            tipotaskpiene = _allCommissioni
+                .where((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+                .map((element) => element.tipologia?.id).cast<String>()
+                .toList();
+          }
+          if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal.toString())) tipoIdGlobal = int.parse(tipotaskpiene!.first);
           print('Tutte le commissioni assegnate a _allCommissioni: ${_allCommissioni.length} task.');
           // Applica il filtro iniziale per filteredCommissioni se l'utente è Mazzei
           //if (widget.utente.cognome! == "Mazzei") {
             print('Filtraggio per utente Mazzei con tipologia id = 9...');
             _filteredCommissioni = commissioni.where((task) {
               print('Task: ${task.titolo}, Tipologia: ${task.tipologia?.id}, Utente: ${task.utente?.cognome}');
-              return task.tipologia?.id! == tipoIdGlobal.toString() && (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
+              return task.attivo == false && task.tipologia?.id! == tipoIdGlobal.toString() && (task.utente?.id! == selectedUtente!.id! ||
+                  task.utentecreate?.id! == selectedUtente!.id!);
               //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
             }).toList();
             print('Numero di task filtrati: ${_filteredCommissioni.length}');
@@ -385,9 +413,10 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
             _filteredCommissioni = commissioni;
             print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
           }*/
-          if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+          if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == false &&
+              !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
             tipotaskdaacc = _allCommissioni
-                .where((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)
+                .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
                 .map((element) => element.tipologia!.id).cast<String>()
                 .toList();
           }
@@ -440,7 +469,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text('ARCHIVIO TASK', style: TextStyle(color: Colors.white)),
+            title: Text('CESTINO TASK', style: TextStyle(color: Colors.white)),
             centerTitle: true,
             backgroundColor: Colors.red,
             actions: [
@@ -565,7 +594,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
             child: Column(
               children: [
                 SizedBox(height: 2),
-                constraints.maxWidth < 460 ? Text('ARCHIVIO TASK ELIMINATI', style: TextStyle(fontSize: 14)) : Container(),
+                constraints.maxWidth < 460 ? Text('CESTINO TASK', style: TextStyle(fontSize: 14)) : Container(),
                 SizedBox(height: 8),
                 Expanded(
                     child: RefreshIndicator(
@@ -1188,7 +1217,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/tipoTask'),
+        Uri.parse('$ipaddress/api/tipoTask'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -1372,7 +1401,7 @@ class TaskDataSource extends DataGridSource{
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1414,7 +1443,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1455,7 +1484,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1493,7 +1522,7 @@ class TaskDataSource extends DataGridSource{
   Future<void> deleteTask(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress2/api/task/$id'),
+        Uri.parse('$ipaddress/api/task/$id'),
       );
       if (response.statusCode == 200) {
         //Navigator.of(context).pop();
@@ -1525,7 +1554,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1562,8 +1591,8 @@ class TaskDataSource extends DataGridSource{
 
   Future<void> getAllTask() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress2/api/task/alldisattivi')
-          : Uri.parse('$ipaddress2/api/task/utentearchivio/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/alldisattivi')
+          : Uri.parse('$ipaddress/api/task/utentearchivio/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -1662,7 +1691,7 @@ class TaskDataSource extends DataGridSource{
         );
       } else if (dataGridCell.columnName == 'ripristina') {
         return IconButton(tooltip: 'CLICCA QUI PER RIPRISTINARE IL TASK',
-          icon: Icon(Icons.delete, color: Colors.red, size: 27,),
+          icon: Icon(Icons.reply_sharp, color: Colors.red, size: 27,),
           onPressed: () {
             showDialog(
               context: context,
@@ -1701,7 +1730,7 @@ class TaskDataSource extends DataGridSource{
                 return AlertDialog(
                   title: Text('ELIMINAZIONE TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER ELIMINARE DEFINITIVAMENTE IL TASK \"'+task.titolo!.toUpperCase()+'\" DALL\'ARCHIVIO?'),
+                      'CONFERMI DI VOLER ELIMINARE DEFINITIVAMENTE IL TASK \"'+task.titolo!.toUpperCase()+'\" DAL CESTINO?'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
