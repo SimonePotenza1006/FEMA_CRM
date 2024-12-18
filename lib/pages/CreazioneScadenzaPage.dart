@@ -225,7 +225,7 @@ class _CreazioneScadenzaPageState extends State<CreazioneScadenzaPage>{
   Future<void> saveScadenza() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/scadenza'),
+        Uri.parse('$ipaddress/api/scadenza'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : _selectedDate?.toIso8601String(),

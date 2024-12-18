@@ -175,7 +175,7 @@ class _ConsegnaMaterialePreventivoPageState
   Future<void> getAziende() async{
     try{
       var apiUrl = Uri.parse(
-        '$ipaddress2/api/azienda'
+        '$ipaddress/api/azienda'
       );
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
@@ -216,7 +216,7 @@ class _ConsegnaMaterialePreventivoPageState
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress2/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -341,7 +341,7 @@ class _ConsegnaMaterialePreventivoPageState
       late http.Response response;
       try {
         response = await http.post(
-          Uri.parse('$ipaddress2/api/preventivo'),
+          Uri.parse('$ipaddress/api/preventivo'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -382,7 +382,7 @@ class _ConsegnaMaterialePreventivoPageState
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddress2/api/destinazione/cliente/${widget.preventivo.cliente?.id}'));
+          '$ipaddress/api/destinazione/cliente/${widget.preventivo.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

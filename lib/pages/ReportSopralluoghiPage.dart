@@ -202,7 +202,7 @@ class _ReportSopralluoghiPageState extends State<ReportSopralluoghiPage> {
 
   Future<void> getAllSopralluoghi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/sopralluogo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/sopralluogo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

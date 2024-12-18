@@ -40,7 +40,7 @@ class _PDFRendicontoInterventiPageState
 
   Future<void> getAllTipologieIntervento() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -92,7 +92,7 @@ class _PDFRendicontoInterventiPageState
   Future<void> getAllInterventiForTipologia(String tipologiaId) async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress2/api/intervento/categoriaIntervento/$tipologiaId');
+          '$ipaddress/api/intervento/categoriaIntervento/$tipologiaId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

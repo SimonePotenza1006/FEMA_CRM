@@ -95,7 +95,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
   Future<void> concludiGruppo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/gruppi'),
+        Uri.parse('$ipaddress/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id' : widget.gruppo.id,
@@ -136,7 +136,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
   Future<void> saveImporto(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -513,7 +513,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
 
   Future<void> getInterventiByGruppo() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/intervento/gruppo/${int.parse(widget.gruppo.id.toString())}');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/${int.parse(widget.gruppo.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

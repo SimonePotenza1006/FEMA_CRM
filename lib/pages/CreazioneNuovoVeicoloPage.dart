@@ -79,7 +79,7 @@ class _CreazioneNuovoVeicoloPageState extends State<CreazioneNuovoVeicoloPage> {
       }
 
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/veicolo'),
+        Uri.parse('$ipaddress/api/veicolo'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione': _descrizioneController.text,

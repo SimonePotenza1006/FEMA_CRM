@@ -112,7 +112,7 @@ class _TableMagazzinoPageState extends State<TableMagazzinoPage>{
 
   Future<void> getProdotti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/prodotto');
+      var apiUrl = Uri.parse('$ipaddress/api/prodotto');
       print('Fetching products from: $apiUrl');
 
       var response = await http.get(apiUrl);

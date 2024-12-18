@@ -249,7 +249,7 @@ class _PDFRendicontoMensilePreventiviPageState
   Future<void> getAllAgenti() async {
     try {
       print('Recupero agenti...');
-      var apiUrl = Uri.parse('$ipaddress2/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -304,7 +304,7 @@ class _PDFRendicontoMensilePreventiviPageState
   Future<void> getAllPreventiviForAgente(String agenteId) async {
     print('Inizio getAllPreventiviForAgente per agente $agenteId');
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/preventivo/agente/$agenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/preventivo/agente/$agenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

@@ -290,7 +290,7 @@ class _DettaglioPreventivoPerAgentePageState
     });
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress2/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

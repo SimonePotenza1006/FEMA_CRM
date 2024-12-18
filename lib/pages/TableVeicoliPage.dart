@@ -54,7 +54,7 @@ class _TableVeicoliPageState extends State<TableVeicoliPage>{
 
   Future<void> getAllVeicoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/veicolo');
+      var apiUrl = Uri.parse('$ipaddress/api/veicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

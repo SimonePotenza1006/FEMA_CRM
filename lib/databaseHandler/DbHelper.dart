@@ -68,7 +68,7 @@ class DbHelper{
     while (retryCount < maxRetry) {
       try {
         // Ricrea un nuovo MultipartRequest ad ogni tentativo
-        var postUri = Uri.parse('$ipaddress2/pdfu/certificazioni/clienti'); // Endpoint corretto
+        var postUri = Uri.parse('$ipaddress/pdfu/certificazioni/clienti'); // Endpoint corretto
         http.MultipartRequest request = http.MultipartRequest('POST', postUri);
 
         // Leggi il file come bytes
@@ -118,7 +118,7 @@ class DbHelper{
     try{
       http.Response response =
       await http
-          .get(Uri.parse('$ipaddress2/api/device'));
+          .get(Uri.parse('$ipaddress/api/device'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         print(responseData.toString());
@@ -153,7 +153,7 @@ class DbHelper{
     try {
       response = await http.post(
 
-          Uri.parse('$ipaddress2/api/licenza',),
+          Uri.parse('$ipaddress/api/licenza',),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -177,7 +177,7 @@ class DbHelper{
     try {
       response = await http.post(
 
-          Uri.parse('$ipaddress2/api/device',),
+          Uri.parse('$ipaddress/api/device',),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -210,7 +210,7 @@ class DbHelper{
     try {
       response = await http.post(
 
-          Uri.parse('$ipaddress2/api/licenza'),
+          Uri.parse('$ipaddress/api/licenza'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -244,7 +244,7 @@ class DbHelper{
     try{
       http.Response response =
       await http
-          .get(Uri.parse('$ipaddress2/api/licenza'));
+          .get(Uri.parse('$ipaddress/api/licenza'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         print("gf45tr54");
@@ -279,14 +279,14 @@ class DbHelper{
 
   Future<Uint8List> getPdfNoleggio(String filename)  async {
     final response =
-    await http.get(Uri.parse('$ipaddress2/api/pdf/preventiviServizi/$filename'));
+    await http.get(Uri.parse('$ipaddress/api/pdf/preventiviServizi/$filename'));
     http.MultipartRequest request;
     return response.bodyBytes;
   }
 
   Future<List<ClienteModel>> getAllClienti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress2/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<ClienteModel> clienti = [];
@@ -305,7 +305,7 @@ class DbHelper{
   Future<List<FaseRiparazioneModel>> getFasiByMerce(InterventoModel intervento) async{
     int? merceId = intervento.merce != null ? int.parse(intervento.merce!.id!) : null;
     try{
-      final response = await http.get(Uri.parse('$ipaddress2/api/fasi/merce/$merceId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/fasi/merce/$merceId'));
       if(response.statusCode == 200){
         final jsonData = jsonDecode(response.body);
         List<FaseRiparazioneModel> fasi = [];
@@ -324,7 +324,7 @@ class DbHelper{
   Future<List<DestinazioneModel>> getDestinazioneByCliente(ClienteModel cliente) async{
     int clienteId = int.parse(cliente.id!);
     try{
-      final response = await http.get(Uri.parse('$ipaddress2/api/destinazione/cliente/${clienteId}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/${clienteId}'));
       if(response.statusCode == 200){
          final jsonData = jsonDecode(response.body);
          List<DestinazioneModel> destinazioni = [];
@@ -342,7 +342,7 @@ class DbHelper{
 
   Future<List<String>> getFilesnamePreventivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/pdf/preventiviServizi'));
+      final response = await http.get(Uri.parse('$ipaddress/api/pdf/preventiviServizi'));
 
       // Aggiungi questa riga per vedere il corpo della risposta.
       print('Risposta del server: ${response.body}');
@@ -386,7 +386,7 @@ class DbHelper{
       print('Il file esiste: ${fileD.path}');
 
       // Creazione dell'URI per la richiesta
-      var postUri = Uri.parse('$ipaddress2/api/pdf/preventivoServizi');
+      var postUri = Uri.parse('$ipaddress/api/pdf/preventivoServizi');
       print('URI creato: $postUri');
 
       // Creazione della richiesta
@@ -440,7 +440,7 @@ class DbHelper{
 
   Future<List<AziendaModel>> getAllAziende() async{
     try{
-      http.Response response = await http.get(Uri.parse('$ipaddress2/api/azienda'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/azienda'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<AziendaModel> allAziende = [];
@@ -458,7 +458,7 @@ class DbHelper{
 
   Future<List<TipologiaInterventoModel>> getAllTipologieIntervento() async{
     try{
-      http.Response response = await http.get(Uri.parse('$ipaddress2/api/tipologiaIntervento'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<TipologiaInterventoModel> allTipologieIntervento = [];
@@ -491,7 +491,7 @@ class DbHelper{
   Future<UtenteModel> getLoginUser(String email, String password) async {
     try {
       http.Response response = await http.post(
-          Uri.parse('$ipaddress2/api/utente/ulogin'),
+          Uri.parse('$ipaddress/api/utente/ulogin'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"
@@ -531,7 +531,7 @@ class DbHelper{
 
   Future<UtenteModel> getUtentebyId(String userId) async {
     final response =
-    await http.get(Uri.parse('$ipaddress2/api/utente/$userId'));
+    await http.get(Uri.parse('$ipaddress/api/utente/$userId'));
 
     if(response.statusCode == 200) {
       var responseData = jsonDecode(response.body.toString());
@@ -588,7 +588,7 @@ class _DbHelper1State extends State<DbHelper1>{
 
   // Future<void> getAllVeicoli() async {
   //   try {
-  //     var apiUrl = Uri.parse('$ipaddress2/api/veicolo');
+  //     var apiUrl = Uri.parse('$ipaddress/api/veicolo');
   //     var response = await http.get(apiUrl);
   //     if (response.statusCode == 200) {
   //       var jsonData = jsonDecode(response.body);
@@ -627,7 +627,7 @@ class _DbHelper1State extends State<DbHelper1>{
   Future<void> getTipologieIntervento() async {
     print('getTipologieIntervento chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

@@ -69,7 +69,7 @@ class _NuovaCategoriaPageState extends State<NuovaCategoriaPage> {
   Future<void> createNewCategoria() async {
     try {
       final response =
-          await http.post(Uri.parse('$ipaddress2/api/categorieIntervento'),
+          await http.post(Uri.parse('$ipaddress/api/categorieIntervento'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'descrizione': _descrizioneController.text,

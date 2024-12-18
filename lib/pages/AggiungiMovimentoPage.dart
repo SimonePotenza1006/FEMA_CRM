@@ -226,7 +226,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
 
   Future<void> getAllInterventiByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/intervento/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/intervento/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(utf8.decode(response.bodyBytes));
         setState(() {
@@ -242,7 +242,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -940,7 +940,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -962,7 +962,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -986,7 +986,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/noteTecnico'),
+        Uri.parse('$ipaddress/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -1006,7 +1006,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
 
   Future<void> saveStatusInterventoAcconto() async{
     try{
-      final response = await http.post(Uri.parse('$ipaddress2/api/intervento'),
+      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
@@ -1065,7 +1065,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
 
   Future<void> saveStatusInterventoPagamento() async{
     try{
-      final response = await http.post(Uri.parse('$ipaddress2/api/intervento'),
+      final response = await http.post(Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': selectedIntervento?.id,
@@ -1140,7 +1140,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
     try {
       debugPrint("Body della richiesta: ${body.toString()}");
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         body: jsonEncode(body),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -1177,7 +1177,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           if(image.path != null && image.path.isNotEmpty){
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress2/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+              Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
             );
             request.files.add(
                 await http.MultipartFile.fromPath(

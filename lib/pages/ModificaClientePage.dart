@@ -242,7 +242,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
     try {
       print("Body inviato: ${json.encode(bodyData)}");
       response = await http.post(
-        Uri.parse('$ipaddress2/api/cliente'),
+        Uri.parse('$ipaddress/api/cliente'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -275,7 +275,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
       // Crea una richiesta multipart per l'upload del file
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress2/pdfu/certificazioni/clienti'),
+        Uri.parse('$ipaddress/pdfu/certificazioni/clienti'),
       );
 
       // Aggiungi il nome del cliente come parametro

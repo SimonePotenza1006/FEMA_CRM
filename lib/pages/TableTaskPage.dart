@@ -107,7 +107,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
     bool allDeleted = true;
 
     for (var task in tasksToDelete) {
-      final String url = '$ipaddress2/api/task/${task.id}';
+      final String url = '$ipaddress/api/task/${task.id}';
       try {
         final response = await http.delete(Uri.parse(url));
         if (response.statusCode == 200 || response.statusCode == 204) {
@@ -153,7 +153,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
       // Step 2: Elimina la tipologia
       print('Task eliminati. Procedo con l\'eliminazione della tipologia.');
-      final String url = '$ipaddress2/api/tipoTask/${selectedTipoToDelete.id}';
+      final String url = '$ipaddress/api/tipoTask/${selectedTipoToDelete.id}';
       final response = await http.delete(Uri.parse(url));
 
       if (response.statusCode == 200 || response.statusCode == 204) {
@@ -178,7 +178,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/tipoTask'),
+        Uri.parse('$ipaddress/api/tipoTask'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id' : tipotask.id,
@@ -255,6 +255,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
     print('Task caricati con successo.');
 
     setState(() {
+
+        selectedUtente = widget.selectedUtente;//allUtenti.firstWhere((element) => element.id == widget.utente.id);
+        //if(widget.utente.cognome == "Mazzei"){
+        tipoIdGlobal = widget.tipoIdGlobal;//9;
+
+
       if (_allCommissioni.any((element) => element.attivo == true && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
 
         tipotaskpiene = _allCommissioni
@@ -262,7 +268,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
             .map((element) => element.tipologia?.id).cast<String>()
             .toList();
       }
-      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal)) tipoIdGlobal = int.parse(tipotaskpiene!.first);
+      print(tipotaskpiene.toString()+' '+tipoIdGlobal!.toString());
+      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal.toString())) tipoIdGlobal = int.parse(tipotaskpiene!.first);
+      print(tipotaskpiene.toString()+' '+tipoIdGlobal!.toString());
       print('Inizio filtraggio delle commissioni...');
       //if (widget.utente.cognome! == "Mazzei") {
         print('Utente Mazzei rilevato. Applicazione del filtro per tipologia id = 9 e cognome Mazzei...');
@@ -282,10 +290,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
       //List<String> ids = [];
 
       // Verifica se almeno un elemento soddisfa la condizione e aggiungi gli id
-      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && element.accettato == false && element.utentecreate?.id != widget.utente.id)) {
+      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && element.accettato == false &&
+          element.utentecreate?.id != widget.utente.id)) {
 
         tipotaskdaacc = _allCommissioni
-            .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && element.accettato == false && element.utentecreate?.id != widget.utente.id)
+            .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && element.accettato == false &&
+            element.utentecreate?.id != widget.utente.id)
             .map((element) => element.tipologia?.id).cast<String>()
             .toList();
       }
@@ -318,7 +328,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -328,6 +338,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         }
         setState(() {
           allUtenti = utenti;
+
           //if (widget.utente.cognome! == "Mazzei")
             //selectedUtente = widget.selectedUtente;//utenti.firstWhere((element) => element.id == widget.utente.id);
         });
@@ -360,7 +371,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -412,13 +423,12 @@ class _TableTaskPageState extends State<TableTaskPage>{
     try {
       // Decidi l'endpoint in base al cognome dell'utente
       var apiUrl = (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti")
-          ? Uri.parse('$ipaddress2/api/task/allattivi')
-          : Uri.parse('$ipaddress2/api/task/utente/' + widget.utente!.id!);
+          ? Uri.parse('$ipaddress/api/task/allattivi')
+          : Uri.parse('$ipaddress/api/task/utente/' + widget.utente!.id!);
       print('Chiamata API verso: $apiUrl');
       final response = await http.get(apiUrl);
       print('Risposta ricevuta con status code: ${response.statusCode}');
       if (response.statusCode == 200) {
-
         var jsonData = json.decode(utf8.decode(response.bodyBytes));
         print(response.body.toString()+' Dati ricevuti: ${jsonData.length} elementi trovati. '+jsonData.toString());
         List<TaskModel> commissioni = [];
@@ -437,14 +447,15 @@ class _TableTaskPageState extends State<TableTaskPage>{
                 .map((element) => element.tipologia?.id).cast<String>()
                 .toList();
           }
-          if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal)) tipoIdGlobal = int.parse(tipotaskpiene!.first);
+          if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal.toString())) tipoIdGlobal = int.parse(tipotaskpiene!.first);
           print('Tutte le commissioni assegnate a _allCommissioni: ${_allCommissioni.length} task.');
           // Applica il filtro iniziale per filteredCommissioni se l'utente è Mazzei
           //if (widget.utente.cognome! == "Mazzei") {
             print('Filtraggio per utente Mazzei con tipologia id = 9...');
             _filteredCommissioni = commissioni.where((task) {
               print('Task: ${task.titolo}, Tipologia: ${task.tipologia?.id}, Utente: ${task.utente?.cognome}');
-              return task.attivo == true && task.tipologia?.id! == tipoIdGlobal.toString() && (task.utente?.id! == selectedUtente!.id! || task.utentecreate?.id! == selectedUtente!.id!);
+              return task.attivo == true && task.tipologia?.id! == tipoIdGlobal.toString() && (task.utente?.id! == selectedUtente!.id! ||
+                  task.utentecreate?.id! == selectedUtente!.id!);
               //return task.tipologia?.id == "9" && task.utente?.cognome == "Mazzei";
             }).toList();
             print('Numero di task filtrati: ${_filteredCommissioni.length}');
@@ -452,13 +463,13 @@ class _TableTaskPageState extends State<TableTaskPage>{
             _filteredCommissioni = commissioni;
             print('Nessun filtro applicato, tutte le task assegnate a _filteredCommissioni.');
           }*/
-          if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+          if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true &&
+              !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
             tipotaskdaacc = _allCommissioni
                 .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
                 .map((element) => element.tipologia!.id).cast<String>()
                 .toList();
           }
-
           _filteredCommissioni.sort((a, b) {
             if (a.concluso! == b.concluso!) {
               return b.data_conclusione != null && a.data_conclusione != null ? b.data_conclusione!.compareTo(a.data_conclusione!) : -1;
@@ -588,7 +599,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        CestinoTaskPage(utente: widget.utente),
+                        CestinoTaskPage(utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,),
                   ),
                 );
               }) : Container(),
@@ -1353,7 +1364,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/tipoTask'),
+        Uri.parse('$ipaddress/api/tipoTask'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -1443,7 +1454,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
             .map((element) => element.tipologia?.id).cast<String>()
             .toList();
       }
-      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal)) tipoIdGlobal = int.parse(tipotaskpiene!.first);
+      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal.toString())) tipoIdGlobal = int.parse(tipotaskpiene!.first);
       // Filtra le commissioni in base all'ID dell'utente
       _filteredCommissioni = _allCommissioni.where((commissione) {
         final taskId = commissione.tipologia?.id?.toString(); // Converte l'ID del task in stringa
@@ -1563,7 +1574,7 @@ class TaskDataSource extends DataGridSource{
     //final formattedDate = _dataController.text.isNotEmpty ? _dataController  // Formatta la data in base al formatter creato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1604,7 +1615,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1645,7 +1656,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1685,7 +1696,7 @@ class TaskDataSource extends DataGridSource{
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1707,7 +1718,7 @@ class TaskDataSource extends DataGridSource{
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Task eliminato con successo!'.toUpperCase()),
+            content: Text('Task spostato in archivio!'.toUpperCase()),
           ),
         );
         /*Navigator.pushAndRemoveUntil(
@@ -1733,7 +1744,7 @@ class TaskDataSource extends DataGridSource{
 
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/task'),
+        Uri.parse('$ipaddress/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': task.id,
@@ -1776,8 +1787,8 @@ class TaskDataSource extends DataGridSource{
 
   Future<void> getAllTaskNO() async{
     try{
-      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress2/api/task/allattivi')
-          : Uri.parse('$ipaddress2/api/task/utente/'+utente.id!);
+      var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/allattivi')
+          : Uri.parse('$ipaddress/api/task/utente/'+utente.id!);
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -1875,16 +1886,17 @@ class TaskDataSource extends DataGridSource{
           ) : null;},
         );
       } else if (dataGridCell.columnName == 'delete') {
-        return IconButton(tooltip: 'CLICCA QUI PER ELIMINARE IL TASK',
+        return IconButton(tooltip: 'CLICCA QUI PER CESTINARE IL TASK',
           icon: Icon(Icons.delete, color: Colors.red, size: 27,),
           onPressed: () {
             showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: Text('ELIMINAZIONE TASK'),
+                  title: Text('ARCHIVIAZIONE TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER ELIMINARE IL TASK \"'+task.titolo!.toUpperCase()+'\" DALLA LISTA?'),
+                      'CONFERMI DI VOLER SPOSTARE IL TASK \"'+task.titolo!.toUpperCase()+'\" NEL CESTINO? POTRAI SUCCESSIVAMENTE '
+                          'RECUPERARE IL TASK DAL CESTINO E RIPRISTINARLO'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {

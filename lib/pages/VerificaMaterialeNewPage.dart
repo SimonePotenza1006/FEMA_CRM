@@ -57,7 +57,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress2/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         setState(() {
@@ -82,7 +82,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
       } else {
         final ddt = DDTModel.fromJson(jsonDecode(data.body));
         try{
-          final response = await http.get(Uri.parse('$ipaddress2/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+          final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
           var responseData = json.decode(response.body);
           if(response.statusCode == 200){
             List<RelazioneDdtProdottoModel> prodotti = [];
@@ -218,7 +218,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
         bool presenzaStorico = prodottiStoricoUtente.any((rel) => rel.prodotto?.id == prodotto.id) ? true : false;
         var DDT = prodottiDDT.any((rel) => rel.prodotto?.id == prodotto.id) ? ddt?.toMap() : null;
         final response = await http.post(
-          Uri.parse('$ipaddress2/api/relazioneProdottoIntervento'),
+          Uri.parse('$ipaddress/api/relazioneProdottoIntervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'prodotto': prodotto.toMap(),
@@ -398,7 +398,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
   Future<void> deleteRelazioneUtentiProdotti(int? relazioneId) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress2/api/relazioneUtentiProdotti/$relazioneId'),
+        Uri.parse('$ipaddress/api/relazioneUtentiProdotti/$relazioneId'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode != 200) {
@@ -413,7 +413,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/prodotto');
+      var apiUrl = Uri.parse('$ipaddress/api/prodotto');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -435,7 +435,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
 
   Future<void> getProdottiStoricoUtente() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/relazioneUtentiProdotti/utente/${widget.utente.id}');
+      var apiUrl = Uri.parse('$ipaddress/api/relazioneUtentiProdotti/utente/${widget.utente.id}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -535,7 +535,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
     for (var relazione in remainingProducts) {
       try {
         final response = await http.post(
-          Uri.parse('$ipaddress2/api/relazioneUtentiProdotti'),
+          Uri.parse('$ipaddress/api/relazioneUtentiProdotti'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data_creazione': DateTime.now().toIso8601String(),

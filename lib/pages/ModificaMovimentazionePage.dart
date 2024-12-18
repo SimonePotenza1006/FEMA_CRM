@@ -73,7 +73,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
         if(image.path.isNotEmpty){
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress2/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+            Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
           );
           request.files.add(
               await http.MultipartFile.fromPath(
@@ -367,7 +367,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -392,7 +392,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
     var cliente = selectedCliente != null ? selectedCliente?.toMap() : null;
     try{
       var response = await http.post(
-        Uri.parse('$ipaddress2/api/movimenti'),
+        Uri.parse('$ipaddress/api/movimenti'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
           'id' : widget.movimento.id,

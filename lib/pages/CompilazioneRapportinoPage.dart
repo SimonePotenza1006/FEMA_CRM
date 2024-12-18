@@ -509,7 +509,7 @@ class _CompilazioneRapportinoPageState
 
   Future<void> saveNota() async{
     try{
-      final response = await http.post(Uri.parse('$ipaddress2/api/noteTecnico'),
+      final response = await http.post(Uri.parse('$ipaddress/api/noteTecnico'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'utente' : widget.intervento.utente!.toMap(),
@@ -530,7 +530,7 @@ class _CompilazioneRapportinoPageState
   Future<void> saveIntervento() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -633,7 +633,7 @@ class _CompilazioneRapportinoPageState
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress2/api/immagine/${intervento}'),
+            Uri.parse('$ipaddress/api/immagine/${intervento}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -661,7 +661,7 @@ class _CompilazioneRapportinoPageState
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddress2/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
+          '$ipaddress/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
 
@@ -727,7 +727,7 @@ class _CompilazioneRapportinoPageState
 
   Future<void> getAllVeicoli() async {
     http.Response response =
-        await http.get(Uri.parse('$ipaddress2/api/veicolo'));
+        await http.get(Uri.parse('$ipaddress/api/veicolo'));
     var responseData = json.decode(response.body.toString());
     if (response.statusCode == 200) {
       List<VeicoloModel> veicoli = [];

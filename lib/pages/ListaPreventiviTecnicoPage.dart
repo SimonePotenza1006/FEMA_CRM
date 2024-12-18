@@ -277,7 +277,7 @@ class _ListaPreventiviTecnicoPageState
       await findAgente();
       String? agenteId = agente?.id;
       http.Response response = await http
-          .get(Uri.parse('$ipaddress2/api/preventivo/ordered'));
+          .get(Uri.parse('$ipaddress/api/preventivo/ordered'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<PreventivoModel> allPreventiviByAgente = [];
@@ -306,7 +306,7 @@ class _ListaPreventiviTecnicoPageState
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

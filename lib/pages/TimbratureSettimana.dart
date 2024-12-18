@@ -687,7 +687,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
 
   Future<void> getAllMarcatempo() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/marcatempo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/marcatempo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -743,7 +743,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
         if (true){//tipoTimbratura == "INGRESSO") {
           print(DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String()+' '+DateTime.now().toIso8601String());
           final response = await http.post(
-            Uri.parse('$ipaddress2/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : row.idmt,
@@ -764,7 +764,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
             }),
           ).then((value) async {
             if (row.idmt2 != null) { final response = await http.post(
-              Uri.parse('$ipaddress2/marcatempo'),
+              Uri.parse('$ipaddress/marcatempo'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'id' : row.idmt2,
@@ -785,7 +785,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
               }),
             );} else if (row.oraIngresso2 != null) {
               final response = await http.post(
-                Uri.parse('$ipaddress2/marcatempo'),
+                Uri.parse('$ipaddress/marcatempo'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode({
                   'id' : '',
@@ -823,7 +823,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress2/marcatempo'),
+            Uri.parse('$ipaddress/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,
@@ -866,7 +866,7 @@ class _TimbratureSettimanaState extends State<TimbratureSettimana> {
 
   Future<void> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];

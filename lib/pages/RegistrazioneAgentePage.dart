@@ -53,7 +53,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
   }
 
   Future<void> createAgente() async {
-    final url = Uri.parse('$ipaddress2/api/agente');
+    final url = Uri.parse('$ipaddress/api/agente');
     final body = jsonEncode({
       'nome': nomeController.text.toString(),
       'cognome': cognomeController.text.toString(),
@@ -89,7 +89,7 @@ class _RegistrazioneAgentePageState extends State<RegistrazioneAgentePage> {
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/azienda');
+      var apiUrl = Uri.parse('$ipaddress/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

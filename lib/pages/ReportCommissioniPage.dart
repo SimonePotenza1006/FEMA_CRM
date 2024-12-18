@@ -127,7 +127,7 @@ class _ReportCommissioniPageState extends State<ReportCommissioniPage> {
 
   Future<void> getAllCommissioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/commissione/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/commissione/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

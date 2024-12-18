@@ -36,7 +36,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   Future<void> getPosizioni() async{
     try{
       final response = await http.get(
-        Uri.parse('$ipaddress2/api/posizioni/cliente/${widget.cliente.id}'));
+        Uri.parse('$ipaddress/api/posizioni/cliente/${widget.cliente.id}'));
         var responseData = json.decode(response.body);
         if(response.statusCode == 200){
           List<PosizioneGPSModel> posizioni = [];
@@ -265,7 +265,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   Future<void> deleteCliente(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress2/api/cliente/$id'),
+        Uri.parse('$ipaddress/api/cliente/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

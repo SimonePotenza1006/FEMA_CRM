@@ -30,7 +30,7 @@ class _StoricoMerciUtentiPageState extends State<StoricoMerciUtentiPage> {
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -58,7 +58,7 @@ class _StoricoMerciUtentiPageState extends State<StoricoMerciUtentiPage> {
 
   Future<void> getAllProdottiForUtente(String utenteId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/relazioneUtentiProdotti/utente/$utenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/relazioneUtentiProdotti/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

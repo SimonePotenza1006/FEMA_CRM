@@ -127,7 +127,7 @@ class _ModificaDestinazionePageState extends State<ModificaDestinazionePage> {
     late http.Response response;
     try {
       print('${widget.destinazione.toJson()}');
-      response = await http.post(Uri.parse('$ipaddress2/api/destinazione'),
+      response = await http.post(Uri.parse('$ipaddress/api/destinazione'),
           headers: {
             "Content-Type": "application/json"
           },

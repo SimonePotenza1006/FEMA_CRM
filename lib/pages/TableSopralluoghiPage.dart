@@ -51,7 +51,7 @@ class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -72,7 +72,7 @@ class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -102,7 +102,7 @@ class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -123,7 +123,7 @@ class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
 
   Future<void> getAllSopralluoghi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/sopralluogo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/sopralluogo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

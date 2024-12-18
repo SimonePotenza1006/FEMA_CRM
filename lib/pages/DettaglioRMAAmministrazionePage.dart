@@ -51,7 +51,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
 
   /*Future<http.Response?> getIntervento() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/restituzioneMerce/${int.parse(widget.merce.id.toString())}');
+      var apiUrl = Uri.parse('$ipaddress/api/restituzioneMerce/${int.parse(widget.merce.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
@@ -86,7 +86,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
       var decodedData = jsonDecode(data.body);
       var interventoData = decodedData[0]; // Adjusted here
       InterventoModel intervento = InterventoModel.fromJson(interventoData);*/ // Adjusted here
-      final url = '$ipaddress2/api/immagine/restituzioneMerce/${widget.merce.id.toString()}/images';
+      final url = '$ipaddress/api/immagine/restituzioneMerce/${widget.merce.id.toString()}/images';
       http.Response? response;
       try {
         response = await http.get(Uri.parse(url));
@@ -133,7 +133,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -496,7 +496,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -532,7 +532,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaDataRicon() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -590,7 +590,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('$ipaddress2/api/restituzioneMerce'),
+                              Uri.parse('$ipaddress/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -660,7 +660,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
                           });
                           try{
                             final response = await http.post(
-                              Uri.parse('$ipaddress2/api/restituzioneMerce'),
+                              Uri.parse('$ipaddress/api/restituzioneMerce'),
                               headers: {'Content-Type': 'application/json'},
                               body: jsonEncode({
                                 'id': widget.merce.id.toString(),
@@ -708,7 +708,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaDataRientro() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -743,7 +743,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaRimborso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -778,7 +778,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaCambio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),
@@ -813,7 +813,7 @@ class _DettaglioRMAAmministrazionePageState extends State<DettaglioRMAAmministra
   void modificaConcluso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/restituzioneMerce'),
+        Uri.parse('$ipaddress/api/restituzioneMerce'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id.toString(),

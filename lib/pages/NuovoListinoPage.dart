@@ -87,7 +87,7 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
 
   Future<void> createNewListino(String descrizione, double prezzo,
       CategoriaInterventoSpecificoModel categoria) async {
-    final url = Uri.parse('$ipaddress2/api/listino');
+    final url = Uri.parse('$ipaddress/api/listino');
     final body = jsonEncode({
       'descrizione': descrizione,
       'prezzo': prezzo,

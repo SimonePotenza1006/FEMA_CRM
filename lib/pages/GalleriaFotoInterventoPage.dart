@@ -28,7 +28,7 @@ class _GalleriaFotoInterventoPageState extends State<GalleriaFotoInterventoPage>
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress2/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));

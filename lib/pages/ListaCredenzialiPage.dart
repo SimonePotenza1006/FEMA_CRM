@@ -33,7 +33,7 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
 
   Future<void> init() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/credenziali');
+      var apiUrl = Uri.parse('$ipaddress/api/credenziali');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

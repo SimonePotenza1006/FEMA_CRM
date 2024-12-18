@@ -83,7 +83,7 @@ class _ReportOrdiniPerUtentePageState extends State<ReportOrdiniPerUtentePage>{
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);
@@ -127,7 +127,7 @@ class _ReportOrdiniPerUtentePageState extends State<ReportOrdiniPerUtentePage>{
 
   Future<void> getAllOrdiniForUtente(String utenteId) async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/ordine/utente/$utenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/ordine/utente/$utenteId');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(response.body);

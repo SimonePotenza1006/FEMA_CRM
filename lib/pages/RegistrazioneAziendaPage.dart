@@ -60,7 +60,7 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   }
 
   Future<void> createAzienda() async {
-    final url = Uri.parse('$ipaddress2/api/azienda');
+    final url = Uri.parse('$ipaddress/api/azienda');
     final body = jsonEncode({
       'nome': denominazioneController.text.toString(),
       'luogo_di_lavoro': luogoLavoroController.text.toString(),

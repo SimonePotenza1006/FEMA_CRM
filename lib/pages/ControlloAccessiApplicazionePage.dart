@@ -30,7 +30,7 @@ class _ControlloAccessiApplicazionePageState extends State<ControlloAccessiAppli
 
   Future<void> getAllIngressiForUtente(String utenteId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/ingresso/utente/$utenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/ingresso/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -57,7 +57,7 @@ class _ControlloAccessiApplicazionePageState extends State<ControlloAccessiAppli
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

@@ -145,7 +145,7 @@ class _ScannerQrCodeAmministrazionePageState
     print(lottoSeriale);
     print(codiceDanea);
 
-    String apiUrl = '$ipaddress2/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
+    String apiUrl = '$ipaddress/api/prodotto/DDT/$codiceDanea/$lottoSeriale';
     final response =
         await http.get(Uri.parse(apiUrl)).timeout(Duration(seconds: 10));
 

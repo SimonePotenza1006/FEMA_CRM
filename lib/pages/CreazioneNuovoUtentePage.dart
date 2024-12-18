@@ -235,7 +235,7 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
   Future<void> saveUtente() async {
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress2/api/utente'),
+          Uri.parse('$ipaddress/api/utente'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -263,7 +263,7 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -299,7 +299,7 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
 
   Future<void> getAllRuoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/ruolo');
+      var apiUrl = Uri.parse('$ipaddress/api/ruolo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

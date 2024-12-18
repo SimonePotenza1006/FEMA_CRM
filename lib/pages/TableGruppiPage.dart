@@ -47,7 +47,7 @@ class _TableGruppiPageState extends State<TableGruppiPage>{
 
   Future<void> getAllGruppi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/gruppi');
+      var apiUrl = Uri.parse('$ipaddress/api/gruppi');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -263,7 +263,7 @@ class GruppoDataSource extends DataGridSource{
 
   Future<List<InterventoModel>> getInterventiByGruppo(String gruppoId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/intervento/gruppo/$gruppoId');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/$gruppoId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -352,7 +352,7 @@ class GruppoDataSource extends DataGridSource{
   Future<void> saveImporto(GruppoInterventiModel gruppo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/gruppi'),
+        Uri.parse('$ipaddress/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': gruppo.id,

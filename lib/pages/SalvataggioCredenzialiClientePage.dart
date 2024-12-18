@@ -196,7 +196,7 @@ class _SalvataggioCredenzialiClientePageState extends State<SalvataggioCredenzia
     late http.Response response;
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/credenziali'),
+        Uri.parse('$ipaddress/api/credenziali'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -250,7 +250,7 @@ class _SalvataggioCredenzialiClientePageState extends State<SalvataggioCredenzia
           // Usa `fromBytes` al posto di `fromPath` per inviare `Uint8List`
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress2/api/immagine/credenziali/${credenziali.id}'),
+            Uri.parse('$ipaddress/api/immagine/credenziali/${credenziali.id}'),
           );
           request.files.add(
             http.MultipartFile.fromBytes(

@@ -48,7 +48,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -71,7 +71,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
 
   Future<void> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -226,7 +226,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
   }
 
   Future<void> createMerce() async{
-    final url = Uri.parse('$ipaddress2/api/merceInRiparazione');
+    final url = Uri.parse('$ipaddress/api/merceInRiparazione');
     final body = jsonEncode({
       'data' : DateTime.now().toIso8601String(),
       'articolo' : _articoloController.text,
@@ -306,7 +306,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
   //         print('Percorso del file: ${image.path}');
   //         var request = http.MultipartRequest(
   //           'POST',
-  //           Uri.parse('$ipaddress2/api/immagine/merce'),
+  //           Uri.parse('$ipaddress/api/immagine/merce'),
   //         );
   //         // Provide field name and file path to fromPath constructor
   //         request.files.add(

@@ -57,7 +57,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
 
   Future<void> getAllPrelievi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/movimenti');
+      var apiUrl = Uri.parse('$ipaddress/api/movimenti');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

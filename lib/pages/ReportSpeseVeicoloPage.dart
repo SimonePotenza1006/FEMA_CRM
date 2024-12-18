@@ -195,7 +195,7 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
 
   Future<void> getAllTipologieSpesa() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaSpesaVeicolo');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaSpesaVeicolo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -235,7 +235,7 @@ class _ReportSpeseVeicoloPageState extends State<ReportSpeseVeicoloPage> {
 
   Future<void> getAllSpese() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/spesaVeicolo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/spesaVeicolo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

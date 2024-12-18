@@ -35,7 +35,7 @@ class _ListaClientiPageState extends State<ListaClientiPage> {
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];

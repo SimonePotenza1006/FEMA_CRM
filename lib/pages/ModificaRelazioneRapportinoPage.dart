@@ -88,7 +88,7 @@ class _ModificaRelazioneRapportinoPageState extends State<ModificaRelazioneRappo
   Future<void> saveIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,

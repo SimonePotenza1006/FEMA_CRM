@@ -85,7 +85,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -106,7 +106,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllTipologie() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -127,7 +127,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllClienti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress2/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -148,7 +148,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<void> getAllGruppi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress2/api/gruppi/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/gruppi/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -181,7 +181,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
     try {
       while (!allDataLoaded) {
-        var apiUrl = Uri.parse('$ipaddress2/api/intervento/paged?page=$currentPage&size=$size');
+        var apiUrl = Uri.parse('$ipaddress/api/intervento/paged?page=$currentPage&size=$size');
         print('Chiamata API alla pagina $currentPage con size $size');
         var response = await http.get(apiUrl);
 
@@ -242,7 +242,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
 
   Future<List<RelazioneUtentiInterventiModel>> getRelazioni(int interventoId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress2/api/relazioneUtentiInterventi/intervento/$interventoId'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/$interventoId'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -1395,7 +1395,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   Future<void> saveGruppo() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress2/api/gruppi'),
+          Uri.parse('$ipaddress/api/gruppi'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1931,7 +1931,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> addToGruppo(InterventoModel intervento) async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -1985,7 +1985,7 @@ class InterventoDataSource extends DataGridSource {
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -2046,7 +2046,7 @@ class InterventoDataSource extends DataGridSource {
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
