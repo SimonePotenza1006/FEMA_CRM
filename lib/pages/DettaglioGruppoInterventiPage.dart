@@ -23,7 +23,7 @@ class DettaglioGruppoInterventiPage extends StatefulWidget {
 
 class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoInterventiPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<InterventoModel> filteredInterventi = [];
   List<InterventoModel> allInterventi = [];
   bool isLoading = true;

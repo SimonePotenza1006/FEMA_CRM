@@ -19,7 +19,9 @@ class ListaSopralluoghiTecnicoPage extends StatefulWidget{
 
 class _ListaSopralluoghiTecnicoPageState extends State<ListaSopralluoghiTecnicoPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   List<SopralluogoModel> sopralluoghiList = [];
   List<SopralluogoModel> originalSopralluoghiList = [];
   TextEditingController _searchController = TextEditingController();

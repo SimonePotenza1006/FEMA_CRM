@@ -32,7 +32,7 @@ class _TimbraturaPageState extends State<TimbraturaPage> {
   bool _isSigned = false;
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String dataOdierna = DateFormat('dd-MM-yyyy, HH:mm').format(DateTime.now()).toString();
   late String nomeUtente = "${widget.utente.nome} ${widget.utente.cognome}";
   String tipoTimbratura = "";

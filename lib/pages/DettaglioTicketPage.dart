@@ -38,6 +38,8 @@ class DettaglioTicketPage extends StatefulWidget{
 class _DettaglioTicketPageState extends State<DettaglioTicketPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   Future<List<Uint8List>>? _futureImages;
   bool conversioneIntervento = false;
   bool conversioneTask = false;

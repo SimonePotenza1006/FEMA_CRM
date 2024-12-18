@@ -16,7 +16,7 @@ class ListaNoteUtentiPage extends StatefulWidget {
 
 class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<NotaTecnicoModel> allNote = [];
   List<NotaTecnicoModel> allNoteByUtente = [];
   List<UtenteModel> allUtenti = [];

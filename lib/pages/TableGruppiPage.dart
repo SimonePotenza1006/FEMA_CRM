@@ -24,7 +24,7 @@ class TableGruppiPage extends StatefulWidget{
 
 class _TableGruppiPageState extends State<TableGruppiPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late GruppoDataSource _dataSource;
   List<GruppoInterventiModel> allGruppi =[];
   Map<String, double> _columnWidths = {

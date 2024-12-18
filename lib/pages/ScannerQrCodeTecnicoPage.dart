@@ -30,7 +30,7 @@ class _ScannerQrCodeTecnicoPageState extends State<ScannerQrCodeTecnicoPage> {
   String qrData = "";
   List<ProdottoModel> prodottiDaAggiungere = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {

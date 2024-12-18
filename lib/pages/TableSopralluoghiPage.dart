@@ -21,7 +21,7 @@ class TableSopralluoghiPage extends StatefulWidget{
 
 class _TableSopralluoghiPageState extends State<TableSopralluoghiPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late SopralluogoDataSource _dataSource;
   List<SopralluogoModel> sopralluoghiList = [];
   List<UtenteModel> utentiList =[];

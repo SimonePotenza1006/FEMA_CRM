@@ -49,6 +49,7 @@ dependencies:
   email_sender: ^1.3.3
   url_launcher: ^6.0.12
   email_validator: ^2.0.1
+  bottom_navy_bar: ^6.0.0
   http:
   dropdown_search: ^5.0.2
   image_picker: ^0.8.4+3

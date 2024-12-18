@@ -54,7 +54,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy'); // Formato della data
   final DateFormat timeFormat = DateFormat('HH:mm');
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<NotaTecnicoModel> allNote = [];
   List<RelazioneDdtProdottoModel> prodotti = [];
   List<RelazioneUtentiInterventiModel> otherUtenti = [];

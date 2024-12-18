@@ -25,6 +25,8 @@ class DettaglioSpesaFornitorePage extends StatefulWidget{
 class _DettaglioSpesaFornitorePageState extends State<DettaglioSpesaFornitorePage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   List<XFile> pickedImages =  [];
   Future<List<Uint8List>>? _futureImages;
 

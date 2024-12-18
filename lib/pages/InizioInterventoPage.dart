@@ -20,7 +20,7 @@ class InizioInterventoPage extends StatefulWidget {
 class _InizioInterventoPageState extends State<InizioInterventoPage> {
   late String _gps;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   TextEditingController _gpsController = TextEditingController();
   TextEditingController _notaClienteController = TextEditingController();
   TextEditingController _notaDestinazioneController = TextEditingController();

@@ -32,7 +32,7 @@ class PDFInterventoPage extends StatefulWidget {
 class _PDFInterventoPageState extends State<PDFInterventoPage> {
   late Future<Uint8List> _pdfFuture;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {

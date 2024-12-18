@@ -18,7 +18,7 @@ class DettaglioStoricoMerceUtentePage extends StatefulWidget{
 
 class _DettaglioStoricoMerceUtentePageState extends State<DettaglioStoricoMerceUtentePage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<RelazioneUtentiProdottiModel> allRelazioni = [];
 
   @override

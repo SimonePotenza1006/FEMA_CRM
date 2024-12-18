@@ -25,7 +25,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
   bool _isFilterButtonPressed =
       false; // New variable to manage filter and download button state
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {

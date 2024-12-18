@@ -19,7 +19,7 @@ class _NuovoListinoPageState extends State<NuovoListinoPage> {
   final _descrizioneController = TextEditingController();
   final _prezzoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   Widget build(BuildContext context) {

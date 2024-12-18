@@ -24,7 +24,7 @@ class PreventivoServiziPage extends StatefulWidget{
 
 class _PreventivoServiziPageState extends State<PreventivoServiziPage> with WidgetsBindingObserver{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   final _formKey = GlobalKey<FormState>();
   List<AziendaModel> allAziende = [];
   AziendaModel? selectedAzienda;

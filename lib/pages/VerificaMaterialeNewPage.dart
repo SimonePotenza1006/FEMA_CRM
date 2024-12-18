@@ -27,7 +27,7 @@ class _VerificaMaterialeNewPageState extends State<VerificaMaterialeNewPage> {
 
   bool isLoading = true;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<ProdottoModel> allProdotti = [];
   late List<TextEditingController> quantityControllersProdotti;
   List<TextEditingController> serialControllersProdotti = [];

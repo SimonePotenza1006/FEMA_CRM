@@ -21,7 +21,7 @@ class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage> {
   DbHelper? dbHelper;
   List<DestinazioneModel> allDestinazioni = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   Widget build(BuildContext context) {

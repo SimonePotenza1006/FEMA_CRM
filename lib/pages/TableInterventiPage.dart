@@ -27,6 +27,10 @@ class TableInterventiPage extends StatefulWidget {
 class _TableInterventiPageState extends State<TableInterventiPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   List<InterventoModel> _allInterventi = [];
   List<InterventoModel> _filteredInterventi = [];
   List<ClienteModel> clientiList = [];
@@ -1381,7 +1385,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                   },
                 );
               },
-              child: Icon(Icons.filter_list, color: Colors.white,),
+              child: Icon(Icons.filter_alt_sharp, color: Colors.white,),
               backgroundColor: Colors.red,
             ),
             SizedBox(height: 45),
@@ -1427,6 +1431,8 @@ class InterventoDataSource extends DataGridSource {
   TextEditingController codiceDaneaController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   GruppoInterventiModel? _selectedGruppo;
   List<GruppoInterventiModel> filteredGruppi = [];
   List<GruppoInterventiModel> allGruppiConclusi = [];
@@ -1942,6 +1948,7 @@ class InterventoDataSource extends DataGridSource {
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': intervento.importo_intervento,
           'saldo_tecnico' : intervento.saldo_tecnico,
           'prezzo_ivato' : intervento.prezzo_ivato,
@@ -1996,6 +2003,7 @@ class InterventoDataSource extends DataGridSource {
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
+          'utente_importo' : utente.nomeCompleto(),
           'importo_intervento': double.parse(importoController.text),
           'saldo_tecnico' : intervento.saldo_tecnico,
           'prezzo_ivato' : prezzoIvato,

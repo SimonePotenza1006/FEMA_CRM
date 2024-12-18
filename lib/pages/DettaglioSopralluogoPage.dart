@@ -26,7 +26,7 @@ class DettaglioSopralluogoPage extends StatefulWidget {
 class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
   XFile? pickedImage;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<List<Uint8List>>? _futureImages;
   List<XFile> pickedImages =  [];
   List<TipologiaInterventoModel> tipologieList = [];

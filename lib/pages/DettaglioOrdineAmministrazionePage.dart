@@ -23,7 +23,7 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   List<FornitoreModel> allFornitori = [];
   List<FornitoreModel> filteredFornitori = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {

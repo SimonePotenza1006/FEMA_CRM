@@ -21,7 +21,9 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   final TextEditingController sitoController = TextEditingController();
   final TextEditingController telefonoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
 
 
 

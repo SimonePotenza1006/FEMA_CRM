@@ -23,7 +23,7 @@ class _DettaglioClientePageState extends State<DettaglioClientePage> {
   List<ClienteModel> allClienti = [];
   List<PosizioneGPSModel> allPosizioni = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   @override
   void initState() {

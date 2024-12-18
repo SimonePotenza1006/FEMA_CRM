@@ -23,7 +23,7 @@ class _DettaglioListinoPageState extends State<DettaglioListinoPage> {
   DbHelper? dbHelper;
   List<CategoriaPrezzoListinoModel> allListiniForCategoria = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   bool isLoading = true;
 
   @override
