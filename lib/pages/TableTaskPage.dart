@@ -159,6 +159,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
         allTipi.remove(selectedTipoToDelete);
         getAllTipi();
         getAllTask();
+
       } else {
         print('Errore nell\'eliminazione della tipologia "${selectedTipoToDelete.descrizione}": '
             '${response.statusCode} - ${response.body}');
@@ -191,6 +192,10 @@ class _TableTaskPageState extends State<TableTaskPage>{
             content: Text('Tipologia Task rinominato con successo!'.toUpperCase()),
           ),
         );
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => TableTaskPage(
+              utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,)));
         /*Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => TableTaskPage(
@@ -1139,11 +1144,15 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                 'Scegliere una tipologia da eliminare'.toUpperCase(),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              content: Column(
+                              content: SingleChildScrollView( // Aggiungi SingleChildScrollView qui
+                            child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: allTipi.map((tipo) {
                                   return RadioListTile<TipoTaskModel>(
-                                    title: Text(tipo.descrizione!.toUpperCase()),
+                                    title: Text(tipo.descrizione!.toUpperCase(),
+                                        softWrap: true,
+                                        overflow: TextOverflow.ellipsis,
+                                    ),
                                     value: tipo,
                                     groupValue: selectedTipoToDelete,
                                     onChanged: (TipoTaskModel? value) {
@@ -1153,7 +1162,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                     },
                                   );
                                 }).toList(),
-                              ),
+                              )),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: selectedTipoToDelete == null
