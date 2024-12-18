@@ -56,7 +56,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<NotaTecnicoModel> allNote = [];
   List<RelazioneDdtProdottoModel> prodotti = [];
   List<RelazioneUtentiInterventiModel> otherUtenti = [];
@@ -105,6 +105,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,  // Using potentially updated descrizione
+          'utente_importo' : widget.intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,  // Using potentially updated importo
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato': widget.intervento.prezzo_ivato,
@@ -418,6 +419,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
           'orario_inizio': DateTime.now().toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : widget.intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,

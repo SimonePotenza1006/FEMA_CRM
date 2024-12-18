@@ -14,6 +14,7 @@ import '../model/InterventoModel.dart';
 import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneInterventoByAmministrazionePage.dart';
+import 'DettaglioInterventoNewPageAndroid.dart';
 import 'ListaClientiPage.dart';
 
 class TableInterventiPage extends StatefulWidget {
@@ -28,7 +29,7 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<InterventoModel> _allInterventi = [];
   List<InterventoModel> _filteredInterventi = [];
   List<ClienteModel> clientiList = [];
@@ -1430,7 +1431,7 @@ class InterventoDataSource extends DataGridSource {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   GruppoInterventiModel? _selectedGruppo;
   List<GruppoInterventiModel> filteredGruppi = [];
   List<GruppoInterventiModel> allGruppiConclusi = [];
@@ -2062,6 +2063,7 @@ class InterventoDataSource extends DataGridSource {
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': intervento.importo_intervento,
           'saldo_tecnico' : intervento.saldo_tecnico,
           'prezzo_ivato' : intervento.prezzo_ivato,
@@ -2189,12 +2191,21 @@ class InterventoDataSource extends DataGridSource {
           } else {
             return GestureDetector(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : utente),
-                  ),
-                );
+                if(Platform.isWindows){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : utente),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente : utente),
+                    ),
+                  );
+                }
               },
               child: Container(
                 alignment: Alignment.center,

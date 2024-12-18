@@ -48,7 +48,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<UtenteModel> allUtenti = [];
   UtenteModel? selectedUtenteSegreteria;
 
@@ -839,6 +839,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'orario_inizio': DateTime.now().toIso8601String(),
           'orario_fine': DateTime.now().toIso8601String(),
           'descrizione': _descrizioneController.text,
+          'utente_importo' : widget.utente.nomeCompleto(),
           'importo_intervento': totaleVendita,
           'saldo_tecnico' : null,
           'prezzo_ivato' : null,

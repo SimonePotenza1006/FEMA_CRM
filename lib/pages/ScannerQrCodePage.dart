@@ -32,7 +32,7 @@ class _ScannerQrCodePageState extends State<ScannerQrCodePage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {

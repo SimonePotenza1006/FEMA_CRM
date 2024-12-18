@@ -30,7 +30,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<InterventoModel> _allInterventi = [];
   List<InterventoModel> _filteredInterventi = [];
   TextEditingController importoController = TextEditingController();
@@ -553,7 +553,7 @@ class InterventoDataSource extends DataGridSource{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   InterventoModel? _selectedIntervento;
   TextEditingController codiceDaneaController = TextEditingController();
 
@@ -751,6 +751,7 @@ class InterventoDataSource extends DataGridSource{
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': intervento.importo_intervento,
           'saldo_tecnico' : intervento.saldo_tecnico,
           'prezzo_ivato' : intervento.prezzo_ivato,

@@ -2567,6 +2567,14 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                         )
                       ],
                     ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                        title: 'Inserito da',
+                        value: intervento.utente_importo ?? "//", // Usa la funzione per calcolare il valore del prezzo ivato
+                        context: context,
+                      ),
+                    ),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children:[
@@ -3428,6 +3436,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : widget.intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
@@ -3490,6 +3499,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': descrizioneController.text.toUpperCase(),
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
@@ -4261,6 +4271,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico': widget.intervento.saldo_tecnico,
           'prezzo_ivato': widget.intervento.prezzo_ivato,
@@ -4371,6 +4382,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : double.tryParse(saldoController.text),
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
@@ -4565,6 +4577,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : widget.utente.nomeCompleto(),
           'importo_intervento': double.tryParse(importo),
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : prezzoIvato,
@@ -4732,6 +4745,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': descrizione,  // Using potentially updated descrizione
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,  // Using potentially updated importo
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato': widget.intervento.prezzo_ivato,
@@ -5081,6 +5095,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
@@ -5155,6 +5170,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,

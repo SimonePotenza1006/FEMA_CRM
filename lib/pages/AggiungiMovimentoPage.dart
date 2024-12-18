@@ -44,7 +44,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   ClienteModel? selectedCliente;
   List<ClienteModel> clientiList = [];
   List<ClienteModel> filteredClientiList = [];
@@ -1022,6 +1022,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),
           'orario_fine': selectedIntervento?.orario_fine?.toIso8601String(),
           'descrizione': selectedIntervento?.descrizione,
+          'utente_importo' : selectedIntervento?.utente_importo,
           'importo_intervento': selectedIntervento?.importo_intervento,
           'saldo_tecnico': selectedIntervento?.saldo_tecnico,
           'prezzo_ivato' : selectedIntervento?.prezzo_ivato,
@@ -1081,6 +1082,7 @@ class _AggiungiMovimentoPageState extends State<AggiungiMovimentoPage> {
           'orario_inizio': selectedIntervento?.orario_inizio?.toIso8601String(),
           'orario_fine': selectedIntervento?.orario_fine?.toIso8601String(),
           'descrizione': selectedIntervento?.descrizione,
+          'utente_importo' : selectedIntervento?.utente_importo,
           'importo_intervento': selectedIntervento?.importo_intervento,
           'saldo_tecnico' : selectedIntervento?.saldo_tecnico,
           'prezzo_ivato' : selectedIntervento?.prezzo_ivato,

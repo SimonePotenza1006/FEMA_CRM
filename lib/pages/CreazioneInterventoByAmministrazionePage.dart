@@ -35,7 +35,7 @@ class _CreazioneInterventoByAmministrazionePageState
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   CategoriaInterventoSpecificoModel? selectedCategoria;
   List<TipologiaInterventoModel> allTipologie = [];
   DateTime _dataOdierna = DateTime.now();
@@ -1352,6 +1352,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'orario_inizio': null,
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
+            'utente_importo' : null,
             'importo_intervento': null,
             'saldo_tecnico': null,
             'prezzo_ivato': null,
@@ -1530,6 +1531,7 @@ class _CreazioneInterventoByAmministrazionePageState
             'orario_inizio': null,
             'orario_fine': null,
             'descrizione': _descrizioneController.text,
+            'utente_importo' : null,
             'importo_intervento': null,
             'saldo_tecnico' : null,
             'prezzo_ivato' : null,

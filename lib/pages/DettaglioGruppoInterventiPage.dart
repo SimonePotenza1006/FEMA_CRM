@@ -25,7 +25,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<InterventoModel> filteredInterventi = [];
   List<InterventoModel> allInterventi = [];
   bool isLoading = true;
@@ -151,6 +151,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
+          'utente_importo' : widget.utente.nomeCompleto(),
           'importo_intervento': double.parse(importoController.text),
           'saldo_tecnico' : intervento.saldo_tecnico,
           'prezzo_ivato' : intervento.prezzo_ivato,

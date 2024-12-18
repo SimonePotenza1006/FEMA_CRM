@@ -40,7 +40,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-  String ipaddressProva2 = 'http://192.168.1.198:8095';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<ProdottoModel> allProdotti = [];
   List<ProdottoModel> filteredProdotti = [];
   List<ProdottoModel> selectedProdotti = [];
@@ -1155,6 +1155,7 @@ class _DettaglioMerceInRiparazioneByTecnicoPageState
           'orario_inizio': fasiRiparazione.first.data?.toIso8601String(),
           'orario_fine': DateTime.now().toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : widget.intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,
