@@ -22,8 +22,8 @@ class _MenuSceltaSaldoPageState extends State<MenuSceltaSaldoPage> {
   TextEditingController saldoController = TextEditingController(); // Controller for TextFormField
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +190,7 @@ class _MenuSceltaSaldoPageState extends State<MenuSceltaSaldoPage> {
     var importo = saldoController.text.isNotEmpty ? double.tryParse(saldoController.text.toString()) : null;
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddress2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),

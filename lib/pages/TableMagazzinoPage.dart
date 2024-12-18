@@ -17,6 +17,8 @@ class TableMagazzinoPage extends StatefulWidget{
 class _TableMagazzinoPageState extends State<TableMagazzinoPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<ProdottoModel> _allProdotti = [];
   List<ProdottoModel> _filteredProdotti = [];
   late ProdottoDataSource _dataSource;
@@ -110,7 +112,7 @@ class _TableMagazzinoPageState extends State<TableMagazzinoPage>{
 
   Future<void> getProdotti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/prodotto');
+      var apiUrl = Uri.parse('$ipaddress2/api/prodotto');
       print('Fetching products from: $apiUrl');
 
       var response = await http.get(apiUrl);

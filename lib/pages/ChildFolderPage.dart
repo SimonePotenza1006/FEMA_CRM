@@ -19,8 +19,8 @@ class ChildFolderPage extends StatefulWidget {
 class _ChildFolderPageState extends State<ChildFolderPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<CartellaModel> allCartelle = [];
   List<bool> _hoverStates = [];
   Future<List<Map<String, dynamic>>>? _futureImages;
@@ -39,7 +39,7 @@ class _ChildFolderPageState extends State<ChildFolderPage> {
   }
 
   Future<List<Map<String, dynamic>>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/cartella/${int.parse(widget.cartella.id.toString())}/images';
+    final url = '$ipaddress2/api/immagine/cartella/${int.parse(widget.cartella.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -69,7 +69,7 @@ class _ChildFolderPageState extends State<ChildFolderPage> {
 
   Future<void> getAllCartelle() async {
     try {
-      var apiUrl = Uri.parse("$ipaddress/api/cartella/parent/${int.parse(widget.cartella.id.toString())}");
+      var apiUrl = Uri.parse("$ipaddress2/api/cartella/parent/${int.parse(widget.cartella.id.toString())}");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -129,7 +129,7 @@ class _ChildFolderPageState extends State<ChildFolderPage> {
   Future<void> deletePic(int immagineId) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/immagine/$immagineId'),
+        Uri.parse('$ipaddress2/api/immagine/$immagineId'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode != 200) {
@@ -152,7 +152,7 @@ class _ChildFolderPageState extends State<ChildFolderPage> {
   Future<void> createCartella(String? name) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/cartella'),
+        Uri.parse('$ipaddress2/api/cartella'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'nome': name.toString(),
@@ -195,7 +195,7 @@ class _ChildFolderPageState extends State<ChildFolderPage> {
   void _uploadFiles(List<PlatformFile> files) async {
     // Create a multipart request to upload the files
     final cartella = widget.cartella.id;
-    final request = http.MultipartRequest('POST', Uri.parse('$ipaddress/api/immagine/cartella/$cartella'));
+    final request = http.MultipartRequest('POST', Uri.parse('$ipaddress2/api/immagine/cartella/$cartella'));
     request.fields['cartella'] = cartella.toString();
     for (var file in files) {
       final fileStream = File(file.path!).openRead();

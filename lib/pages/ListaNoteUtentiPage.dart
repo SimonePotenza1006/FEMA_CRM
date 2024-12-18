@@ -17,6 +17,8 @@ class ListaNoteUtentiPage extends StatefulWidget {
 class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<NotaTecnicoModel> allNote = [];
   List<NotaTecnicoModel> allNoteByUtente = [];
   List<UtenteModel> allUtenti = [];
@@ -60,7 +62,7 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
 
   Future<void> getAllNoteByUtente(int utenteId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/utente/$utenteId');
+      var apiUrl = Uri.parse('$ipaddress2/api/noteTecnico/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> noteByUtente = [];
@@ -80,7 +82,7 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddress2/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -101,7 +103,7 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
 
   Future<void> getAllNote() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/ordered');
+      var apiUrl = Uri.parse('$ipaddress2/api/noteTecnico/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> note = [];

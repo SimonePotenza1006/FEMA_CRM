@@ -25,8 +25,8 @@ class _AggiuntaFotoPageState extends State<AggiuntaFotoPage> {
   List<XFile> pickedImages = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   final ImagePicker _picker = ImagePicker();
   io.File? imageFile;
 
@@ -113,7 +113,7 @@ class _AggiuntaFotoPageState extends State<AggiuntaFotoPage> {
         if (image.path != null && image.path.isNotEmpty) {
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+            Uri.parse('$ipaddress2/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(

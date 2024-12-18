@@ -38,8 +38,8 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
   final TextEditingController _prodottoNonPresenteController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   late DateTime selectedDate;
   late DateTime selectedDate2;
   bool isSearching = false;
@@ -49,7 +49,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
 
   Future<void> getAllProdotti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/prodotto'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ProdottoModel> prodotti = [];
@@ -70,7 +70,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
 
   Future<void> getAllFornitori() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/fornitore'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<FornitoreModel> fornitori = [];
@@ -92,7 +92,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/cliente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -605,7 +605,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
   Future<void> saveNota() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddress2/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'utente' : widget.utente.toMap(),
@@ -623,7 +623,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
     var fornitore = selectedFornitore != null ? selectedFornitore?.toMap() : null;
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ordine'),
+        Uri.parse('$ipaddress2/api/ordine'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -661,7 +661,7 @@ class _FormOrdineFornitorePageState extends State<FormOrdineFornitorePage>{
       for(var prodotto in prodottiOrdinati){
         try{
           final response = await http.post(
-            Uri.parse('$ipaddress/api/ordine'),
+            Uri.parse('$ipaddress2/api/ordine'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'descrizione' : _descrizioneController.text,

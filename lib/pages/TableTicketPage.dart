@@ -29,8 +29,8 @@ class TableTicketPage extends StatefulWidget{
 class _TableTicketPageState extends State<TableTicketPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<TicketModel> _allTickets =[];
   List<TicketModel> _filteredTickets = [];
   late TicketDataSource _dataSource;
@@ -48,7 +48,7 @@ class _TableTicketPageState extends State<TableTicketPage>{
 
   Future<void> getAllTickets() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/ticket');
+      var apiUrl = Uri.parse('$ipaddress2/api/ticket');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -357,8 +357,8 @@ class TicketDataSource extends DataGridSource{
   List<TicketModel> _filteredTickets = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   TicketDataSource(
       this.utente,

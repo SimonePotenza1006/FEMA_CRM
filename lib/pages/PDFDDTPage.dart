@@ -34,6 +34,8 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   GlobalKey globalKey = GlobalKey();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -565,7 +567,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
+          '$ipaddress2/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

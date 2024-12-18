@@ -36,6 +36,8 @@ class _CreazioneRMAPageState
   List<XFile> pickedImages =  [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   CategoriaInterventoSpecificoModel? selectedCategoria;
   List<TipologiaInterventoModel> allTipologie = [];
   DateTime _dataOdierna = DateTime.now();
@@ -721,7 +723,7 @@ class _CreazioneRMAPageState
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/restituzione/${rma.id}')
+              Uri.parse('$ipaddress2/api/immagine/restituzione/${rma.id}')
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -765,7 +767,7 @@ class _CreazioneRMAPageState
       bool assigned = responsabile != null ? true : false;
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddress2/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -841,7 +843,7 @@ class _CreazioneRMAPageState
             print("PROVA TECNICO ${tecnico?.nome}");
             print("INTERVENTO: ${intervento.id}");
             final response = await http.post(
-              Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+              Uri.parse('$ipaddress2/api/relazioneUtentiInterventi'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': tecnico?.toMap(),
@@ -882,7 +884,7 @@ class _CreazioneRMAPageState
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        Uri.parse('$ipaddress2/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
@@ -912,7 +914,7 @@ class _CreazioneRMAPageState
     //if(_orarioDisponibile == true){
       try {
         response = await http.post(
-          Uri.parse('$ipaddress/api/restituzioneMerce'),
+          Uri.parse('$ipaddress2/api/restituzioneMerce'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'prodotto':_prodotto,
@@ -964,7 +966,7 @@ class _CreazioneRMAPageState
     else{
       try {
         response = await http.post(
-          Uri.parse('$ipaddress/api/intervento'),
+          Uri.parse('$ipaddress2/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data': selectedDate?.toIso8601String(),
@@ -1282,7 +1284,7 @@ class _CreazioneRMAPageState
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -1305,7 +1307,7 @@ class _CreazioneRMAPageState
 
   Future<void> getAllFornitori() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/fornitore'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -1328,7 +1330,7 @@ class _CreazioneRMAPageState
 
   Future<void> getAllTipologie() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
@@ -1349,7 +1351,7 @@ class _CreazioneRMAPageState
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddress2/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

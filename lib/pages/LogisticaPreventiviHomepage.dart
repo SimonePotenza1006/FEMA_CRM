@@ -30,6 +30,8 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
   int _hoveredIndex = -1;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<PreventivoModel> preventiviList = [];
   ScrollController _verticalScrollController = ScrollController();
   ScrollController _horizontalScrollController = ScrollController();
@@ -50,7 +52,7 @@ class _LogisticaPreventiviHomepageState extends State<LogisticaPreventiviHomepag
 
   Future<void> getAllPreventivi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/preventivo/ordered');
+      var apiUrl = Uri.parse('$ipaddress2/api/preventivo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
