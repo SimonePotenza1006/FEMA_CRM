@@ -62,7 +62,7 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
 
   Future<void> getAllNoteByUtente(int utenteId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/noteTecnico/utente/$utenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> noteByUtente = [];
@@ -82,7 +82,7 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -103,7 +103,7 @@ class _ListaNoteUtentiPageState extends State<ListaNoteUtentiPage> {
 
   Future<void> getAllNote() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/noteTecnico/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         List<NotaTecnicoModel> note = [];

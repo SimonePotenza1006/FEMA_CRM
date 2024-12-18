@@ -175,7 +175,7 @@ class _CreazioneClientePageState extends State<CreazioneClientePage> {
   }
 
   Future<void> createNewCliente() async {
-    final url = Uri.parse('$ipaddressProva2/api/cliente');
+    final url = Uri.parse('$ipaddress/api/cliente');
     final body = jsonEncode({
       'codice_fiscale': _codiceFiscaleController.text,
       'cod_danea' : _daneaController.text,

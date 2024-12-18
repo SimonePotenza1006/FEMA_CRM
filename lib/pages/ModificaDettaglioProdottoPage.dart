@@ -64,7 +64,7 @@ class _ModificaDettaglioProdottoPageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/prodotto'),
+        Uri.parse('$ipaddress/api/prodotto'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"

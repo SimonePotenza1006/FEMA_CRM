@@ -204,7 +204,7 @@ class _ListaSopralluoghiTecnicoPageState extends State<ListaSopralluoghiTecnicoP
 
   Future<void> getSopralluoghiByUtente() async {
     try {
-      http.Response response = await http.get(Uri.parse('$ipaddressProva2/api/sopralluogo/utente/${widget.utente.id}'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/sopralluogo/utente/${widget.utente.id}'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<SopralluogoModel> sopralluoghi = [];

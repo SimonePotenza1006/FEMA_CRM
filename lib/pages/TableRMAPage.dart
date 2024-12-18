@@ -57,7 +57,7 @@ class _TableRMAPageState extends State<TableRMAPage>{
 
   Future<void> getAllMerce() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva2/api/restituzioneMerce');
+      var apiUrl = Uri.parse('$ipaddress/api/restituzioneMerce');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

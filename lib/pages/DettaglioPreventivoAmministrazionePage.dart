@@ -561,7 +561,7 @@ class _DettaglioPreventivoAmministrazionePageState
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddressProva2/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -603,7 +603,7 @@ class _DettaglioPreventivoAmministrazionePageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/preventivo'),
+        Uri.parse('$ipaddress/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -648,7 +648,7 @@ class _DettaglioPreventivoAmministrazionePageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/preventivo'),
+        Uri.parse('$ipaddress/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -694,7 +694,7 @@ class _DettaglioPreventivoAmministrazionePageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/preventivo'),
+        Uri.parse('$ipaddress/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"

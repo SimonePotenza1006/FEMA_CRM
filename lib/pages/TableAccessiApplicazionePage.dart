@@ -31,7 +31,7 @@ class _TableAccessiApplicazionePageState
 
   Future<void> getAllIngressi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/ingresso/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/ingresso/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

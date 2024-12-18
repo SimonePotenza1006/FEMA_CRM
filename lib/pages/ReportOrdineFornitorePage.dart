@@ -307,7 +307,7 @@ class _ReportOrdineFornitorePageState extends State<ReportOrdineFornitorePage> {
 
   Future<void> getAllOrdini() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/ordine/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/ordine/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

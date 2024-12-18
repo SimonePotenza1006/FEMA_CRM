@@ -43,7 +43,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
 
   Future<http.Response?> getIntervento() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/intervento/merce/${int.parse(widget.merce.id.toString())}');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/merce/${int.parse(widget.merce.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -78,7 +78,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       var decodedData = jsonDecode(data.body);
       var interventoData = decodedData[0]; // Adjusted here
       InterventoModel intervento = InterventoModel.fromJson(interventoData); // Adjusted here
-      final url = '$ipaddressProva2/api/immagine/intervento/${intervento.id}/images';
+      final url = '$ipaddress/api/immagine/intervento/${intervento.id}/images';
       http.Response? response;
       try {
         response = await http.get(Uri.parse(url));
@@ -541,7 +541,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       double? importo = double.parse(importoPreventivatoController.text);
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -578,7 +578,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
     try {
       String? dataConsegna = widget.merce.data_consegna != null ? widget.merce.data_consegna!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,
@@ -617,7 +617,7 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
     try {
       String? dataConclusione = widget.merce.data_conclusione != null ? widget.merce.data_conclusione!.toIso8601String() : null;
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,

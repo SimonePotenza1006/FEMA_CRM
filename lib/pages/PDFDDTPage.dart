@@ -567,7 +567,7 @@ class _PDFDDTPageState extends State<PDFDDTPage> {
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddressProva2/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
+          '$ipaddress/api/relazioneDDTProdotto/ddt/${widget.ddt.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

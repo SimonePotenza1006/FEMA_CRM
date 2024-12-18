@@ -262,7 +262,7 @@ class _InizializzazionePreventivoByTecnicoPageState
     }
 
     try {
-      final response = await http.post(Uri.parse('$ipaddressProva2/api/preventivo'),
+      final response = await http.post(Uri.parse('$ipaddress/api/preventivo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'azienda': selectedAzienda?.toMap(),
@@ -295,7 +295,7 @@ class _InizializzazionePreventivoByTecnicoPageState
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -320,7 +320,7 @@ class _InizializzazionePreventivoByTecnicoPageState
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
       final response = await http
-          .get(Uri.parse('$ipaddressProva2/api/destinazione/cliente/$clientId'));
+          .get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -459,7 +459,7 @@ class _InizializzazionePreventivoByTecnicoPageState
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -482,7 +482,7 @@ class _InizializzazionePreventivoByTecnicoPageState
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/azienda');
+      var apiUrl = Uri.parse('$ipaddress/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

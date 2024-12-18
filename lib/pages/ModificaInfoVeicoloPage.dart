@@ -326,7 +326,7 @@ class _ModificaInfoVeicoloPageState extends State<ModificaInfoVeicoloPage>{
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/veicolo'),
+        Uri.parse('$ipaddress/api/veicolo'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
           'id' : widget.veicolo.id,

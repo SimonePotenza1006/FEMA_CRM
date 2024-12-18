@@ -57,7 +57,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -79,7 +79,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
 
   Future<void> getAllCommissioni() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/commissione');
+      var apiUrl = Uri.parse('$ipaddress/api/commissione');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -102,7 +102,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
   Future<void> getTipologieIntervento() async {
     print('getTipologieIntervento chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -127,7 +127,7 @@ class _CalendarioPageState extends State<CalendarioPage> {
   Future<void> getAllInterventi() async {
     print('getAllInterventi chiamato');
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/intervento');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

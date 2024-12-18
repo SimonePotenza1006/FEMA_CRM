@@ -84,7 +84,7 @@ class _DettaglioTipologiePageState extends State<DettaglioTipologiePage> {
   Future<void> getAllCategorieForTipologia() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddressProva2/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
+          '$ipaddress/api/categorieIntervento/tipologia/${widget.tipologia.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

@@ -67,7 +67,7 @@ class _MenuOrdiniFornitorePageState extends State<MenuOrdiniFornitorePage> {
 
   Future<void> getAllOrdini() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/ordine');
+      var apiUrl = Uri.parse('$ipaddress/api/ordine');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

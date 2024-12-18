@@ -55,7 +55,7 @@ class _ListaUtentiPageState extends State<ListaUtentiPage>{
   
   Future<void> getAllUtenti() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva2/api/utente');
+      var apiUrl = Uri.parse('$ipaddress/api/utente');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -174,7 +174,7 @@ class _ListaUtentiPageState extends State<ListaUtentiPage>{
   Future<void> saveNewPassword(String password, UtenteModel utente) async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/utente'),
+        Uri.parse('$ipaddress/api/utente'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'id' : utente.id,

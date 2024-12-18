@@ -89,7 +89,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
     try {
       // Making HTTP request to update the 'intervento
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -188,7 +188,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
     late http.Response response;
     try{
       response = await http.get(
-        Uri.parse('$ipaddressProva2/api/ddt/intervento/${widget.intervento.id}'));
+        Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
         if(response.statusCode == 200){
           var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           DDTModel ddt = DDTModel.fromJson(jsonData);
@@ -208,7 +208,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
     late http.Response response;
     try{
       response = await http.get(
-          Uri.parse('$ipaddressProva2/api/intervento/${widget.intervento.id}'));
+          Uri.parse('$ipaddress/api/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         InterventoModel intervento = InterventoModel.fromJson(jsonData);
@@ -226,7 +226,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddressProva2/pdfu/intervento'),
+        Uri.parse('$ipaddress/pdfu/intervento'),
       );
       request.fields['intervento'] = widget.intervento.id!;
       request.files.add(
@@ -273,7 +273,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
     try {
       print('Inizio richiesta al server per intervento ID: ${widget.intervento.id}'); // Debug
 
-      final response = await http.get(Uri.parse('$ipaddressProva2/pdfu/intervento/${widget.intervento.id.toString()}'));
+      final response = await http.get(Uri.parse('$ipaddress/pdfu/intervento/${widget.intervento.id.toString()}'));
       print('Risposta ricevuta con status code: ${response.statusCode}'); // Debug
 
       switch (response.statusCode) {
@@ -330,7 +330,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
       }
       final ddt = DDTModel.fromJson(jsonDecode(data.body));
       try{
-        var apiUrl = Uri.parse('$ipaddressProva2/api/relazioneDDTProdotto/ddt/${ddt.id}');
+        var apiUrl = Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}');
         var response = await http.get(apiUrl);
         if(response.statusCode == 200){
           var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -354,7 +354,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -374,7 +374,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
 
   Future<void> getAllNoteByIntervento() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva2/api/noteTecnico/intervento/${widget.intervento.id}');
+      var apiUrl = Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -403,7 +403,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
   void modificaOrarioInizio() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -1039,7 +1039,7 @@ class _DettaglioInterventoByTecnicoPageState extends State<DettaglioInterventoBy
 
   Future<void> _openPdfFile(BuildContext context, String interventoId, String fileName) async {
     // Costruisci l'URL dell'endpoint
-    final pdfUrl = '$ipaddressProva2/pdfu/intervento/$interventoId/$fileName';
+    final pdfUrl = '$ipaddress/pdfu/intervento/$interventoId/$fileName';
     print('PDF URL: $pdfUrl'); // Debug
 
     try {

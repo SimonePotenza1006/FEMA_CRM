@@ -290,7 +290,7 @@ class _AggiuntaProdottoPreventivoPageState
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("$ipaddressProva2/api/prodotto");
+      var apiUrl = Uri.parse("$ipaddress/api/prodotto");
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

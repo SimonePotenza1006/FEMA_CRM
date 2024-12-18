@@ -178,7 +178,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
   void modificaTitolo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -242,7 +242,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
     try {
       print('Inizio richiesta al server per intervento ID: ${widget.intervento.id}'); // Debug
 
-      final response = await http.get(Uri.parse('$ipaddressProva2/pdfu/intervento/${widget.intervento.id.toString()}'));
+      final response = await http.get(Uri.parse('$ipaddress/pdfu/intervento/${widget.intervento.id.toString()}'));
       print('Risposta ricevuta con status code: ${response.statusCode}'); // Debug
 
       switch (response.statusCode) {
@@ -268,7 +268,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddressProva2/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
+    final url = '$ipaddress/api/immagine/intervento/${int.parse(widget.intervento.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -400,7 +400,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<http.Response?> getDDTByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/ddt/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
       if(response.statusCode == 200){
         print('DDT recuperato');
         return response;
@@ -422,7 +422,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
       } else {
         final ddt = DDTModel.fromJson(jsonDecode(data.body));
         try{
-          final response = await http.get(Uri.parse('$ipaddressProva2/api/relazioneDDTProdotto/ddt/${ddt.id}'));
+          final response = await http.get(Uri.parse('$ipaddress/api/relazioneDDTProdotto/ddt/${ddt.id}'));
           var responseData = json.decode(response.body);
           if(response.statusCode == 200){
             List<RelazioneDdtProdottoModel> prodotti = [];
@@ -444,7 +444,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> getMetodiPagamento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/tipologiapagamento'));
+      final response = await http.get(Uri.parse('$ipaddress/api/tipologiapagamento'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<TipologiaPagamentoModel> tipologie = [];
@@ -462,7 +462,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> getAllTipologieIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<TipologiaInterventoModel> tipologie = [];
@@ -480,7 +480,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> getAllVeicoli() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/veicolo'));
+      final response = await http.get(Uri.parse('$ipaddress/api/veicolo'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<VeicoloModel> veicoli = [];
@@ -498,7 +498,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> getCommissioni()async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/commissione/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/commissione/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<CommissioneModel> commissioni = [];
@@ -516,7 +516,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> getProdottiByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneProdottoIntervento/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<RelazioneProdottiInterventoModel> prodotti = [];
@@ -545,7 +545,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> getNoteByIntervento() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/noteTecnico/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/noteTecnico/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body);
       if(response.statusCode == 200){
         List<NotaTecnicoModel> note =[];
@@ -565,7 +565,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> getRelazioni() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/intervento/${widget.intervento.id}'));
       var responseData = json.decode(response.body.toString());
       if(response.statusCode == 200){
         List<RelazioneUtentiInterventiModel> relazioni = [];
@@ -585,7 +585,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
 
   Future<void> _fetchUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<UtenteModel> utenti = [];
@@ -656,7 +656,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
   void modificaDescrizione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -727,7 +727,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
   void riabilitaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -1002,7 +1002,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
     try {
       print(' IVA : ${iva}');
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -1150,7 +1150,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
   void annullaIntervento() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),
@@ -1201,7 +1201,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
             try {
               print('Eliminazione vecchie relazioni');
               final response = await http.delete(
-                Uri.parse('$ipaddressProva2/api/relazioneUtentiInterventi/' + relaz.id.toString()),
+                Uri.parse('$ipaddress/api/relazioneUtentiInterventi/' + relaz.id.toString()),
                 headers: {'Content-Type': 'application/json'},
               );
               print(response.body.toString());

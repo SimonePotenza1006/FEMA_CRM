@@ -55,7 +55,7 @@ class _AggiuntaManualeProdottiDDTPageState
       debugPrint('Body della richiesta: $body', wrapWidth: 1024);
 
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/ddt'),
+        Uri.parse('$ipaddress/api/ddt'),
         body: jsonEncode(body),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -239,7 +239,7 @@ class _AggiuntaManualeProdottiDDTPageState
 
   Future<http.Response?> checkExistingDDT() async{
     try{
-      var apiUrl = Uri.parse("$ipaddressProva2/api/ddt/intervento/${widget.intervento.id}");
+      var apiUrl = Uri.parse("$ipaddress/api/ddt/intervento/${widget.intervento.id}");
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -257,7 +257,7 @@ class _AggiuntaManualeProdottiDDTPageState
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse("$ipaddressProva2/api/prodotto");
+      var apiUrl = Uri.parse("$ipaddress/api/prodotto");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

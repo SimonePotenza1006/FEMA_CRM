@@ -409,7 +409,7 @@ class _ReportPreventiviPerAgentePageState
 
   Future<void> getAllAgenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/agente');
+      var apiUrl = Uri.parse('$ipaddress/api/agente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -456,7 +456,7 @@ class _ReportPreventiviPerAgentePageState
 
   Future<void> getAllPreventiviForAgente(String agenteId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/preventivo/agente/$agenteId');
+      var apiUrl = Uri.parse('$ipaddress/api/preventivo/agente/$agenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

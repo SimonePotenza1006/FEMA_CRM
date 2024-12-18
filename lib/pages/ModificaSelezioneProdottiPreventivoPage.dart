@@ -646,7 +646,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
       for (var preventivo in preventivi) {
         if (preventivo.id != excludeId) {
           try {
-            var apiUrl = Uri.parse('$ipaddressProva2/api/relazionePreventivoProdotto/preventivo/${preventivo.id}');
+            var apiUrl = Uri.parse('$ipaddress/api/relazionePreventivoProdotto/preventivo/${preventivo.id}');
             var response = await http.get(apiUrl);
             if (response.statusCode == 200) {
               var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -676,7 +676,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
 
   Future<http.Response?> getPreventiviByCliente() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva2/api/preventivo/cliente/${widget.preventivo.cliente?.id}');
+      var apiUrl = Uri.parse('$ipaddress/api/preventivo/cliente/${widget.preventivo.cliente?.id}');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -700,7 +700,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddressProva2/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -748,7 +748,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
     try {
       // Chiamata POST per aggiornare il preventivo
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/preventivo'),
+        Uri.parse('$ipaddress/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -787,7 +787,7 @@ class _ModificaSelezioneProdottiPreventivoPageState
           final prezzo = double.tryParse(prezziControllers[i].text);
 
           response = await http.post(
-            Uri.parse('$ipaddressProva2/api/relazionePreventivoProdotto'),
+            Uri.parse('$ipaddress/api/relazionePreventivoProdotto'),
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json"

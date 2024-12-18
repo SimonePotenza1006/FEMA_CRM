@@ -48,7 +48,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/noteTecnico'),
+        Uri.parse('$ipaddress/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -75,7 +75,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/noteTecnico'),
+        Uri.parse('$ipaddress/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,
@@ -269,7 +269,7 @@ class _InizioInterventoPageState extends State<InizioInterventoPage> {
       final now = DateTime.now();
 
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,

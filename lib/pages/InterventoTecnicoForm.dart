@@ -112,7 +112,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllTipologie() async {
     try {
       final response =
-          await http.get(Uri.parse('$ipaddressProva2/api/tipologiaIntervento'));
+          await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
@@ -135,7 +135,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     try {
       if (_selectedTipologia != null) {
         final response = await http.get(Uri.parse(
-            '$ipaddressProva2/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
+            '$ipaddress/api/categorieIntervento/tipologia/${_selectedTipologia!.id}'));
         if (response.statusCode == 200) {
           var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
           List<CategoriaInterventoSpecificoModel> categorie = [];
@@ -159,7 +159,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/utente/attivo'));
+      final response = await http.get(Uri.parse('$ipaddress/api/utente/attivo'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -950,7 +950,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
       final response = await http
-          .get(Uri.parse('$ipaddressProva2/api/destinazione/cliente/$clientId'));
+          .get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -1026,7 +1026,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
                 'POST',
-                Uri.parse('$ipaddressProva2/api/immagine/${intervento.id}')
+                Uri.parse('$ipaddress/api/immagine/${intervento.id}')
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -1070,7 +1070,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       try{
         String prioritaString = _selectedPriorita.toString().split('.').last;
         final response = await http.post(
-          Uri.parse('$ipaddressProva2/api/intervento'),
+          Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1147,7 +1147,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
             print("PROVA TECNICO ${tecnico?.nome}");
             print("INTERVENTO: ${intervento.id}");
             final response = await http.post(
-              Uri.parse('$ipaddressProva2/api/relazioneUtentiInterventi'),
+              Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({
                 'utente': tecnico?.toMap(),
@@ -1172,7 +1172,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
               print('Percorso del file: ${image.path}');
               var request = http.MultipartRequest(
                   'POST',
-                  Uri.parse('$ipaddressProva2/api/immagine/${intervento.id}')
+                  Uri.parse('$ipaddress/api/immagine/${intervento.id}')
               );
               request.files.add(
                 await http.MultipartFile.fromPath(
@@ -1220,7 +1220,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
     late http.Response response;
     try{
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : DateTime.now().toIso8601String(),
@@ -1252,7 +1252,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
         print('$prioritaString');
         final orario = DateTime(_selectedTime.hour, _selectedTime.minute);
         response = await http.post(
-          Uri.parse('$ipaddressProva2/api/intervento'),
+          Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1303,7 +1303,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
       try {
         String prioritaString = _selectedPriorita.toString().split('.').last;
         response = await http.post(
-          Uri.parse('$ipaddressProva2/api/intervento'),
+          Uri.parse('$ipaddress/api/intervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -1355,7 +1355,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/cliente');
+      var apiUrl = Uri.parse('$ipaddress/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -1380,7 +1380,7 @@ class _InterventoTecnicoFormState extends State<InterventoTecnicoForm> {
   Future<void> getAllVeicoli() async {
     try {
       http.Response response =
-          await http.get(Uri.parse('$ipaddressProva2/api/veicolo'));
+          await http.get(Uri.parse('$ipaddress/api/veicolo'));
       var responseData = json.decode(response.body.toString());
       if (response.statusCode == 200) {
         List<VeicoloModel> allVeicoli = [];

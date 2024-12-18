@@ -213,7 +213,7 @@ class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage> {
   Future<void> deleteDestinazione(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddressProva2/api/destinazione/$id'),
+        Uri.parse('$ipaddress/api/destinazione/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -37,7 +37,7 @@ class _DettaglioSpesaSivisPageState extends State<DettaglioSpesaVeicoloPage> {
 
   Future<List<Uint8List>> loadImages() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/immagine/spesa/${widget.spesa.idSpesaVeicolo}/images'));
+      final response = await http.get(Uri.parse('$ipaddress/api/immagine/spesa/${widget.spesa.idSpesaVeicolo}/images'));
       if (response.statusCode == 200) {
         // Decodifica la lista di immagini JSON
         List<dynamic> imagesJson = jsonDecode(response.body);
@@ -54,7 +54,7 @@ class _DettaglioSpesaSivisPageState extends State<DettaglioSpesaVeicoloPage> {
 
   Future<Uint8List> getImageSpesa(String idspesa) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddressProva2/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
+      final response = await http.get(Uri.parse('$ipaddress/api/immagine/spesa/${int.parse(widget.spesa.idSpesaVeicolo.toString())}'));
       if (response.statusCode == 200) {
         return response.bodyBytes;
       } else {

@@ -398,7 +398,7 @@ class _ReportPreventiviPageState extends State<ReportPreventiviPage> {
 
   Future<void> getAllPreventivi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/preventivo/ordered');
+      var apiUrl = Uri.parse('$ipaddress/api/preventivo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);

@@ -190,7 +190,7 @@ class _MenuSceltaSaldoPageState extends State<MenuSceltaSaldoPage> {
     var importo = saldoController.text.isNotEmpty ? double.tryParse(saldoController.text.toString()) : null;
     try {
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/intervento'),
+        Uri.parse('$ipaddress/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id?.toString(),

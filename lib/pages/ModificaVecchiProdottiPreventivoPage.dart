@@ -523,7 +523,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
   Future<void> eliminaProdotto(int relazioneId, int index) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddressProva2/api/relazionePreventivoProdotto/${relazioneId}'),
+        Uri.parse('$ipaddress/api/relazionePreventivoProdotto/${relazioneId}'),
         headers: {'Content-Type': 'application/json'},
       );
       if(response.statusCode == 200){
@@ -552,7 +552,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
     try {
       // Chiamata POST per aggiornare il preventivo
       response = await http.post(
-        Uri.parse('$ipaddressProva2/api/preventivo'),
+        Uri.parse('$ipaddress/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -592,7 +592,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
           final prezzo = double.tryParse(prezziControllers[i].text);
 
           response = await http.post(
-            Uri.parse('$ipaddressProva2/api/relazionePreventivoProdotto'),
+            Uri.parse('$ipaddress/api/relazionePreventivoProdotto'),
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json"

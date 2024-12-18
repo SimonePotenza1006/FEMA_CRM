@@ -39,7 +39,7 @@ class _CompilazioneDDTByTecnicoPageState
 
   Future<void> getAllAziende() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/azienda');
+      var apiUrl = Uri.parse('$ipaddress/api/azienda');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -281,7 +281,7 @@ class _CompilazioneDDTByTecnicoPageState
   Future<void> getDdtByIntervento() async {
     try {
       final response = await http.get(
-          Uri.parse('$ipaddressProva2/api/ddt/intervento/${widget.intervento.id}'));
+          Uri.parse('$ipaddress/api/ddt/intervento/${widget.intervento.id}'));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         setState(() {
@@ -306,7 +306,7 @@ class _CompilazioneDDTByTecnicoPageState
   //       final controller = quantityControllers[i]; // Ottieni il controller del TextFormField corrispondente
   //       final quantita = double.tryParse(controller.text) ?? 1;
   //       final response = await http.post(
-  //         Uri.parse('$ipaddressProva2/api/relazioneUtentiProdotti'),
+  //         Uri.parse('$ipaddress/api/relazioneUtentiProdotti'),
   //         headers: {
   //           "Accept": "application/json",
   //           "Content-Type": "application/json"
@@ -338,7 +338,7 @@ class _CompilazioneDDTByTecnicoPageState
         final controller = quantityControllers[i]; // Ottieni il controller del TextFormField corrispondente
         final quantita = double.tryParse(controller.text) ?? 1;
         final response = await http.post(
-          Uri.parse('$ipaddressProva2/api/relazioneDDTProdotto'),
+          Uri.parse('$ipaddress/api/relazioneDDTProdotto'),
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json"

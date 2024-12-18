@@ -37,7 +37,7 @@ class _AggiuntaMerceStoricoUtentePageState extends State<AggiuntaMerceStoricoUte
 
   Future<void> getAllProdotti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddressProva2/api/prodotto');
+      var apiUrl = Uri.parse('$ipaddress/api/prodotto');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -295,7 +295,7 @@ class _AggiuntaMerceStoricoUtentePageState extends State<AggiuntaMerceStoricoUte
     };
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/relazioneUtentiProdotti'),
+        Uri.parse('$ipaddress/api/relazioneUtentiProdotti'),
         body: jsonEncode(body),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',

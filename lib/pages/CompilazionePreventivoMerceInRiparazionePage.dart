@@ -96,7 +96,7 @@ class _CompilazionePreventivoMerceInRiparazionePageState extends State<Compilazi
   Future<void> compilaPreventivo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/merceInRiparazione'),
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.merce.id,

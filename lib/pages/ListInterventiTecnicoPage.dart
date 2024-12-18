@@ -58,7 +58,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva2/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -82,7 +82,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva2/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -105,7 +105,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getMerce(String userId) async{
     try{
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddressProva2/api/intervento/withMerce/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce/$userId'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -129,7 +129,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva2/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];
@@ -143,7 +143,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
 
         //getAllRelazioniByUtente(widget.userData!.id.toString(), selectedDate);
         http.Response response2 = await http
-            .get(Uri.parse('$ipaddressProva2/api/relazioneUtentiInterventi/utente/$userId'));
+            .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
         if (response2.statusCode == 200) {
           var responseData2 = json.decode(response2.body);
           //print('rrdd2 '+responseData2.toString());
@@ -213,7 +213,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getAllInterventiBySettore() async {
     try {
       print('getAllInterventiBySettore chiamato');
-      var apiUrl = Uri.parse('$ipaddressProva2/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
+      var apiUrl = Uri.parse('$ipaddress/api/intervento/categoriaIntervento/'+widget.userData!.tipologia_intervento!.id.toString());
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -237,7 +237,7 @@ class _ListInterventiTecnicoPageState extends State<ListInterventiTecnicoPage>{
   Future<List<InterventoModel>> getAllInterventi() async {
     try {
       print('getAllInterventi chiamato');
-      var apiUrl = Uri.parse('$ipaddressProva2/api/intervento');
+      var apiUrl = Uri.parse('$ipaddress/api/intervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

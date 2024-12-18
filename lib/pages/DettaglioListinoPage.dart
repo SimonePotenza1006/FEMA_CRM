@@ -83,7 +83,7 @@ class _DettaglioListinoPageState extends State<DettaglioListinoPage> {
   Future<void> getAllListiniForCategoria() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddressProva2/api/listino/categoria/${widget.categoria.id}'));
+          '$ipaddress/api/listino/categoria/${widget.categoria.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {

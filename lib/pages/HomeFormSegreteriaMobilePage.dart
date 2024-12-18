@@ -66,7 +66,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
   Future<void> getAllTasks() async {
     try {
       String userId = widget.userData!.id.toString();
-      http.Response response = await http.get(Uri.parse('$ipaddressProva2/api/task/utente/$userId'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/task/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<TaskModel> tasks = [];
@@ -103,7 +103,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddressProva2/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -150,7 +150,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
   Future<void> saveIngresso() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/ingresso'),
+        Uri.parse('$ipaddress/api/ingresso'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'orario': formattedDate,
@@ -169,7 +169,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva2/api/commissione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/commissione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<CommissioneModel> allCommissioniByUtente = [];
@@ -192,7 +192,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
   Future<List<InterventoModel>> getMerce() async{
     try{
 
-      http.Response response = await http.get(Uri.parse('$ipaddressProva2/api/intervento/withMerce'));
+      http.Response response = await http.get(Uri.parse('$ipaddress/api/intervento/withMerce'));
       if(response.statusCode == 200){
         var responseData = json.decode(response.body);
         List<InterventoModel> interventi = [];
@@ -215,7 +215,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva2/api/merceInRiparazione/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/merceInRiparazione/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<MerceInRiparazioneModel> allMerceByUtente = [];
@@ -239,7 +239,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try{
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva2/api/relazioneUtentiInterventi/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/relazioneUtentiInterventi/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<RelazioneUtentiInterventiModel> allRelazioniByUtente = [];
@@ -263,7 +263,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
     try {
       String userId = widget.userData!.id.toString();
       http.Response response = await http
-          .get(Uri.parse('$ipaddressProva2/api/intervento/utente/$userId'));
+          .get(Uri.parse('$ipaddress/api/intervento/utente/$userId'));
       if (response.statusCode == 200) {
         var responseData = json.decode(response.body);
         List<InterventoModel> allInterventiByUtente = [];

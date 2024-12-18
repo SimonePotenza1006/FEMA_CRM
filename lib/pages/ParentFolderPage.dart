@@ -29,7 +29,7 @@ class _ParentFolderPageState extends State<ParentFolderPage> {
 
   Future<void> getAllCartelle() async {
     try {
-      var apiUrl = Uri.parse("$ipaddressProva2/api/cartella");
+      var apiUrl = Uri.parse("$ipaddress/api/cartella");
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -92,7 +92,7 @@ class _ParentFolderPageState extends State<ParentFolderPage> {
   Future<void> createCartella(String? name) async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddressProva2/api/cartella'),
+        Uri.parse('$ipaddress/api/cartella'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'nome' : name.toString(),

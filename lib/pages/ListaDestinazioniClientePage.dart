@@ -90,7 +90,7 @@ class _ListaDestinazioniClientePageState
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddressProva2/api/destinazione/cliente/${widget.cliente.id}'));
+          '$ipaddress/api/destinazione/cliente/${widget.cliente.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
