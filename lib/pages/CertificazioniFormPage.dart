@@ -31,6 +31,8 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
   ClienteModel? selectedCliente;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   TextEditingController _impiantoController = TextEditingController();
 
   @override
@@ -43,7 +45,7 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
 
   Future<void> getAllClienti() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/cliente'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
@@ -63,7 +65,7 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
 
   Future<void> getAllTipologie() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/tipologiaIntervento'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/tipologiaIntervento'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipologiaInterventoModel> tipologie = [];
@@ -83,7 +85,7 @@ class _CertificazioniFormPageState extends State<CertificazioniFormPage>{
 
   Future<void> getAllAziende() async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/azienda'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/azienda'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<AziendaModel> aziende = [];

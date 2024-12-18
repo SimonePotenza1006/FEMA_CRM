@@ -16,6 +16,8 @@ class DettaglioNotaPage extends StatefulWidget {
 class _DettaglioNotaPageState extends State<DettaglioNotaPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +77,7 @@ class _DettaglioNotaPageState extends State<DettaglioNotaPage> {
   Future<void> deleteNota(String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/noteTecnico/$id'),
+        Uri.parse('$ipaddressProva2/api/noteTecnico/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

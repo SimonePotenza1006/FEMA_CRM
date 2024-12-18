@@ -34,6 +34,8 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
   final TextEditingController descrizioneController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   final ImagePicker _picker = ImagePicker();
 
   Future<void> takePicture() async {
@@ -453,7 +455,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
             print('Percorso del file: ${image.path}');
             var request = http.MultipartRequest(
               'POST',
-              Uri.parse('$ipaddress/api/immagine/sopralluogo/${int.parse(sopralluogo.id!.toString())}'),
+              Uri.parse('$ipaddressProva2/api/immagine/sopralluogo/${int.parse(sopralluogo.id!.toString())}'),
             );
             request.files.add(
               await http.MultipartFile.fromPath(
@@ -493,7 +495,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
     late http.Response response;
     try {
       response =
-      await http.post(Uri.parse('$ipaddress/api/sopralluogo'),
+      await http.post(Uri.parse('$ipaddressProva2/api/sopralluogo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data': DateTime.now().toIso8601String(),
@@ -519,7 +521,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -551,7 +553,7 @@ class _SopralluogoTecnicoFormState extends State<SopralluogoTecnicoForm> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {

@@ -29,6 +29,8 @@ class _DettaglioPreventivoAmministrazionePageState
   List<RelazionePreventivoProdottiModel> allProdotti = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -559,7 +561,7 @@ class _DettaglioPreventivoAmministrazionePageState
   Future<void> getProdotti() async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
+          '$ipaddressProva2/api/relazionePreventivoProdotto/preventivo/${widget.preventivo.id}');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -601,7 +603,7 @@ class _DettaglioPreventivoAmministrazionePageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/preventivo'),
+        Uri.parse('$ipaddressProva2/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -646,7 +648,7 @@ class _DettaglioPreventivoAmministrazionePageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/preventivo'),
+        Uri.parse('$ipaddressProva2/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -692,7 +694,7 @@ class _DettaglioPreventivoAmministrazionePageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/preventivo'),
+        Uri.parse('$ipaddressProva2/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"

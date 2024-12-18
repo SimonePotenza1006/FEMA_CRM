@@ -24,6 +24,8 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   List<FornitoreModel> filteredFornitori = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -262,7 +264,7 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   Future<void> consegnato() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva2/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -304,7 +306,7 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   Future<void> arrivato() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva2/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -346,7 +348,7 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   Future<void> ordinato() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva2/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -388,7 +390,7 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   Future<void> presaVisione() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/ordine'),
+        Uri.parse('$ipaddressProva2/api/ordine'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.ordine.id,
@@ -430,7 +432,7 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
   Future<void> saveModifiche() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/ordine'),
+          Uri.parse('$ipaddressProva2/api/ordine'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : widget.ordine.id,
@@ -571,7 +573,7 @@ class _DettaglioOrdineAmministrazionePageState extends State<DettaglioOrdineAmmi
 
   Future<void> getAllFornitori() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/fornitore'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/fornitore'));
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         List<FornitoreModel> fornitori = [];

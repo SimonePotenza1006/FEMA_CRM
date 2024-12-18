@@ -47,12 +47,14 @@ class _FemaShopPageState extends State<FemaShopPage> {
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<UtenteModel> allUtenti = [];
   UtenteModel? selectedUtenteSegreteria;
 
   Future<void> getAllRelazioniVendite(String clienteId) async{
     try{
-      final response = await http.get(Uri.parse('$ipaddress/api/relazioniClientiProdotti/cliente/$clienteId'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/relazioniClientiProdotti/cliente/$clienteId'));
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<RelazioneClientiProdottiModel> relazioni = [];
@@ -72,7 +74,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
 
   Future<void> getAllUtentiAttivi() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/utente/attivo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -94,7 +96,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/cliente'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ClienteModel> clienti = [];
@@ -242,7 +244,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
 
   Future<void> getAllDestinazioniByCliente(String clientId) async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/destinazione/cliente/$clientId'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/destinazione/cliente/$clientId'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         setState(() {
@@ -359,7 +361,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
 
   Future<void> getAllProdotti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/prodotto'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/prodotto'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<ProdottoModel> prodotti = [];
@@ -823,7 +825,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
     double totaleVendita = calcolaTotaleSelezionati();
     try{
       response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'attivo' : true,
@@ -837,6 +839,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'orario_inizio': DateTime.now().toIso8601String(),
           'orario_fine': DateTime.now().toIso8601String(),
           'descrizione': _descrizioneController.text,
+          'utente_importo' : widget.utente.nomeCompleto(),
           'importo_intervento': totaleVendita,
           'saldo_tecnico' : null,
           'prezzo_ivato' : null,
@@ -885,7 +888,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
       final intervento = InterventoModel.fromJson(jsonDecode(data.body));
       try{
         final response = await http.post(
-          Uri.parse('$ipaddress/api/ddt'),
+          Uri.parse('$ipaddressProva2/api/ddt'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'data' : DateTime.now().toIso8601String(),
@@ -927,7 +930,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'data' : DateTime.now().toIso8601String()
         };
         final response = await http.post(
-          Uri.parse('$ipaddress/api/relazioniClientiProdotti'),
+          Uri.parse('$ipaddressProva2/api/relazioniClientiProdotti'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(relazione),
         );
@@ -961,7 +964,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
           'seriale': selezione.prodotto.lotto_seriale,
         };
         final response = await http.post(
-          Uri.parse('$ipaddress/api/relazioneProdottoIntervento'),
+          Uri.parse('$ipaddressProva2/api/relazioneProdottoIntervento'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(relazione),
         );
@@ -995,7 +998,7 @@ class _FemaShopPageState extends State<FemaShopPage> {
       }
       double totaleVendita = calcolaTotaleSelezionati();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva2/api/movimenti'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data' : DateTime.now().toIso8601String(),

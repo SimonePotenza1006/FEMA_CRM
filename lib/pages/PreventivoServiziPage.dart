@@ -25,6 +25,8 @@ class PreventivoServiziPage extends StatefulWidget{
 class _PreventivoServiziPageState extends State<PreventivoServiziPage> with WidgetsBindingObserver{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   final _formKey = GlobalKey<FormState>();
   List<AziendaModel> allAziende = [];
   AziendaModel? selectedAzienda;
@@ -736,7 +738,7 @@ class _PreventivoServiziPageState extends State<PreventivoServiziPage> with Widg
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/cliente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -834,7 +836,7 @@ class _PreventivoServiziPageState extends State<PreventivoServiziPage> with Widg
 
   Future<void> getAllAziende() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/azienda');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/azienda');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         List<AziendaModel> aziende = [];

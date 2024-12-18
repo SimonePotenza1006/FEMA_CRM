@@ -22,8 +22,8 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   final TextEditingController telefonoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
 
 
@@ -60,7 +60,7 @@ class _RegistrazioneAziendaPageState extends State<RegistrazioneAziendaPage> {
   }
 
   Future<void> createAzienda() async {
-    final url = Uri.parse('$ipaddress/api/azienda');
+    final url = Uri.parse('$ipaddressProva2/api/azienda');
     final body = jsonEncode({
       'nome': denominazioneController.text.toString(),
       'luogo_di_lavoro': luogoLavoroController.text.toString(),

@@ -23,6 +23,8 @@ class SalvataggioCredenzialiClientePage extends StatefulWidget{
 class _SalvataggioCredenzialiClientePageState extends State<SalvataggioCredenzialiClientePage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -194,7 +196,7 @@ class _SalvataggioCredenzialiClientePageState extends State<SalvataggioCredenzia
     late http.Response response;
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/credenziali'),
+        Uri.parse('$ipaddressProva2/api/credenziali'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -248,7 +250,7 @@ class _SalvataggioCredenzialiClientePageState extends State<SalvataggioCredenzia
           // Usa `fromBytes` al posto di `fromPath` per inviare `Uint8List`
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/credenziali/${credenziali.id}'),
+            Uri.parse('$ipaddressProva2/api/immagine/credenziali/${credenziali.id}'),
           );
           request.files.add(
             http.MultipartFile.fromBytes(

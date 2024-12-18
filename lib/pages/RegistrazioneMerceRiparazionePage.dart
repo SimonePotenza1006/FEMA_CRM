@@ -31,8 +31,8 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
   bool _preventivoRichiesto = false;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<XFile> pickedImages =  [];
   List<UtenteModel> allUtenti =[];
   List<ClienteModel> clientiList = [];
@@ -48,7 +48,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/cliente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -71,7 +71,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
 
   Future<void> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/utente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -226,7 +226,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
   }
 
   Future<void> createMerce() async{
-    final url = Uri.parse('$ipaddress/api/merceInRiparazione');
+    final url = Uri.parse('$ipaddressProva2/api/merceInRiparazione');
     final body = jsonEncode({
       'data' : DateTime.now().toIso8601String(),
       'articolo' : _articoloController.text,
@@ -306,7 +306,7 @@ class _RegistrazioneMerceRiparazionePageState extends State<RegistrazioneMerceRi
   //         print('Percorso del file: ${image.path}');
   //         var request = http.MultipartRequest(
   //           'POST',
-  //           Uri.parse('$ipaddress/api/immagine/merce'),
+  //           Uri.parse('$ipaddressProva2/api/immagine/merce'),
   //         );
   //         // Provide field name and file path to fromPath constructor
   //         request.files.add(

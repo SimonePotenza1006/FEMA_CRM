@@ -44,8 +44,8 @@ class _CompilazioneRapportinoPageState
   VeicoloModel? selectedVeicolo;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   CategoriaPrezzoListinoModel? selectedListino;
   List<DestinazioneModel> allDestinazioniByCliente = [];
   DestinazioneModel? selectedDestinazione;
@@ -509,7 +509,7 @@ class _CompilazioneRapportinoPageState
 
   Future<void> saveNota() async{
     try{
-      final response = await http.post(Uri.parse('$ipaddress/api/noteTecnico'),
+      final response = await http.post(Uri.parse('$ipaddressProva2/api/noteTecnico'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'utente' : widget.intervento.utente!.toMap(),
@@ -530,7 +530,7 @@ class _CompilazioneRapportinoPageState
   Future<void> saveIntervento() async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': widget.intervento.id,
@@ -546,6 +546,7 @@ class _CompilazioneRapportinoPageState
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': DateTime.now().toIso8601String(),
           'descrizione': widget.intervento.descrizione,
+          'utente_importo' : widget.intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato': widget.intervento.prezzo_ivato,
@@ -633,7 +634,7 @@ class _CompilazioneRapportinoPageState
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/${intervento}'),
+            Uri.parse('$ipaddressProva2/api/immagine/${intervento}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -661,7 +662,7 @@ class _CompilazioneRapportinoPageState
   Future<void> getAllDestinazioniByCliente() async {
     try {
       final response = await http.get(Uri.parse(
-          '$ipaddress/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
+          '$ipaddressProva2/api/destinazione/cliente/${widget.intervento.cliente?.id}'));
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
 
@@ -727,7 +728,7 @@ class _CompilazioneRapportinoPageState
 
   Future<void> getAllVeicoli() async {
     http.Response response =
-        await http.get(Uri.parse('$ipaddress/api/veicolo'));
+        await http.get(Uri.parse('$ipaddressProva2/api/veicolo'));
     var responseData = json.decode(response.body.toString());
     if (response.statusCode == 200) {
       List<VeicoloModel> veicoli = [];

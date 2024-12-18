@@ -28,6 +28,8 @@ class _PDFRendicontoInterventiPageState
   List<TipologiaInterventoModel> tipologieList = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -38,7 +40,7 @@ class _PDFRendicontoInterventiPageState
 
   Future<void> getAllTipologieIntervento() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -90,7 +92,7 @@ class _PDFRendicontoInterventiPageState
   Future<void> getAllInterventiForTipologia(String tipologiaId) async {
     try {
       var apiUrl = Uri.parse(
-          '$ipaddress/api/intervento/categoriaIntervento/$tipologiaId');
+          '$ipaddressProva2/api/intervento/categoriaIntervento/$tipologiaId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

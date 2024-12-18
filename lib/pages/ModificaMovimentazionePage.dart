@@ -24,8 +24,8 @@ class ModificaMovimentazionePage extends StatefulWidget{
 class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<UtenteModel> allUtenti = [];
   late UtenteModel? _selectedUtente = widget.movimento.utente;
   ClienteModel? selectedCliente;
@@ -73,7 +73,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
         if(image.path.isNotEmpty){
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
+            Uri.parse('$ipaddressProva2/api/immagine/movimento/${int.parse(movimento.id!.toString())}'),
           );
           request.files.add(
               await http.MultipartFile.fromPath(
@@ -367,7 +367,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
 
   Future<void> getAllClienti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/cliente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/cliente'));
 
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -392,7 +392,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
     var cliente = selectedCliente != null ? selectedCliente?.toMap() : null;
     try{
       var response = await http.post(
-        Uri.parse('$ipaddress/api/movimenti'),
+        Uri.parse('$ipaddressProva2/api/movimenti'),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
           'id' : widget.movimento.id,

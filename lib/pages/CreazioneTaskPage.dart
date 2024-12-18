@@ -40,8 +40,8 @@ class _CreazioneTaskPageState
   final TextEditingController _noteController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   UtenteModel? selectedUtente;
   DateTime _dataOdierna = DateTime.now();
   DateTime? selectedDate = null;
@@ -243,7 +243,7 @@ class _CreazioneTaskPageState
   Future<void> saveTipologia() async{
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/tipoTask'),
+          Uri.parse('$ipaddressProva2/api/tipoTask'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'descrizione' : _descrizioneController.text,
@@ -1048,7 +1048,7 @@ class _CreazioneTaskPageState
     late http.Response response;
     try {
       response = await http.post(
-        Uri.parse('$ipaddress/api/task'),
+        Uri.parse('$ipaddressProva2/api/task'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data_creazione': DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
@@ -1092,7 +1092,7 @@ class _CreazioneTaskPageState
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/task/${int.parse(task.id!.toString())}'),
+            Uri.parse('$ipaddressProva2/api/immagine/task/${int.parse(task.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -1141,7 +1141,7 @@ class _CreazioneTaskPageState
           print('Percorso del file audio: ${file.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
+            Uri.parse('$ipaddressProva2/api/immagine/taskaudio/${int.parse(task.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(
@@ -1177,7 +1177,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllTipi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -1222,7 +1222,7 @@ class _CreazioneTaskPageState
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente/attivo');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/utente/attivo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

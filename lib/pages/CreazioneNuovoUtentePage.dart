@@ -26,8 +26,8 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
   List<RuoloUtenteModel> ruoliList = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState(){
@@ -235,7 +235,7 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
   Future<void> saveUtente() async {
     try{
       final response = await http.post(
-          Uri.parse('$ipaddress/api/utente'),
+          Uri.parse('$ipaddressProva2/api/utente'),
           headers: {'Content-Type' : 'application/json'},
           body: jsonEncode({
             'attivo' : true,
@@ -263,7 +263,7 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -299,7 +299,7 @@ class _CreazioneNuovoUtentePageState extends State<CreazioneNuovoUtentePage> {
 
   Future<void> getAllRuoli() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/ruolo');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/ruolo');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

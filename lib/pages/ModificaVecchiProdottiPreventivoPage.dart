@@ -30,8 +30,8 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
   Timer? _debounce;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -523,7 +523,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
   Future<void> eliminaProdotto(int relazioneId, int index) async{
     try{
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/relazionePreventivoProdotto/${relazioneId}'),
+        Uri.parse('$ipaddressProva2/api/relazionePreventivoProdotto/${relazioneId}'),
         headers: {'Content-Type': 'application/json'},
       );
       if(response.statusCode == 200){
@@ -552,7 +552,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
     try {
       // Chiamata POST per aggiornare il preventivo
       response = await http.post(
-        Uri.parse('$ipaddress/api/preventivo'),
+        Uri.parse('$ipaddressProva2/api/preventivo'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -592,7 +592,7 @@ class _ModificaVecchiProdottiPreventivoPageState extends State<ModificaVecchiPro
           final prezzo = double.tryParse(prezziControllers[i].text);
 
           response = await http.post(
-            Uri.parse('$ipaddress/api/relazionePreventivoProdotto'),
+            Uri.parse('$ipaddressProva2/api/relazionePreventivoProdotto'),
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json"

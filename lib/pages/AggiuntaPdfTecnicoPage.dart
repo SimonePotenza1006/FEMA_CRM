@@ -16,6 +16,8 @@ class AggiuntaPdfTecnicoPage extends StatefulWidget {
 class _AggiuntaPdfTecnicoPageState extends State<AggiuntaPdfTecnicoPage> {
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress = 'http://gestione.femasistemi.it:8090';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<File> selectedFiles = [];
   String? errorMessage;
 
@@ -146,7 +148,7 @@ class _AggiuntaPdfTecnicoPageState extends State<AggiuntaPdfTecnicoPage> {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/intervento'),
+        Uri.parse('$ipaddressProva2/pdfu/intervento'),
       );
       request.fields['intervento'] = widget.intervento.id!;
       request.files.add(

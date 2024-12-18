@@ -37,6 +37,8 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
   late TextEditingController _daneaController;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   io.File? selectedFile;
 
   @override
@@ -240,7 +242,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
     try {
       print("Body inviato: ${json.encode(bodyData)}");
       response = await http.post(
-        Uri.parse('$ipaddress/api/cliente'),
+        Uri.parse('$ipaddressProva2/api/cliente'),
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json"
@@ -273,7 +275,7 @@ class _ModificaClientePageState extends State<ModificaClientePage> {
       // Crea una richiesta multipart per l'upload del file
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$ipaddress/pdfu/certificazioni/clienti'),
+        Uri.parse('$ipaddressProva2/pdfu/certificazioni/clienti'),
       );
 
       // Aggiungi il nome del cliente come parametro

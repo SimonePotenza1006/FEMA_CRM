@@ -20,8 +20,8 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
   Future<List<Uint8List>>? _futureImages;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/credenziali/${int.parse(widget.credenziale.id.toString())}/images';
+    final url = '$ipaddressProva2/api/immagine/credenziali/${int.parse(widget.credenziale.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));

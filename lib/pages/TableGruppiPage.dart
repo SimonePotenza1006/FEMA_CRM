@@ -25,6 +25,8 @@ class TableGruppiPage extends StatefulWidget{
 class _TableGruppiPageState extends State<TableGruppiPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   late GruppoDataSource _dataSource;
   List<GruppoInterventiModel> allGruppi =[];
   Map<String, double> _columnWidths = {
@@ -45,7 +47,7 @@ class _TableGruppiPageState extends State<TableGruppiPage>{
 
   Future<void> getAllGruppi() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/gruppi');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/gruppi');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -250,7 +252,9 @@ class GruppoDataSource extends DataGridSource{
   List<GruppoInterventiModel> _gruppi =[];
   BuildContext context;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   TextEditingController importoController = TextEditingController();
 
   GruppoDataSource(this.context, this.utente,List<GruppoInterventiModel> gruppi){
@@ -259,7 +263,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
 
   Future<List<InterventoModel>> getInterventiByGruppo(String gruppoId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/$gruppoId');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/intervento/gruppo/$gruppoId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -348,7 +352,7 @@ String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   Future<void> saveImporto(GruppoInterventiModel gruppo) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/gruppi'),
+        Uri.parse('$ipaddressProva2/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': gruppo.id,

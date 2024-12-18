@@ -27,6 +27,8 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
   XFile? pickedImage;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   Future<List<Uint8List>>? _futureImages;
   List<XFile> pickedImages =  [];
   List<TipologiaInterventoModel> tipologieList = [];
@@ -36,7 +38,7 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
 
   Future<void> getAllTipologie() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiaIntervento');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/tipologiaIntervento');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -66,7 +68,7 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
 
   Future<void> getAllClienti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/cliente');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/cliente');
       var response = await http.get(apiUrl);
 
       if (response.statusCode == 200) {
@@ -129,7 +131,7 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
   }
 
   Future<List<Uint8List>> fetchImages() async {
-    final url = '$ipaddress/api/immagine/sopralluogo/${int.parse(widget.sopralluogo.id.toString())}/images';
+    final url = '$ipaddressProva2/api/immagine/sopralluogo/${int.parse(widget.sopralluogo.id.toString())}/images';
     http.Response? response;
     try {
       response = await http.get(Uri.parse(url));
@@ -318,7 +320,7 @@ class _DettaglioSopralluogoPageState extends State<DettaglioSopralluogoPage> {
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/sopralluogo/${sopralluogo}'),
+            Uri.parse('$ipaddressProva2/api/immagine/sopralluogo/${sopralluogo}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(

@@ -29,8 +29,8 @@ class TableMerceInRiparazionePage extends StatefulWidget{
 class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<InterventoModel> _allInterventi = [];
   List<InterventoModel> _filteredInterventi = [];
   TextEditingController importoController = TextEditingController();
@@ -122,7 +122,7 @@ class _TableMerceInRiparazionePageState extends State<TableMerceInRiparazionePag
       isLoading = true; // Inizio del caricamento
     });
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/withMerce');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/intervento/withMerce');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -552,8 +552,8 @@ class InterventoDataSource extends DataGridSource{
   BuildContext context;
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   InterventoModel? _selectedIntervento;
   TextEditingController codiceDaneaController = TextEditingController();
 
@@ -736,7 +736,7 @@ class InterventoDataSource extends DataGridSource{
   Future<void> saveCodice(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -751,6 +751,7 @@ class InterventoDataSource extends DataGridSource{
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
           'importo_intervento': intervento.importo_intervento,
           'saldo_tecnico' : intervento.saldo_tecnico,
           'prezzo_ivato' : intervento.prezzo_ivato,

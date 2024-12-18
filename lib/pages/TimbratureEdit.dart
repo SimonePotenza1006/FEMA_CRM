@@ -33,8 +33,8 @@ class _TimbratureEditState extends State<TimbratureEdit> {
   final _formKey = GlobalKey<FormState>();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   String dataOdierna = DateFormat('dd-MM-yyyy, HH:mm')
       .format(DateTime.now())
       .toString();
@@ -427,7 +427,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempoDataUtente(DateTime data, String utenteid) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddressProva2/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -468,7 +468,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempoToday() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/pres/1/2');
+      var apiUrl = Uri.parse('$ipaddressProva2/marcatempo/pres/1/2');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -514,7 +514,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempoMonth(int current) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo');
+      var apiUrl = Uri.parse('$ipaddressProva2/marcatempo');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -559,7 +559,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllMarcatempo() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/marcatempo/ordered');
+      var apiUrl = Uri.parse('$ipaddressProva2/marcatempo/ordered');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -624,7 +624,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         print(DateFormat('dd/MM/yyyy HH:mm').parse('${row.dataIngresso} ${row.oraIngresso}').toIso8601String()+' '+DateTime.now().toIso8601String());
 
         final response1 = await http.post(
-          Uri.parse('$ipaddress/marcatempo'),
+          Uri.parse('$ipaddressProva2/marcatempo'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'id' : row.idmt,
@@ -649,7 +649,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         var response3;
         if (row.idmt2 != null) {
           response2 = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva2/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : row.idmt2,
@@ -672,7 +672,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         } else if (row.oraIngresso2 != null && row.oraIngresso2 != '') {
           print('3');
           response3 = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva2/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : '',
@@ -759,7 +759,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
           var response2 = null;
           var response3 = null;
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva2/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id' : '',
@@ -803,7 +803,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
         } else {
           print('${tipoTimbratura}');
           final response = await http.post(
-            Uri.parse('$ipaddress/marcatempo'),
+            Uri.parse('$ipaddressProva2/marcatempo'),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'id': idMarcatempo,
@@ -853,7 +853,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<List<UtenteModel>?> getAllUtentiNV() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/utente'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
@@ -878,7 +878,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<List<UtenteModel>?> getAllUtentiSearch() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/utente'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];
@@ -903,7 +903,7 @@ class _TimbratureEditState extends State<TimbratureEdit> {
 
   Future<void> getAllUtenti() async {
     try {
-      final response = await http.get(Uri.parse('$ipaddress/api/utente'));
+      final response = await http.get(Uri.parse('$ipaddressProva2/api/utente'));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<UtenteModel> utenti = [];

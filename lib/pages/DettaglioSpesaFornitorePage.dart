@@ -25,8 +25,8 @@ class DettaglioSpesaFornitorePage extends StatefulWidget{
 class _DettaglioSpesaFornitorePageState extends State<DettaglioSpesaFornitorePage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<XFile> pickedImages =  [];
   Future<List<Uint8List>>? _futureImages;
 
@@ -94,7 +94,7 @@ class _DettaglioSpesaFornitorePageState extends State<DettaglioSpesaFornitorePag
   }
 
   Future<List<Uint8List>> fetchImages() async{
-    final url = '$ipaddress/api/immagine/movimenti/${int.parse(widget.movimento.id.toString())}/images';
+    final url = '$ipaddressProva2/api/immagine/movimenti/${int.parse(widget.movimento.id.toString())}/images';
     http.Response? response;
     try{
       response = await http.get(Uri.parse(url));
@@ -250,7 +250,7 @@ class _DettaglioSpesaFornitorePageState extends State<DettaglioSpesaFornitorePag
           print('Percorso del file: ${image.path}');
           var request = http.MultipartRequest(
             'POST',
-            Uri.parse('$ipaddress/api/immagine/movimento/${int.parse(widget.movimento.id!.toString())}'),
+            Uri.parse('$ipaddressProva2/api/immagine/movimento/${int.parse(widget.movimento.id!.toString())}'),
           );
           request.files.add(
             await http.MultipartFile.fromPath(

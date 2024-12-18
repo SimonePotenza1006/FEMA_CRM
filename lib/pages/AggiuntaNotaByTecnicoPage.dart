@@ -21,8 +21,8 @@ class AggiuntaNotaByTecnicoPage extends StatefulWidget{
 class _AggiuntaNotaByTecnicoPageState extends State<AggiuntaNotaByTecnicoPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   TextEditingController _notaController = TextEditingController();
 
   @override
@@ -115,7 +115,7 @@ class _AggiuntaNotaByTecnicoPageState extends State<AggiuntaNotaByTecnicoPage>{
     try{
       final now = DateTime.now().toIso8601String();
       final response = await http.post(
-        Uri.parse('$ipaddress/api/noteTecnico'),
+        Uri.parse('$ipaddressProva2/api/noteTecnico'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'data': now,

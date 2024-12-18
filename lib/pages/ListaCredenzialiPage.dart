@@ -21,6 +21,8 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
   bool isSearching = false;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -31,7 +33,7 @@ class _ListaCredenzialiPageState extends State<ListaCredenzialiPage> {
 
   Future<void> init() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/credenziali');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/credenziali');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

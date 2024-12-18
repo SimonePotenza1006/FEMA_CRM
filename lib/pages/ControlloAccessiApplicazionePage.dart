@@ -16,6 +16,8 @@ class ControlloAccessiApplicazionePage extends StatefulWidget {
 class _ControlloAccessiApplicazionePageState extends State<ControlloAccessiApplicazionePage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<UtenteModel> utentiList = [];
   Map<String, List<IngressoModel>> ingressiPerUtenteMap = {};
   DateTime? _selectedDate;
@@ -28,7 +30,7 @@ class _ControlloAccessiApplicazionePageState extends State<ControlloAccessiAppli
 
   Future<void> getAllIngressiForUtente(String utenteId) async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/ingresso/utente/$utenteId');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/ingresso/utente/$utenteId');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
@@ -55,7 +57,7 @@ class _ControlloAccessiApplicazionePageState extends State<ControlloAccessiAppli
 
   Future<void> getAllUtenti() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/utente');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/utente');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

@@ -17,6 +17,8 @@ class _CreazioneNuovaCartaPageState extends State<CreazioneNuovaCartaPage>{
   TipologiaCartaModel? selectedTipologiaCarta;
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState(){
@@ -148,7 +150,7 @@ class _CreazioneNuovaCartaPageState extends State<CreazioneNuovaCartaPage>{
   Future<void> saveCarta() async {
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/cartadicredito'),
+        Uri.parse('$ipaddressProva2/api/cartadicredito'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           'descrizione' : _descrizioneController.text,
@@ -210,7 +212,7 @@ class _CreazioneNuovaCartaPageState extends State<CreazioneNuovaCartaPage>{
 
   Future<void> getAllTipologieCarta() async {
     try {
-      var apiUrl = Uri.parse('$ipaddress/api/tipologiacarta');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/tipologiacarta');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));

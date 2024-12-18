@@ -26,6 +26,8 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
   List<FileSystemItem> fileStructure = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   String currentPath = '';
 
   @override
@@ -37,7 +39,7 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
 
   Future<void> fetchFiles() async {
     print("Fetching files...");
-    final response = await http.get(Uri.parse('$ipaddress/pdfu/filesnameCertificazioni'));
+    final response = await http.get(Uri.parse('$ipaddressProva2/pdfu/filesnameCertificazioni'));
     if (response.statusCode == 200) {
       print("Files fetched successfully");
       print(response.body);
@@ -125,7 +127,7 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
 
   Future<void> _openFile(BuildContext context, FileModel file) async {
     String path = file.path;
-    final pdfUrl = '$ipaddress/pdfu/certificazioni/$path/${file.name}';
+    final pdfUrl = '$ipaddressProva2/pdfu/certificazioni/$path/${file.name}';
     print('PDF URL: $pdfUrl');
     try {
       final response = await http.get(Uri.parse(pdfUrl));
@@ -165,8 +167,8 @@ class _DirectoryViewWrapperState extends State<DirectoryViewWrapper> {
   String _searchQuery = '';
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
-  String ipaddress2 = '192.128.1.248:8090';
-  String ipaddressProva2 = '192.168.1.198:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   void initState() {
@@ -312,7 +314,7 @@ class _DirectoryViewWrapperState extends State<DirectoryViewWrapper> {
     String path = file.path.replaceAll('\\', '/');
     String modifiedPath = path.replaceAll('/', '_');
     String encodedFilename = Uri.encodeComponent(file.name);
-    final deleteUrl = '$ipaddress/pdfu/certificazioni/$modifiedPath/$encodedFilename';
+    final deleteUrl = '$ipaddressProva2/pdfu/certificazioni/$modifiedPath/$encodedFilename';
     print('Delete URL: $deleteUrl');
     try {
       final response = await http.delete(Uri.parse(deleteUrl));
@@ -349,7 +351,7 @@ class _DirectoryViewWrapperState extends State<DirectoryViewWrapper> {
     String encodedFilename = Uri.encodeComponent(file.name);
 
     // Costruisci l'URL con il path modificato
-    final pdfUrl = '$ipaddress/pdfu/certificazioni/$modifiedPath/$encodedFilename';
+    final pdfUrl = '$ipaddressProva2/pdfu/certificazioni/$modifiedPath/$encodedFilename';
     print('PDF URL: $pdfUrl');
 
     try {

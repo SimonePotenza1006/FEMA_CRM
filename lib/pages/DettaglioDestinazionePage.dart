@@ -22,6 +22,8 @@ class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage> {
   List<DestinazioneModel> allDestinazioni = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +213,7 @@ class _DettaglioDestinazionePageState extends State<DettaglioDestinazionePage> {
   Future<void> deleteDestinazione(BuildContext context, String? id) async {
     try {
       final response = await http.delete(
-        Uri.parse('$ipaddress/api/destinazione/$id'),
+        Uri.parse('$ipaddressProva2/api/destinazione/$id'),
       );
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(

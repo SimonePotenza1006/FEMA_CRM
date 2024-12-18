@@ -24,6 +24,8 @@ class DettaglioGruppoInterventiPage extends StatefulWidget {
 class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoInterventiPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = 'http://192.168.1.248:8090';
+      String ipaddressProva2 = 'http://192.168.1.198:8095';
   List<InterventoModel> filteredInterventi = [];
   List<InterventoModel> allInterventi = [];
   bool isLoading = true;
@@ -93,7 +95,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
   Future<void> concludiGruppo() async{
     try{
       final response = await http.post(
-        Uri.parse('$ipaddress/api/gruppi'),
+        Uri.parse('$ipaddressProva2/api/gruppi'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id' : widget.gruppo.id,
@@ -134,7 +136,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
   Future<void> saveImporto(InterventoModel intervento) async {
     try {
       final response = await http.post(
-        Uri.parse('$ipaddress/api/intervento'),
+        Uri.parse('$ipaddressProva2/api/intervento'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'id': intervento.id,
@@ -149,6 +151,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
           'orario_inizio': intervento.orario_inizio?.toIso8601String(),
           'orario_fine': intervento.orario_fine?.toIso8601String(),
           'descrizione': intervento.descrizione,
+          'utente_importo' : widget.utente.nomeCompleto(),
           'importo_intervento': double.parse(importoController.text),
           'saldo_tecnico' : intervento.saldo_tecnico,
           'prezzo_ivato' : intervento.prezzo_ivato,
@@ -511,7 +514,7 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
 
   Future<void> getInterventiByGruppo() async{
     try{
-      var apiUrl = Uri.parse('$ipaddress/api/intervento/gruppo/${int.parse(widget.gruppo.id.toString())}');
+      var apiUrl = Uri.parse('$ipaddressProva2/api/intervento/gruppo/${int.parse(widget.gruppo.id.toString())}');
       var response = await http.get(apiUrl);
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
