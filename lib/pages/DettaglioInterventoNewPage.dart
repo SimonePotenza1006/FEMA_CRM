@@ -4840,7 +4840,6 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
           'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
           'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
           'descrizione': widget.intervento.descrizione,
-          'utente_importo' : intervento.utente_importo,
           'importo_intervento': widget.intervento.importo_intervento,
           'saldo_tecnico' : widget.intervento.saldo_tecnico,
           'prezzo_ivato' : widget.intervento.prezzo_ivato,

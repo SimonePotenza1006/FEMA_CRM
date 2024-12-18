@@ -42,6 +42,7 @@ class DbHelper{
       String ipaddressProva2 = 'http://192.168.1.198:8095';
 
 
+
   List<OrdinePerInterventoModel> allOrdini = [];
   List<VeicoloModel> allVeicoli = [];
   List<TipologiaInterventoModel> allTipologie = [];
