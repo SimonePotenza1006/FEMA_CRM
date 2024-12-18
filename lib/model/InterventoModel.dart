@@ -22,6 +22,7 @@ class InterventoModel {
   DateTime? orario_inizio;
   DateTime? orario_fine;
   String? descrizione;
+  String? utente_importo;
   double? importo_intervento;
   double? saldo_tecnico;
   bool? prezzo_ivato;
@@ -62,6 +63,7 @@ class InterventoModel {
       this.orario_inizio,
       this.orario_fine,
       this.descrizione,
+      this.utente_importo,
       this.importo_intervento,
       this.saldo_tecnico,
       this.prezzo_ivato,
@@ -104,6 +106,7 @@ class InterventoModel {
       'orario_inizio': orario_inizio?.toIso8601String(),
       'orario_fine': orario_fine?.toIso8601String(),
       'descrizione': descrizione,
+      'utente_importo' : utente_importo,
       'importo_intervento': importo_intervento,
       'saldo_tecnico' : saldo_tecnico,
       'prezzo_ivato' : prezzo_ivato,
@@ -150,6 +153,7 @@ class InterventoModel {
     map['orario_inizio'] != null ? DateTime.parse(map['orario_inizio']) : null;
     map['orario_fine'] != null ? DateTime.parse(map['orario_fine']) : null;
     descrizione = map['descrizione'];
+    utente_importo = map['utente_importo'];
     importo_intervento = map['importo_intervento'];
     saldo_tecnico = map['saldo_tecnico'];
     prezzo_ivato = map['prezzo_ivato'];
@@ -191,6 +195,7 @@ class InterventoModel {
     'orario_inizio': orario_inizio?.toIso8601String(),
     'orario_fine': orario_fine?.toIso8601String(),
     'descrizione': descrizione,
+    'utente_importo' : utente_importo,
     'importo_intervento': importo_intervento,
     'saldo_tecnico' : saldo_tecnico,
     'prezzo_ivato' : prezzo_ivato,
@@ -233,6 +238,7 @@ class InterventoModel {
       json['orario_inizio'] != null ? DateTime.parse(json['orario_inizio']) : null,
       json['orario_fine'] != null ? DateTime.parse(json['orario_fine']) : null,
       json['descrizione'],
+      json['utente_importo'],
       json['importo_intervento'] != null ? double.parse(json['importo_intervento'].toString()) : null,
       json['saldo_tecnico'] != null ? double.parse(json['saldo_tecnico'].toString()) : null,
       json['prezzo_ivato'],

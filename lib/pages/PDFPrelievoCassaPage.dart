@@ -43,7 +43,7 @@ class _PDFPrelievoCassaPageState extends State<PDFPrelievoCassaPage> {
   final GlobalKey<SfSignaturePadState> signatureGlobalKey = GlobalKey();
   final GlobalKey<SfSignaturePadState> signatureGlobalKeyDip = GlobalKey();
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<MovimentiModel> allPrelievi = [];
 
   @override

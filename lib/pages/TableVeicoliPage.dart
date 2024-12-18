@@ -20,7 +20,7 @@ class TableVeicoliPage extends StatefulWidget{
 
 class _TableVeicoliPageState extends State<TableVeicoliPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   late VeicoloDataSource _dataSource;
   List<VeicoloModel> allVeicoli =[];
   Map<String, double> _columnWidths = {

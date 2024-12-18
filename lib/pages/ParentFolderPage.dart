@@ -15,7 +15,7 @@ class ParentFolderPage extends StatefulWidget {
 
 class _ParentFolderPageState extends State<ParentFolderPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   List<CartellaModel> allCartelle = [];
   List<bool> _hoverStates = [];
 

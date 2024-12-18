@@ -1,4 +1,4 @@
-import 'dart:convert';
+  import 'dart:convert';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,7 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
 
   List<FileSystemItem> fileStructure = [];
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String currentPath = '';
 
   @override
@@ -165,6 +165,8 @@ class _DirectoryViewWrapperState extends State<DirectoryViewWrapper> {
   String _searchQuery = '';
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
 
   @override
   void initState() {

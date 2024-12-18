@@ -37,7 +37,9 @@ class _PDFOggiPageState extends State<PDFOggiPage> {
   List<RelazionePreventivoProdottiModel> allProdotti = [];
   GlobalKey globalKey = GlobalKey();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   List<MarcaTempoModel> marcasss = [];
   int totore=0;
 

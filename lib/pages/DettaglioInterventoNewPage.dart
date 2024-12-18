@@ -102,6 +102,8 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   final TextEditingController saldoController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   Future<List<Uint8List>>? _futureImages;
   DbHelper? dbHelper;
   List<XFile> pickedImages = [];
@@ -5192,5 +5194,4 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
       print('Qualcosa non va: $e');
     }
   }
-
 }

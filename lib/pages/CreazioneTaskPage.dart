@@ -40,6 +40,8 @@ class _CreazioneTaskPageState
   final TextEditingController _noteController = TextEditingController();
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddress2 = '192.128.1.248:8090';
+  String ipaddressProva2 = '192.168.1.198:8095';
   UtenteModel? selectedUtente;
   DateTime _dataOdierna = DateTime.now();
   DateTime? selectedDate = null;

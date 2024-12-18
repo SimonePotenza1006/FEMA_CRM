@@ -22,7 +22,7 @@ class SalvataggioCredenzialiClientePage extends StatefulWidget{
 
 class _SalvataggioCredenzialiClientePageState extends State<SalvataggioCredenzialiClientePage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
-String ipaddressProva = 'http://gestione.femasistemi.it:8095';
+  String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   final TextEditingController _descrizioneController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
