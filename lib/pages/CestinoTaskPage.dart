@@ -171,7 +171,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
     _columnWidths = {
       'task': 0,
       //'accettatoicon': 60,//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
-      //'completed': 60,
+      'ripristina': 60,
       'delete': 60,
       //'condividi': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
       'data_creazione': 150,
@@ -624,10 +624,10 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                           ),
                           width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['accettatoicon']?? double.nan,
                           minimumWidth: 60//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
-                        ),
+                        ),*/
                         GridColumn(
                           allowSorting: false,
-                          columnName: 'completed',
+                          columnName: 'ripristina',
                           label: Container(
                             padding: EdgeInsets.all(8.0),
                             alignment: Alignment.center,
@@ -646,7 +646,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                           ),
                           width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
                           minimumWidth: 60,
-                        ),*/
+                        ),
                         GridColumn(
                           allowSorting: false,
                           columnName: 'delete',
@@ -1343,7 +1343,7 @@ class TaskDataSource extends DataGridSource{
         cells: [
           DataGridCell<TaskModel>(columnName: 'task', value: task),
           //DataGridCell<TaskModel>(columnName: 'accettatoicon', value: task),
-          //DataGridCell<TaskModel>(columnName: 'completed', value: task),
+          DataGridCell<TaskModel>(columnName: 'ripristina', value: task),
           DataGridCell<TaskModel>(columnName: 'delete', value: task),
          // DataGridCell<TaskModel>(columnName: 'condividi', value: task),
           DataGridCell<String>(columnName: 'data_creazione', value: dataCreazione),
@@ -1382,7 +1382,8 @@ class TaskDataSource extends DataGridSource{
           'accettato': task.accettato,//false,
           'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utentecreate': task.utentecreate!.toMap()//_condiviso ? selectedUtente?.toMap() : widget.utente,
+          'utentecreate': task.utentecreate!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
+          'attivo': task.attivo
         }),
       );
       if(response.statusCode == 201){
@@ -1423,7 +1424,8 @@ class TaskDataSource extends DataGridSource{
           'accettato': false,//task.accettato,//false,
           'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
           'utente': utente.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utentecreate': task.utentecreate!.toMap()
+          'utentecreate': task.utentecreate!.toMap(),
+          'attivo': task.attivo
         }),
       );
       if(response.statusCode == 201){
@@ -1463,7 +1465,8 @@ class TaskDataSource extends DataGridSource{
           'accettato': true,//task.accettato,//false,
           'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
           'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
-          'utentecreate': task.utentecreate!.toMap()
+          'utentecreate': task.utentecreate!.toMap(),
+          'attivo': task.attivo
         }),
       );
       if(response.statusCode == 201){
@@ -1510,6 +1513,46 @@ class TaskDataSource extends DataGridSource{
       }
     } catch (e) {
       print('Errore durante l\'eliminazione del task: $e');
+    }
+  }
+
+  Future<void> ripristinaTask(TaskModel task) async {
+    final formatter = DateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
+    try {
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/task'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': task.id,
+          'data_creazione': task.data_creazione!.toIso8601String(),//DateTime.now().toIso8601String(),//data, // Utilizza la data formattata
+          'data_conclusione': task.data_conclusione != null ? task.data_conclusione!.toIso8601String() : null,//task.data_conclusione!.toIso8601String(),//task.data_conclusione,//null,
+          'titolo' : task.titolo,//_titoloController.text,
+          'riferimento': task.riferimento,
+          'descrizione': task.descrizione,//_descrizioneController.text,
+          'concluso': task.concluso,
+          'condiviso': task.condiviso,//_condiviso,
+          'accettato': task.accettato,//false,
+          'tipologia': task.tipologia?.toMap(),//_selectedTipo.toString().split('.').last,
+          'utente': task.utente!.toMap(),//_condiviso ? selectedUtente?.toMap() : widget.utente,
+          'utentecreate': task.utentecreate!.toMap(),
+          'attivo': true//task.attivo
+        }),
+      );
+      if(response.statusCode == 201){
+        //Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Task ripristinato con successo!'),
+          ),
+        );
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => CestinoTaskPage(
+                utente: utente)));
+      }
+    } catch (e) {
+      print('Errore durante il ripristino del task $e');
     }
   }
 
@@ -1612,6 +1655,37 @@ class TaskDataSource extends DataGridSource{
               );
             },
           ) : null;},
+        );
+      } else if (dataGridCell.columnName == 'ripristina') {
+        return IconButton(tooltip: 'CLICCA QUI PER RIPRISTINARE IL TASK',
+          icon: Icon(Icons.delete, color: Colors.red, size: 27,),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('RIPRISTINA TASK'),
+                  content: Text(
+                      'CONFERMI DI VOLER RIPRISTINARE IL TASK \"'+task.titolo!.toUpperCase()),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('NO'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        ripristinaTask(task);
+                        //Navigator.of(context).pop();
+                      },
+                      child: Text('OK', style: TextStyle(fontSize: 18)),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
         );
       } else if (dataGridCell.columnName == 'delete') {
         return IconButton(tooltip: 'CLICCA QUI PER ELIMINARE IL TASK',
