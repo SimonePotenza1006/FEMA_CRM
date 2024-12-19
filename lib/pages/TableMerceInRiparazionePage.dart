@@ -13,6 +13,7 @@ import '../model/RelazioneUtentiInterventiModel.dart';
 import '../model/UtenteModel.dart';
 import 'CreazioneInterventoByAmministrazionePage.dart';
 import 'DettaglioInterventoNewPage.dart';
+import 'DettaglioInterventoNewPageAndroid.dart';
 import 'ListaClientiPage.dart';
 import 'TableInterventiPage.dart';
 
@@ -837,13 +838,21 @@ class InterventoDataSource extends DataGridSource{
           } else {
             return GestureDetector(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DettaglioInterventoNewPage(intervento: intervento, utente : utente),
-                  ),
-                );
+                if(Platform.isWindows){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : utente),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente : utente),
+                    ),
+                  );
+                }
               },
               child: Container(
                 alignment: Alignment.center,
