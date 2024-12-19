@@ -732,7 +732,7 @@ class _CreazioneTaskPageState
                                       element.id== (_selectedTipo?.utente!.id != widget.utente.id ? _selectedTipo?.utente!.id! : _selectedTipo?.utentecreate!.id!)) : null;
 
                                     if (_selectedTipo?.utente != null) _condiviso = true;
-
+                                    //controllare 9 e 10
                                     if (_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) _condiviso = false;
                               });
                             },
