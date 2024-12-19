@@ -212,16 +212,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             child: IconButton(
               icon: Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 30),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PDFInterventoPage(
-                      intervento: widget.intervento,
-                      note: allNote,
-                      //descrizione: widget.intervento.relazione_tecnico.toString(),
-                    ),
-                  ),
-                );
+
               },
             ),
           ),
@@ -1563,17 +1554,6 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                           context: context
                       ),
                     ),
-                    /*(widget.intervento!.visualizzato! == true) ? IconButton(
-                      icon: Icon(Icons.check_circle, color: Colors.green,),
-                      onPressed: (){
-                        _showUtentiDialog();
-                      },
-                    ) : IconButton(
-                      icon: Icon(Icons.check_circle_outline, color: Colors.grey,),
-                      onPressed: (){
-                        _showUtentiDialog();
-                      },
-                    ),*/
                     IconButton(
                       icon: Icon(Icons.edit),
                       onPressed: (){
@@ -2161,13 +2141,13 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                       width: 170,
                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
                       child: FloatingActionButton(
-                        onPressed: widget.utente.cognome == "Mazzei"
+                        onPressed: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti"
                             ? () {
                           annullaIntervento();
                         }
                             : null, // Il pulsante è disabilitato se onPressed è null
                         heroTag: "TagAnnullamento",
-                        backgroundColor: widget.utente.cognome == "Mazzei" ? Colors.red : Colors.grey, // Colore condizionale
+                        backgroundColor: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? Colors.red : Colors.grey, // Colore condizionale
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -2985,10 +2965,10 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   }
 
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
-    bool isValueTooLong = value.length > 20;
-    String displayedValue = isValueTooLong ? value.substring(0, 20) + "..." : value;
+    bool isValueTooLong = value.length > 15;
+    String displayedValue = isValueTooLong ? value.substring(0, 15) + "..." : value;
     return SizedBox(
-      width: 287,
+      width: 296,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(

@@ -10,6 +10,7 @@ import 'package:fema_crm/model/RelazioneProdottiInterventoModel.dart';
 import 'package:fema_crm/model/RelazioneUtentiInterventiModel.dart';
 import 'package:fema_crm/pages/TableInterventiPage.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -414,6 +415,24 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
     }
   }
 
+  Future<void> _pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null && result.files.single.path != null) {
+        setState(() {
+          // Salva il file selezionato come un oggetto File
+          selectedFile = File(result.files.single.path!);
+        });
+        print("File selezionato: ${selectedFile!.path}");
+      } else {
+        // L'utente ha annullato la selezione
+        print("Nessun file selezionato.");
+      }
+    } catch (e) {
+      print("Errore durante la selezione del file: $e");
+    }
+  }
+
   Future<void> getProdottiDdt() async {
     final data = await getDDTByIntervento();
     try{
@@ -784,11 +803,54 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
     }
   }
 
+  Future<void> creaCommissione(UtenteModel utente, String? descrizione, String? note, DateTime? data) async {
+    String? formattedData = data != null ? data.toIso8601String() : null;
+    final url = Uri.parse('$ipaddress/api/commissione');
+    final body = jsonEncode({
+      'data': formattedData, // Usa la stringa ISO solo se 'data' non è null
+      'descrizione': descrizione,
+      'concluso': false,
+      'note': note,
+      'utente': utente.toMap(),
+      'intervento': widget.intervento.toMap(),
+      'attivo': true,
+    });
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+      if (response.statusCode == 201) {
+        print('Commissione creata!');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DettaglioInterventoNewPageAndroid(
+              intervento: widget.intervento,
+              utente: widget.utente,
+            ),
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Commissione assegnata!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else {
+        throw Exception('Errore durante la creazione della commissione');
+      }
+    } catch (e) {
+      print('Errore durante la richiesta HTTP: $e');
+    }
+  }
+
   Widget buildInfoRow({required String title, required String value, BuildContext? context}) {
     bool isValueTooLong = value.length > 8;
     String displayedValue = isValueTooLong ? value.substring(0, 8) + "..." : value;
     return SizedBox(
-      width: 310,
+      width: 314,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(
@@ -1063,7 +1125,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
     bool isValueTooLong = value.length > 13;
     String displayedValue = isValueTooLong ? value.substring(0, 13) + "..." : value;
     return SizedBox(
-      width: 200,
+      width: 300,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(
@@ -1147,6 +1209,386 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
     );
   }
 
+  void modificaSaldo() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
+          'titolo' : titoloController.text.toUpperCase(),
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : double.tryParse(saldoController.text),
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Saldo tecnico modificato con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.saldo_tecnico = double.tryParse(saldoController.text);
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  Future<void> savePics() async {
+    try {
+      // Mostra il caricamento
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Impedisce la chiusura del dialog premendo fuori
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text("Caricamento in corso..."),
+              ],
+            ),
+          );
+        },
+      );
+      for (var image in pickedImages) {
+        if (image.path != null && image.path.isNotEmpty) {
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('$ipaddress/api/immagine/${int.parse(widget.intervento.id!.toString())}'),
+          );
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'intervento', // Field name
+              image.path, // File path
+              contentType: MediaType('image', 'jpeg'),
+            ),
+          );
+          var response = await request.send();
+          if (response.statusCode == 200) {
+            print('File inviato con successo');
+          } else {
+            print('Errore durante l\'invio del file: ${response.statusCode}');
+          }
+        } else {
+          print('Errore: Il percorso del file non è valido');
+        }
+      }
+      pickedImages.clear();
+      Navigator.pop(context); // Chiudi il dialog di caricamento
+      // Mostra il messaggio di caricamento completato
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Successo"),
+            content: Text("Caricamento completato!"),
+            actions: [
+              TextButton(
+                child: Text("OK"),
+                onPressed: () {
+                  Navigator.pop(context); // Chiudi l'alert di successo
+                  Navigator.pop(context); // Torna alla pagina precedente
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      Navigator.pop(context); // Chiudi il dialog di caricamento in caso di errore
+      print('Errore durante l\'invio del file: $e');
+    }
+  }
+
+  void _showUtentiDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Seleziona Utenti', textAlign: TextAlign.center),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              content: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          children: allUtenti.map((utente) {
+                            return ListTile(
+                              leading: Checkbox(
+                                value: _finalSelectedUtenti.contains(utente),
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value!) {
+                                      _selectedUtenti.add(utente);
+                                      _finalSelectedUtenti.add(utente);
+                                    } else {
+                                      _finalSelectedUtenti.remove(utente);
+                                      _selectedUtenti.remove(utente);
+                                    }
+                                  });
+                                },
+                              ),
+                              title: Text('${utente.nome} ${utente.cognome}'),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        if (_finalSelectedUtenti!.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Scegli un responsabile tra gli utenti selezionati:',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 100,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _finalSelectedUtenti?.length,
+                                  itemBuilder: (context, index) {
+                                    final UtenteModel? utente = _finalSelectedUtenti?[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(right: 8.0),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            responsabile = utente;
+                                            _selectedUtenti?.remove(utente);
+                                            _responsabileSelezionato = utente;
+                                            print('Responsabile: ${responsabile?.cognome}');
+                                          });
+                                        },
+                                        child: Chip(
+                                          label: Text('${utente?.nome} ${utente?.cognome}'),
+                                          backgroundColor: _responsabileSelezionato == utente ? Colors.yellow : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+                            ],
+                          ),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              assegna();
+                            },
+                            child: Text(
+                                'ASSEGNA'
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+              ),
+            );
+          },
+        );
+      },
+    )
+        .then((_) {
+      setState(() {});
+    });
+  }
+
+  Future<void> assegna() async {
+    print('rrees ' + _responsabileSelezionato!.toMap().toString());
+    print(_selectedUtenti.toString());
+    print(_finalSelectedUtenti.toString());
+    try {
+      // Eliminazione preventiva delle vecchie relazioni
+      if (otherUtenti.isNotEmpty) {
+        for (var relaz in otherUtenti) {
+          try {
+            print('Eliminazione vecchie relazioni');
+            final response = await http.delete(
+              Uri.parse('$ipaddress/api/relazioneUtentiInterventi/' + relaz.id.toString()),
+              headers: {'Content-Type': 'application/json'},
+            );
+            print(response.body.toString());
+            print(response.statusCode);
+          } catch (e) {
+            print('Errore durante l\'eliminazione della relazione: $e');
+          }
+        }
+      }
+      // Richiesta per assegnare il responsabile all'intervento
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id,
+          'attivo': widget.intervento.attivo,
+          'titolo': widget.intervento.titolo,
+          'visualizzato': false,//widget.intervento.visualizzato,
+          'numerazione_danea': widget.intervento.numerazione_danea,
+          'priorita': widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento': widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps': widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'utente_importo' : intervento.utente_importo,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico': widget.intervento.saldo_tecnico,
+          'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'iva': widget.intervento.iva,
+          'acconto': widget.intervento.acconto,
+          'assegnato': true,
+          'accettato_da_tecnico': widget.intervento.accettato_da_tecnico,
+          'annullato': widget.intervento.annullato,
+          'conclusione_parziale': widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico': widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico': widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura': widget.intervento.utente_apertura?.toMap(),
+          'utente': _responsabileSelezionato?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce': widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo': widget.intervento.gruppo?.toMap()
+        }),
+      );
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento assegnato!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        print('EVVAIIIIIIII');
+        // Salvataggio delle nuove relazioni per gli utenti selezionati
+        if (_selectedUtenti.isNotEmpty) {
+          for (var utente in _selectedUtenti) {
+            try {
+              print('Sono quiiiiii');
+              final response = await http.post(
+                Uri.parse('$ipaddress/api/relazioneUtentiInterventi'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({
+                  'utente': utente?.toMap(),
+                  'intervento': widget.intervento.toMap(),
+                  'visualizzato': false,
+                }),
+              );
+              relazioniNuove.add(RelazioneUtentiInterventiModel.fromJson(json.decode(response.body.toString())));
+              print(response.body.toString());
+              print(response.statusCode);
+            } catch (e) {
+              print('Errore durante il salvataggio della relazione: $e');
+            }
+          }
+        }
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento assegnato!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        setState(() {
+          otherUtenti = relazioniNuove;
+        });
+      }
+    } catch (e) {
+      print('Errore durante il salvataggio del preventivo: $e');
+    }
+  }
+
+  Widget _buildImagePreview() {
+    return SizedBox(
+      width: 200,
+      child: Wrap(
+        children: [
+          ListView.builder(
+            shrinkWrap: true, // Aggiunto per risolvere il problema
+            physics: NeverScrollableScrollPhysics(), // Disabilita lo scrolling del ListView
+            scrollDirection: Axis.vertical,
+            itemCount: pickedImages.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Image.file(File(pickedImages[index].path)),
+                    IconButton(
+                      icon: Icon(Icons.remove_circle),
+                      onPressed: () {
+                        setState(() {
+                          pickedImages.removeAt(index);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
   void annullaIntervento() async{
     try{
       final response = await http.post(
@@ -1222,16 +1664,938 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
     }
   }
 
+  Future<bool> _deletePdfFile(String interventoId, String fileName) async {
+    final url = Uri.parse('$ipaddress/pdfu/intervento/$interventoId/$fileName');
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode == 200) {
+        print('File eliminato con successo.');
+        return true;
+      } else {
+        print('Errore durante l\'eliminazione del file: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Errore durante la richiesta: $e');
+      return false;
+    }
+  }
+
+  void _showDeleteDialog(BuildContext context, String interventoId, String fileName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Conferma Cancellazione'),
+          content: Text('Cancellare definitivamente il file "$fileName"?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Chiude il dialog senza fare nulla
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Chiama la funzione per cancellare il file
+                final success = await _deletePdfFile(interventoId, fileName);
+                Navigator.of(context).pop(); // Chiude il dialog
+
+                // Mostra feedback
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('File eliminato con successo!')),
+                  );
+                  fetchPdfFiles();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Errore durante l\'eliminazione del file.')),
+                  );
+                }
+              },
+              child: Text('Sì'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _openPdfFile(BuildContext context, String interventoId, String fileName) async {
+    // Costruisci l'URL dell'endpoint
+    final pdfUrl = '$ipaddress/pdfu/intervento/$interventoId/$fileName';
+    print('PDF URL: $pdfUrl'); // Debug
+
+    try {
+      final response = await http.get(Uri.parse(pdfUrl));
+
+      if (response.statusCode == 200) {
+        print('Download del PDF riuscito');
+        final dir = await getTemporaryDirectory();
+        final fileToSave = File('${dir.path}/$fileName');
+        await fileToSave.writeAsBytes(response.bodyBytes);
+
+        // Naviga alla schermata del visualizzatore PDF
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PDFViewer(filePath: fileToSave.path),
+          ),
+        );
+      } else {
+        print('Errore durante il download del PDF: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Errore durante il download del PDF: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      print('Errore durante il download: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore durante il download: $e')),
+      );
+    }
+  }
+
+  Future<void> showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Impedisce di chiudere il dialog toccando all'esterno
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Conferma eliminazione'),
+          content: Text('Eliminare definitivamente l\'intervento?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Chiude il dialog con risposta "NO"
+              },
+              child: Text('NO'),
+            ),
+            TextButton(
+              onPressed: () {
+                eliminaIntervento();
+              },
+              child: Text('SI'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void eliminaIntervento() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id?.toString(),
+          'attivo' :false,
+          'visualizzato' :widget.intervento.visualizzato,
+          'titolo' : widget.intervento.titolo,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento' : widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento' : widget.intervento.orario_appuntamento?.toIso8601String(),
+          'posizione_gps' : widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': widget.intervento.descrizione,
+          'importo_intervento': widget.intervento.importo_intervento,
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
+          'prezzo_ivato' : widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto' : widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale' : widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico' : widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico' : widget.intervento.relazione_tecnico,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': widget.intervento.cliente?.toMap(),
+          'veicolo': widget.intervento.veicolo?.toMap(),
+          'merce' :widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria_intervento_specifico':
+          widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': widget.intervento.tipologia_pagamento?.toMap(),
+          'destinazione': widget.intervento.destinazione?.toMap(),
+          'gruppo' : widget.intervento.gruppo?.toMap()
+        }),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Intervento eliminato con successo!'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TableInterventiPage(utente:widget.utente),
+        ),
+      );
+    } catch(e){
+      print('Errore $e');
+    }
+  }
+
+  Future<void> takePicture() async {
+    final ImagePicker _picker = ImagePicker();
+    if (Platform.isAndroid) {
+      // Mostra il dialog per scegliere tra fotocamera e galleria
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Seleziona un'opzione"),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Chiudi il dialog
+                  // Apri la fotocamera
+                  final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+                  if (pickedFile != null) {
+                    setState(() {
+                      pickedImages.add(pickedFile);
+                    });
+                  }
+                },
+                child: Text("Scatta foto", style: TextStyle(color: Colors.red)),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context); // Chiudi il dialog
+                  // Apri il picker dalla galleria
+                  final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+                  if (pickedFiles != null && pickedFiles.isNotEmpty) {
+                    setState(() {
+                      pickedImages.addAll(pickedFiles);
+                    });
+                  }
+                },
+                child: Text("Carica da galleria", style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    // Gestione per altre piattaforme (es. Windows)
+    else if (Platform.isWindows) {
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
+    }
+  }
+
+
+  Future<void> showVeicoloDialog(BuildContext context, List<VeicoloModel> allVeicoli, VeicoloModel? selectedVeicolo) async {
+    VeicoloModel? tempSelectedVeicolo = selectedVeicolo;
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Seleziona un veicolo'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: allVeicoli.map((veicolo) {
+                    return CheckboxListTile(
+                      title: Text(veicolo.descrizione!),
+                      value: tempSelectedVeicolo == veicolo,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          tempSelectedVeicolo = value! ? veicolo : null;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Annulla'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState((){
+                      selectedVeicolo = tempSelectedVeicolo;
+                      intervento.veicolo = selectedVeicolo;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Conferma'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void modificaArticolo() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : articoloController.text.toUpperCase(),
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Articolo modificato con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.articolo = articoloController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaAccessori() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : accessoriController.text.toUpperCase(),
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Accessori modificati con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.accessori = accessoriController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDifetto() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : difettoController.text.toUpperCase(),
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Difetto riscontrato modificato con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.difetto_riscontrato = difettoController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaPassword() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : passwordController.text.toUpperCase(),
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Password modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.password = passwordController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDati() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': datiController.text.toUpperCase(),
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Dati modificati con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.dati = datiController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaDiagnosi() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : diagnosiController.text.toUpperCase(),
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Diagnosi modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.diagnosi = diagnosiController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaImportoMerce() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : double.tryParse(importoMerceController.text.toString()),
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Importo preventivato modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.importo_preventivato =
+              double.tryParse(importoMerceController.text.toString());
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void showPreventivoDialog(BuildContext context) {
+    // Variabile per gestire il valore locale del checkbox
+    bool? isPreventivo = widget.intervento.merce?.preventivo ?? false;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text("È richiesto un preventivo?"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isPreventivo == true,
+                        onChanged: (bool? value) {
+                          setDialogState(() {
+                            isPreventivo = value == true;
+                          });
+                          setState(() {
+                            widget.intervento.merce?.preventivo = value == true;
+                          });
+                        },
+                      ),
+                      Text("Sì"),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isPreventivo == false,
+                        onChanged: (bool? value) {
+                          setDialogState(() {
+                            isPreventivo = value == false;
+                          });
+                          setState(() {
+                            widget.intervento.merce?.preventivo = value == false;
+                          });
+                        },
+                      ),
+                      Text("No"),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: (){
+                    modificaRichiestaPreventivo(intervento.merce!.preventivo!);
+                  },
+                  child: Text("Conferma"),
+                ),
+                SizedBox(width: 5),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Chiudi"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void modificaRichiestaPreventivo(bool preventivo) async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : intervento.merce?.risoluzione,
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Richiesta preventivo modificata con successo!'),
+          ),
+        );
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  void modificaRisoluzione() async{
+    try{
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/merceInRiparazione'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': intervento.merce?.id,
+          'data' : intervento.merce?.data?.toIso8601String(),
+          'articolo' : intervento.merce?.articolo,
+          'accessori' : intervento.merce?.accessori,
+          'difetto_riscontrato' : intervento.merce?.difetto_riscontrato,
+          'password' : intervento.merce?.password,
+          'dati': intervento.merce?.dati,
+          'presenza_magazzino' : intervento.merce?.presenza_magazzino,
+          'preventivo': intervento.merce?.preventivo,
+          'importo_preventivato' : intervento.merce?.importo_preventivato,
+          'preventivo_accettato' : intervento.merce?.preventivo_accettato,
+          'diagnosi' : intervento.merce?.diagnosi,
+          'risoluzione' : risoluzioneController.text.toUpperCase(),
+          'data_conclusione': intervento.merce?.data_conclusione?.toIso8601String(),
+          'data_consegna' : intervento.merce?.data_consegna?.toIso8601String(),
+        }),
+      );
+      if(response.statusCode == 201){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Risoluzione modificata con successo!'),
+          ),
+        );
+        setState(() {
+          widget.intervento.merce?.diagnosi = diagnosiController.text;
+        });
+      }
+    } catch(e){
+      print('Qualcosa non va: $e');
+    }
+  }
+
+  Future<void> uploadFile(File file) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$ipaddress/pdfu/intervento'),
+      );
+      request.fields['intervento'] = widget.intervento.id!;
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'pdf', // Nome del parametro nel controller
+          file.path,
+        ),
+      );
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print("File caricato con successo!");
+        setState(() {
+          selectedFile = null;
+        });
+
+        // Mostra l'alert dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Successo!"),
+              content: Text("Documento caricato correttamente!"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Chiudi il dialog
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        print("Errore durante il caricamento del file: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Errore durante il caricamento del file: $e");
+    }
+  }
+
+  Widget buildRelazioneForm({required String title}) {
+
+    return SizedBox(
+      width: 350,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // Allinea il contenuto a sinistra
+        children: [
+          Text(
+            title,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16), // Spazio tra il titolo e il campo di testo
+          Row(
+            children: [
+              SizedBox(
+                width: 300,
+                child: TextFormField(
+                  minLines: 3,
+                  maxLines: 3,
+                  style: TextStyle(fontSize: 13),
+                  controller: rapportinoController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),// Spazio tra il campo di testo e l'icona
+              IconButton(
+                icon: Icon(Icons.content_copy),
+                onPressed: () {
+                  if (rapportinoController.text.isNotEmpty) {
+                    Clipboard.setData(ClipboardData(text: rapportinoController.text));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Rapportino copiato!')),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> saveModifiche() async {
+    // If _selectedTimeAppuntamento is not null, convert TimeOfDay to DateTime, else use widget.intervento.orario_appuntamento
+    DateTime? orario;
+    if (_selectedTimeAppuntamento != null) {
+      final now = DateTime.now();
+      orario = DateTime(now.year, now.month, now.day, _selectedTimeAppuntamento!.hour, _selectedTimeAppuntamento!.minute);
+    } else {
+      orario = widget.intervento.orario_appuntamento;
+    }
+    String? descrizione = descrizioneController.text.isNotEmpty
+        ? descrizioneController.text
+        : widget.intervento.descrizione;
+    VeicoloModel? veicolo = selectedVeicolo != null ? selectedVeicolo : widget.intervento.veicolo;
+    ClienteModel? cliente = selectedCliente != null ? selectedCliente : widget.intervento.cliente;
+    DestinazioneModel? destinazione = selectedDestinazione != null ? selectedDestinazione : widget.intervento.destinazione;
+    TipologiaPagamentoModel? pagamento = selectedTipologia ?? widget.intervento.tipologia_pagamento;
+
+    try {
+      // Making HTTP request to update the 'intervento
+      final response = await http.post(
+        Uri.parse('$ipaddress/api/intervento'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'id': widget.intervento.id,
+          'attivo' : widget.intervento.attivo,
+          'visualizzato' : widget.intervento.visualizzato,
+          'titolo' : widget.intervento.titolo,
+          'numerazione_danea' : widget.intervento.numerazione_danea,
+          'priorita' : widget.intervento.priorita.toString().split('.').last,
+          'data_apertura_intervento': widget.intervento.data_apertura_intervento?.toIso8601String(),
+          'data': widget.intervento.data?.toIso8601String(),
+          'orario_appuntamento': orario?.toIso8601String(),  // Ensured correct DateTime
+          'posizione_gps': widget.intervento.posizione_gps,
+          'orario_inizio': widget.intervento.orario_inizio?.toIso8601String(),
+          'orario_fine': widget.intervento.orario_fine?.toIso8601String(),
+          'descrizione': descrizione,  // Using potentially updated descrizione
+          'utente_importo' : intervento.utente_importo,
+          'importo_intervento': widget.intervento.importo_intervento,  // Using potentially updated importo
+          'saldo_tecnico' : widget.intervento.saldo_tecnico,
+          'prezzo_ivato': widget.intervento.prezzo_ivato,
+          'iva' : widget.intervento.iva,
+          'acconto': widget.intervento.acconto,
+          'assegnato': widget.intervento.assegnato,
+          'accettato_da_tecnico' : widget.intervento.accettato_da_tecnico,
+          'annullato' : widget.intervento.annullato,
+          'conclusione_parziale': widget.intervento.conclusione_parziale,
+          'concluso': widget.intervento.concluso,
+          'saldato': widget.intervento.saldato,
+          'saldato_da_tecnico': widget.intervento.saldato_da_tecnico,
+          'note': widget.intervento.note,
+          'relazione_tecnico': rapportinoController.text,
+          'firma_cliente': widget.intervento.firma_cliente,
+          'utente_apertura' : widget.intervento.utente_apertura?.toMap(),
+          'utente': widget.intervento.utente?.toMap(),
+          'cliente': cliente?.toMap(),
+          'veicolo': veicolo?.toMap(),
+          'merce': widget.intervento.merce?.toMap(),
+          'tipologia': widget.intervento.tipologia?.toMap(),
+          'categoria': widget.intervento.categoria_intervento_specifico?.toMap(),
+          'tipologia_pagamento': pagamento?.toMap(),
+          'destinazione': destinazione?.toMap(),
+          'gruppo': widget.intervento.gruppo?.toMap(),
+        }),
+      );
+      // Handle response success/failure
+      if (response.statusCode == 201) {
+        print('Modifica effettuata');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Intervento modificato con successo!'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DettaglioInterventoNewPageAndroid(intervento: InterventoModel.fromJson(jsonDecode(response.body)), utente: widget.utente)),
+        );
+      } else {
+        print('Errore nella richiesta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Errore nell\'aggiornamento dell\'intervento: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context){
+    final fasiNonConcluse = fasiRiparazione.where((fase) => fase.conclusione != true).toList();
+    final fasiConcluse = fasiRiparazione.where((fase) => fase.conclusione == true).toList();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
         title: Text('${intervento.titolo}', style: TextStyle(color: Colors.white)),
       ),
-      // drawer: Drawer(
-      //   backgroundColor: Colors.grey[700],
-      // ),
+
+      floatingActionButton: Stack(
+        children: [
+          Positioned(
+            bottom: 30,
+            right: 16,
+            child: SpeedDial(
+              animatedIcon: AnimatedIcons.menu_close,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              children: [
+                SpeedDialChild(
+                  child: Icon(Icons.attach_file, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Allega foto'.toUpperCase(),
+                  onTap: () => takePicture(),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.save, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Salva modifiche'.toUpperCase(),
+                  onTap: () => saveModifiche(),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.delete_forever, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Elimina intervento'.toUpperCase(),
+                  onTap: () => showDeleteConfirmationDialog(context),
+                ),
+                SpeedDialChild(
+                  child: Icon(Icons.picture_as_pdf_outlined, color: Colors.white),
+                  backgroundColor: Colors.red,
+                  label: 'Genera pdf'.toUpperCase(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PDFInterventoPage(
+                        intervento: widget.intervento,
+                        note: allNote,
+                        //descrizione: widget.intervento.relazione_tecnico.toString(),
+                      ),
+                    ),
+                  ),
+                ),
+
+              ],
+            ),
+          )
+        ],
+      ),
       body: SizedBox.expand(
         child: PageView(
           controller: _pageController,
@@ -1509,6 +2873,563 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
                           context: context
                       ),
                       SizedBox(height: 20),
+                      if(widget.intervento.merce != null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Merce in riparazione',
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                            ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Articolo',
+                                    value: widget.intervento.merce?.articolo ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: (){
+                                    setState(() {
+                                      modificaArticoloVisibile = !modificaArticoloVisibile;
+                                    });
+                                  },
+                                )
+                              ],
+                            ),
+                            if(modificaArticoloVisibile)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: articoloController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Articolo',
+                                        hintText: 'Modifica titolo',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                    ),
+                                    child: FloatingActionButton(
+                                      heroTag: "TagArticolo",
+                                      onPressed: () {
+                                        if(articoloController.text.isNotEmpty){
+                                          modificaArticolo();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare un articolo vuoto!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica articolo'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Accessori',
+                                    value: widget.intervento.merce?.accessori ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: (){
+                                    setState(() {
+                                      modificaAccessoriVisibile = !modificaAccessoriVisibile;
+                                    });
+                                  },
+                                )
+                              ],
+                            ),
+                            if(modificaAccessoriVisibile)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: accessoriController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Accessori',
+                                        hintText: 'Modifica accessori',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                    ),
+                                    child: FloatingActionButton(
+                                      heroTag: "TagAccessori",
+                                      onPressed: () {
+                                        if(accessoriController.text.isNotEmpty){
+                                          modificaAccessori();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare accessori vuoti!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica accessori'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Difetto riscontrato',
+                                    value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: (){
+                                      setState(() {
+                                        modificaDifettoVisibile = !modificaDifettoVisibile;
+                                      });
+                                    }
+                                )
+                              ],
+                            ),
+                            if(modificaDifettoVisibile)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: difettoController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Difetto riscontrato',
+                                        hintText: 'Modifica difetto',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                    ),
+                                    child: FloatingActionButton(
+                                      heroTag: "TagDifetto",
+                                      onPressed: () {
+                                        if(difettoController.text.isNotEmpty){
+                                          modificaDifetto();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare un difetto vuoto!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica difetto'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Richiesta di preventivo',
+                                    value: booleanToString(widget.intervento.merce?.preventivo ?? false),
+                                    context: context
+                                ),
+                                IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed : (){
+                                      showPreventivoDialog(context);
+                                    }
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Importo preventivato',
+                                    value: '${widget.intervento.merce?.importo_preventivato.toString()}€' ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                  icon : Icon(Icons.edit),
+                                  onPressed: (){
+                                    setState(() {
+                                      modificaImportoMerceVisibile = !modificaImportoMerceVisibile;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            if(modificaImportoMerceVisibile)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: importoMerceController,
+                                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.allow(
+                                          RegExp(r'^\d+\.?\d{0,2}'),
+                                        ),
+                                      ],
+                                      decoration: InputDecoration(
+                                        labelText: 'Importo preventivato',
+                                        hintText: 'Modifica importo preventivato',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    child: FloatingActionButton(
+                                      heroTag: "TagImporto",
+                                      onPressed: () {
+                                        if (importoMerceController.text.isNotEmpty) {
+                                          modificaImportoMerce();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare un importo nullo!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              'Modifica importo preventivato'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center,
+                                              softWrap: true,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Password',
+                                    value: widget.intervento.merce?.password ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: (){
+                                      setState(() {
+                                        modificaPasswordVisibile = !modificaPasswordVisibile;
+                                      });
+                                    }
+                                )
+                              ],
+                            ),
+                            if(modificaPasswordVisibile)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: passwordController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Password',
+                                        hintText: 'Modifica password',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                    ),
+                                    child: FloatingActionButton(
+                                      heroTag: "TagPassword",
+                                      onPressed: () {
+                                        if(passwordController.text.isNotEmpty){
+                                          modificaPassword();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare una password vuota!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica password'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Dati',
+                                    value: widget.intervento.merce?.dati ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                  icon : Icon(Icons.edit),
+                                  onPressed: (){
+                                    setState(() {
+                                      modificaDatiVisibile = !modificaDatiVisibile;
+                                    });
+                                  },
+                                )
+                              ],
+                            ),
+                            if(modificaDatiVisibile)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: datiController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Dati',
+                                        hintText: 'Modifica dati',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                    ),
+                                    child: FloatingActionButton(
+                                      heroTag: "TagDati",
+                                      onPressed: () {
+                                        if(datiController.text.isNotEmpty){
+                                          modificaDati();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare dei dati nulli!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica dati'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Diagnosi',
+                                    value: widget.intervento.merce?.diagnosi ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed : (){
+                                      setState(() {
+                                        modificaDiagnosiVisibile = !modificaDiagnosiVisibile;
+                                      });
+                                    }
+                                )
+                              ],
+                            ),
+                            if(modificaDiagnosiVisibile)
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: diagnosiController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Diagnosi',
+                                        hintText: 'Modifica diagnosi',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                    ),
+                                    child: FloatingActionButton(
+                                      heroTag: "TagDiagnosi",
+                                      onPressed: () {
+                                        if(diagnosiController.text.isNotEmpty){
+                                          modificaDiagnosi();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare una diagnosi vuota!'),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica diagnosi'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            Row(
+                              children: [
+                                buildInfoRow(
+                                    title: 'Risoluzione',
+                                    value: widget.intervento.merce?.risoluzione ?? 'N/A',
+                                    context: context
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.edit),
+                                  onPressed: (){
+                                    setState(() {
+                                      modificaRisoluzioneVisibile = !modificaRisoluzioneVisibile;
+                                    });
+                                  },
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      SizedBox(height:20),
                       Text("Informazioni Cliente", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
                       buildInfoRow(
                           title: 'Cliente',
@@ -1531,7 +3452,7 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
                           context: context
                       ),
                       buildInfoRow(
-                          title: 'Cell. destinazione',
+                          title: 'Cel. destinazione',
                           value: widget.intervento.destinazione?.cellulare ?? 'N/A',
                           context: context
                       ),
@@ -1845,9 +3766,6 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
                             value: getPrezzoIvato(widget.intervento), // Usa la funzione per calcolare il valore del prezzo ivato
                             context: context,
                           ),
-                          SizedBox(
-                            width: 4,
-                          ),
                           TextButton(
                             onPressed: () {
                               openImportoDialog(context, _importoController);
@@ -1858,15 +3776,857 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
                             ),
                           )
                         ],
-                      )
+                      ),
+                      buildInfoRow(
+                        title: 'Inserito da',
+                        value: intervento.utente_importo ?? "//", // Usa la funzione per calcolare il valore del prezzo ivato
+                        context: context,
+                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children:[
+                            buildInfoRow(
+                                title: 'Saldato',
+                                value: booleanToString(widget.intervento.saldato ?? false),
+                                context: context
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    bool isSaldato = widget.intervento.saldato ?? false;
+
+                                    return AlertDialog(
+                                      title: Text(isSaldato
+                                          ? 'L\'intervento non è stato saldato?'
+                                          : 'L\'intervento è stato saldato?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.intervento.saldato = !isSaldato;
+                                            });
+                                            Navigator.of(context).pop(); // Chiude il dialogo
+                                          },
+                                          child: Text(isSaldato ? 'Non saldato' : 'Saldato'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(); // Chiude il dialogo senza fare nulla
+                                          },
+                                          child: Text('Annulla'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ]
+                      ),
+                      Row(
+                        children: [
+                          buildInfoRow(
+                              title: "Saldo tecnico",
+                              context: context,
+                              value : widget.intervento.saldo_tecnico != null ? widget.intervento.saldo_tecnico!.toString() : "N/A"
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: (){
+                                setState(() {
+                                  modificaSaldoTecnicoVisibile = !modificaSaldoTecnicoVisibile;
+                                });
+                              }
+                          ),
+                        ],
+                      ),
+                      if(modificaSaldoTecnicoVisibile)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: saldoController,
+                                decoration: InputDecoration(
+                                  labelText: 'Saldo tecnico',
+                                  hintText: 'Aggiungi il saldo del tecnico',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "Tag4",
+                                onPressed: () {
+                                  if(saldoController.text.isNotEmpty){
+                                    modificaSaldo();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare un titolo vuoto!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica saldo'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      Row(
+                        children: [
+                          buildInfoRow(
+                            title: 'Metodo di pagamento',
+                            value: widget.intervento.tipologia_pagamento != null
+                                ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
+                                : 'N/A',
+                            context: context,
+                          ),
+
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  TipologiaPagamentoModel? tempSelectedTipologia = selectedTipologia ?? widget.intervento.tipologia_pagamento;
+
+                                  return AlertDialog(
+                                    title: Text("Seleziona Metodo di Pagamento"),
+                                    content: StatefulBuilder(
+                                      builder: (BuildContext context, StateSetter setState) {
+                                        return DropdownButton<TipologiaPagamentoModel>(
+                                          value: tempSelectedTipologia,
+                                          isExpanded: true,
+                                          items: tipologiePagamento.map((tipologia) {
+                                            return DropdownMenuItem<TipologiaPagamentoModel>(
+                                              value: tipologia,
+                                              child: Text(tipologia.descrizione ?? "Sconosciuto"),
+                                            );
+                                          }).toList(),
+                                          onChanged: (TipologiaPagamentoModel? newValue) {
+                                            setState(() {
+                                              tempSelectedTipologia = newValue;
+                                            });
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Chiude il dialog senza salvare
+                                        },
+                                        child: Text("Annulla"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedTipologia = tempSelectedTipologia; // Salva il valore selezionato
+                                            widget.intervento.tipologia_pagamento = tempSelectedTipologia;
+                                          });
+                                          Navigator.of(context).pop(); // Chiude il dialog dopo aver salvato
+                                        },
+                                        child: Text("Conferma"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 8.0),
+                          if(prodottiDdt.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Prodotti inseriti nel DDT:',style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold)),
+                                  ...prodottiDdt.map((relazione){
+                                    return ListTile(
+                                      title: Text(
+                                          'Codice Danea: ${relazione.prodotto?.codice_danea}, ${relazione.prodotto?.descrizione}'
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
+                            ),
+                          if(allProdotti.isEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Nessun prodotto utilizzato', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                              ],
+                            ),
+                          if (allProdotti.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Prodotti utilizzati:',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                                ...allProdotti.map((relazione) {
+                                  bool isInHistoricalUser = relazione.presenza_storico_utente ?? true; // Supponendo che il valore predefinito sia true
+                                  bool hasDdt = relazione.ddt != null; // Controlla se ddt non è null
+                                  bool hasSerial = relazione.seriale != null;
+                                  bool shouldBeRed = !isInHistoricalUser && !hasDdt; // Colore rosso se isInHistoricalUser è false e se hasDdt è false
+
+                                  String prezzoFornitore = relazione.prodotto?.prezzo_fornitore != null
+                                      ? relazione.prodotto!.prezzo_fornitore!.toStringAsFixed(2) + "€"
+                                      : "Non disponibile"; // Controlla se prezzo_fornitore è null
+
+                                  return ListTile(
+                                    title: Text(
+                                      '${relazione.prodotto?.descrizione ?? "Descrizione non disponibile"}',
+                                      style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore - Quantità: ${relazione.quantita?.toStringAsFixed(2)}',
+                                          style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                        ),
+                                        SizedBox(height: 6),
+                                        Text(
+                                          '${relazione.seriale ?? ''}', style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                SizedBox(height: 16), // Aggiungere uno spazio tra la lista e il totale
+                                Text(
+                                  'Totale prezzo fornitore: ${totalePrezzoFornitore.toStringAsFixed(2)}€',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+
                     ],
                   ),
                 ),
               ),
             ),
             //Fine info finanziarie, inizio info tecnico
-            Container(color: Colors.blue,),
-            Container(color: Colors.yellow,),
+            Container(
+              child: Padding(
+                padding: EdgeInsets.all(7),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'TECNICO',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                      ),
+                      SizedBox(height: 12.0),
+                      buildInfoRow(
+                          title: 'Assegnato',
+                          value: booleanToString(widget.intervento.assegnato ?? false),
+                          context: context
+                      ),
+                      if (widget.intervento.utente == null)
+                        FloatingActionButton(
+                          heroTag: "Tag",
+                          onPressed: () {
+                            _showUtentiDialog();
+                          },
+                          child: Text(
+                            '  Assegna  ',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      Row(
+                        children: [
+                          buildInfoRowUtente(
+                              title: 'Resp.',
+                              value: '${widget.intervento.utente?.nomeCompleto() ?? 'Non assegnato'}',
+                              visualizzato: widget.intervento!.visualizzato!,
+                              context: context
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: (){
+                              _showUtentiDialog();
+                            },
+                          )
+                        ],
+                      ),
+                      if (otherUtenti.isNotEmpty)
+                        SizedBox(
+                          width: 300,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Altri utenti:',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              ...otherUtenti.map((relazione) => buildInfoRowUtente(
+                                  title: 'Utente',
+                                  value: '${relazione.utente?.nomeCompleto() ?? 'N/A'}',
+                                  visualizzato: relazione.visualizzato!,//widget.intervento!.visualizzato!,
+                                  context: context
+                              )),
+                            ],
+                          ),
+                        ),
+                      buildInfoRow(
+                          title: "Posizione gps",
+                          context: context,
+                          value : widget.intervento.posizione_gps ?? "N/A"
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 300,
+                            child: buildInfoRow(
+                                title: "Veicolo",
+                                context: context,
+                                value : widget.intervento.veicolo?.descrizione ?? "N/A"
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: (){
+                              showVeicoloDialog(context, allVeicoli, selectedVeicolo);
+                            },
+                          )
+                        ],
+                      ),
+                      SizedBox(height: 15),
+                      buildRelazioneForm(title: 'Relazione tecnico'),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children:[
+                            buildInfoRow(
+                                title: 'Concluso',
+                                value: booleanToString(widget.intervento.concluso ?? false),
+                                context: context
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                // Mostra il dialogo quando l'utente tocca l'icona
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    bool isConcluso = widget.intervento.concluso ?? false;
+
+                                    return AlertDialog(
+                                      title: Text(isConcluso
+                                          ? 'L\'intervento non è concluso?'
+                                          : 'L\'intervento è concluso?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.intervento.concluso = !isConcluso;
+                                            });
+                                            Navigator.of(context).pop(); // Chiude il dialogo
+                                          },
+                                          child: Text(isConcluso ? 'Non concluso' : 'Concluso'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(); // Chiude il dialogo senza fare nulla
+                                          },
+                                          child: Text('Annulla'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ]
+                      ),
+                      if(allNote.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Note dei tecnici:',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            ...allNote.map((nota) => ListTile(
+                              title: Text('${nota.utente?.nome} ${nota.utente?.cognome}'),
+                              subtitle: Text('${nota.nota}'),
+                            )),
+                          ],
+                        ),
+                      if(allNote.isEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 14,),
+                            Text('Nessuna nota relativa all\'intervento', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                          ],
+                        ),
+                      SizedBox(height: 20),
+                      if(allCommissioni.isEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Nessuna commissione creata', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                          ],
+                        ),
+                      SizedBox(height: 16),
+                      if(allCommissioni.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Commissioni:',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            ...allCommissioni.map((commissione) => ListTile(
+                              title: Text(
+                                'Creazione: ${commissione.data_creazione}, utente: ${commissione.utente?.nomeCompleto()}',
+                                style: TextStyle(
+                                  color: commissione.concluso! ? Colors.green : Colors.red,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Descrizione: ${commissione.descrizione}, note: ${commissione.note}',
+                                style: TextStyle(
+                                  color: commissione.concluso! ? Colors.green : Colors.red,
+                                ),
+                              ),
+                            )),
+                          ],
+                        ),
+                      ElevatedButton(
+                        onPressed: () {
+                          TextEditingController descriptionController = TextEditingController();
+                          TextEditingController notesController = TextEditingController();
+                          UtenteModel? selectedUser;
+                          DateTime? selectedDate;
+
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Crea Commissione'),
+                                content: StatefulBuilder(
+                                  builder: (BuildContext context, StateSetter setState) {
+                                    return SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Bottone per selezionare la data
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              DateTime? pickedDate = await showDatePicker(
+                                                context: context,
+                                                initialDate: DateTime.now(),
+                                                firstDate: DateTime(2000),
+                                                lastDate: DateTime(2100),
+                                              );
+                                              if (pickedDate != null) {
+                                                setState(() {
+                                                  selectedDate = pickedDate;
+                                                });
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.grey[200],
+                                              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                            ),
+                                            child: Text(
+                                              selectedDate != null
+                                                  ? 'Data selezionata: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'
+                                                  : 'Seleziona Data',
+                                              style: TextStyle(color: Colors.black),
+                                            ),
+                                          ),
+                                          SizedBox(height: 16),
+                                          // Campo di testo per la descrizione
+                                          TextFormField(
+                                            controller: descriptionController,
+                                            decoration: InputDecoration(
+                                              labelText: 'Descrizione',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                          ),
+                                          SizedBox(height: 16),
+                                          // Campo di testo per le note
+                                          TextFormField(
+                                            controller: notesController,
+                                            decoration: InputDecoration(
+                                              labelText: 'Note',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                          ),
+                                          SizedBox(height: 16),
+                                          // Dropdown per la selezione dell'utente
+                                          DropdownButtonFormField<UtenteModel>(
+                                            decoration: InputDecoration(
+                                              labelText: 'Seleziona Utente',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            value: selectedUser,
+                                            items: allUtenti.map((utente) {
+                                              return DropdownMenuItem<UtenteModel>(
+                                                value: utente,
+                                                child: Text(utente.nomeCompleto() ?? "Anonimo"),
+                                              );
+                                            }).toList(),
+                                            onChanged: (UtenteModel? newValue) {
+                                              setState(() {
+                                                selectedUser = newValue;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      if (descriptionController.text.isNotEmpty &&
+                                          notesController.text.isNotEmpty &&
+                                          selectedUser != null  ){
+                                        creaCommissione(selectedUser!, descriptionController.text, notesController.text, selectedDate);
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text("Completa tutti i campi prima di assegnare")),
+                                        );
+                                      }
+                                    },
+                                    child: Text(
+                                      'ASSEGNA',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), backgroundColor: Colors.red,
+                          textStyle: TextStyle(fontSize: 18),
+                        ),
+                        child: Text(
+                          'CREA COMMISSIONE',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Fine info tecnico, inizio immagini e pdf
+            Container(
+              child: Padding(
+                padding: EdgeInsets.all(7),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'IMMAGINI',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                      ),
+                      FutureBuilder<List<Uint8List>>(
+                        future: _futureImages,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Wrap(
+                              spacing: 16,
+                              runSpacing: 16,
+                              children: snapshot.data!.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                Uint8List imageData = entry.value;
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PhotoViewPage(
+                                          images: snapshot.data!,
+                                          initialIndex: index, // Passa l'indice dell'immagine cliccata
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 150, // aumenta la larghezza del container
+                                    height: 170, // aumenta l'altezza del container
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 1), // aggiungi bordo al container
+                                    ),
+                                    child: Image.memory(
+                                      imageData,
+                                      fit: BoxFit.cover, // aggiungi fit per coprire l'intero spazio
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return Text('Nessuna foto presente nel database!');
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        },
+                      ),
+                      SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'DOCUMENTI',
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                          ),
+                          SizedBox(width : 8),
+                          IconButton(
+                            onPressed: (){
+                              _pickFile();
+                            },
+                            icon: Icon(Icons.add, color: Colors.grey,),
+                            tooltip: "Aggiungi pdf",
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5),
+                      FutureBuilder<List<String>>(
+                        future: fetchPdfFiles(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            final error = snapshot.error.toString();
+                            if (error.contains('Directory non trovata')) {
+                              return Center(child: Text('Nessun allegato presente.'));
+                            } else if (error.contains('connessione al server')) {
+                              return Center(child: Text('Errore di connessione al server.'));
+                            } else {
+                              return Center(child: Text('Errore sconosciuto: $error'));
+                            }
+                          } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                            return Center(child: Text('Nessun file PDF trovato.'));
+                          } else if (snapshot.hasData) {
+                            final pdfFiles = snapshot.data!;
+                            // Aggiunta di ConstrainedBox per vincoli al GridView
+                            return ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: MediaQuery.of(context).size.height * 0.6, // Dinamico
+                              ),
+                              child: GridView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2, // Due card per riga
+                                  crossAxisSpacing: 8.0, // Margine orizzontale tra le card
+                                  mainAxisSpacing: 8.0, // Margine verticale tra le card
+                                  childAspectRatio: 0.75, // Rapporto larghezza/altezza
+                                ),
+                                itemCount: pdfFiles.length,
+                                itemBuilder: (context, index) {
+                                  final fileName = pdfFiles[index];
+                                  return SizedBox(
+                                      width: MediaQuery.of(context).size.width / 2 - 12, // Larghezza dinamica
+                                      child: Card(
+                                        elevation: 3,
+                                        color: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                          side: BorderSide(
+                                            color: Colors.red,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            // Icona PDF
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 8.0),
+                                              child: Icon(
+                                                Icons.picture_as_pdf,
+                                                size: 50, // Ridotto per adattarsi meglio
+                                                color: Colors.redAccent,
+                                              ),
+                                            ),
+                                            // Nome del file
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                                              child: Text(
+                                                fileName,
+                                                textAlign: TextAlign.center,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: 14, // Ridotto leggermente per schermi più piccoli
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            // Pulsanti
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom: 8.0),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  // Bottone Apri
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      await _openPdfFile(context, widget.intervento.id!, fileName);
+                                                    },
+                                                    child: Text(
+                                                      'Apri',
+                                                      style: TextStyle(fontSize: 12), // Font size adattato
+                                                    ),
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.red,
+                                                      foregroundColor: Colors.white,
+                                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                                    ),
+                                                  ),
+                                                  // Bottone Elimina
+                                                  IconButton(
+                                                    icon: Icon(Icons.delete_forever),
+                                                    color: Colors.red,
+                                                    onPressed: () {
+                                                      _showDeleteDialog(context, widget.intervento.id!, fileName);
+                                                    },
+                                                    iconSize: 20, // Ridotto per coerenza
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                  );
+                                },
+                              ),
+                            );
+                          } else {
+                            return Center(child: Text('Nessun risultato.'));
+                          }
+                        },
+                      ),
+                      if(pickedImages.length > 0)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 20),
+                            Text("Immagini da caricare:",
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),),
+                            _buildImagePreview(),
+                            SizedBox(height: 20),
+                            pickedImages.isNotEmpty ? ElevatedButton(
+                              onPressed: pickedImages.isNotEmpty ? savePics : null, // Attiva solo se ci sono immagini
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white, backgroundColor: Colors.red,
+                              ),
+                              child: Text('Salva Foto', style: TextStyle(fontSize: 18.0)),
+                            ) : Container(),
+                          ],
+                        ),
+                      if(selectedFile != null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'File selezionato: ${selectedFile!.path.split('/').last}',
+                              style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    uploadFile(selectedFile!);
+                                  },
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white, // Colore del testo
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8), // Bordi arrotondati
+                                    ),
+                                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Spaziatura interna
+                                  ),
+                                  child: Text(
+                                    "Salva",
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width : 10,
+                                ),
+                                IconButton(
+                                  onPressed: (){
+                                    setState((){
+                                      selectedFile = null;
+                                    });
+                                  },
+                                  icon: Icon(Icons.delete, color: Colors.grey,),
+                                  tooltip: "Elimina",
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             //Container(color: Colors.orange,),
           ],
         ),

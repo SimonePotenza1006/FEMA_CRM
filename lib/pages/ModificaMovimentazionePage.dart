@@ -42,6 +42,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
   void initState(){
     super.initState();
     getAllClienti();
+    _selectedTipoMovimentazione = widget.movimento.tipo_movimentazione;
     _importoController = TextEditingController(text: widget.movimento.importo!.toStringAsFixed(2));
     _descrizioneController = TextEditingController(text: widget.movimento.descrizione);
   }
@@ -166,8 +167,10 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
                       label = 'Pagamento';
                     } else if(value == TipoMovimentazione.Prelievo){
                       label = 'Prelievo';
-                    } else {
+                    } else if(value == TipoMovimentazione.Versamento){
                       label = 'Versamento';
+                    } else{
+                      label = "Chiusura";
                     }
                     return DropdownMenuItem<TipoMovimentazione>(
                       value: value,
@@ -399,7 +402,7 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
           'data' : _selectedDate?.toIso8601String(),
           'utente' : _selectedUtente?.toMap(),
           'cliente' : cliente,
-          'tipo_movimentazione': selectedTipologia.toString().split('.').last,
+          'tipo_movimentazione': _selectedTipoMovimentazione.toString().split('.').last,
           'descrizione' : _descrizioneController.text,
           'importo' : double.parse(_importoController.text.toString())
         }),
@@ -411,7 +414,6 @@ class _ModificaMovimentazionePageState extends State<ModificaMovimentazionePage>
             duration: Duration(seconds: 3), // Durata dello Snackbar
           ),
         );
-        Navigator.pop(context);
       }
     } catch(e){
       print('Errore durante la modifica : $e');
