@@ -307,9 +307,9 @@ class _ModificaTaskPageState
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
-          if (widget.utente.cognome! == "Mazzei" ||
+          if (//widget.utente.cognome! == "Mazzei" ||
               (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id)
-              || TipoTaskModel.fromJson(item).utente == null
+              || (TipoTaskModel.fromJson(item).utente == null && (TipoTaskModel.fromJson(item).id == '9' || TipoTaskModel.fromJson(item).id == '10'))
               || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
             tipi.add(TipoTaskModel.fromJson(item));
         }
@@ -634,7 +634,10 @@ class _ModificaTaskPageState
                                   _selectedTipo?.utente != null ?
                                   selectedUtente = allUtenti.firstWhere((element) =>
                                   element.id== (_selectedTipo?.utente!.id != widget.utente.id ? _selectedTipo?.utente!.id! : _selectedTipo?.utentecreate!.id!)) : null;
-                                  _selectedTipo?.utente != null ? _condiviso = true : null;
+
+                                  if (_selectedTipo?.utente != null) _condiviso = true;
+
+                                  if (_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) _condiviso = false;
                                 });
                               },
                               items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
@@ -684,7 +687,10 @@ class _ModificaTaskPageState
                             ),
                           ),
                           SizedBox(height: 20),
-                          //(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ?
+                          //se è una tipologia creata da me e non condivisa con nessuno -> task non condivisibile
+                          //e se è tipologia diversa da 9 o 10
+                          ((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
+                              (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
                           SizedBox(
                             width: 400,
                             child: CheckboxListTile(
@@ -703,6 +709,9 @@ class _ModificaTaskPageState
                                   _condiviso = value!;
                                   if (_condiviso) {
                                     _condivisoController.clear();
+                                  } else {
+                                    selectedUtente = allUtenti.firstWhere((element) => element.id == widget.utente.id);//null;
+
                                   }
                                 });
                               },

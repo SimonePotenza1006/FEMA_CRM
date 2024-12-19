@@ -726,12 +726,14 @@ class _CreazioneTaskPageState
                               setState(() {
 
                                     _selectedTipo = newValue;
+
                                     _selectedTipo?.utente != null ?
                                       selectedUtente = allUtenti.firstWhere((element) =>
                                       element.id== (_selectedTipo?.utente!.id != widget.utente.id ? _selectedTipo?.utente!.id! : _selectedTipo?.utentecreate!.id!)) : null;
-                                    _selectedTipo?.utente != null ? _condiviso = true : null;
 
+                                    if (_selectedTipo?.utente != null) _condiviso = true;
 
+                                    if (_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) _condiviso = false;
                               });
                             },
                             items: [
@@ -803,6 +805,11 @@ class _CreazioneTaskPageState
 
                         ],),
                         SizedBox(height: 20),
+                        //se è una tipologia creata da me e non condivisa con nessuno -> task non condivisibile
+                        //e se è tipologia diversa da 9 o 10
+                        //((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
+                        //    (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
+                        _selectedTipo?.id == '9' || _selectedTipo?.id == '10' || !(_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ?
                         SizedBox(
                           width: 200,
                           child: CheckboxListTile(
@@ -815,12 +822,13 @@ class _CreazioneTaskPageState
                                 if (_condiviso) {
                                   _condivisoController.clear();
                                 } else {
-                                  selectedUtente = null;
+                                  selectedUtente = allUtenti.firstWhere((element) => element.id == widget.utente.id);//null;
+
                                 }
                               });
                             },
                           ),
-                        ),
+                        ) : Container(),
                         SizedBox(height: 10),// Button
                         if (_condiviso) SizedBox(
                           width: 400,
@@ -831,15 +839,25 @@ class _CreazioneTaskPageState
                                 selectedUtente = newValue;
                               });
                             },
-                            items: allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
+                            items: [
+// Aggiungi l'opzione "Nessun utente"
+                              /*DropdownMenuItem<UtenteModel>(
+                                value: null, // Puoi usare null per rappresentare "Nessun utente"
+                                child: Text(
+                                  '- NESSUN UTENTE -',
+                                  style: TextStyle(fontSize: 13, color: Colors.black87),
+                                ),
+                              ),*/
+                            ...allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
                               return DropdownMenuItem<UtenteModel>(
                                 value: utente,
                                 child: Text(
                                   utente.nomeCompleto()!.toUpperCase(),
-                                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                                  style: TextStyle(fontSize: 14, color: Colors.black54),
                                 ),
                               );
                             }).toList(),
+                            ],
                             decoration: InputDecoration(
                               labelText: 'SELEZIONA UTENTE',
                               labelStyle: TextStyle(
@@ -1184,9 +1202,10 @@ class _CreazioneTaskPageState
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
           if (//widget.utente.cognome! == "Mazzei" ||
-              (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id)
-              || TipoTaskModel.fromJson(item).utente == null
-              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
+              (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id) //create da me
+                  //personale e aziendale che non sono create da me ma sono comunque generiche per tutti
+              || (TipoTaskModel.fromJson(item).utente == null && (TipoTaskModel.fromJson(item).id == '9' || TipoTaskModel.fromJson(item).id == '10'))
+              || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id)) //che mi hanno condiviso
             tipi.add(TipoTaskModel.fromJson(item));
         }
         setState(() {

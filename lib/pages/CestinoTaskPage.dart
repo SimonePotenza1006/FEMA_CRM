@@ -1361,6 +1361,9 @@ class TaskDataSource extends DataGridSource{
   UtenteModel? selectedUtenteCondivisione;
   UtenteModel selectedUtente;
   int tipoIdGlobal;
+  TextEditingController _titoloController = TextEditingController();
+  TextEditingController _riferimentoController = TextEditingController();
+  TextEditingController _descrizioneController = TextEditingController();
 
   TaskDataSource(
       this.context,
@@ -1840,6 +1843,312 @@ class TaskDataSource extends DataGridSource{
         );
       } else {
         return GestureDetector(
+          onLongPress: () {
+
+            _titoloController = TextEditingController(text: task.titolo!.toUpperCase());
+            _riferimentoController = TextEditingController(text: task.riferimento != '' ? task.riferimento!.toUpperCase() : '//');
+            _descrizioneController = TextEditingController(text: task.descrizione != '' ? task.descrizione!.toUpperCase() : '//');
+            //utente.id == task.utentecreate!.id ?
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
+                  builder: (BuildContext context, StateSetter setState) {
+                    return AlertDialog(
+                        contentPadding: EdgeInsets.all(4),
+                        //title: Text('DETTAGLIO TASK \"'.toUpperCase()+task.titolo!.toUpperCase()+'\"', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                        //content: Text('RINOMINA TASK\n\"'.toUpperCase()+task.titolo!.toUpperCase()+'\"'),
+                        content: Stack(
+                            clipBehavior: Clip.none,
+                            children: <Widget>[
+                              SingleChildScrollView(
+                                  child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(height: 15,),
+                                        Text(
+                                          'DETTAGLIO TASK',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10,),
+                                        SizedBox(
+                                          width: 600,
+                                          child: TextFormField(enabled: false,
+                                            controller: _titoloController,
+                                            maxLines: null,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black87,
+                                            ),
+                                            decoration: InputDecoration(
+                                              labelText: 'Titolo'.toUpperCase(),
+                                              labelStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide.none, // Rimuove il bordo standard
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.redAccent,
+                                                  width: 2.0,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.grey[300]!,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                              hintText: "Inserisci il titolo",
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[500],
+                                              ),
+                                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 7,),
+                                        SizedBox(
+                                          width: 600,
+                                          child: TextFormField(enabled: false,
+                                            controller: _riferimentoController,
+                                            maxLines: null,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black87,
+                                            ),
+                                            decoration: InputDecoration(
+                                              labelText: 'RIFERIMENTO'.toUpperCase(),
+                                              labelStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide.none, // Rimuove il bordo standard
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.redAccent,
+                                                  width: 2.0,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.grey[300]!,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                              hintText: "Inserisci il riferimento",
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[500],
+                                              ),
+                                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 7,),
+                                        SizedBox(
+                                          width: 600,
+                                          child: TextFormField(enabled: false,
+                                            controller: _descrizioneController,
+                                            maxLines: null,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black87,
+                                            ),
+                                            decoration: InputDecoration(
+                                              labelText: 'DESCRIZIONE'.toUpperCase(),
+                                              labelStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide.none, // Rimuove il bordo standard
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.redAccent,
+                                                  width: 2.0,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.grey[300]!,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                              hintText: "Inserisci il titolo",
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[500],
+                                              ),
+                                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 7,),
+                                        SizedBox(
+                                          width: 600,
+                                          child: TextFormField(enabled: false,
+                                            initialValue: task.tipologia!.descrizione?.toUpperCase(),
+                                            //controller: task.tipologia.descrizione,//_descrizioneController,
+                                            maxLines: null,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black87,
+                                            ),
+                                            decoration: InputDecoration(
+                                              labelText: 'TIPOLOGIA'.toUpperCase(),
+                                              labelStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide.none, // Rimuove il bordo standard
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.redAccent,
+                                                  width: 2.0,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.grey[300]!,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                              hintText: "Inserisci il titolo",
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[500],
+                                              ),
+                                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 7,),
+                                        SizedBox(
+                                          width: 600,
+                                          child: TextFormField(enabled: false,
+                                            initialValue: task.condiviso == true ?
+                                            "${task.utentecreate?.nome!} ${task.utentecreate?.cognome?.substring(0,1)}.${String.fromCharCode(10132)}${task.utente?.nome!} ${task.utente?.cognome?.substring(0,1)}." :
+                                            "${selectedUtente.nomeCompleto()}",//task.tipologia!.descrizione?.toUpperCase(),
+                                            //controller: task.tipologia.descrizione,//_descrizioneController,
+                                            maxLines: null,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black87,
+                                            ),
+                                            decoration: InputDecoration(
+                                              labelText: 'UTENTE'.toUpperCase(),
+                                              labelStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              filled: true,
+                                              fillColor: Colors.grey[200],
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide.none, // Rimuove il bordo standard
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.redAccent,
+                                                  width: 2.0,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                  color: Colors.grey[300]!,
+                                                  width: 1.0,
+                                                ),
+                                              ),
+                                              hintText: "Inserisci il titolo",
+                                              hintStyle: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[500],
+                                              ),
+                                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                            ),
+                                          ),
+                                        ),
+                                        task.accettato! ? Row(children: [
+                                          Text('   ACCETTATO '), Icon(Icons.check_circle, color: Colors.green)
+                                        ],) : Row(children: [
+                                          Text('   NON ACCETTATO '), Icon(Icons.warning, color: Colors.orange)
+                                        ],),
+                                        task.concluso! ? Row(children: [
+                                          Text('   CONCLUSO '), Icon(Icons.check_circle, color: Colors.green)
+                                        ],) : Row(children: [
+                                          Text('   NON CONCLUSO '), Icon(Icons.hourglass_bottom, color: Colors.grey)
+                                        ],),
+                                        //color: task.concluso! ? Colors.green : Colors.grey,
+                                        //task.concluso! ? Icons.check_circle : Icons.hourglass_bottom,
+                                        SizedBox(height: 18,),
+                                        /*TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('CHIUDI'.toUpperCase()),
+                          ),*/
+                                      ]
+                                  )
+                              ),
+
+                              Positioned(
+                                right: 8,
+                                top: -6,
+                                child: IconButton(
+                                  icon: Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Chiude il dialog
+                                  },
+                                ),
+                              ),
+
+                            ])
+
+                    );
+                  },
+                );
+              },
+            );// : null;
+          },
             onTap: () {
               /*/SystemChrome.setPreferredOrientations([
                 DeviceOrientation.portraitUp,
