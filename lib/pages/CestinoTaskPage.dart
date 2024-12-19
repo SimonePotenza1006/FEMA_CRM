@@ -187,10 +187,10 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
     };
 
     setState(() {
-
+      selectedUtente = widget.selectedUtente;
       //selectedUtente = allUtenti.firstWhere((element) => element.id == widget.utente.id);
       //if(widget.utente.cognome == "Mazzei"){
-      tipoIdGlobal = 9;
+      tipoIdGlobal = widget.tipoIdGlobal;
       //}
     });
     print(tipoIdGlobal.toString()+''+tipoIdGlobal.toString());
@@ -386,17 +386,19 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
         for (var item in jsonData) {
           commissioni.add(TaskModel.fromJson(item));
         }
-        print('Numero di task convertiti: ${commissioni.length}');
+        print(selectedUtente!.toString()+'Numero di task convertiti: ${commissioni.length}');
         setState(() {
           _isLoading = false;
           _allCommissioni = commissioni;
-          if (_allCommissioni.any((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+          if (_allCommissioni.any((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id ||
+              element.utentecreate?.id != selectedUtente!.id))) {
 
             tipotaskpiene = _allCommissioni
                 .where((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
                 .map((element) => element.tipologia?.id).cast<String>()
                 .toList();
           }
+          print('5665655656');
           if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal.toString())) tipoIdGlobal = int.parse(tipotaskpiene!.first);
           print('Tutte le commissioni assegnate a _allCommissioni: ${_allCommissioni.length} task.');
           // Applica il filtro iniziale per filteredCommissioni se l'utente è Mazzei
@@ -580,7 +582,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                    Navigator.pushReplacement(
                        context,
                        MaterialPageRoute(builder: (context) => CestinoTaskPage(
-                         utente: widget.utente)));
+                         utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!)));
                   /*getAllTask();
                   getAllTipi();
                   getAllUtenti();*/
@@ -912,8 +914,9 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                               children: allTipi.map((tipo) {
                                 print(tipoIdGlobal.toString()+' mmm '+tipo.id!);
                                 final isSelected = tipoIdGlobal == int.parse(tipo.id!);
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                return (tipotaskpiene!.isNotEmpty && tipotaskpiene!.contains(tipo.id)) ?
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                   //child: Container(
                                 //width: 120, // Larghezza del pulsante
                                 //height: 50, // Altezza del pulsante
@@ -963,7 +966,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                                         ],)
                                       ),
                                       //(tipo.utente != null && tipo.utente != tipo.utentecreate) ?
-                                      (tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id)) ?
+                                      /*(tipotaskdaacc!.isNotEmpty && tipotaskdaacc!.contains(tipo.id)) ?
                                       Positioned(
                                         right: -5, // Posizione a destra (puoi regolare questo valore)
                                         top: -5, // Posizione in alto (puoi regolare questo valore)
@@ -981,10 +984,10 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                                             ),
                                           ),
                                         ),
-                                      ) : Container(),
+                                      ) : Container(),*/
                                     ],
                                   ))//),
-                                );
+                                ) : Container();
                               }).toList(),
                             ),
                           ),
@@ -1256,7 +1259,8 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
           final selectedUserId = selectedUtente!.id; // ID dell'utente selezionato
           //final matches = taskUserId == selectedUserId; // Confronta gli ID
 
-          final matches = (taskId == tipoIdStr && (taskUserId == selectedUserId || taskUsercreateId == selectedUserId));
+          final matches = (task.attivo == false && taskId == tipoIdStr && (taskUserId == selectedUserId || taskUsercreateId == selectedUserId));
+          //(taskId == tipoIdStr && (taskUserId == selectedUserId || taskUsercreateId == selectedUserId));
               //|| (task.tipologia!.utente != null && task.tipologia!.utente!.id == selectedUserId); // Confronta come stringhe
           print('Filtering task: $taskId matches: $matches'); // Debug
           return matches;
@@ -1267,10 +1271,18 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
       }
 
       print('Filtered _filteredCommissioni count: ${_filteredCommissioni.length}'); // Debug
-      if (_allCommissioni.any((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+      if (_allCommissioni.any((element) => !element.accettato! &&
+          element.utentecreate!.id != widget.utente.id)) {
         tipotaskdaacc = _allCommissioni
             .where((element) => !element.accettato! && element.utentecreate!.id != widget.utente.id)
             .map((element) => element.tipologia!.id).cast<String>()
+            .toList();
+      }
+      if (_allCommissioni.any((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+        tipotaskpiene = _allCommissioni
+            .where((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+            .map((element) => element.tipologia?.id).cast<String>()
             .toList();
       }
       // Aggiorna la tabella
@@ -1293,6 +1305,14 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
 
   void filterTasksByUtente(UtenteModel utente) {
     setState(() {
+      if (_allCommissioni.any((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id != selectedUtente!.id))) {
+
+        tipotaskpiene = _allCommissioni
+            .where((element) => element.attivo == false && (element.utente!.id == selectedUtente!.id || element.utentecreate?.id == selectedUtente!.id))
+            .map((element) => element.tipologia?.id).cast<String>()
+            .toList();
+      }
+      if (tipotaskpiene != null && tipotaskpiene!.isNotEmpty && !tipotaskpiene!.contains(tipoIdGlobal.toString())) tipoIdGlobal = int.parse(tipotaskpiene!.first);
       // Filtra le commissioni in base all'ID dell'utente
       _filteredCommissioni = _allCommissioni.where((commissione) {
         final taskId = commissione.tipologia?.id?.toString(); // Converte l'ID del task in stringa
@@ -1300,7 +1320,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
         final taskUserId = commissione.utente?.id; // ID dell'utente nella commissione
         final taskUsercreateId = commissione.utentecreate?.id; // ID dell'utentecreate
         final selectedUserId = utente.id; // ID dell'utente selezionato
-        final matches = (taskUserId == selectedUserId || taskUsercreateId == selectedUserId) &&
+        final matches = commissione.attivo == false && (taskUserId == selectedUserId || taskUsercreateId == selectedUserId) &&
             taskId == tipoIdGlobal.toString();
             //|| (commissione.tipologia!.utente != null && commissione.tipologia!.utente!.id == selectedUserId); // Confronta gli ID
         print('Filtering task by user: $taskUserId matches: $matches'); // Debug
@@ -1320,7 +1340,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
         return a.concluso! && b.concluso! && b.data_conclusione != null && a.data_conclusione != null ? b.data_conclusione!.compareTo(a.data_conclusione!) : 1;
       });*/
       //_filteredCommissioni.sort((a, b) => a!.concluso! ? 1 : 0);
-      _dataSource.updateData(_filteredCommissioni, selectedUtente!, tipoIdGlobal!);
+      _dataSource.updateData(_filteredCommissioni, utente, tipoIdGlobal!);
       print('Filtered _filteredCommissioni count: ${_filteredCommissioni.length}'); // Debug
     });
   }
@@ -1394,7 +1414,7 @@ class TaskDataSource extends DataGridSource{
     return rows;
   }
 
-  Future<void> conclusoTask(TaskModel task) async {
+  /*Future<void> conclusoTask(TaskModel task) async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     //var data = selectedDate != null ? selectedDate?.toIso8601String() : null;
@@ -1436,9 +1456,9 @@ class TaskDataSource extends DataGridSource{
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
-  }
+  }*/
 
-  Future<void> assegnaTask(TaskModel task, UtenteModel utente) async {
+  /*Future<void> assegnaTask(TaskModel task, UtenteModel utente) async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
@@ -1477,9 +1497,9 @@ class TaskDataSource extends DataGridSource{
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
-  }
+  }*/
 
-  Future<void> accettaTask(TaskModel task) async {
+ /* Future<void> accettaTask(TaskModel task) async {
     final formatter = DateFormat(
         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // Crea un formatter per il formato desiderato
     try {
@@ -1517,7 +1537,7 @@ class TaskDataSource extends DataGridSource{
     } catch (e) {
       print('Errore durante il salvataggio del task $e');
     }
-  }
+  }*/
 
   Future<void> deleteTask(BuildContext context, String? id) async {
     try {
@@ -1532,7 +1552,7 @@ class TaskDataSource extends DataGridSource{
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => CestinoTaskPage(
-                utente: utente)));
+                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
         /*Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -1582,14 +1602,14 @@ class TaskDataSource extends DataGridSource{
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => CestinoTaskPage(
-                utente: utente)));
+                utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
       }
     } catch (e) {
       print('Errore durante il ripristino del task $e');
     }
   }
 
-  Future<void> getAllTask() async{
+  Future<void> getAllTaskNO() async{
     try{
       var apiUrl = (utente.cognome! == "Mazzei" || utente.cognome! == "Chiriatti") ? Uri.parse('$ipaddress/api/task/alldisattivi')
           : Uri.parse('$ipaddress/api/task/utentearchivio/'+utente.id!);
@@ -1645,7 +1665,7 @@ class TaskDataSource extends DataGridSource{
                     ),
                     TextButton(
                       onPressed: () {
-                        conclusoTask(task);
+                        //conclusoTask(task);
                         Navigator.of(context).pop();
                       },
                       child: Text('OK', style: TextStyle(fontSize: 18)),
@@ -1679,7 +1699,7 @@ class TaskDataSource extends DataGridSource{
                   ),
                   TextButton(
                     onPressed: () {
-                      accettaTask(task);
+                      //accettaTask(task);
                       //Navigator.of(context).pop();
                     },
                     child: Text('OK', style: TextStyle(fontSize: 18)),
@@ -1699,7 +1719,7 @@ class TaskDataSource extends DataGridSource{
                 return AlertDialog(
                   title: Text('RIPRISTINA TASK'),
                   content: Text(
-                      'CONFERMI DI VOLER RIPRISTINARE IL TASK \"'+task.titolo!.toUpperCase()),
+                      'CONFERMI DI VOLER RIPRISTINARE IL TASK \"'+task.titolo!.toUpperCase()+'\"'),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -1804,7 +1824,7 @@ class TaskDataSource extends DataGridSource{
                           onPressed: () {
                             if (localSelectedUtente != null) {
                               // Salva l'utente selezionato
-                              assegnaTask(task, localSelectedUtente!);
+                              //assegnaTask(task, localSelectedUtente!);
                               print('Utente selezionato: ${localSelectedUtente!.nomeCompleto()}');
                             }
                           },
@@ -1836,7 +1856,7 @@ class TaskDataSource extends DataGridSource{
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => CestinoTaskPage(
-                        utente: utente)));
+                        utente: utente, selectedUtente: selectedUtente, tipoIdGlobal: tipoIdGlobal)));
                    // Aggiorna la pagina
                 }
               });

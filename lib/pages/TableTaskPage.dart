@@ -592,7 +592,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   ),
                 );
               }),
-              widget.utente.cognome! == "Mazzei" ? IconButton(
+              //widget.utente.cognome! == "Mazzei" ?
+              IconButton(
                   color: Colors.white,
                   icon: Icon(Icons.delete_forever), onPressed: () async {
                 Navigator.push(
@@ -602,7 +603,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         CestinoTaskPage(utente: widget.utente, selectedUtente: selectedUtente!, tipoIdGlobal: tipoIdGlobal!,),
                   ),
                 );
-              }) : Container(),
+              }),// : Container(),
               (widget.utente.id == "2" && Platform.isAndroid) ? Container() : IconButton(
                 icon: Icon(
                   Icons.refresh, // Icona di ricarica, puoi scegliere un'altra icona se preferisci
@@ -1039,7 +1040,6 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                         ) : null;// : null;
                                       },
                                     child:
-
                                       Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                       child: Container(
@@ -1125,7 +1125,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                               ],
                                             ),
                                           )),
-                                    )) : Container();
+                                    )
+                                      ) : Container();
                                   }).toList(),
                                 ),
                               ),
@@ -1414,7 +1415,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
       }
 
       print('Filtered _filteredCommissioni count: ${_filteredCommissioni.length}'); // Debug
-      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)) {
+      if (_allCommissioni.any((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! &&
+          element.utentecreate!.id != widget.utente.id)) {
         tipotaskdaacc = _allCommissioni
             .where((element) => element.utente!.id == widget.utente.id && element.attivo == true && !element.accettato! && element.utentecreate!.id != widget.utente.id)
             .map((element) => element.tipologia!.id).cast<String>()
@@ -1538,7 +1540,6 @@ class TaskDataSource extends DataGridSource{
   List<DataGridRow> get rows{
     List<DataGridRow> rows =[];
     for(int i = 0; i < commissioniFiltrate.length; i++){
-
       TaskModel task = commissioniFiltrate[i];
       print('tiiiiiiiiiiiii '+task.titolo.toString());
       String? concluso = task.concluso != null ? (task.concluso != true ? "NO" : "SI") : "ERRORE";
