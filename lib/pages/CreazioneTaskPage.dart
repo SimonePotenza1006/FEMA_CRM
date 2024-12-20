@@ -733,7 +733,9 @@ class _CreazioneTaskPageState
 
                                     if (_selectedTipo?.utente != null) _condiviso = true;
                                     //controllare 9 e 10
-                                    if (_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) _condiviso = false;
+                                    if (_selectedTipo?.utente == null &&
+                                        (_selectedTipo?.utentecreate?.id == widget.utente.id || (_selectedTipo?.id == '9' || _selectedTipo?.id == '10')))
+                                      _condiviso = false;
                               });
                             },
                             items: [
@@ -809,7 +811,8 @@ class _CreazioneTaskPageState
                         //e se è tipologia diversa da 9 o 10
                         //((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
                         //    (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
-                        _selectedTipo?.id == '9' || _selectedTipo?.id == '10' || !(_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ?
+                        _selectedTipo?.id == '9' || _selectedTipo?.id == '10' ||
+                            !(_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ?
                         SizedBox(
                           width: 200,
                           child: CheckboxListTile(

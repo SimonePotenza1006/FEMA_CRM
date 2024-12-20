@@ -637,7 +637,9 @@ class _ModificaTaskPageState
 
                                   if (_selectedTipo?.utente != null) _condiviso = true;
 
-                                  if (_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) _condiviso = false;
+                                  if (_selectedTipo?.utente == null &&
+                                      (_selectedTipo?.utentecreate?.id == widget.utente.id || (_selectedTipo?.id == '9' || _selectedTipo?.id == '10')))
+                                    _condiviso = false;
                                 });
                               },
                               items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
@@ -689,8 +691,10 @@ class _ModificaTaskPageState
                           SizedBox(height: 20),
                           //se è una tipologia creata da me e non condivisa con nessuno -> task non condivisibile
                           //e se è tipologia diversa da 9 o 10
-                          ((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
-                              (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
+                          //((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
+                            //  (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
+                          _selectedTipo?.id == '9' || _selectedTipo?.id == '10' ||
+                              !(_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ?
                           SizedBox(
                             width: 400,
                             child: CheckboxListTile(
@@ -724,8 +728,7 @@ class _ModificaTaskPageState
                               ),
                               contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
-                          ) ,
-                              //: Container(),
+                          ) : Container(),
                           SizedBox(height: 10),// Button
                           if (_condiviso) SizedBox(
                             width: 600,

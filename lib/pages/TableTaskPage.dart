@@ -1908,7 +1908,7 @@ class TaskDataSource extends DataGridSource{
                   title: Text('ARCHIVIAZIONE TASK'),
                   content: Text(
                       'CONFERMI DI VOLER SPOSTARE IL TASK \"'+task.titolo!.toUpperCase()+'\" NEL CESTINO? POTRAI SUCCESSIVAMENTE '
-                          'RECUPERARE IL TASK DAL CESTINO E RIPRISTINARLO'),
+                          'RECUPERARE IL TASK DAL CESTINO CLICCANDO SU RIPRISTINA '),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {

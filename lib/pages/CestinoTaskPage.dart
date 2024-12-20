@@ -699,8 +699,8 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['task']?? double.nan,
-                          minimumWidth: 60,
+                          width: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? (constraints.maxWidth < 460) ? 45 : 60 : 0,//_columnWidths['task']?? double.nan,
+                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
                         ),
                         /*GridColumn(
                           allowSorting: false,
@@ -1408,7 +1408,7 @@ class TaskDataSource extends DataGridSource{
           //DataGridCell<String>(columnName: 'utente', value: task.utente?.nomeCompleto()),
           DataGridCell<String>(columnName: 'utente', value: task.condiviso == true ?
             "${task.utentecreate?.nome!} ${task.utentecreate?.cognome?.substring(0,1)}. ${String.fromCharCode(10132)} ${task.utente?.nome!} ${task.utente?.cognome?.substring(0,1)}." :
-            "${utente.nomeCompleto()}"),
+            "${selectedUtente.nomeCompleto()}"),
           DataGridCell<String>(columnName: 'accettato', value: accettato),
           DataGridCell<String>(columnName: 'data_conclusione', value: dataConclusione),
         ]
@@ -1733,7 +1733,7 @@ class TaskDataSource extends DataGridSource{
                     TextButton(
                       onPressed: () {
                         ripristinaTask(task);
-                        //Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                       child: Text('OK', style: TextStyle(fontSize: 18)),
                     ),
@@ -1764,7 +1764,7 @@ class TaskDataSource extends DataGridSource{
                     TextButton(
                       onPressed: () {
                         deleteTask(context, task.id);
-                        //Navigator.of(context).pop();
+                        Navigator.of(context).pop();
                       },
                       child: Text('OK', style: TextStyle(fontSize: 18)),
                     ),
