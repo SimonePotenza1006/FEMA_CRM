@@ -909,7 +909,7 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                         child: Container(
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(
+                            child: tipotaskpiene != null && tipotaskpiene!.isNotEmpty ? Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: allTipi.map((tipo) {
                                 print(tipoIdGlobal.toString()+' mmm '+tipo.id!);
@@ -989,7 +989,9 @@ class _CestinoTaskPageState extends State<CestinoTaskPage>{
                                   ))//),
                                 ) : Container();
                               }).toList(),
-                            ),
+                            ) : SizedBox(
+                              child: Text(' - NESSUN TASK DISPONIBILE -'),
+                              height: 49,),
                           ),
                         ),
                       ),
@@ -1547,7 +1549,9 @@ class TaskDataSource extends DataGridSource{
       final response = await http.delete(
         Uri.parse('$ipaddress/api/task/$id'),
       );
+      print('1111');
       if (response.statusCode == 200) {
+        print('2222');
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Task eliminato con successo'.toUpperCase())),

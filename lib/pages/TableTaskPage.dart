@@ -371,6 +371,47 @@ class _TableTaskPageState extends State<TableTaskPage>{
     }
   }
 
+  Future<List<TipoTaskModel>> getTaskByTipo(String tipologiatask) async {
+    try {
+      var apiUrl = Uri.parse('$ipaddress/api/task/tipologia/$tipologiatask');
+      var response = await http.get(apiUrl);
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        List<TipoTaskModel> utenti = [];
+        for (var item in jsonData) {
+          utenti.add(TipoTaskModel.fromJson(item));
+        }
+        print(tipologiatask+' taskbytip '+utenti.length.toString());
+        return utenti;
+      } else {
+        throw Exception(
+            'Failed to load utenti data from API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching agenti data from API: $e');
+      throw Exception(
+          'Failed to load utenti data from API: $e');
+      /*showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Connection Error'),
+            content: Text(
+                'Unable to load data from API. Please check your internet connection and try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );*/
+    }
+  }
+
   Future<void> getAllTipi() async{
     try{
       var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
@@ -1163,6 +1204,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                         TipoTaskModel? selectedTipoToDelete;
                         return StatefulBuilder(
                           builder: (BuildContext context, StateSetter setState) {
+                            bool eliminabile = false;
                             return AlertDialog(
                               title: Text(
                                 'Scegliere una tipologia da eliminare'.toUpperCase(),
@@ -1182,6 +1224,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                     onChanged: (TipoTaskModel? value) {
                                       setState(() {
                                         selectedTipoToDelete = value;
+
+
                                       });
                                     },
                                   );
@@ -1192,14 +1236,15 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                   onPressed: selectedTipoToDelete == null
                                       ? null
                                       : () {
-                                    showDialog(
+                                    getTaskByTipo(selectedTipoToDelete!.id!).then((valuee) => valuee.isEmpty ?
+                                      showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
                                           title: Text('Conferma Eliminazione'.toUpperCase()),
                                           content: Text(
-                                            'Questa operazione cancellerà la tipologia "${selectedTipoToDelete?.descrizione!.toUpperCase()}" '
-                                                'e tutte le task ad essa associate. Sei sicuro di voler procedere all\'eliminazione?'.toUpperCase(),
+                                            'La tipologia "${selectedTipoToDelete?.descrizione!.toUpperCase()}" non ha dei task associati ad essa, è pertanto '
+                                                'consentita la sua eliminazione. Vuoi procedere?'.toUpperCase(),
                                           ),
                                           actions: [
                                             TextButton(
@@ -1218,9 +1263,44 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                               child: Text('NO'),
                                             ),
                                           ],
+                                        );/* : AlertDialog(
+                                          title: Text('ELIMINAZIONE NON CONSENTITA'.toUpperCase()),
+                                          content: Text(
+                                            'ESISTONO ANCORA DEI TASK ASSOCIATI ALLA TIPOLOGIA "${selectedTipoToDelete?.descrizione!.toUpperCase()}" '
+                                                'PERTANTO NON è POSSIBILE ELIMINARLA. '.toUpperCase(),
+                                          ),
+                                          actions: [
+
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Chiudi il dialog di conferma
+                                              },
+                                              child: Text('OK'),
+                                            ),
+                                          ],
+                                        );*/
+                                      },
+                                    ) : showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('ELIMINAZIONE NON CONSENTITA'.toUpperCase()),
+                                          content: Text(
+                                            'ESISTONO ANCORA DEI TASK ASSOCIATI ALLA TIPOLOGIA "${selectedTipoToDelete?.descrizione!.toUpperCase()}", '
+                                                'PERTANTO NON è POSSIBILE ELIMINARLA. '.toUpperCase(),
+                                          ),
+                                          actions: [
+
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Chiudi il dialog di conferma
+                                              },
+                                              child: Text('OK'),
+                                            ),
+                                          ],
                                         );
                                       },
-                                    );
+                                    ));
                                   },
                                   child: Text('ELIMINA'),
                                 ),
