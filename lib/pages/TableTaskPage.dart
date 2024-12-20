@@ -225,7 +225,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
       'accettatoicon': 60,//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 0 : 60,
       'completed': 60,
       'delete': 60,
-      'condividi': (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
+      'condividi': (tipoIdGlobal.toString() == '9' || tipoIdGlobal.toString() == '10') ? 60 : 0,//(widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
       'data_creazione': 150,
       'titolo': 300,
       'riferimento': 300,
@@ -761,8 +761,8 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          width: (constraints.maxWidth < 460) ? 45 : 60,//_columnWidths['condividi']?? double.nan,
-                          minimumWidth: (widget.utente.cognome! == "Mazzei" || widget.utente.cognome! == "Chiriatti") ? 60 : 0,
+                          width: (tipoIdGlobal.toString() == '9' || tipoIdGlobal.toString() == '10') ? (constraints.maxWidth < 460) ? 45 : 60 : 0,//_columnWidths['condividi']?? double.nan,
+                          minimumWidth: (tipoIdGlobal.toString() == '9' || tipoIdGlobal.toString() == '10') ? 60 : 0,
                         ),
                         GridColumn(
                           columnName: 'data_creazione',
@@ -959,14 +959,14 @@ class _TableTaskPageState extends State<TableTaskPage>{
                               SizedBox(height: 10),
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
-                                child: Row(
+                                child: tipotaskpiene != null && tipotaskpiene!.isNotEmpty ? Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: allTipi.map((tipo) {
                                     print(tipoIdGlobal.toString()+' mmm '+tipo.id!);
                                     final isSelected = tipoIdGlobal == int.parse(tipo.id!);
                                     return (tipotaskpiene!.isNotEmpty && tipotaskpiene!.contains(tipo.id)) ?
                                       GestureDetector(
-                                      onLongPress: () {
+                                        onLongPress: () {
 
                                         _titoloControllerTip = TextEditingController(text: tipo.descrizione!.toUpperCase());
                                         //utente.id == task.utentecreate!.id ?
@@ -1048,8 +1048,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                           },
                                         ) : null;// : null;
                                       },
-                                    child:
-                                      Padding(
+                                    child: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                       child: Container(
                                         //width: 120, // Larghezza del pulsante
@@ -1137,7 +1136,9 @@ class _TableTaskPageState extends State<TableTaskPage>{
                                     )
                                       ) : Container();
                                   }).toList(),
-                                ),
+                                ) : SizedBox(
+                                  child: Text(' - NESSUN TASK DISPONIBILE -'),
+                                height: 49,) ,
                               ),
                             ],
                           )
@@ -1154,7 +1155,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children : [
-                FloatingActionButton(
+                allTipiElim.isNotEmpty ? FloatingActionButton(
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -1239,7 +1240,7 @@ class _TableTaskPageState extends State<TableTaskPage>{
                   backgroundColor: Colors.red,
                   child: Icon(Icons.delete, color: Colors.white),
                   heroTag: "Tag3",
-                ),
+                ) : Container(),
                 SizedBox(height: 10),
                 FloatingActionButton(
                   onPressed: () {
