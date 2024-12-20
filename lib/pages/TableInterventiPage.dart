@@ -270,6 +270,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             return intervento.annullato != true; // Escludi annullati
           })
               .toList();
+          setState(() {
+            selectedTipologia = null;
+          });
           break;
         case 1: // Non conclusi
           _filteredInterventi = _allInterventi
@@ -280,6 +283,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 intervento.orario_fine == null &&
                 intervento.tipologia?.id != "6"; // Escludi tipologia id 6
           }).toList();
+          setState(() {
+            selectedTipologia = null;
+          });
           break;
         case 2: // Conclusi non saldati
           _filteredInterventi = _allInterventi
@@ -291,6 +297,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 !(intervento.saldato ?? false);
           })
               .toList();
+          setState(() {
+            selectedTipologia = null;
+          });
           break;
         case 3: // Conclusi e saldati
           _filteredInterventi = _allInterventi
@@ -302,6 +311,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 (intervento.saldato ?? false);
           })
               .toList();
+          setState(() {
+            selectedTipologia = null;
+          });
           break;
         case 4: // Non conclusi e saldati
           _filteredInterventi = _allInterventi
@@ -313,6 +325,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
                 (intervento.saldato ?? false);
           })
               .toList();
+          setState(() {
+            selectedTipologia = null;
+          });
           break;
         case 5: // Solo annullati
           _filteredInterventi = _allInterventi
@@ -321,6 +336,9 @@ class _TableInterventiPageState extends State<TableInterventiPage> {
             return intervento.annullato == true; // Solo annullati
           })
               .toList();
+          setState(() {
+            selectedTipologia = null;
+          });
           break;
       }
       _dataSource.updateData(_filteredInterventi, filteredGruppi);
@@ -2191,20 +2209,32 @@ class InterventoDataSource extends DataGridSource {
           } else {
             return GestureDetector(
               onTap: () {
-                if(Platform.isWindows){
+                if (Platform.isWindows) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : utente),
+                      builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: utente),
                     ),
                   );
                 } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente : utente),
-                    ),
-                  );
+                  if (Platform.isAndroid) {
+                    final screenWidth = MediaQuery.of(context).size.width;
+                    if (screenWidth < 420) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente: utente),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: utente),
+                        ),
+                      );
+                    }
+                  }
                 }
               },
               child: Container(
