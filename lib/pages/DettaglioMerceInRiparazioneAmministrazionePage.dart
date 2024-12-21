@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 
 import '../model/InterventoModel.dart';
 import 'DettaglioInterventoNewPage.dart';
+import 'DettaglioInterventoNewPageAndroid.dart';
 import 'GalleriaFotoInterventoPage.dart';
 
 class DettaglioMerceInRiparazioneAmministrazionePage extends StatefulWidget{
@@ -291,12 +292,21 @@ class _DettaglioMerceInRiparazioneAmministrazionePageState extends State<Dettagl
                             buildInterventoRow(title: "Intervento", valueWidget: GestureDetector(
                               onTap: () {
                                 if (interventoAssociato != null) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DettaglioInterventoNewPage(intervento: interventoAssociato!, utente: widget.utente),
-                                    ),
-                                  );
+                                  if(Platform.isWindows){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DettaglioInterventoNewPage(intervento: interventoAssociato!, utente : widget.utente),
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DettaglioInterventoNewPageAndroid(intervento: interventoAssociato!, utente : widget.utente),
+                                      ),
+                                    );
+                                  }
                                 }
                               },
                               child: Stack(

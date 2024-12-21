@@ -4,10 +4,13 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
+import 'dart:io';
+import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 import '../model/InterventoModel.dart';
 import '../model/UtenteModel.dart';
 import 'DettaglioInterventoNewPage.dart';
+import 'DettaglioInterventoNewPageAndroid.dart';
 
 class DettaglioGruppoInterventiPage extends StatefulWidget {
   final GruppoInterventiModel gruppo;
@@ -466,12 +469,21 @@ class _DettaglioGruppoInterventiPageState extends State<DettaglioGruppoIntervent
                           ],
                           onSelectChanged: (isSelected) {
                             if (isSelected!= null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: widget.utente),
-                                ),
-                              );
+                              if(Platform.isWindows){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : widget.utente),
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente : widget.utente),
+                                  ),
+                                );
+                              }
                             }
                           },
                         );

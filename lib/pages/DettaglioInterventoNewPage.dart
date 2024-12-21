@@ -233,7 +233,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   // Menu laterale statico
   Widget _buildStaticDrawer() {
     return Container(
-      width: 360,
+      width: 370,
       color: Colors.grey[200],
       child: ListView(
         padding: EdgeInsets.zero,
@@ -353,6 +353,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     return Padding(
       padding: EdgeInsets.all(16),
       child:Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -1851,436 +1852,443 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   Widget _buildGeneralInfoSection() {
     return Padding(
       padding: EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          Column(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Informazioni Generali',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              SizedBox(height: 12.0),
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 500,
-                    child: buildInfoRow(
-                        title: 'Titolo',
-                        value: widget.intervento.titolo ?? '//',
-                        context: context
-                    ),
+                  Text(
+                    'Informazioni Generali',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        modificaTitoloVisible = !modificaTitoloVisible;
-                      });
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.black,
-                    ),
-                  )
-                ],
-              ),
-              if(modificaTitoloVisible)
-                SizedBox(
-                    width: 500,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 300,
-                          child: TextFormField(
-                            maxLines: null,
-                            controller: titoloController,
-                            decoration: InputDecoration(
-                              labelText: 'Titolo',
-                              hintText: 'Aggiungi un titolo',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 170,
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                          decoration: BoxDecoration(
-                            // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                          ),
-                          child: FloatingActionButton(
-                            heroTag: "Tag4",
-                            onPressed: () {
-                              if(titoloController.text.isNotEmpty){
-                                modificaTitolo();
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Non è possibile salvare un titolo vuoto!'),
-                                  ),
-                                );
-                              }
-                            },
-                            backgroundColor: Colors.red,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                  child: Text(
-                                    'Modifica Titolo'.toUpperCase(),
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                    textAlign: TextAlign.center, // Centra il testo
-                                    softWrap: true, // Permette al testo di andare a capo
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                ),
-              SizedBox(
-                height: 12,
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 500,
-                    child: buildInfoRow(
-                        title: 'Descrizione',
-                        value: widget.intervento.descrizione!,
-                        context: context
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        modificaDescrizioneVisible = !modificaDescrizioneVisible;
-                      });
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.black,
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(height: 12),
-              if(modificaDescrizioneVisible)
-                SizedBox(
-                    width: 500,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 300,
-                          child: TextFormField(
-                            maxLines: null,
-                            controller: descrizioneController,
-                            decoration: InputDecoration(
-                              labelText: 'Descrizione',
-                              hintText: 'Aggiungi una descrizione',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 170,
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                          decoration: BoxDecoration(
-                            // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                          ),
-                          child: FloatingActionButton(
-                            heroTag: "Tag2",
-                            onPressed: () {
-                              if(descrizioneController.text.isNotEmpty){
-                                modificaDescrizione();
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Non è possibile salvare una descrizione nulla!'),
-                                  ),
-                                );
-                              }
-                            },
-                            backgroundColor: Colors.red,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                  child: Text(
-                                    'Modifica Descrizione'.toUpperCase(),
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                    textAlign: TextAlign.center, // Centra il testo
-                                    softWrap: true, // Permette al testo di andare a capo
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                ),
-              SizedBox(height : 12),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 500,
-                    child: buildInfoRow(
-                        title: 'Note',
-                        value: widget.intervento.note ?? 'N/A',
-                        context: context
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        modificaNotaVisibile = !modificaNotaVisibile;
-                      });
-                    },
-                    child: Icon(
-                      Icons.edit,
-                      color: Colors.black,
-                    ),
-                  )
-                ],
-              ),
-              if(modificaNotaVisibile)
-                SizedBox(
-                    width: 500,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 300,
-                          child: TextFormField(
-                            maxLines: null,
-                            controller: noteController,
-                            decoration: InputDecoration(
-                              labelText: 'Nota',
-                              hintText: 'Aggiungi una nota',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 170,
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                          decoration: BoxDecoration(
-                            // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                          ),
-                          child: FloatingActionButton(
-                            heroTag: "Tag12",
-                            onPressed: () {
-                              setState(() {
-                                widget.intervento.note = noteController.text;
-                              });
-                            },
-                            backgroundColor: Colors.red,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                  child: Text(
-                                    'Modifica Nota'.toUpperCase(),
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                    textAlign: TextAlign.center, // Centra il testo
-                                    softWrap: true, // Permette al testo di andare a capo
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                ),
-              SizedBox(height : 10),
-              Row(
-                children: [
-                  buildInfoRow(
-                      title: "tipologia",
-                      value: intervento.tipologia!.descrizione!
-                  ),
-                  IconButton(
-                    icon : Icon(Icons.edit),
-                    onPressed: (){
-                        showTipologiaDialog(context, tipologieIntervento, selectedTipologiaIntervento);
-                      },
-                  )
-                ],
-              ),
-              SizedBox(height : 10),
-              buildInfoRow(
-                  title: 'Apertura',
-                  value: widget.intervento.utente_apertura?.nomeCompleto() ?? 'N/A',
-                  context: context
-              ),
-              SizedBox(height : 20),
-              Row(
-                children: [
-                  if(intervento.annullato == false)
-                    Container(
-                      width: 170,
-                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                      child: FloatingActionButton(
-                        onPressed: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti"
-                            ? () {
-                          annullaIntervento();
-                        }
-                            : null, // Il pulsante è disabilitato se onPressed è null
-                        heroTag: "TagAnnullamento",
-                        backgroundColor: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? Colors.red : Colors.grey, // Colore condizionale
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Flexible( // Permette al testo di adattarsi alla dimensione
-                              child: Text(
-                                'Annulla intervento'.toUpperCase(),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                                textAlign: TextAlign.center, // Centra il testo
-                                softWrap: true, // Permette al testo di andare a capo
-                              ),
-                            ),
-                          ],
+                  SizedBox(height: 12.0),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Titolo',
+                            value: widget.intervento.titolo ?? '//',
+                            context: context
                         ),
                       ),
-                    ),
-                  SizedBox(width: 10),
-                  if(intervento.annullato == true)
-                    Container(
-                      width: 170,
-                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                      child: FloatingActionButton(
+                      SizedBox(
+                        width: 10,
+                      ),
+                      TextButton(
                         onPressed: () {
-                          riabilitaIntervento();
+                          setState(() {
+                            modificaTitoloVisible = !modificaTitoloVisible;
+                          });
                         },
-                        heroTag: "TagRiabilita",
-                        backgroundColor: Colors.red,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        child: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      )
+                    ],
+                  ),
+                  if(modificaTitoloVisible)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Flexible( // Permette al testo di adattarsi alla dimensione
-                              child: Text(
-                                'Riabilita intervento'.toUpperCase(),
-                                style: TextStyle(color: Colors.white, fontSize: 12),
-                                textAlign: TextAlign.center, // Centra il testo
-                                softWrap: true, // Permette al testo di andare a capo
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: titoloController,
+                                decoration: InputDecoration(
+                                  labelText: 'Titolo',
+                                  hintText: 'Aggiungi un titolo',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "Tag4",
+                                onPressed: () {
+                                  if(titoloController.text.isNotEmpty){
+                                    modificaTitolo();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare un titolo vuoto!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica Titolo'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
+                        )
+                    ),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Descrizione',
+                            value: widget.intervento.descrizione!,
+                            context: context
                         ),
                       ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            modificaDescrizioneVisible = !modificaDescrizioneVisible;
+                          });
+                        },
+                        child: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  if(modificaDescrizioneVisible)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: descrizioneController,
+                                decoration: InputDecoration(
+                                  labelText: 'Descrizione',
+                                  hintText: 'Aggiungi una descrizione',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "Tag2",
+                                onPressed: () {
+                                  if(descrizioneController.text.isNotEmpty){
+                                    modificaDescrizione();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare una descrizione nulla!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica Descrizione'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
                     ),
+                  SizedBox(height : 12),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Note',
+                            value: widget.intervento.note ?? 'N/A',
+                            context: context
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            modificaNotaVisibile = !modificaNotaVisibile;
+                          });
+                        },
+                        child: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                      )
+                    ],
+                  ),
+                  if(modificaNotaVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: noteController,
+                                decoration: InputDecoration(
+                                  labelText: 'Nota',
+                                  hintText: 'Aggiungi una nota',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "Tag12",
+                                onPressed: () {
+                                  setState(() {
+                                    widget.intervento.note = noteController.text;
+                                  });
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica Nota'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  SizedBox(height : 10),
+                  Row(
+                    children: [
+                      buildInfoRow(
+                          title: "tipologia",
+                          value: intervento.tipologia!.descrizione!
+                      ),
+                      IconButton(
+                        icon : Icon(Icons.edit),
+                        onPressed: (){
+                          showTipologiaDialog(context, tipologieIntervento, selectedTipologiaIntervento);
+                        },
+                      )
+                    ],
+                  ),
+                  SizedBox(height : 10),
+                  buildInfoRow(
+                      title: 'Apertura',
+                      value: widget.intervento.utente_apertura!.nome! + " " + widget.intervento.utente_apertura!.cognome!.substring(0, 1) + ".",
+                      context: context
+                  ),
+                  SizedBox(height : 20),
+                  Row(
+                    children: [
+                      if(intervento.annullato == false)
+                        Container(
+                          width: 170,
+                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                          child: FloatingActionButton(
+                            onPressed: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti"
+                                ? () {
+                              annullaIntervento();
+                            }
+                                : null, // Il pulsante è disabilitato se onPressed è null
+                            heroTag: "TagAnnullamento",
+                            backgroundColor: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? Colors.red : Colors.grey, // Colore condizionale
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible( // Permette al testo di adattarsi alla dimensione
+                                  child: Text(
+                                    'Annulla intervento'.toUpperCase(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                    textAlign: TextAlign.center, // Centra il testo
+                                    softWrap: true, // Permette al testo di andare a capo
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      SizedBox(width: 10),
+                      if(intervento.annullato == true)
+                        Container(
+                          width: 170,
+                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                          child: FloatingActionButton(
+                            onPressed: () {
+                              riabilitaIntervento();
+                            },
+                            heroTag: "TagRiabilita",
+                            backgroundColor: Colors.red,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible( // Permette al testo di adattarsi alla dimensione
+                                  child: Text(
+                                    'Riabilita intervento'.toUpperCase(),
+                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                    textAlign: TextAlign.center, // Centra il testo
+                                    softWrap: true, // Permette al testo di andare a capo
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
+              SizedBox(width: 50),
+              SizedBox(
+                width: 550,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 48),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Cliente',
+                          value: widget.intervento.cliente?.denominazione ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'ID Danea cliente',
+                          value: widget.intervento.cliente?.cod_danea ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Città destinazione',
+                          value: widget.intervento.destinazione?.citta ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Indirizzo destinazione',
+                          value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Cellulare destinazione',
+                          value: widget.intervento.destinazione?.cellulare ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Telefono destinazione',
+                          value: widget.intervento.destinazione?.telefono ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Indirizzo cliente',
+                          value: widget.intervento.cliente?.indirizzo ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Telefono cliente',
+                          value: widget.intervento.cliente?.telefono ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                    SizedBox(
+                      width: 500,
+                      child: buildInfoRow(
+                          title: 'Cellulare cliente',
+                          value: widget.intervento.cliente?.cellulare ?? 'N/A',
+                          context: context
+                      ),
+                    ),
+                  ],
+                ),
+              )
             ],
-          ),
-          SizedBox(width: 50),
-          SizedBox(
-            width: 550,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 48),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Cliente',
-                      value: widget.intervento.cliente?.denominazione ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'ID Danea cliente',
-                      value: widget.intervento.cliente?.cod_danea ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Città destinazione',
-                      value: widget.intervento.destinazione?.citta ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Indirizzo destinazione',
-                      value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Cellulare destinazione',
-                      value: widget.intervento.destinazione?.cellulare ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Telefono destinazione',
-                      value: widget.intervento.destinazione?.telefono ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Indirizzo cliente',
-                      value: widget.intervento.cliente?.indirizzo ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Telefono cliente',
-                      value: widget.intervento.cliente?.telefono ?? 'N/A',
-                      context: context
-                  ),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Cellulare cliente',
-                      value: widget.intervento.cliente?.cellulare ?? 'N/A',
-                      context: context
-                  ),
-                ),
-              ],
-            ),
           )
-        ],
+        ),
       )
     );
   }
@@ -2289,222 +2297,229 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   Widget _buildTemporalDetailsSection() {
     return Padding(
       padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Dettagli Temporali',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-          ),
-          SizedBox(height: 8.0),
-          Row(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildInfoRow(
-                  title: 'Data creazione',
-                  value: formatDate(widget.intervento.data_apertura_intervento),
-                  context: context
+              Text(
+                'Dettagli Temporali',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
               ),
-              IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed:(){
-                    _selectDate2(context);
-                  }
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              buildInfoRow(
-                  title: 'Appuntamento',
-                  value: formatDate(widget.intervento.data),
-                  context: context
-              ),
-              SizedBox(width: 20),
-              Container(
-                width: 170,
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                child: FloatingActionButton(
-                  onPressed: () {
-                    _selectDate(context);
-                  },
-                  heroTag: "Tag3",
-                  backgroundColor: Colors.red,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible( // Permette al testo di adattarsi alla dimensione
-                        child: Text(
-                          'Modifica data appuntamento'.toUpperCase(),
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                          textAlign: TextAlign.center, // Centra il testo
-                          softWrap: true, // Permette al testo di andare a capo
-                        ),
-                      ),
-                    ],
+              SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  buildInfoRow(
+                      title: 'Data creazione',
+                      value: formatDate(widget.intervento.data_apertura_intervento),
+                      context: context
                   ),
-                ),
+                  IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed:(){
+                        _selectDate2(context);
+                      }
+                  )
+                ],
               ),
-              SizedBox(width: 5),
-              Container(
-                width: 70,
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                child: FloatingActionButton(
-                  onPressed: () {
-                    //_selectDate(context);
-                    setState(() {
-                      widget.intervento.data = null;
-                    });
-                  },
-                  heroTag: "TagDel",
-                  backgroundColor: Colors.red,
-                  child: Icon(Icons.delete, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              buildInfoRow(
-                  title: 'Orario',
-                  value: formatTime(widget.intervento.orario_appuntamento),
-                  context: context
-              ),
-              SizedBox(width: 20),
-              Container(
-                width: 170,
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                decoration: BoxDecoration(
-                  // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                ),
-                child: FloatingActionButton(
-                  heroTag: "Tag2",
-                  onPressed: () {
-                    _selectTimeAppuntamento(context);
-                  },
-                  backgroundColor: Colors.red,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                        child: Text(
-                          'Inserisci orario appuntamento'.toUpperCase(),
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                          textAlign: TextAlign.center, // Centra il testo
-                          softWrap: true, // Permette al testo di andare a capo
-                        ),
-                      ),
-                    ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  buildInfoRow(
+                      title: 'Appuntamento',
+                      value: formatDate(widget.intervento.data),
+                      context: context
                   ),
-                ),
-              ),
-              Container(
-                width: 70,
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                child: FloatingActionButton(
-                  onPressed: () {
-                    setState(() {
-                      widget.intervento.orario_appuntamento = null;
-                      _selectedTimeAppuntamento = null;
-                    });
-                  },
-                  heroTag: "TagDel2",
-                  backgroundColor: Colors.red,
-                  child: Icon(Icons.delete, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // Prima colonna
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                        children:[
-                          buildInfoRow(
-                              title: 'Orario Inizio',
-                              value: widget.intervento.orario_inizio != null ? DateFormat("HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
-                              context: context
-                          ),
-                          SizedBox(width : 10),
-                          Align(
-                            alignment: Alignment.center,
-                            child: InkWell(
-                              onTap: () => _selectTime(context),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit),
-                                ],
-                              ),
+                  SizedBox(width: 20),
+                  Container(
+                    width: 170,
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        _selectDate(context);
+                      },
+                      heroTag: "Tag3",
+                      backgroundColor: Colors.red,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Flexible( // Permette al testo di adattarsi alla dimensione
+                            child: Text(
+                              'Modifica data appuntamento'.toUpperCase(),
+                              style: TextStyle(color: Colors.white, fontSize: 12),
+                              textAlign: TextAlign.center, // Centra il testo
+                              softWrap: true, // Permette al testo di andare a capo
                             ),
                           ),
-                        ]
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 5),
+                  Container(
+                    width: 70,
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        //_selectDate(context);
+                        setState(() {
+                          widget.intervento.data = null;
+                        });
+                      },
+                      heroTag: "TagDel",
+                      backgroundColor: Colors.red,
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  buildInfoRow(
+                      title: 'Orario',
+                      value: formatTime(widget.intervento.orario_appuntamento),
+                      context: context
+                  ),
+                  SizedBox(width: 20),
+                  Container(
+                    width: 170,
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                    decoration: BoxDecoration(
+                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                    ),
+                    child: FloatingActionButton(
+                      heroTag: "Tag2",
+                      onPressed: () {
+                        _selectTimeAppuntamento(context);
+                      },
+                      backgroundColor: Colors.red,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                            child: Text(
+                              'Inserisci orario appuntamento'.toUpperCase(),
+                              style: TextStyle(color: Colors.white, fontSize: 12),
+                              textAlign: TextAlign.center, // Centra il testo
+                              softWrap: true, // Permette al testo di andare a capo
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 70,
+                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        setState(() {
+                          widget.intervento.orario_appuntamento = null;
+                          _selectedTimeAppuntamento = null;
+                        });
+                      },
+                      heroTag: "TagDel2",
+                      backgroundColor: Colors.red,
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    // Prima colonna
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                            children:[
+                              buildInfoRow(
+                                  title: 'Orario Inizio',
+                                  value: widget.intervento.orario_inizio != null ? DateFormat("HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
+                                  context: context
+                              ),
+                              SizedBox(width : 10),
+                              Align(
+                                alignment: Alignment.center,
+                                child: InkWell(
+                                  onTap: () => _selectTime(context),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.edit),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ]
+                        )
+                      ],
+                    ),
+                    // Divisore verticale
+                    SizedBox(
+                      width: 20,
+                    ),
+                  ],
+                ),
+              ),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    buildInfoRow(
+                        title: 'Orario Fine',
+                        value: widget.intervento.orario_fine != null ? DateFormat("HH:mm").format(widget.intervento.orario_fine!) : "N/A",
+                        context: context
+                    ),
+                    SizedBox(width : 10),
+                    Align(
+                      alignment: Alignment.center,
+                      child: InkWell(
+                        onTap: () => _selectTime2(context),
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit),
+                            SizedBox(width: 8),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if(intervento.merce != null)
+                buildInfoRow(title: 'Data conclusione', value: intervento.merce?.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_conclusione!) : 'N/A'),
+              if(intervento.merce != null)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    buildInfoRow(
+                        title: 'Data consegna',
+                        value: formatDate(widget.intervento.merce?.data_consegna),
+                        context: context
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed:(){
+                          _selectDate3(context);
+                        }
                     )
                   ],
                 ),
-                // Divisore verticale
-                SizedBox(
-                  width: 20,
-                ),
-              ],
-            ),
+            ],
           ),
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                buildInfoRow(
-                    title: 'Orario Fine',
-                    value: widget.intervento.orario_fine != null ? DateFormat("HH:mm").format(widget.intervento.orario_fine!) : "N/A",
-                    context: context
-                ),
-                SizedBox(width : 10),
-                Align(
-                  alignment: Alignment.center,
-                  child: InkWell(
-                    onTap: () => _selectTime2(context),
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit),
-                        SizedBox(width: 8),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if(intervento.merce != null)
-            buildInfoRow(title: 'Data conclusione', value: intervento.merce?.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_conclusione!) : 'N/A'),
-          if(intervento.merce != null)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                buildInfoRow(
-                    title: 'Data consegna',
-                    value: formatDate(widget.intervento.merce?.data_consegna),
-                    context: context
-                ),
-                IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed:(){
-                      _selectDate3(context);
-                    }
-                )
-              ],
-            ),
-        ],
-      ),
+        ),
+      )
     );
   }
 
@@ -2512,12 +2527,17 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
   Widget _buildFinancialDetailsSection() {
     return Padding(
         padding: EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Column(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
                     Text(
                       'Dettagli Finanziari',
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
@@ -2747,94 +2767,95 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                         ),
                       ],
                     ),
-          ],
-        ),
-            SizedBox(width : 30),
-            SizedBox(
-              width: 500,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 8.0),
-                  if(prodottiDdt.isNotEmpty)
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Prodotti inseriti nel DDT:',style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold)),
-                          ...prodottiDdt.map((relazione){
-                            return ListTile(
-                              title: Text(
-                                  'Codice Danea: ${relazione.prodotto?.codice_danea}, ${relazione.prodotto?.descrizione}'
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
-                    ),
-                  if(allProdotti.isEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Nessun prodotto utilizzato', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                      ],
-                    ),
-                  if (allProdotti.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Prodotti utilizzati:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ],
+                ),
+                SizedBox(width : 30),
+                SizedBox(
+                  width: 500,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 8.0),
+                      if(prodottiDdt.isNotEmpty)
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Prodotti inseriti nel DDT:',style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold)),
+                              ...prodottiDdt.map((relazione){
+                                return ListTile(
+                                  title: Text(
+                                      'Codice Danea: ${relazione.prodotto?.codice_danea}, ${relazione.prodotto?.descrizione}'
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
                         ),
-                        ...allProdotti.map((relazione) {
-                          bool isInHistoricalUser = relazione.presenza_storico_utente ?? true; // Supponendo che il valore predefinito sia true
-                          bool hasDdt = relazione.ddt != null; // Controlla se ddt non è null
-                          bool hasSerial = relazione.seriale != null;
-                          bool shouldBeRed = !isInHistoricalUser && !hasDdt; // Colore rosso se isInHistoricalUser è false e se hasDdt è false
-
-                          String prezzoFornitore = relazione.prodotto?.prezzo_fornitore != null
-                              ? relazione.prodotto!.prezzo_fornitore!.toStringAsFixed(2) + "€"
-                              : "Non disponibile"; // Controlla se prezzo_fornitore è null
-
-                          return ListTile(
-                            title: Text(
-                              '${relazione.prodotto?.descrizione ?? "Descrizione non disponibile"}',
-                              style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                      if(allProdotti.isEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Nessun prodotto utilizzato', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                          ],
+                        ),
+                      if (allProdotti.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Prodotti utilizzati:',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore - Quantità: ${relazione.quantita?.toStringAsFixed(2)}',
+                            ...allProdotti.map((relazione) {
+                              bool isInHistoricalUser = relazione.presenza_storico_utente ?? true; // Supponendo che il valore predefinito sia true
+                              bool hasDdt = relazione.ddt != null; // Controlla se ddt non è null
+                              bool hasSerial = relazione.seriale != null;
+                              bool shouldBeRed = !isInHistoricalUser && !hasDdt; // Colore rosso se isInHistoricalUser è false e se hasDdt è false
+                              String prezzoFornitore = relazione.prodotto?.prezzo_fornitore != null
+                                  ? relazione.prodotto!.prezzo_fornitore!.toStringAsFixed(2) + "€"
+                                  : "Non disponibile"; // Controlla se prezzo_fornitore è null
+                              return ListTile(
+                                title: Text(
+                                  '${relazione.prodotto?.descrizione ?? "Descrizione non disponibile"}',
                                   style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
                                 ),
-                                SizedBox(height: 6),
-                                Text(
-                                  '${relazione.seriale ?? ''}', style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore - Quantità: ${relazione.quantita?.toStringAsFixed(2)}',
+                                      style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      '${relazione.seriale ?? ''}', style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              );
+                            }).toList(),
+                            SizedBox(height: 16), // Aggiungere uno spazio tra la lista e il totale
+                            Text(
+                              'Totale prezzo fornitore: ${totalePrezzoFornitore.toStringAsFixed(2)}€',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
-                          );
-                        }).toList(),
-                        SizedBox(height: 16), // Aggiungere uno spazio tra la lista e il totale
-                        Text(
-                          'Totale prezzo fornitore: ${totalePrezzoFornitore.toStringAsFixed(2)}€',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ],
                         ),
-                      ],
-                    ),
-                ],
-              ),
+                    ],
+                  ),
+                )
+              ],
             )
-          ],
+          )
         )
     );
   }

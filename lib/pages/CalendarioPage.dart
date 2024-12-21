@@ -5,6 +5,7 @@ import 'package:fema_crm/model/TipologiaInterventoModel.dart';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:fema_crm/pages/CreazioneInterventoByAmministrazionePage.dart';
 import 'package:fema_crm/pages/DettaglioCommissioneAmministrazionePage.dart';
+import 'package:fema_crm/pages/DettaglioInterventoNewPageAndroid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -13,6 +14,7 @@ import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'DettaglioInterventoNewPage.dart';
+import 'dart:io';
 
 class CalendarioPage extends StatefulWidget {
   final UtenteModel utente;
@@ -399,7 +401,11 @@ class _CalendarioPageState extends State<CalendarioPage> {
                                 builder: (context) {
                                   if (appointment.recurrenceId is InterventoModel) {
                                     InterventoModel intervento = appointment.recurrenceId as InterventoModel;
-                                    return DettaglioInterventoNewPage(intervento: intervento, utente: widget.utente);
+                                    if(Platform.isWindows){
+                                      return DettaglioInterventoNewPage(intervento: intervento, utente: widget.utente);
+                                    } else {
+                                      return DettaglioInterventoNewPageAndroid(intervento: intervento, utente: widget.utente);
+                                    }
                                   } else {
                                     CommissioneModel commissione = appointment.recurrenceId as CommissioneModel;
                                     return DettaglioCommissioneAmministrazionePage(commissione: commissione, utente : widget.utente);

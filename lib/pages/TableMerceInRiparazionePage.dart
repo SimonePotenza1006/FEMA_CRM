@@ -838,20 +838,32 @@ class InterventoDataSource extends DataGridSource{
           } else {
             return GestureDetector(
               onTap: () {
-                if(Platform.isWindows){
+                if (Platform.isWindows) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : utente),
+                      builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: utente),
                     ),
                   );
                 } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente : utente),
-                    ),
-                  );
+                  if (Platform.isAndroid) {
+                    final screenWidth = MediaQuery.of(context).size.width;
+                    if (screenWidth < 420) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente: utente),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente: utente),
+                        ),
+                      );
+                    }
+                  }
                 }
               },
               child: Container(

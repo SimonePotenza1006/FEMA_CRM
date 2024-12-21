@@ -3,9 +3,10 @@ import '../model/InterventoModel.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'dart:io';
 import '../model/UtenteModel.dart';
 import 'DettaglioInterventoNewPage.dart';
+import 'DettaglioInterventoNewPageAndroid.dart';
 
 class DettaglioGruppoPage extends StatefulWidget {
   final GruppoInterventiModel gruppo;
@@ -231,12 +232,21 @@ class _DettaglioGruppoPageState extends State<DettaglioGruppoPage> {
         return GestureDetector(
           onTap: () {
             if (intervento != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : widget.utente),
-                ),
-              );
+              if(Platform.isWindows){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DettaglioInterventoNewPage(intervento: intervento, utente : widget.utente),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DettaglioInterventoNewPageAndroid(intervento: intervento, utente : widget.utente),
+                  ),
+                );
+              }
             }
           },
           child: Stack(

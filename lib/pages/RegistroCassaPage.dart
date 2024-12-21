@@ -18,6 +18,7 @@ import '../model/UtenteModel.dart';
 import 'AcquistoFornitorePage.dart';
 import 'AggiungiMovimentoPage.dart';
 import 'DettaglioInterventoNewPage.dart';
+import 'DettaglioInterventoNewPageAndroid.dart';
 import 'DettaglioSpesaFornitorePage.dart';
 import 'FemaShopPage.dart';
 import 'ModificaMovimentazionePage.dart';
@@ -425,12 +426,33 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                           GestureDetector(
                             onTap: () {
                               if (movimento.intervento != null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DettaglioInterventoNewPage(intervento: movimento.intervento!, utente: widget.userData,),
-                                  ),
-                                );
+                                if (Platform.isWindows) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DettaglioInterventoNewPage(intervento: movimento.intervento!, utente: widget.userData),
+                                    ),
+                                  );
+                                } else {
+                                  if (Platform.isAndroid) {
+                                    final screenWidth = MediaQuery.of(context).size.width;
+                                    if (screenWidth < 460) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DettaglioInterventoNewPageAndroid(intervento: movimento.intervento!, utente: widget.userData),
+                                        ),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DettaglioInterventoNewPage(intervento: movimento.intervento!, utente: widget.userData),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                }
                               }
                             },
                             child: Stack(
