@@ -637,7 +637,9 @@ class _ModificaTaskPageState
 
                                   if (_selectedTipo?.utente != null) _condiviso = true;
 
-                                  if (_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) _condiviso = false;
+                                  if (_selectedTipo?.utente == null &&
+                                      (_selectedTipo?.utentecreate?.id == widget.utente.id || (_selectedTipo?.id == '9' || _selectedTipo?.id == '10')))
+                                    _condiviso = false;
                                 });
                               },
                               items: allTipi.map<DropdownMenuItem<TipoTaskModel>>((TipoTaskModel tipologia) {
@@ -689,8 +691,10 @@ class _ModificaTaskPageState
                           SizedBox(height: 20),
                           //se è una tipologia creata da me e non condivisa con nessuno -> task non condivisibile
                           //e se è tipologia diversa da 9 o 10
-                          ((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
-                              (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
+                          //((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
+                            //  (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
+                          _selectedTipo?.id == '9' || _selectedTipo?.id == '10' ||
+                              !(_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ?
                           SizedBox(
                             width: 400,
                             child: CheckboxListTile(
@@ -724,12 +728,13 @@ class _ModificaTaskPageState
                               ),
                               contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                             ),
-                          ) ,
-                              //: Container(),
+                          ) : Container(),
                           SizedBox(height: 10),// Button
                           if (_condiviso) SizedBox(
                             width: 600,
-                            child: DropdownButtonFormField<UtenteModel>(
+                            child: AbsorbPointer(
+                              absorbing: _selectedTipo?.utente != null ? true : false,
+                              child: DropdownButtonFormField<UtenteModel>(
                               value: selectedUtente,
                               onChanged: _selectedTipo?.utente != null ? null : (UtenteModel? newValue) {
                                 setState(() {
@@ -741,7 +746,7 @@ class _ModificaTaskPageState
                                   value: utente,
                                   child: Text(
                                     utente.nomeCompleto()!.toUpperCase(),
-                                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                                    style: TextStyle(fontSize: 14, color:  _selectedTipo?.utente != null ? Colors.grey[500] : Colors.black87),
                                   ),
                                 );
                               }).toList(),
@@ -749,11 +754,11 @@ class _ModificaTaskPageState
                                 labelText: 'SELEZIONA UTENTE',
                                 labelStyle: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey[600],
+                                  color: _selectedTipo?.utente != null ? Colors.grey[500] : Colors.grey[600],
                                   fontWeight: FontWeight.bold,
                                 ),
                                 filled: true,
-                                fillColor: Colors.grey[200],
+                                fillColor: _selectedTipo?.utente != null ? Colors.grey[100] : Colors.grey[200],
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide.none,
@@ -780,6 +785,7 @@ class _ModificaTaskPageState
                                 }
                                 return null;
                               },
+                            )
                             ),
                           ),
                           SizedBox(height: 10),
