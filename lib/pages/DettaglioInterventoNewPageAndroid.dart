@@ -3062,13 +3062,12 @@ class _DettaglioInterventoNewPageAndoridState extends State<DettaglioInterventoN
                             SizedBox(height : 10),
                             buildInfoRow(
                                 title: 'Apertura',
-                                value: widget.intervento.utente_apertura?.nomeCompleto() ?? 'N/A',
+                                value: widget.intervento.utente_apertura!.nome! + " " + widget.intervento.utente_apertura!.cognome!.substring(0, 1),
                                 context: context
                             ),
                           ],
                         ),
                       ),
-
                       SizedBox(height: 20),
                       if(widget.intervento.merce != null)
                         Column(
