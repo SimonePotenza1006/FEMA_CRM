@@ -1549,9 +1549,9 @@ class TaskDataSource extends DataGridSource{
       final response = await http.delete(
         Uri.parse('$ipaddress/api/task/$id'),
       );
-      print('1111');
+
       if (response.statusCode == 200) {
-        print('2222');
+
         //Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Task eliminato con successo'.toUpperCase())),
