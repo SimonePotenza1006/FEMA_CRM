@@ -436,7 +436,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                                 } else {
                                   if (Platform.isAndroid) {
                                     final screenWidth = MediaQuery.of(context).size.width;
-                                    if (screenWidth < 360) {
+                                    if (screenWidth < 460) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
