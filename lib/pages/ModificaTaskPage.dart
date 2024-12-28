@@ -304,18 +304,22 @@ class _ModificaTaskPageState
       var apiUrl = Uri.parse('$ipaddress/api/tipoTask');
       var response = await http.get(apiUrl);
       if(response.statusCode == 200){
+        print('1111');
         var jsonData = jsonDecode(utf8.decode(response.bodyBytes));
         List<TipoTaskModel> tipi = [];
         for(var item in jsonData){
-          if (//widget.utente.cognome! == "Mazzei" ||
+          if (widget.utente.cognome! == "Mazzei" ||
               (TipoTaskModel.fromJson(item).utentecreate!.id == widget.utente.id)
               || (TipoTaskModel.fromJson(item).utente == null && (TipoTaskModel.fromJson(item).id == '9' || TipoTaskModel.fromJson(item).id == '10'))
               || (TipoTaskModel.fromJson(item).utente != null && TipoTaskModel.fromJson(item).utente!.id == widget.utente.id))
             tipi.add(TipoTaskModel.fromJson(item));
         }
+        print('2222');
         setState(() {
           allTipi = tipi;
+          print(_selectedTipo.toString()+'2222...333'+tipi.toString());
           _selectedTipo = tipi.firstWhere((element) => element.id==widget.task.tipologia!.id!);
+          print('333');
         });
       } else {
         throw Exception(
@@ -458,7 +462,7 @@ class _ModificaTaskPageState
                 Text('DATA SELEZIONATA: ${selectedDate?.day}/${selectedDate?.month}/${selectedDate?.year}'),
               const SizedBox(height: 20.0),*/
                           //SizedBox(height: 2),
-                          _accettato == false ? Padding(
+                          _accettato == false && widget.task.utentecreate!.id != widget.utente.id && widget.task.utente!.id == widget.utente.id ? Padding(
                               padding: EdgeInsets.all(10.0),
                               child:
                               RichText(
@@ -813,7 +817,7 @@ class _ModificaTaskPageState
                               controlAffinity: ListTileControlAffinity.leading,
                               activeColor: Colors.redAccent,
                               checkColor: Colors.white,
-                              tileColor: _accettato == false ? Colors.red[50] : Colors.grey[200],
+                              tileColor: _accettato == false && widget.task.utentecreate!.id != widget.utente.id && widget.task.utente!.id == widget.utente.id ? Colors.red[50] : Colors.grey[200],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -1050,7 +1054,7 @@ class _ModificaTaskPageState
             : true,
         'tipologia': _selectedTipo?.toMap(),
         'utentecreate': widget.task.utentecreate?.toMap(),
-        'utente': _condiviso ? selectedUtente?.toMap() : widget.utente,
+        'utente': _condiviso ? selectedUtente?.toMap() : widget.task.utente,
         'attivo': widget.task.attivo,
       });
       final response = await http.post(
@@ -1094,7 +1098,7 @@ class _ModificaTaskPageState
             'Failed to load utenti data from API: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching agenti data from API: $e');
+      print('Error fetching utenti data from API: $e');
       showDialog(
         context: context,
         builder: (BuildContext context) {

@@ -1544,7 +1544,7 @@ class TaskDataSource extends DataGridSource{
     }
   }*/
 
-  Future<void> deleteTask(BuildContext context, String? id) async {
+  Future<void> deleteTask(String? id) async {
     try {
       final response = await http.delete(
         Uri.parse('$ipaddress/api/task/$id'),
@@ -1767,7 +1767,7 @@ class TaskDataSource extends DataGridSource{
                     ),
                     TextButton(
                       onPressed: () {
-                        deleteTask(context, task.id);
+                        deleteTask(task.id);
                         Navigator.of(context).pop();
                       },
                       child: Text('OK', style: TextStyle(fontSize: 18)),

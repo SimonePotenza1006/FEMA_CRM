@@ -3037,7 +3037,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: Text("${title.toUpperCase()}"),
-                                  content: Text(value), // Mostra il valore completo qui
+                                  content: Text(value.toUpperCase()), // Mostra il valore completo qui
                                   actions: [
                                     TextButton(
                                       child: Text("Chiudi"),
@@ -3119,7 +3119,7 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                               builder: (BuildContext context) {
                                 return AlertDialog(
                                   title: Text("${title.toUpperCase()}"),
-                                  content: Text(value), // Mostra il valore completo qui
+                                  content: Text(value.toUpperCase()), // Mostra il valore completo qui
                                   actions: [
                                     TextButton(
                                       child: Text("Chiudi"),

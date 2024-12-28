@@ -1614,7 +1614,7 @@ class InterventoDataSource extends DataGridSource {
           ),
           DataGridCell<String>(
             columnName: 'descrizione',
-            value: intervento.titolo ?? '',
+            value: intervento.titolo!.toUpperCase() ?? '',
           ),
           DataGridCell<String>(
             columnName: 'responsabile',

@@ -261,6 +261,9 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
         child: Stack(
           children: [
             SingleChildScrollView(
+        child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+
               child: InteractiveViewer(
                 scaleEnabled: false,
                 panEnabled: false,
@@ -1207,7 +1210,7 @@ class _CertificazioneImpiantoFormPageState extends State<CertificazioneImpiantoF
                     )
                   ),
                 ),
-              ),
+              )),
             )
           ],
         ),

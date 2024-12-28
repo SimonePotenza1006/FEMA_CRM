@@ -166,13 +166,13 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
                 SpeedDialChild(
                   child: Icon(Icons.history, color: Colors.white),
                   backgroundColor: Colors.red,
-                  label: 'Rendiconto settimane precedenti'.toUpperCase(),
+                  label: 'Rendiconto settimane\nprecedenti'.toUpperCase(),
                   onTap: () => _showPreviousWeeksDialog(),
                 ),
                 SpeedDialChild(
                   child: Icon(Icons.build, color: Colors.white),
                   backgroundColor: Colors.red,
-                  label: 'Pagamento/Acconto intervento'.toUpperCase(),
+                  label: 'Pagamento/Acconto\nintervento'.toUpperCase(),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(

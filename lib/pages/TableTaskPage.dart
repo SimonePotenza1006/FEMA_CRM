@@ -1923,8 +1923,27 @@ class TaskDataSource extends DataGridSource{
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('CONCLUSIONE TASK'),
-                  content: Text(
-                      'CONFERMI DI VOLER AGGIORNARE LO STATO DEL TASK \"'+task.titolo!.toUpperCase()+'\" COME CONCLUSO?'),
+                  content:
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'CONFERMI DI VOLER AGGIORNARE LO STATO DEL TASK "',
+                          style: TextStyle(color: Colors.black), // Colore del testo normale
+                        ),
+                        TextSpan(
+                          text: task.titolo!.toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // Testo in grassetto
+                        ),
+                        TextSpan(
+                          text: '" COME CONCLUSO?',
+                          style: TextStyle(color: Colors.black), // Colore del testo normale
+                        ),
+                      ],
+                    ),
+                  ),
+                  /*Text(
+                      'CONFERMI DI VOLER AGGIORNARE LO STATO DEL TASK \"'+task.titolo!.toUpperCase()+'\" COME CONCLUSO?'),*/
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -1957,8 +1976,28 @@ class TaskDataSource extends DataGridSource{
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text('ACCETTA TASK'),
-                content: Text(
-                    task.utentecreate!.nomeCompleto()!.toUpperCase()+' HA CREATO IL TASK \"${task.titolo!.toUpperCase()}\" PER TE, CONFERMI DI AVER PRESO VISIONE?'),
+                content:
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: task.utentecreate!.nomeCompleto()!.toUpperCase()+' HA CREATO IL TASK "',
+                        style: TextStyle(color: Colors.black), // Colore del testo normale
+                      ),
+                      TextSpan(
+                        text: task.titolo!.toUpperCase(),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // Testo in grassetto
+                      ),
+                      TextSpan(
+                        text: '"  PER TE, CONFERMI DI AVER PRESO VISIONE?',
+                        style: TextStyle(color: Colors.black), // Colore del testo normale
+                      ),
+                    ],
+                  ),
+                ),
+                /*Text(
+                    task.utentecreate!.nomeCompleto()!.toUpperCase()+' HA CREATO IL TASK \"${task.titolo!.toUpperCase()}\" PER TE, '
+                        'CONFERMI DI AVER PRESO VISIONE?'),*/
                 actions: <Widget>[
                   TextButton(
                     onPressed: () {
@@ -1987,9 +2026,28 @@ class TaskDataSource extends DataGridSource{
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('ARCHIVIAZIONE TASK'),
-                  content: Text(
+                  content: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'CONFERMI DI VOLER SPOSTARE IL TASK "',
+                          style: TextStyle(color: Colors.black), // Colore del testo normale
+                        ),
+                        TextSpan(
+                          text: task.titolo!.toUpperCase(),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // Testo in grassetto
+                        ),
+                        TextSpan(
+                          text: '" NEL CESTINO? POTRAI SUCCESSIVAMENTE '
+                              'RECUPERARE IL TASK DAL CESTINO CLICCANDO SU RIPRISTINA',
+                          style: TextStyle(color: Colors.black), // Colore del testo normale
+                        ),
+                      ],
+                    ),
+                  ),
+                  /*Text(
                       'CONFERMI DI VOLER SPOSTARE IL TASK \"'+task.titolo!.toUpperCase()+'\" NEL CESTINO? POTRAI SUCCESSIVAMENTE '
-                          'RECUPERARE IL TASK DAL CESTINO CLICCANDO SU RIPRISTINA '),
+                          'RECUPERARE IL TASK DAL CESTINO CLICCANDO SU RIPRISTINA '),*/
                   actions: <Widget>[
                     TextButton(
                       onPressed: () {
@@ -2024,7 +2082,7 @@ class TaskDataSource extends DataGridSource{
                 return StatefulBuilder( // Consente di aggiornare lo stato nel dialog
                   builder: (BuildContext context, StateSetter setState) {
                     return AlertDialog(
-                      title: Text('Condividi Task\n\"'.toUpperCase()+task.titolo!.toUpperCase()+'\"'),
+                      title: Text('Condividi Task\n\"'.toUpperCase()+task.titolo!.toUpperCase()+'\"', style: TextStyle(fontSize: 18)),
                       content: SingleChildScrollView(
                         child: Container(
                           width: double.maxFinite,
@@ -2036,7 +2094,9 @@ class TaskDataSource extends DataGridSource{
                                 physics: NeverScrollableScrollPhysics(),
                                 itemCount: _allUtenti.length,
                                 itemBuilder: (context, index) {
-                                  return RadioListTile<UtenteModel>(
+                                  return Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 0.0), // Modifica il valore per avvicinare gli elementi
+                                      child: RadioListTile<UtenteModel>(
                                     value: _allUtenti[index],
                                     groupValue: localSelectedUtente,
                                     onChanged: (UtenteModel? newValue) {
@@ -2045,7 +2105,7 @@ class TaskDataSource extends DataGridSource{
                                       });
                                     },
                                     title: Text(_allUtenti[index].nomeCompleto()!.toUpperCase()),
-                                  );
+                                  ));
                                 },
                               ),
                             ],

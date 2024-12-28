@@ -10,6 +10,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:audioplayers/audioplayers.dart' as ap;
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:convert';
@@ -160,6 +161,8 @@ class _CreazioneTaskPageState
     _timer?.cancel();
   }
 
+  bool _isPlaying = false;
+
   Future<void> _playRecording() async {
     if (_filePath != null) {
       await _audioPlayer.setFilePath(_filePath!);
@@ -172,6 +175,37 @@ class _CreazioneTaskPageState
         });
       });
     }
+    ////////////
+    /*if (_isPlaying) {
+      // Se l'audio è in riproduzione, metti in pausa.
+      await _audioPlayer.pause();
+      setState(() {
+        _isPlaying = false;
+      });
+    } else {
+      // Se l'audio è stato messo in pausa, riprendi la riproduzione dalla posizione corrente.
+      if (_currentPosition > 0 && _currentPosition < _totalDuration) {
+        await _audioPlayer.play(ap.BytesSource(resp!), position: Duration(seconds: _currentPosition.toInt()));
+      } else {
+        // Altrimenti, avvia la riproduzione dall'inizio.
+        await _audioPlayer.play();//ap.BytesSource(resp!));
+      }
+      setState(() {
+        _isPlaying = true;
+      });
+    }
+
+    _audioPlayer.onPositionChanged.listen((position) {
+      setState(() {
+        _currentPosition = position.inSeconds.toDouble();
+      });
+    });
+
+    _audioPlayer.onPlayerComplete.listen((_) {
+      setState(() {
+        _isPlaying = false; // Aggiorna lo stato quando la riproduzione è completata
+      });
+    });*/
   }
 
   Future<void> _selezionaData() async {
@@ -213,7 +247,7 @@ class _CreazioneTaskPageState
     print('hjgfddfg');
     return SizedBox(
       //width: 200,
-      height: 150,
+      height: 120,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: pickedImages.length,
@@ -291,17 +325,35 @@ class _CreazioneTaskPageState
             centerTitle: true,
             backgroundColor: Colors.red,
           ),
+          floatingActionButton: Align(
+            alignment: Platform.isAndroid ? Alignment.bottomRight : Alignment.bottomCenter, // Allinea a sinistra
+            child: Padding(
+            padding: EdgeInsets.all(1.0),
+            child: ElevatedButton(
+              onPressed: _selectedTipo != null ? () {
+                saveTaskPlusAudio();//saveTaskPlusPics();
+              } : null,
+              child: Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20) ),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.all(15.0),
+                foregroundColor: Colors.white, backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          )),
           body: LayoutBuilder(
               builder: (context, constraints){
 
                 return Padding(
-                  padding: EdgeInsets.all(20.0),
+                  padding: EdgeInsets.all(12.0),
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child:  Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         // Description Field
                         SizedBox(
                           width: 600,
@@ -344,11 +396,11 @@ class _CreazioneTaskPageState
                                 fontSize: 14,
                                 color: Colors.grey[500],
                               ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 14),
                         // Description Field
                         SizedBox(
                           width: 600,
@@ -391,11 +443,11 @@ class _CreazioneTaskPageState
                                 fontSize: 14,
                                 color: Colors.grey[500],
                               ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 14),
                         // Description Field
                         SizedBox(
                           width: 600,
@@ -438,11 +490,11 @@ class _CreazioneTaskPageState
                                 fontSize: 14,
                                 color: Colors.grey[500],
                               ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              contentPadding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 14),
                         Row(children: [
                           /*ElevatedButton(
                             onPressed:  () {
@@ -668,7 +720,7 @@ class _CreazioneTaskPageState
                                                           width: 1.0,
                                                         ),
                                                       ),
-                                                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                                                      contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                                                     ),
                                                     validator: (value) {
                                                       if (value == null) {
@@ -703,12 +755,12 @@ class _CreazioneTaskPageState
                                 borderRadius: BorderRadius.circular(10),
                                 side: BorderSide(color: Colors.grey[300]!), // Bordo
                               ),
-                              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              padding: EdgeInsets.symmetric(vertical: 9, horizontal: 10),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add, color: Colors.black87), // Icona +
+                                Icon(Icons.add, color: Colors.black87, size: 29,), // Icona +
                                 /*SizedBox(width: 8), // Spazio tra l'icona e il testo
                                 Text(
                                   'AGGIUNGI', // Testo del bottone
@@ -719,7 +771,7 @@ class _CreazioneTaskPageState
                           ),
                           SizedBox(width: 8,),
                           SizedBox(
-                          width: constraints.maxWidth < 460 ? 246 : 526,
+                          width: constraints.maxWidth < 460 ? 262 : 526,
                           child: DropdownButtonFormField<TipoTaskModel>(//isExpanded: true,
                             value: _selectedTipo,
                             onChanged: (TipoTaskModel? newValue) {
@@ -781,7 +833,7 @@ class _CreazioneTaskPageState
                                   width: 1.0,
                                 ),
                               ),
-                              contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                              contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                             ),
                             validator: (value) {
                               if (value == null) {
@@ -806,13 +858,138 @@ class _CreazioneTaskPageState
                         ),
 
                         ],),
-                        SizedBox(height: 20),
+                        SizedBox(height: 14),
                         //se è una tipologia creata da me e non condivisa con nessuno -> task non condivisibile
                         //e se è tipologia diversa da 9 o 10
                         //((_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ||
                         //    (_selectedTipo?.id != '9' && _selectedTipo?.id != '10'))? Container() :
+                        constraints.maxWidth < 460 ?
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                          _selectedTipo?.id == '9' || _selectedTipo?.id == '10' ||
+                              !(_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ?
+                          Wrap(children: [
+                          Icon(
+                            Icons.people,
+                            size: 42,
+                            color: _selectedTipo?.utente != null ? Colors.grey[400] : Colors.grey,
+                          ),
+                          SizedBox(
+                            //width: 200,
+                            child: Transform.scale(
+                              scale: 1.2, // Modifica questo valore per aumentare o diminuire la dimensione
+                              child: Checkbox(
+                              //enabled: _selectedTipo?.utente != null ? false : true,
+                              value: _condiviso,
+                              onChanged: _selectedTipo?.utente != null
+                                  ? null // Disabilita la checkbox se _selectedTipo?.utente non è null
+                                  : (value) {
+                                setState(() {
+                                  _condiviso = value!;
+                                  if (_condiviso) {
+                                    _condivisoController.clear();
+                                  } else {
+                                    selectedUtente = allUtenti.firstWhere((element) => element.id == widget.utente.id);
+                                  }
+                                });
+                              },
+                            ),
+                          ))
+                          ],)
+                          /*SizedBox(
+                            //width: 200,
+                            child: CheckboxListTile(
+                              //contentPadding: EdgeInsets.symmetric(horizontal: 95, vertical: 0),
+                              enabled: _selectedTipo?.utente != null ? false : true,
+
+                              value: _condiviso,
+                              onChanged: (value) {
+                                setState(() {
+                                  _condiviso = value!;
+                                  if (_condiviso) {
+                                    _condivisoController.clear();
+                                  } else {
+                                    selectedUtente = allUtenti.firstWhere((element) => element.id == widget.utente.id);//null;
+
+                                  }
+                                });
+                              },
+                            ),
+                          )*/ : Container(),
+                          SizedBox(width: 7),// Button
+                          if (_condiviso) SizedBox(
+                            width: 237,
+                            child: AbsorbPointer(
+                                absorbing: _selectedTipo?.utente != null ? true : false,
+                                child: DropdownButtonFormField<UtenteModel>(
+                                  value: selectedUtente,
+                                  onChanged: _selectedTipo?.utente != null ? null : (UtenteModel? newValue) {
+                                    setState(() {
+                                      selectedUtente = newValue;
+                                    });
+                                  },
+                                  items: [
+// Aggiungi l'opzione "Nessun utente"
+                                    /*DropdownMenuItem<UtenteModel>(
+                                value: null, // Puoi usare null per rappresentare "Nessun utente"
+                                child: Text(
+                                  '- NESSUN UTENTE -',
+                                  style: TextStyle(fontSize: 13, color: Colors.black87),
+                                ),
+                              ),*/
+                                    ...allUtenti.map<DropdownMenuItem<UtenteModel>>((UtenteModel utente) {
+                                      return DropdownMenuItem<UtenteModel>(
+                                        value: utente,
+                                        child: Text(
+                                          utente.nomeCompleto()!.toUpperCase(),
+                                          style: TextStyle(fontSize: 14, color: _selectedTipo?.utente != null ? Colors.grey[500] : Colors.black87),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                  decoration: InputDecoration(
+                                    labelText: 'SELEZIONA UTENTE',
+                                    labelStyle: TextStyle(
+                                      fontSize: 14,
+                                      color: _selectedTipo?.utente != null ? Colors.grey[500] : Colors.grey[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    filled: true,
+                                    fillColor: _selectedTipo?.utente != null ? Colors.grey[100] : Colors.grey[200],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.redAccent,
+                                        width: 2.0,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Selezionare un utente'.toUpperCase();
+                                    }
+                                    return null;
+                                  },
+                                )),
+                          ),
+
+                        ],) : Wrap(children: [
                         _selectedTipo?.id == '9' || _selectedTipo?.id == '10' ||
                             !(_selectedTipo?.utente == null && _selectedTipo?.utentecreate?.id == widget.utente.id) ?
+
                         SizedBox(
                           width: 200,
                           child: CheckboxListTile(
@@ -832,7 +1009,7 @@ class _CreazioneTaskPageState
                             },
                           ),
                         ) : Container(),
-                        SizedBox(height: 10),// Button
+                        SizedBox(height: 7),// Button
                         if (_condiviso) SizedBox(
                           width: 400,
                           child: AbsorbPointer(
@@ -900,8 +1077,10 @@ class _CreazioneTaskPageState
                             },
                           )),
                         ),
-                        SizedBox(height: 40),
-                        Platform.isWindows ? Container(
+                        ],
+                        ),
+                        SizedBox(height: 10),
+                        /*Platform.isWindows ? Container(
                           child: ElevatedButton(
                             onPressed: pickImagesFromGallery,
                             style: ElevatedButton.styleFrom(
@@ -932,14 +1111,146 @@ class _CreazioneTaskPageState
                               ),
                             ),
                           ],
+                        ),*/
+
+                        Platform.isWindows ? Container(
+                          child: ElevatedButton(
+                            onPressed: pickImagesFromGallery,
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white, backgroundColor: Colors.red,
+                            ),
+                            child: Text('Allega Foto'.toUpperCase(), style: TextStyle(fontSize: 18.0)), // Aumenta la dimensione del testo del pulsante
+                          ),
+                        ) : Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Primo riquadro
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              margin: EdgeInsets.all(10), // Margine tra i riquadri
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],//blue[100],
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 3,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
+                                children: [
+                                  Text(
+                                    'FOTO',
+                                    style: TextStyle(fontSize: 16),//, fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 13), // Spazio tra il titolo e le icone
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          takePicture();
+                                        },
+                                        child: Icon(Icons.camera_alt, size: 50, color: Colors.red),
+                                      ),
+                                      //Icon(Icons.camera_alt, size: 50, color: Colors.red),
+                                      SizedBox(width: 12),
+                                      GestureDetector(
+                                        onTap: () {
+                                          pickImagesFromGallery();
+                                        },
+                                        child: Icon(Icons.attach_file, size: 50, color: Colors.red),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            //SizedBox(width: 1,),
+                            // Secondo riquadro
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              margin: EdgeInsets.all(10), // Margine tra i riquadri
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 3,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
+                                children: [
+                                Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [Text(
+                                    'REGISTRA',
+                                    style: TextStyle(fontSize: 15),//, fontWeight: FontWeight.bold),
+                                  ),
+                                  Icon(
+                                    _isRecording ? Icons.mic : Icons.mic_none,
+                                    size: 27,
+                                    color: _isRecording ? Colors.red : Colors.blue,
+                                  ),
+                                  Text(
+                                    '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                ]),
+                                  SizedBox(height: 2), // Spazio tra il titolo e le icone
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: _isRecording ? null : _startRecording,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 12),
+                                        ),
+                                        child: Icon(Icons.record_voice_over, size: 28, color: Colors.white),
+                                      ),
+                                      /*GestureDetector(
+                                        onTap: () {
+                                          _isRecording ? null : _startRecording;
+                                        },
+                                        child:  Icon(Icons.record_voice_over, size: 50, color: Colors.red),
+                                      ),*/
+
+                                      SizedBox(width: 4),
+                                      ElevatedButton(
+                                        onPressed: _isRecording ? _stopRecording : null,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 7, vertical: 12),
+                                        ),
+                                        child: Icon(Icons.stop, size: 34, color: Colors.white),
+                                        //const Text('STOP', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                      ),
+                                      //Icon(Icons.stop, size: 50, color: Colors.red),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 10),
-                        if (pickedImages.isNotEmpty) _buildImagePreview(),
-                        SizedBox(height: 10),
-                        const SizedBox(height: 20),
+
+
+                        SizedBox(height: 7),
+                        //const SizedBox(height: 14),
                         if (Platform.isAndroid)
                           Column(children: [
-                            Row(
+                            /*Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 ElevatedButton(
@@ -972,8 +1283,8 @@ class _CreazioneTaskPageState
                             Text(
                               '${(_elapsedSeconds ~/ 60).toString().padLeft(2, '0')}:${(_elapsedSeconds % 60).toString().padLeft(2, '0')}',
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 12),
+                            ),*/
+                            /*const SizedBox(height: 12),
                             if (_timer != null) Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -987,7 +1298,7 @@ class _CreazioneTaskPageState
                                   child: Icon(
                                     Icons.play_arrow, // Icona di play
                                     color: Colors.white, // Colore dell'icona
-                                    size: 28, // Dimensione dell'icona
+                                    size: 14, // Dimensione dell'icona
                                   ),
                                 ),
                                 /*ElevatedButton(
@@ -1010,9 +1321,11 @@ class _CreazioneTaskPageState
                                   child: Icon(
                                     Icons.delete_forever, // Icona di play
                                     color: Colors.white, // Colore dell'icona
-                                    size: 28, // Dimensione dell'icona
+                                    size: 14, // Dimensione dell'icona
                                   ),
                                 ),
+                              ],
+                            ),*/
                                 //if (_timer != null)
                                   /*ElevatedButton(
                                   onPressed: _resetRecording,
@@ -1023,36 +1336,52 @@ class _CreazioneTaskPageState
                                   ),
                                   child: const Text('annulla', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                                 ),*/
+
+                            if (_timer != null)
+                              Row(children: [
+                                ElevatedButton(
+                                  onPressed: !_isRecording ? _playRecording : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                                  ),
+                                  child: Icon(
+                                    Icons.play_arrow, // Icona di play
+                                    color: Colors.white, // Colore dell'icona
+                                    size: 22, // Dimensione dell'icona
+                                  ),
+                                ),
+                                  Slider(
+                                  activeColor: Colors.blue,
+                                  value: _currentPosition,
+                                  max: _totalDuration,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _currentPosition = value;
+                                    });
+                                    _audioPlayer.seek(Duration(seconds: value.toInt()));
+                                  },
+                                ),
+                                ElevatedButton(
+                                  onPressed: _resetRecording,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete_forever, // Icona di play
+                                    color: Colors.white, // Colore dell'icona
+                                    size: 22, // Dimensione dell'icona
+                                  ),
+                                ),
                               ],),
-                            if (_timer != null) Slider(
-                              activeColor: Colors.blue,
-                              value: _currentPosition,
-                              max: _totalDuration,
-                              onChanged: (value) {
-                                setState(() {
-                                  _currentPosition = value;
-                                });
-                                _audioPlayer.seek(Duration(seconds: value.toInt()));
-                              },
-                            ),
-                            SizedBox(height: 43),
+                            SizedBox(height: 3),
                           ],
                           ),
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: ElevatedButton(
-                            onPressed: _selectedTipo != null ? () {
-                              saveTaskPlusAudio();//saveTaskPlusPics();
-                            } : null,
-                            child: Text('SALVA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16) ),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white, backgroundColor: _selectedTipo != null ? Colors.red : Colors.grey,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        )
+                        SizedBox(height: 7),
+                        if (pickedImages.isNotEmpty) _buildImagePreview(),
+
                       ],
                     ),
                   ),

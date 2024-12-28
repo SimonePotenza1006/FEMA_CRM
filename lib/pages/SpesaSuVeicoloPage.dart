@@ -80,7 +80,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Form(
@@ -89,7 +89,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 20),
+                  SizedBox(height: 8),
                   SizedBox(
                     width: 300,
                     child: DropdownButtonFormField<VeicoloModel>(
@@ -144,7 +144,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       validator: (value) => value == null ? 'SELEZIONA UN VEICOLO' : null,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 12),
                 SizedBox(
                   width: 300,
                   child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
@@ -198,7 +198,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                     validator: (value) => value == null ? 'SELEZIONA UNA TIPOLOGIA DI SPESA' : null,
                   ),
                 ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 12),
                   if (selectedTipologia?.descrizione == "ALTRO")
                     Container(
                       child: SizedBox(
@@ -302,7 +302,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       validator: (value) => value == null ? 'SELEZIONA UN FORNITORE' : null,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 12),
                   if (selectedFornitore == "ALTRO")
                     Container(
                       child: SizedBox(
@@ -353,7 +353,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   if (selectedTipologia?.descrizione == "POLIZZA")
                     Column(
                       children: [
-                        SizedBox(height: 20),
+                        SizedBox(height: 12),
                         SizedBox(
                           width: 300, // Imposta la larghezza come quella degli altri widget
                           child: TextFormField(
@@ -412,13 +412,13 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                             value == null || value.isEmpty ? 'SELEZIONA UNA DATA' : null,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 12),
                       ],
                     ),
                   if (selectedTipologia?.descrizione == "BOLLO")
                     Column(
                       children: [
-                        SizedBox(height: 20),
+                        SizedBox(height: 12),
                         SizedBox(
                           width: 400, // Imposta la larghezza come quella degli altri widget
                           child: TextFormField(
@@ -479,7 +479,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                         ),
                       ],
                     ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 12),
                   SizedBox(
                     width: 300,
                     child: TextFormField(
@@ -526,7 +526,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       value == null || value.isEmpty ? 'INSERISCI UN IMPORTO VALIDO' : null,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 12),
                   if (selectedTipologia?.descrizione == "POLIZZA")
                     Center(
                       child: Text(
@@ -585,8 +585,105 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                       },
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Center(
+                  SizedBox(height: 12),
+
+    Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+    // Primo riquadro
+    Container(
+    padding: EdgeInsets.all(8),
+    margin: EdgeInsets.all(10), // Margine tra i riquadri
+    decoration: BoxDecoration(
+    color: Colors.grey[200],//Colors.blue[100],
+    borderRadius: BorderRadius.circular(10),
+    boxShadow: [
+    BoxShadow(
+    color: Colors.grey.withOpacity(0.5),
+    spreadRadius: 3,
+    blurRadius: 7,
+    offset: Offset(0, 3),
+    ),
+    ],
+    ),
+    child: Column(
+    mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
+    children: [
+    Text(
+    'RICEVUTA',
+    style: TextStyle(fontSize: 18),//, fontWeight: FontWeight.bold),
+    ),
+    SizedBox(height: 7), // Spazio tra il titolo e le icone
+    Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+    GestureDetector(
+    onTap: () {
+      takePicture();
+    },
+    child: Icon(Icons.camera_alt, size: 44, color: Colors.red),
+    ),
+    SizedBox(width: 20),
+    GestureDetector(
+    onTap: () {
+      takePictureAttach();
+    },
+    child: Icon(Icons.attach_file, size: 44, color: Colors.red),
+    ),
+    ],
+    ),
+    ],
+    ),
+    ),
+    // Secondo riquadro
+    Container(
+    padding: EdgeInsets.all(8),
+    margin: EdgeInsets.all(10), // Margine tra i riquadri
+    decoration: BoxDecoration(
+    color: Colors.grey[200],//Colors.green[100],
+    borderRadius: BorderRadius.circular(10),
+    boxShadow: [
+    BoxShadow(
+    color: Colors.grey.withOpacity(0.5),
+    spreadRadius: 3,
+    blurRadius: 7,
+    offset: Offset(0, 3),
+    ),
+    ],
+    ),
+    child: Column(
+    mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
+    children: [
+    Text(
+    'CONTAKM',
+    style: TextStyle(fontSize: 18),//, fontWeight: FontWeight.bold),
+    ),
+    SizedBox(height: 7), // Spazio tra il titolo e le icone
+    Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+    GestureDetector(
+    onTap: () {
+      takePicture();
+    },
+    child: Icon(Icons.camera_alt, size: 44, color: Colors.red),
+    ),
+    SizedBox(width: 20),
+    GestureDetector(
+    onTap: () {
+      takePictureAttach();
+    },
+    child: Icon(Icons.attach_file, size: 44, color: Colors.red),
+    ),
+    ],
+    ),
+    ],
+    ),
+    ),
+    ],
+    ),
+
+                  /*Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -641,12 +738,12 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                         )
                       ],
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  _buildImagePreview(),
-                  SizedBox(height: 24,),
+                  ),*/
+                  SizedBox(height: 8),
+                  pickedImages.isNotEmpty ? _buildImagePreview() : Container(),
+                  SizedBox(height: 8,),
                   ElevatedButton(
-                    onPressed: pickedImages.length > 0
+                    onPressed: pickedImages.length > 1
                         ? () {
                       if (_formKey.currentState!.validate()) {
                         showDialog(
@@ -701,7 +798,8 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
           onPressed: () {
             _showConfirmationDialog();
           },
-          child: Icon(Icons.arrow_downward, color: Colors.white),
+          child: Icon(Icons.download,//arrow_downward,
+              color: Colors.white),
         ),
       )
           : null,
@@ -710,7 +808,7 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
 
   Widget _buildImagePreview() {
     return SizedBox(
-      height: 200,
+      height: 140,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: pickedImages.length,
@@ -1392,6 +1490,19 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
         });
       }
     }
+  }
+
+  Future<void> takePictureAttach() async {
+    final ImagePicker _picker = ImagePicker();
+
+      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+
+      if (pickedFiles != null && pickedFiles.isNotEmpty) {
+        setState(() {
+          pickedImages.addAll(pickedFiles);
+        });
+      }
+
   }
 
   Future<void> getTipologieSpesa() async {

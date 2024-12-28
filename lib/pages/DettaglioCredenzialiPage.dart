@@ -65,13 +65,14 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            /*Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: [*/
                 Container(
                   constraints: BoxConstraints(maxWidth: 500),
                   padding: EdgeInsets.all(25.0),
@@ -79,7 +80,11 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Column(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                  child: Row( // Cambiato da Column a Row
+                      children: [
+                        Column(
                     children: [
                       buildInfoRow(title: "Cliente", value: widget.credenziale.cliente!.denominazione!, context: context),
                       SizedBox(height: 15),
@@ -141,12 +146,12 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
                         ]
                       ),
                     ],
-                  ),
+                  )
+        ])),
                 )
-              ],
-            )
+              //],)
           ],
-        )
+        ))
       ),
     );
   }
@@ -161,7 +166,7 @@ class _DettaglioCredenzialiPageState extends State<DettaglioCredenzialiPage>{
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,//spaceBetween,
               children: [
                 Row(
                   children: [

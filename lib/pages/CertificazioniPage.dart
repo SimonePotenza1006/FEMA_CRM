@@ -1,4 +1,4 @@
-  import 'dart:convert';
+import 'dart:convert';
 import 'package:fema_crm/model/UtenteModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +10,7 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:io' as io;
 import '../model/FileModel.dart';
 import 'CertificazioneImpiantoFormPage.dart';
+import 'CertificazioneImpiantoFormPageNew.dart';
 import 'CertificazioniFormPage.dart';
 
 class CertificazioniPage extends StatefulWidget{
@@ -27,7 +28,7 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
   String ipaddress = 'http://gestione.femasistemi.it:8090'; 
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-      String ipaddressProva2 = 'http://192.168.1.198:8095';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   String currentPath = '';
 
   @override
@@ -69,6 +70,19 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
         actions: [
           IconButton(
             icon: Icon(
+                Icons.add
+            ),
+            color: Colors.white,
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CertificazioneImpiantoFormPageNew()),
+              );
+            },
+          ),
+          /*IconButton(
+            icon: Icon(
               Icons.add
             ),
             color: Colors.white,
@@ -79,7 +93,7 @@ class _CertificazioniPageState extends State<CertificazioniPage>{
                     builder: (context) => CertificazioneImpiantoFormPage()),
               );
             },
-          )
+          )*/
         ],
       ),
       body: fileStructure.isEmpty
