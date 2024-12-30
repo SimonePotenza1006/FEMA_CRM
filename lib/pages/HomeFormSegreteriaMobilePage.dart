@@ -47,7 +47,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-      String ipaddressProva2 = 'http://192.168.1.198:8095';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   String formattedDate = intl.DateFormat('yyyy-MM-ddTHH:mm:ss').format(DateTime.now());
   int _hoveredIndex = -1;
   int _lastClickedIndex = 0;
@@ -246,7 +246,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
         for(var item in responseData){
           RelazioneUtentiInterventiModel relazione = RelazioneUtentiInterventiModel.fromJson(item);
           if (relazione.intervento!.concluso != true)
-          allRelazioniByUtente.add(relazione);
+            allRelazioniByUtente.add(relazione);
 
         }
         return allRelazioniByUtente;
@@ -271,7 +271,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
           InterventoModel intervento = InterventoModel.fromJson(interventoJson);
           // Aggiungi il filtro per interventi non conclusi
           if (intervento.concluso != true)
-          allInterventiByUtente.add(intervento);
+            allInterventiByUtente.add(intervento);
 
         }
         return allInterventiByUtente;
@@ -486,7 +486,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                   interventi = interventi.where((intervento) {
                     return intervento.data == null || intervento.data!.isSameDay(selectedDate);
                   }).toList();
-                 return ListView.builder(
+                  return ListView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: interventi.length,
@@ -625,59 +625,59 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                           elevation: 4,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           child:
-                        ListTile(contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                        title: Text(
-                          '${relazione.intervento?.cliente!.denominazione!}\n${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
-                          style: textStyle,
-                        ),
-                        subtitle: Text(
-                          '${relazione.intervento?.titolo}',
-                          style: textStyle,
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (relazione.intervento!.concluso ?? false)
-                              Icon(Icons.check, color: Colors.black, size: 18), // Check icon
-                            Text(
-                              // Formatta la data secondo il tuo formato desiderato
-                              relazione.intervento?.data!= null
-                                  ? '${relazione.intervento?.data!.day.toString().padLeft(2, '0')}/${relazione.intervento?.data!.month.toString().padLeft(2, '0')}/${relazione.intervento?.data!.year}'
-                                  : 'Data non disponibile',
-                              style: TextStyle(
-                                fontSize: 13, // Stile opzionale per la data
-                                color: Colors.black,//relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
-                              ),
+                          ListTile(contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                            title: Text(
+                              '${relazione.intervento?.cliente!.denominazione!}\n${relazione.intervento?.destinazione?.citta}, ${relazione.intervento?.destinazione?.indirizzo}',
+                              style: textStyle,
                             ),
-                            Text(
-                              relazione.intervento?.orario_appuntamento!= null
-                                  ? '${relazione.intervento?.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${relazione.intervento?.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
-                                  : 'Nessun orario di appuntamento',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.black,//relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
-                              ),
+                            subtitle: Text(
+                              '${relazione.intervento?.titolo}',
+                              style: textStyle,
                             ),
-                          ],
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  DettaglioInterventoByTecnicoPage(
-                                    utente: widget.userData!,
-                                    intervento: relazione.intervento!,
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (relazione.intervento!.concluso ?? false)
+                                  Icon(Icons.check, color: Colors.black, size: 18), // Check icon
+                                Text(
+                                  // Formatta la data secondo il tuo formato desiderato
+                                  relazione.intervento?.data!= null
+                                      ? '${relazione.intervento?.data!.day.toString().padLeft(2, '0')}/${relazione.intervento?.data!.month.toString().padLeft(2, '0')}/${relazione.intervento?.data!.year}'
+                                      : 'Data non disponibile',
+                                  style: TextStyle(
+                                    fontSize: 13, // Stile opzionale per la data
+                                    color: Colors.black,//relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
                                   ),
+                                ),
+                                Text(
+                                  relazione.intervento?.orario_appuntamento!= null
+                                      ? '${relazione.intervento?.orario_appuntamento?.hour.toString().padLeft(2, '0')}:${relazione.intervento?.orario_appuntamento?.minute.toString().padLeft(2, '0')}'
+                                      : 'Nessun orario di appuntamento',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black,//relazione.intervento!.concluso ?? false ? Colors.white : Colors.black,
+                                  ),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                        tileColor: Colors.white60,
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(color: getPriorityColor(relazione.intervento!.priorita!), width: 8),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                      )
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DettaglioInterventoByTecnicoPage(
+                                        utente: widget.userData!,
+                                        intervento: relazione.intervento!,
+                                      ),
+                                ),
+                              );
+                            },
+                            tileColor: Colors.white60,
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(color: getPriorityColor(relazione.intervento!.priorita!), width: 8),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          )
                       );
                     },
                   );
@@ -755,7 +755,7 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
                               trailing: Column(
                                 children: [
                                   Text('Data arrivo merce:',
-                                    style: TextStyle(fontSize: 13, color: Colors.black)),
+                                      style: TextStyle(fontSize: 13, color: Colors.black)),
                                   SizedBox(height: 3),
                                   Text('${singolaMerce.data_apertura_intervento != null ? intl.DateFormat("dd/MM/yyyy").format(singolaMerce.data_apertura_intervento!) : "Non disponibile"}',
                                       style: TextStyle(fontSize: 13, color: Colors.black))
@@ -876,13 +876,13 @@ class _HomeFormSegreteriaMobilePageState extends State<HomeFormSegreteriaMobileP
               ),
               SizedBox(width: 10),
               Text(
-                  text,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
             ],
           ),
         ),

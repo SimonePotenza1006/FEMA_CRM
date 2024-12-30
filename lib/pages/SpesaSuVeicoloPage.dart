@@ -31,10 +31,10 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   List<TipologiaSpesaVeicoloModel> allTipologie = [];
   List<VeicoloModel> allVeicoli = [];
   List<SpesaVeicoloModel> allSpese = [];
-  String ipaddress = 'http://gestione.femasistemi.it:8090'; 
+  String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-      String ipaddressProva2 = 'http://192.168.1.198:8095';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   final TextEditingController _importoController = TextEditingController();
   final TextEditingController _kmController = TextEditingController();
   final TextEditingController _dataPolizzaController = TextEditingController();
@@ -145,59 +145,59 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                     ),
                   ),
                   SizedBox(height: 12),
-                SizedBox(
-                  width: 300,
-                  child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
-                    value: selectedTipologia,
-                    onChanged: (TipologiaSpesaVeicoloModel? newValue) {
-                      setState(() {
-                        selectedTipologia = newValue;
-                      });
-                    },
-                    items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
-                      return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
-                        value: tipologia,
-                        child: Text(
-                          tipologia.descrizione!,
-                          style: TextStyle(
-                            fontSize: 14,  // FontSize coerente con gli altri widget
-                            color: Colors.black87,  // Colore coerente con gli altri widget
+                  SizedBox(
+                    width: 300,
+                    child: DropdownButtonFormField<TipologiaSpesaVeicoloModel>(
+                      value: selectedTipologia,
+                      onChanged: (TipologiaSpesaVeicoloModel? newValue) {
+                        setState(() {
+                          selectedTipologia = newValue;
+                        });
+                      },
+                      items: allTipologie.map((TipologiaSpesaVeicoloModel tipologia) {
+                        return DropdownMenuItem<TipologiaSpesaVeicoloModel>(
+                          value: tipologia,
+                          child: Text(
+                            tipologia.descrizione!,
+                            style: TextStyle(
+                              fontSize: 14,  // FontSize coerente con gli altri widget
+                              color: Colors.black87,  // Colore coerente con gli altri widget
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'TIPOLOGIA DI SPESA',
+                        labelStyle: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.bold,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.redAccent,
+                            width: 2.0,
                           ),
                         ),
-                      );
-                    }).toList(),
-                    decoration: InputDecoration(
-                      labelText: 'TIPOLOGIA DI SPESA',
-                      labelStyle: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.bold,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.redAccent,
-                          width: 2.0,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1.0,
+                          ),
                         ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.grey[300]!,
-                          width: 1.0,
-                        ),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                      validator: (value) => value == null ? 'SELEZIONA UNA TIPOLOGIA DI SPESA' : null,
                     ),
-                    validator: (value) => value == null ? 'SELEZIONA UNA TIPOLOGIA DI SPESA' : null,
                   ),
-                ),
                   SizedBox(height: 12),
                   if (selectedTipologia?.descrizione == "ALTRO")
                     Container(
@@ -587,158 +587,101 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
                   ),
                   SizedBox(height: 12),
 
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    // Primo riquadro
-    Container(
-    padding: EdgeInsets.all(8),
-    margin: EdgeInsets.all(10), // Margine tra i riquadri
-    decoration: BoxDecoration(
-    color: Colors.grey[200],//Colors.blue[100],
-    borderRadius: BorderRadius.circular(10),
-    boxShadow: [
-    BoxShadow(
-    color: Colors.grey.withOpacity(0.5),
-    spreadRadius: 3,
-    blurRadius: 7,
-    offset: Offset(0, 3),
-    ),
-    ],
-    ),
-    child: Column(
-    mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
-    children: [
-    Text(
-    'RICEVUTA',
-    style: TextStyle(fontSize: 18),//, fontWeight: FontWeight.bold),
-    ),
-    SizedBox(height: 7), // Spazio tra il titolo e le icone
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    GestureDetector(
-    onTap: () {
-      takePicture();
-    },
-    child: Icon(Icons.camera_alt, size: 44, color: Colors.red),
-    ),
-    SizedBox(width: 20),
-    GestureDetector(
-    onTap: () {
-      takePictureAttach();
-    },
-    child: Icon(Icons.attach_file, size: 44, color: Colors.red),
-    ),
-    ],
-    ),
-    ],
-    ),
-    ),
-    // Secondo riquadro
-    Container(
-    padding: EdgeInsets.all(8),
-    margin: EdgeInsets.all(10), // Margine tra i riquadri
-    decoration: BoxDecoration(
-    color: Colors.grey[200],//Colors.green[100],
-    borderRadius: BorderRadius.circular(10),
-    boxShadow: [
-    BoxShadow(
-    color: Colors.grey.withOpacity(0.5),
-    spreadRadius: 3,
-    blurRadius: 7,
-    offset: Offset(0, 3),
-    ),
-    ],
-    ),
-    child: Column(
-    mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
-    children: [
-    Text(
-    'CONTAKM',
-    style: TextStyle(fontSize: 18),//, fontWeight: FontWeight.bold),
-    ),
-    SizedBox(height: 7), // Spazio tra il titolo e le icone
-    Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    GestureDetector(
-    onTap: () {
-      takePicture();
-    },
-    child: Icon(Icons.camera_alt, size: 44, color: Colors.red),
-    ),
-    SizedBox(width: 20),
-    GestureDetector(
-    onTap: () {
-      takePictureAttach();
-    },
-    child: Icon(Icons.attach_file, size: 44, color: Colors.red),
-    ),
-    ],
-    ),
-    ],
-    ),
-    ),
-    ],
-    ),
-
-                  /*Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton.icon(
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.red, // Sfondo rosso
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // Angoli arrotondati
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Primo riquadro
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        margin: EdgeInsets.all(10), // Margine tra i riquadri
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],//Colors.blue[100],
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 3,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
                             ),
-                          ),
-                          icon: Icon(
-                            Icons.camera_alt,
-                            color: Colors.white, // Icona bianca
-                            size: 30,
-                          ),
-                          label: Text(
-                            "Allega ricevuta".toUpperCase(),
-                            style: TextStyle(
-                              color: Colors.white, // Testo bianco
-                              fontSize: 16,
-                            ),
-                          ),
-                          onPressed: () {
-                            takePicture();
-                          },
+                          ],
                         ),
-                        SizedBox(height: 10),
-                        TextButton.icon(
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.red, // Sfondo rosso
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // Angoli arrotondati
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
+                          children: [
+                            Text(
+                              'RICEVUTA',
+                              style: TextStyle(fontSize: 18),//, fontWeight: FontWeight.bold),
                             ),
-                          ),
-                          icon: Icon(
-                            Icons.camera_alt,
-                            color: Colors.white, // Icona bianca
-                            size: 30,
-                          ),
-                          label: Text(
-                            "Allega contachilometri".toUpperCase(),
-                            style: TextStyle(
-                              color: Colors.white, // Testo bianco
-                              fontSize: 16,
+                            SizedBox(height: 7), // Spazio tra il titolo e le icone
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    takePicture();
+                                  },
+                                  child: Icon(Icons.camera_alt, size: 44, color: Colors.red),
+                                ),
+                                SizedBox(width: 20),
+                                GestureDetector(
+                                  onTap: () {
+                                    takePictureAttach();
+                                  },
+                                  child: Icon(Icons.attach_file, size: 44, color: Colors.red),
+                                ),
+                              ],
                             ),
-                          ),
-                          onPressed: () {
-                            takePicture();
-                          },
-                        )
-                      ],
-                    ),
-                  ),*/
+                          ],
+                        ),
+                      ),
+                      // Secondo riquadro
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        margin: EdgeInsets.all(10), // Margine tra i riquadri
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],//Colors.green[100],
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 3,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min, // Per adattare la dimensione del contenitore
+                          children: [
+                            Text(
+                              'CONTAKM',
+                              style: TextStyle(fontSize: 18),//, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 7), // Spazio tra il titolo e le icone
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    takePicture();
+                                  },
+                                  child: Icon(Icons.camera_alt, size: 44, color: Colors.red),
+                                ),
+                                SizedBox(width: 20),
+                                GestureDetector(
+                                  onTap: () {
+                                    takePictureAttach();
+                                  },
+                                  child: Icon(Icons.attach_file, size: 44, color: Colors.red),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                   SizedBox(height: 8),
                   pickedImages.isNotEmpty ? _buildImagePreview() : Container(),
                   SizedBox(height: 8,),
@@ -1495,13 +1438,13 @@ class _SpesaSuVeicoloPageState extends State<SpesaSuVeicoloPage> {
   Future<void> takePictureAttach() async {
     final ImagePicker _picker = ImagePicker();
 
-      final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
 
-      if (pickedFiles != null && pickedFiles.isNotEmpty) {
-        setState(() {
-          pickedImages.addAll(pickedFiles);
-        });
-      }
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        pickedImages.addAll(pickedFiles);
+      });
+    }
 
   }
 

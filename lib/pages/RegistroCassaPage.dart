@@ -36,7 +36,6 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   List<MovimentiModel> movimentiList = [];
   List<MovimentiModel> movimentiList2 = [];
   List<DateTime> dateChiusure = [];
-
   List<MovimentiModel> movimentiListPreviousWeek = [];
   List<MovimentiModel> movimentiListPreviousWeek2 = [];
   List<MovimentiModel> movimentiListPreviousWeek3 = [];
@@ -45,7 +44,7 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   String ipaddress = 'http://gestione.femasistemi.it:8090';
   String ipaddressProva = 'http://gestione.femasistemi.it:8095';
   String ipaddress2 = 'http://192.168.1.248:8090';
-      String ipaddressProva2 = 'http://192.168.1.198:8095';
+  String ipaddressProva2 = 'http://192.168.1.198:8095';
   double? fondoCassaSettimana1;
   double? fondoCassaSettimana2;
   double? fondoCassaSettimana3;
@@ -67,6 +66,8 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
   GlobalKey<SfSignaturePadState> _signaturePadKey =
   GlobalKey<SfSignaturePadState>();
   Map<int, List<Uint8List>> immaginiMovimentiMap = {};
+  DateTime? startDate;
+  DateTime? endDate;
 
   Future<void> getAllUtenti() async{
     try{
@@ -97,6 +98,264 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
     getAllUtenti();
   }
 
+  void openFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Filtra'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: startDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              startDate = pickedDate;
+                            });
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'DATA INIZIO',
+                            labelStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.bold,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.grey[400]!,
+                                width: 1.0,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.blueAccent,
+                                width: 2.0,
+                              ),
+                            ),
+                            contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          ),
+                          child: Text(
+                            startDate == null
+                                ? 'SELEZIONA'
+                                : DateFormat('dd/MM/yyyy').format(startDate!),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color:
+                              startDate == null ? Colors.grey[600] : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: endDate ?? DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              endDate = pickedDate;
+                            });
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: 'DATA FINE',
+                            labelStyle: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.bold,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.grey[400]!,
+                                width: 1.0,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Colors.blueAccent,
+                                width: 2.0,
+                              ),
+                            ),
+                            contentPadding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          ),
+                          child: Text(
+                            endDate == null
+                                ? 'SELEZIONA'
+                                : DateFormat('dd/MM/yyyy').format(endDate!),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color:
+                              endDate == null ? Colors.grey[600] : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<UtenteModel>(
+                  decoration: InputDecoration(
+                    labelText: 'SELEZIONA UTENTE',
+                    labelStyle: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.redAccent,
+                        width: 2.0,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1.0,
+                      ),
+                    ),
+                    contentPadding:
+                    EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  ),
+                  value: selectedUtente,
+                  items: allUtenti.map((utente) {
+                    return DropdownMenuItem<UtenteModel>(
+                      value: utente,
+                      child: Text(utente.nomeCompleto() ?? 'Nome non disponibile'),
+                    );
+                  }).toList(),
+                  onChanged: (UtenteModel? val) {
+                    setState(() {
+                      selectedUtente = val;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Seleziona un utente';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: (){
+                setState(() {
+                  endDate = null;
+                  startDate = null;
+                  selectedUtente = null;
+                });
+                Navigator.pop(context);
+              },
+              child: Text('Reset filtri', style: TextStyle(color: Colors.red)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Annulla', style: TextStyle(color: Colors.red)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                filterMovimentiList(); // Applica il filtro
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Cerca'),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void filterMovimentiList() {
+    List<MovimentiModel> allMovimenti = movimentiList2 +
+        movimentiListPreviousWeek +
+        movimentiListPreviousWeek2 +
+        movimentiListPreviousWeek3;
+
+    print("Total movimenti: ${allMovimenti.length}");
+    print("Start Date: $startDate");
+    print("End Date: $endDate");
+    print("Selected User: ${selectedUtente?.nomeCompleto()}");
+
+    setState(() {
+      movimentiList = allMovimenti.where((movimento) {
+        print("Checking movimento: ID=${movimento.id}, Data=${movimento.data}, Utente=${movimento.utente?.nomeCompleto()}");
+
+        final DateTime? movimentoDate = movimento.data;
+        if (movimentoDate == null) {
+          print("Skipping movimento ID=${movimento.id}, data is null");
+          return false;
+        }
+
+        final bool matchesStartDate =
+            startDate == null || !movimentoDate.isBefore(startDate!);
+        print("Matches Start Date: $matchesStartDate");
+
+        final bool matchesEndDate =
+            endDate == null || !movimentoDate.isAfter(endDate!);
+        print("Matches End Date: $matchesEndDate");
+
+        final bool matchesUser = selectedUtente == null ||
+            movimento.utente?.id == selectedUtente?.id;
+        print("Matches User: $matchesUser");
+
+        final bool result = matchesStartDate && matchesEndDate && matchesUser;
+        print("Result for movimento ID=${movimento.id}: $result");
+        return result;
+      }).toList();
+
+      double fondoCassaNew = calcolaFondoCassa(movimentiList);
+      setState(() {
+        fondoCassa = fondoCassaNew;
+      });
+    });
+    print("Filtered movimentiList: ${movimentiList.length}");
+  }
+
   @override
   Widget build(BuildContext context) {
     fondoCassa = double.parse(
@@ -110,6 +369,15 @@ class _RegistroCassaPageState extends State<RegistroCassaPage> {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.filter_alt_sharp,
+              color: Colors.white,
+            ),
+            onPressed: (){
+              openFilterDialog();
+            },
+          ),
           IconButton(
             icon: Icon(
               Icons.balance,

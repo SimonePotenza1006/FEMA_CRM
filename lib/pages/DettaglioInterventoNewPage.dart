@@ -351,208 +351,305 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     final fasiNonConcluse = fasiRiparazione.where((fase) => fase.conclusione != true).toList();
     final fasiConcluse = fasiRiparazione.where((fase) => fase.conclusione == true).toList();
     return Padding(
-      padding: EdgeInsets.all(16),
-      child:Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'MERCE IN RIPARAZIONE',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                ),
-                SizedBox(
-                  width: 500,
-                  child: buildInfoRow(
-                      title: 'Presenza magazzino'.toUpperCase(),
-                      value: widget.intervento.merce?.presenza_magazzino == true ? "SI" : "NO",
-                      context: context
+        padding: EdgeInsets.all(16),
+        child:Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    'MERCE IN RIPARAZIONE',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child : buildInfoRow(
-                          title: 'Articolo',
-                          value: widget.intervento.merce?.articolo ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: (){
-                        setState(() {
-                          modificaArticoloVisibile = !modificaArticoloVisibile;
-                        });
-                      },
-                    )
-                  ],
-                ),
-                if(modificaArticoloVisibile)
                   SizedBox(
-                      width: 500,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 300,
-                            child: TextFormField(
-                              maxLines: null,
-                              controller: articoloController,
-                              decoration: InputDecoration(
-                                labelText: 'Articolo',
-                                hintText: 'Modifica titolo',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 170,
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                            decoration: BoxDecoration(
-                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                            ),
-                            child: FloatingActionButton(
-                              heroTag: "TagArticolo",
-                              onPressed: () {
-                                if(articoloController.text.isNotEmpty){
-                                  modificaArticolo();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non è possibile salvare un articolo vuoto!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              backgroundColor: Colors.red,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                    child: Text(
-                                      'Modifica articolo'.toUpperCase(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12),
-                                      textAlign: TextAlign.center, // Centra il testo
-                                      softWrap: true, // Permette al testo di andare a capo
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                  ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Accessori',
-                          value: widget.intervento.merce?.accessori ?? 'N/A',
-                          context: context
-                      ),
+                    width: 500,
+                    child: buildInfoRow(
+                        title: 'Presenza magazzino'.toUpperCase(),
+                        value: widget.intervento.merce?.presenza_magazzino == true ? "SI" : "NO",
+                        context: context
                     ),
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: (){
-                        setState(() {
-                          modificaAccessoriVisibile = !modificaAccessoriVisibile;
-                        });
-                      },
-                    )
-                  ],
-                ),
-                if(modificaAccessoriVisibile)
-                  SizedBox(
-                      width: 500,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 300,
-                            child: TextFormField(
-                              maxLines: null,
-                              controller: accessoriController,
-                              decoration: InputDecoration(
-                                labelText: 'Accessori',
-                                hintText: 'Modifica accessori',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 170,
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                            decoration: BoxDecoration(
-                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                            ),
-                            child: FloatingActionButton(
-                              heroTag: "TagAccessori",
-                              onPressed: () {
-                                if(accessoriController.text.isNotEmpty){
-                                  modificaAccessori();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non è possibile salvare accessori vuoti!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              backgroundColor: Colors.red,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                    child: Text(
-                                      'Modifica accessori'.toUpperCase(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12),
-                                      textAlign: TextAlign.center, // Centra il testo
-                                      softWrap: true, // Permette al testo di andare a capo
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
                   ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Difetto riscontrato',
-                          value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
-                          context: context
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child : buildInfoRow(
+                            title: 'Articolo',
+                            value: widget.intervento.merce?.articolo ?? 'N/A',
+                            context: context
+                        ),
                       ),
-                    ),
-                    IconButton(
+                      IconButton(
                         icon: Icon(Icons.edit),
                         onPressed: (){
                           setState(() {
-                            modificaDifettoVisibile = !modificaDifettoVisibile;
+                            modificaArticoloVisibile = !modificaArticoloVisibile;
                           });
-                        }
-                    )
-                  ],
-                ),
-                if(modificaDifettoVisibile)
-                  SizedBox(
+                        },
+                      )
+                    ],
+                  ),
+                  if(modificaArticoloVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: articoloController,
+                                decoration: InputDecoration(
+                                  labelText: 'Articolo',
+                                  hintText: 'Modifica titolo',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "TagArticolo",
+                                onPressed: () {
+                                  if(articoloController.text.isNotEmpty){
+                                    modificaArticolo();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare un articolo vuoto!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica articolo'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Accessori',
+                            value: widget.intervento.merce?.accessori ?? 'N/A',
+                            context: context
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: (){
+                          setState(() {
+                            modificaAccessoriVisibile = !modificaAccessoriVisibile;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                  if(modificaAccessoriVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: accessoriController,
+                                decoration: InputDecoration(
+                                  labelText: 'Accessori',
+                                  hintText: 'Modifica accessori',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "TagAccessori",
+                                onPressed: () {
+                                  if(accessoriController.text.isNotEmpty){
+                                    modificaAccessori();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare accessori vuoti!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica accessori'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Difetto riscontrato',
+                            value: widget.intervento.merce?.difetto_riscontrato ?? 'N/A',
+                            context: context
+                        ),
+                      ),
+                      IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: (){
+                            setState(() {
+                              modificaDifettoVisibile = !modificaDifettoVisibile;
+                            });
+                          }
+                      )
+                    ],
+                  ),
+                  if(modificaDifettoVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: difettoController,
+                                decoration: InputDecoration(
+                                  labelText: 'Difetto riscontrato',
+                                  hintText: 'Modifica difetto',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "TagDifetto",
+                                onPressed: () {
+                                  if(difettoController.text.isNotEmpty){
+                                    modificaDifetto();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare un difetto vuoto!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica difetto'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Richiesta di preventivo',
+                            value: booleanToString(widget.intervento.merce?.preventivo ?? false),
+                            context: context
+                        ),
+                      ),
+                      IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed : (){
+                            showPreventivoDialog(context);
+                          }
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Importo preventivato',
+                            value: '${widget.intervento.merce?.importo_preventivato.toString()}€' ?? 'N/A',
+                            context: context
+                        ),
+                      ),
+                      IconButton(
+                        icon : Icon(Icons.edit),
+                        onPressed: (){
+                          setState(() {
+                            modificaImportoMerceVisibile = !modificaImportoMerceVisibile;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                  if(modificaImportoMerceVisibile)
+                    SizedBox(
                       width: 500,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -561,10 +658,16 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                             width: 300,
                             child: TextFormField(
                               maxLines: null,
-                              controller: difettoController,
+                              controller: importoMerceController,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,2}'),
+                                ),
+                              ],
                               decoration: InputDecoration(
-                                labelText: 'Difetto riscontrato',
-                                hintText: 'Modifica difetto',
+                                labelText: 'Importo preventivato',
+                                hintText: 'Modifica importo preventivato',
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -573,19 +676,16 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                           ),
                           Container(
                             width: 170,
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                            decoration: BoxDecoration(
-                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                             child: FloatingActionButton(
-                              heroTag: "TagDifetto",
+                              heroTag: "TagImporto",
                               onPressed: () {
-                                if(difettoController.text.isNotEmpty){
-                                  modificaDifetto();
+                                if (importoMerceController.text.isNotEmpty) {
+                                  modificaImportoMerce();
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Non è possibile salvare un difetto vuoto!'),
+                                      content: Text('Non è possibile salvare un importo nullo!'),
                                     ),
                                   );
                                 }
@@ -595,12 +695,12 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                  Flexible(
                                     child: Text(
-                                      'Modifica difetto'.toUpperCase(),
+                                      'Modifica importo preventivato'.toUpperCase(),
                                       style: TextStyle(color: Colors.white, fontSize: 12),
-                                      textAlign: TextAlign.center, // Centra il testo
-                                      softWrap: true, // Permette al testo di andare a capo
+                                      textAlign: TextAlign.center,
+                                      softWrap: true,
                                     ),
                                   ),
                                 ],
@@ -608,646 +708,546 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                             ),
                           ),
                         ],
-                      )
-                  ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Richiesta di preventivo',
-                          value: booleanToString(widget.intervento.merce?.preventivo ?? false),
-                          context: context
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed : (){
-                        showPreventivoDialog(context);
-                      }
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Importo preventivato',
-                          value: '${widget.intervento.merce?.importo_preventivato.toString()}€' ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    IconButton(
-                      icon : Icon(Icons.edit),
-                      onPressed: (){
-                        setState(() {
-                          modificaImportoMerceVisibile = !modificaImportoMerceVisibile;
-                        });
-                      },
-                    )
-                  ],
-                ),
-                if(modificaImportoMerceVisibile)
-                  SizedBox(
-                    width: 500,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 300,
-                          child: TextFormField(
-                            maxLines: null,
-                            controller: importoMerceController,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'^\d+\.?\d{0,2}'),
-                              ),
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Importo preventivato',
-                              hintText: 'Modifica importo preventivato',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Password',
+                            value: widget.intervento.merce?.password ?? 'N/A',
+                            context: context
                         ),
-                        Container(
-                          width: 170,
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          child: FloatingActionButton(
-                            heroTag: "TagImporto",
-                            onPressed: () {
-                              if (importoMerceController.text.isNotEmpty) {
-                                modificaImportoMerce();
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Non è possibile salvare un importo nullo!'),
-                                  ),
-                                );
-                              }
-                            },
-                            backgroundColor: Colors.red,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    'Modifica importo preventivato'.toUpperCase(),
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                    softWrap: true,
+                      ),
+                      IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: (){
+                            setState(() {
+                              modificaPasswordVisibile = !modificaPasswordVisibile;
+                            });
+                          }
+                      )
+                    ],
+                  ),
+                  if(modificaPasswordVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: passwordController,
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                  hintText: 'Modifica password',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "TagPassword",
+                                onPressed: () {
+                                  if(passwordController.text.isNotEmpty){
+                                    modificaPassword();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare una password vuota!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica password'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Dati',
+                            value: widget.intervento.merce?.dati ?? 'N/A',
+                            context: context
+                        ),
+                      ),
+                      IconButton(
+                        icon : Icon(Icons.edit),
+                        onPressed: (){
+                          setState(() {
+                            modificaDatiVisibile = !modificaDatiVisibile;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                  if(modificaDatiVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: datiController,
+                                decoration: InputDecoration(
+                                  labelText: 'Dati',
+                                  hintText: 'Modifica dati',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "TagDati",
+                                onPressed: () {
+                                  if(datiController.text.isNotEmpty){
+                                    modificaDati();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare dei dati nulli!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica dati'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Diagnosi',
+                            value: widget.intervento.merce?.diagnosi ?? 'N/A',
+                            context: context
+                        ),
+                      ),
+                      IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed : (){
+                            setState(() {
+                              modificaDiagnosiVisibile = !modificaDiagnosiVisibile;
+                            });
+                          }
+                      )
+                    ],
+                  ),
+                  if(modificaDiagnosiVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: diagnosiController,
+                                decoration: InputDecoration(
+                                  labelText: 'Diagnosi',
+                                  hintText: 'Modifica diagnosi',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "TagDiagnosi",
+                                onPressed: () {
+                                  if(diagnosiController.text.isNotEmpty){
+                                    modificaDiagnosi();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare una diagnosi vuota!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'Modifica diagnosi'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 500,
+                        child: buildInfoRow(
+                            title: 'Risoluzione',
+                            value: widget.intervento.merce?.risoluzione ?? 'N/A',
+                            context: context
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: (){
+                          setState(() {
+                            modificaRisoluzioneVisibile = !modificaRisoluzioneVisibile;
+                          });
+                        },
+                      )
+                    ],
+                  ),
+                  if(modificaRisoluzioneVisibile)
+                    SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: 300,
+                              child: TextFormField(
+                                maxLines: null,
+                                controller: risoluzioneController,
+                                decoration: InputDecoration(
+                                  labelText: 'Risoluzione',
+                                  hintText: 'Modifica risoluzione',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                              decoration: BoxDecoration(
+                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                              ),
+                              child: FloatingActionButton(
+                                heroTag: "TagRisoluzione",
+                                onPressed: () {
+                                  if(risoluzioneController.text.isNotEmpty){
+                                    modificaRisoluzione();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Non è possibile salvare una risoluzione vuota!'),
+                                      ),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                      child: Text(
+                                        'modifica Risoluzione'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                    ),
+                ],
+              ),
+            ),
+            SizedBox(width: 70),
+            if (fasiRiparazione.isNotEmpty)
+              SizedBox(width: 550,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height:35),
+                    Row(
+                      children: [
+                        Text(
+                          'Fasi riparazione:',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.copy),
+                          onPressed: () {
+                            // Funzione per copiare negli appunti
+                            copiaFasiRiparazioneNegliAppunti(fasiRiparazione);
+                          },
                         ),
                       ],
                     ),
-                  ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Password',
-                          value: widget.intervento.merce?.password ?? 'N/A',
-                          context: context
+                    ...fasiNonConcluse.map((fase) => SizedBox(
+                      width: 370,
+                      child: ListTile(
+                        title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, ${fase.utente?.nome} ${fase.utente?.cognome}'),
+                        subtitle: Text('${fase.descrizione}'),
+                      ),
+                    )),
+                    // Se esiste una fase conclusa, la mostriamo per ultima
+                    if (fasiConcluse.isNotEmpty) SizedBox(
+                      width: 370,
+                      child: ListTile(
+                        title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fasiConcluse.first.data!)}, ${fasiConcluse.first.utente?.nome} ${fasiConcluse.first.utente?.cognome}'),
+                        subtitle: Text('${fasiConcluse.first.descrizione}'),
                       ),
                     ),
-                    IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: (){
-                          setState(() {
-                            modificaPasswordVisibile = !modificaPasswordVisibile;
-                          });
-                        }
-                    )
                   ],
                 ),
-                if(modificaPasswordVisibile)
-                  SizedBox(
-                      width: 500,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 300,
-                            child: TextFormField(
-                              maxLines: null,
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                labelText: 'Password',
-                                hintText: 'Modifica password',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 170,
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                            decoration: BoxDecoration(
-                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                            ),
-                            child: FloatingActionButton(
-                              heroTag: "TagPassword",
-                              onPressed: () {
-                                if(passwordController.text.isNotEmpty){
-                                  modificaPassword();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non è possibile salvare una password vuota!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              backgroundColor: Colors.red,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                    child: Text(
-                                      'Modifica password'.toUpperCase(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12),
-                                      textAlign: TextAlign.center, // Centra il testo
-                                      softWrap: true, // Permette al testo di andare a capo
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                  ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Dati',
-                          value: widget.intervento.merce?.dati ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    IconButton(
-                      icon : Icon(Icons.edit),
-                      onPressed: (){
-                        setState(() {
-                          modificaDatiVisibile = !modificaDatiVisibile;
-                        });
-                      },
-                    )
-                  ],
-                ),
-                if(modificaDatiVisibile)
-                  SizedBox(
-                      width: 500,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 300,
-                            child: TextFormField(
-                              maxLines: null,
-                              controller: datiController,
-                              decoration: InputDecoration(
-                                labelText: 'Dati',
-                                hintText: 'Modifica dati',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 170,
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                            decoration: BoxDecoration(
-                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                            ),
-                            child: FloatingActionButton(
-                              heroTag: "TagDati",
-                              onPressed: () {
-                                if(datiController.text.isNotEmpty){
-                                  modificaDati();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non è possibile salvare dei dati nulli!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              backgroundColor: Colors.red,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                    child: Text(
-                                      'Modifica dati'.toUpperCase(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12),
-                                      textAlign: TextAlign.center, // Centra il testo
-                                      softWrap: true, // Permette al testo di andare a capo
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                  ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Diagnosi',
-                          value: widget.intervento.merce?.diagnosi ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed : (){
-                          setState(() {
-                            modificaDiagnosiVisibile = !modificaDiagnosiVisibile;
-                          });
-                        }
-                    )
-                  ],
-                ),
-                if(modificaDiagnosiVisibile)
-                  SizedBox(
-                      width: 500,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 300,
-                            child: TextFormField(
-                              maxLines: null,
-                              controller: diagnosiController,
-                              decoration: InputDecoration(
-                                labelText: 'Diagnosi',
-                                hintText: 'Modifica diagnosi',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 170,
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                            decoration: BoxDecoration(
-                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                            ),
-                            child: FloatingActionButton(
-                              heroTag: "TagDiagnosi",
-                              onPressed: () {
-                                if(diagnosiController.text.isNotEmpty){
-                                  modificaDiagnosi();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non è possibile salvare una diagnosi vuota!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              backgroundColor: Colors.red,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                    child: Text(
-                                      'Modifica diagnosi'.toUpperCase(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12),
-                                      textAlign: TextAlign.center, // Centra il testo
-                                      softWrap: true, // Permette al testo di andare a capo
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                  ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Risoluzione',
-                          value: widget.intervento.merce?.risoluzione ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: (){
-                        setState(() {
-                          modificaRisoluzioneVisibile = !modificaRisoluzioneVisibile;
-                        });
-                      },
-                    )
-                  ],
-                ),
-                if(modificaRisoluzioneVisibile)
-                  SizedBox(
-                      width: 500,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SizedBox(
-                            width: 300,
-                            child: TextFormField(
-                              maxLines: null,
-                              controller: risoluzioneController,
-                              decoration: InputDecoration(
-                                labelText: 'Risoluzione',
-                                hintText: 'Modifica risoluzione',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 170,
-                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                            decoration: BoxDecoration(
-                              // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                            ),
-                            child: FloatingActionButton(
-                              heroTag: "TagRisoluzione",
-                              onPressed: () {
-                                if(risoluzioneController.text.isNotEmpty){
-                                  modificaRisoluzione();
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Non è possibile salvare una risoluzione vuota!'),
-                                    ),
-                                  );
-                                }
-                              },
-                              backgroundColor: Colors.red,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                    child: Text(
-                                      'modifica Risoluzione'.toUpperCase(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12),
-                                      textAlign: TextAlign.center, // Centra il testo
-                                      softWrap: true, // Permette al testo di andare a capo
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                  ),
-              ],
-            ),
-          ),
-          SizedBox(width: 70),
-          if (fasiRiparazione.isNotEmpty)
-            SizedBox(width: 550,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height:35),
-                  Row(
-                    children: [
-                      Text(
-                        'Fasi riparazione:',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.copy),
-                        onPressed: () {
-                          // Funzione per copiare negli appunti
-                          copiaFasiRiparazioneNegliAppunti(fasiRiparazione);
-                        },
-                      ),
-                    ],
-                  ),
-                  ...fasiNonConcluse.map((fase) => SizedBox(
-                    width: 370,
-                    child: ListTile(
-                      title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fase.data!)}, ${fase.utente?.nome} ${fase.utente?.cognome}'),
-                      subtitle: Text('${fase.descrizione}'),
-                    ),
-                  )),
-                  // Se esiste una fase conclusa, la mostriamo per ultima
-                  if (fasiConcluse.isNotEmpty) SizedBox(
-                    width: 370,
-                    child: ListTile(
-                      title: Text('${DateFormat('dd/MM/yyyy HH:mm').format(fasiConcluse.first.data!)}, ${fasiConcluse.first.utente?.nome} ${fasiConcluse.first.utente?.cognome}'),
-                      subtitle: Text('${fasiConcluse.first.descrizione}'),
-                    ),
-                  ),
-                ],
-              ),
-            )
-        ],
-      )
+              )
+          ],
+        )
     );
   }
 
   Widget _buildDocumentiSection(){
     return Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'DOCUMENTI',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              SizedBox(width : 8),
-              IconButton(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'DOCUMENTI',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+                SizedBox(width : 8),
+                IconButton(
                   onPressed: (){
                     _pickFile();
                   },
                   icon: Icon(Icons.add, color: Colors.grey,),
                   tooltip: "Aggiungi pdf",
-              ),
-            ],
-          ),
-          if(selectedFile != null)
-            Row(
-              children: [
-                Text(
-                  'File selezionato: ${selectedFile!.path.split('/').last}',
-                  style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  width : 12,
-                ),
-                TextButton(
-                  onPressed: () {
-                    uploadFile(selectedFile!);
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white, // Colore del testo
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Bordi arrotondati
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Spaziatura interna
-                  ),
-                  child: Text(
-                    "Salva",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  width : 10,
-                ),
-                IconButton(
-                  onPressed: (){
-                    setState((){
-                      selectedFile = null;
-                    });
-                  },
-                  icon: Icon(Icons.delete, color: Colors.grey,),
-                  tooltip: "Elimina",
                 ),
               ],
             ),
-          SizedBox(height: 25),
-          Container(
-            width: 1000,
-            height: 600,
-            child: FutureBuilder<List<String>>(
-              future: fetchPdfFiles(), // Chiama la funzione per recuperare i file
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  // Controlla il tipo o il messaggio dell'errore
-                  final error = snapshot.error.toString();
-                  if (error.contains('Directory non trovata')) {
-                    return Center(child: Text('Nessun allegato presente.'));
-                  } else if (error.contains('connessione al server')) {
-                    return Center(child: Text('Errore di connessione al server.'));
-                  } else {
-                    return Center(child: Text('Errore sconosciuto: $error'));
-                  }
-                } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                  return Center(child: Text('Nessun file PDF trovato.'));
-                } else if (snapshot.hasData) {
-                  final pdfFiles = snapshot.data!;
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, // Numero di card per riga
-                      crossAxisSpacing: 10.0,
-                      mainAxisSpacing: 10.0,
+            if(selectedFile != null)
+              Row(
+                children: [
+                  Text(
+                    'File selezionato: ${selectedFile!.path.split('/').last}',
+                    style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    width : 12,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      uploadFile(selectedFile!);
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white, // Colore del testo
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // Bordi arrotondati
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Spaziatura interna
                     ),
-                    itemCount: pdfFiles.length,
-                    itemBuilder: (context, index) {
-                      final fileName = pdfFiles[index]; // Nome del file PDF
-                      return SizedBox(
-                        width: 200, // Larghezza fissa della card
-                        height: 250, // Altezza fissa della card
-                        child: Card(
-                          elevation: 3,
-                          color: Colors.white, // Sfondo bianco
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(
-                              color: Colors.red, // Bordi rossi
-                              width: 1.5, // Spessore del bordo
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Expanded(
-                                flex: 2, // Mantiene proporzioni equilibrate
-                                child: Icon(
-                                  Icons.picture_as_pdf,
-                                  size: 60,
-                                  color: Colors.redAccent,
-                                ),
+                    child: Text(
+                      "Salva",
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  SizedBox(
+                    width : 10,
+                  ),
+                  IconButton(
+                    onPressed: (){
+                      setState((){
+                        selectedFile = null;
+                      });
+                    },
+                    icon: Icon(Icons.delete, color: Colors.grey,),
+                    tooltip: "Elimina",
+                  ),
+                ],
+              ),
+            SizedBox(height: 25),
+            Container(
+              width: 1000,
+              height: 600,
+              child: FutureBuilder<List<String>>(
+                future: fetchPdfFiles(), // Chiama la funzione per recuperare i file
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    // Controlla il tipo o il messaggio dell'errore
+                    final error = snapshot.error.toString();
+                    if (error.contains('Directory non trovata')) {
+                      return Center(child: Text('Nessun allegato presente.'));
+                    } else if (error.contains('connessione al server')) {
+                      return Center(child: Text('Errore di connessione al server.'));
+                    } else {
+                      return Center(child: Text('Errore sconosciuto: $error'));
+                    }
+                  } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                    return Center(child: Text('Nessun file PDF trovato.'));
+                  } else if (snapshot.hasData) {
+                    final pdfFiles = snapshot.data!;
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3, // Numero di card per riga
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
+                      ),
+                      itemCount: pdfFiles.length,
+                      itemBuilder: (context, index) {
+                        final fileName = pdfFiles[index]; // Nome del file PDF
+                        return SizedBox(
+                          width: 200, // Larghezza fissa della card
+                          height: 250, // Altezza fissa della card
+                          child: Card(
+                            elevation: 3,
+                            color: Colors.white, // Sfondo bianco
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(
+                                color: Colors.red, // Bordi rossi
+                                width: 1.5, // Spessore del bordo
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  fileName,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 2, // Mantiene proporzioni equilibrate
+                                  child: Icon(
+                                    Icons.picture_as_pdf,
+                                    size: 60,
+                                    color: Colors.redAccent,
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        // Apri il PDF
-                                        await _openPdfFile(context, widget.intervento.id!, fileName);
-                                      },
-                                      child: Text('Apri'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        foregroundColor: Colors.white,
-                                      ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    fileName,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete_forever),
-                                      color: Colors.red,
-                                      onPressed: () {
-                                        _showDeleteDialog(context, widget.intervento.id!, fileName);
-                                      },
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          // Apri il PDF
+                                          await _openPdfFile(context, widget.intervento.id!, fileName);
+                                        },
+                                        child: Text('Apri'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete_forever),
+                                        color: Colors.red,
+                                        onPressed: () {
+                                          _showDeleteDialog(context, widget.intervento.id!, fileName);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                } else {
-                  return Center(child: Text('Nessun risultato.'));
-                }
-              },
+                        );
+                      },
+                    );
+                  } else {
+                    return Center(child: Text('Nessun risultato.'));
+                  }
+                },
+              ),
             ),
-          ),
-        ],
-      )
+          ],
+        )
     );
   }
 
@@ -1662,864 +1662,864 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
             ),
             SizedBox(width: 30),
             SizedBox(width: 550,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (allNote.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Note dei tecnici:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        ...allNote.map((nota) => ListTile(
-                          title: Text('${nota.utente?.nome} ${nota.utente?.cognome}'),
-                          subtitle: Text('${nota.nota}'),
-                        )),
-                      ],
-                    ),
-                  if(allNote.isEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 14,),
-                        Text('Nessuna nota relativa all\'intervento', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                      ],
-                    ),
-                  SizedBox(height: 20),
-                  if(allCommissioni.isEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Nessuna commissione creata', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                      ],
-                    ),
-                  SizedBox(height: 16),
-                  if(allCommissioni.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Commissioni:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        ...allCommissioni.map((commissione) => ListTile(
-                          title: Text(
-                            'Creazione: ${commissione.data_creazione}, utente: ${commissione.utente?.nomeCompleto()}',
-                            style: TextStyle(
-                              color: commissione.concluso! ? Colors.green : Colors.red,
-                            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (allNote.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Note dei tecnici:',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text(
-                            'Descrizione: ${commissione.descrizione}, note: ${commissione.note}',
-                            style: TextStyle(
-                              color: commissione.concluso! ? Colors.green : Colors.red,
-                            ),
+                          ...allNote.map((nota) => ListTile(
+                            title: Text('${nota.utente?.nome} ${nota.utente?.cognome}'),
+                            subtitle: Text('${nota.nota}'),
+                          )),
+                        ],
+                      ),
+                    if(allNote.isEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 14,),
+                          Text('Nessuna nota relativa all\'intervento', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                        ],
+                      ),
+                    SizedBox(height: 20),
+                    if(allCommissioni.isEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Nessuna commissione creata', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                        ],
+                      ),
+                    SizedBox(height: 16),
+                    if(allCommissioni.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Commissioni:',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                           ),
-                        )),
-                      ],
-                    ),
-                  ElevatedButton(
-                    onPressed: () {
-                      TextEditingController descriptionController = TextEditingController();
-                      TextEditingController notesController = TextEditingController();
-                      UtenteModel? selectedUser;
-                      DateTime? selectedDate;
-
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Crea Commissione'),
-                            content: StatefulBuilder(
-                              builder: (BuildContext context, StateSetter setState) {
-                                return SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Bottone per selezionare la data
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          DateTime? pickedDate = await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(2000),
-                                            lastDate: DateTime(2100),
-                                          );
-                                          if (pickedDate != null) {
-                                            setState(() {
-                                              selectedDate = pickedDate;
-                                            });
-                                          }
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.grey[200],
-                                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                        ),
-                                        child: Text(
-                                          selectedDate != null
-                                              ? 'Data selezionata: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'
-                                              : 'Seleziona Data',
-                                          style: TextStyle(color: Colors.black),
-                                        ),
-                                      ),
-                                      SizedBox(height: 16),
-                                      // Campo di testo per la descrizione
-                                      TextFormField(
-                                        controller: descriptionController,
-                                        decoration: InputDecoration(
-                                          labelText: 'Descrizione',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                      SizedBox(height: 16),
-                                      // Campo di testo per le note
-                                      TextFormField(
-                                        controller: notesController,
-                                        decoration: InputDecoration(
-                                          labelText: 'Note',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                      SizedBox(height: 16),
-                                      // Dropdown per la selezione dell'utente
-                                      DropdownButtonFormField<UtenteModel>(
-                                        decoration: InputDecoration(
-                                          labelText: 'Seleziona Utente',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        value: selectedUser,
-                                        items: allUtenti.map((utente) {
-                                          return DropdownMenuItem<UtenteModel>(
-                                            value: utente,
-                                            child: Text(utente.nomeCompleto() ?? "Anonimo"),
-                                          );
-                                        }).toList(),
-                                        onChanged: (UtenteModel? newValue) {
-                                          setState(() {
-                                            selectedUser = newValue;
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  if (descriptionController.text.isNotEmpty &&
-                                      notesController.text.isNotEmpty &&
-                                      selectedUser != null  ){
-                                    creaCommissione(selectedUser!, descriptionController.text, notesController.text, selectedDate);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Completa tutti i campi prima di assegnare")),
-                                    );
-                                  }
-                                },
-                                child: Text(
-                                  'ASSEGNA',
-                                  style: TextStyle(color: Colors.red),
-                                ),
+                          ...allCommissioni.map((commissione) => ListTile(
+                            title: Text(
+                              'Creazione: ${commissione.data_creazione}, utente: ${commissione.utente?.nomeCompleto()}',
+                              style: TextStyle(
+                                color: commissione.concluso! ? Colors.green : Colors.red,
                               ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), backgroundColor: Colors.red,
-                      textStyle: TextStyle(fontSize: 18),
+                            ),
+                            subtitle: Text(
+                              'Descrizione: ${commissione.descrizione}, note: ${commissione.note}',
+                              style: TextStyle(
+                                color: commissione.concluso! ? Colors.green : Colors.red,
+                              ),
+                            ),
+                          )),
+                        ],
+                      ),
+                    ElevatedButton(
+                      onPressed: () {
+                        TextEditingController descriptionController = TextEditingController();
+                        TextEditingController notesController = TextEditingController();
+                        UtenteModel? selectedUser;
+                        DateTime? selectedDate;
+
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Crea Commissione'),
+                              content: StatefulBuilder(
+                                builder: (BuildContext context, StateSetter setState) {
+                                  return SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Bottone per selezionare la data
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            DateTime? pickedDate = await showDatePicker(
+                                              context: context,
+                                              initialDate: DateTime.now(),
+                                              firstDate: DateTime(2000),
+                                              lastDate: DateTime(2100),
+                                            );
+                                            if (pickedDate != null) {
+                                              setState(() {
+                                                selectedDate = pickedDate;
+                                              });
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.grey[200],
+                                            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                          ),
+                                          child: Text(
+                                            selectedDate != null
+                                                ? 'Data selezionata: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'
+                                                : 'Seleziona Data',
+                                            style: TextStyle(color: Colors.black),
+                                          ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        // Campo di testo per la descrizione
+                                        TextFormField(
+                                          controller: descriptionController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Descrizione',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        // Campo di testo per le note
+                                        TextFormField(
+                                          controller: notesController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Note',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                        ),
+                                        SizedBox(height: 16),
+                                        // Dropdown per la selezione dell'utente
+                                        DropdownButtonFormField<UtenteModel>(
+                                          decoration: InputDecoration(
+                                            labelText: 'Seleziona Utente',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                          value: selectedUser,
+                                          items: allUtenti.map((utente) {
+                                            return DropdownMenuItem<UtenteModel>(
+                                              value: utente,
+                                              child: Text(utente.nomeCompleto() ?? "Anonimo"),
+                                            );
+                                          }).toList(),
+                                          onChanged: (UtenteModel? newValue) {
+                                            setState(() {
+                                              selectedUser = newValue;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    if (descriptionController.text.isNotEmpty &&
+                                        notesController.text.isNotEmpty &&
+                                        selectedUser != null  ){
+                                      creaCommissione(selectedUser!, descriptionController.text, notesController.text, selectedDate);
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text("Completa tutti i campi prima di assegnare")),
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    'ASSEGNA',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16), backgroundColor: Colors.red,
+                        textStyle: TextStyle(fontSize: 18),
+                      ),
+                      child: Text(
+                        'CREA COMMISSIONE',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                    child: Text(
-                      'CREA COMMISSIONE',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-               )
-              )
+                  ],
+                )
+            )
 
           ],
         )
-      );
+    );
   }
 
   // Sezione "Informazioni Generali"
   Widget _buildGeneralInfoSection() {
     return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
+        padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Informazioni Generali',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                  SizedBox(height: 12.0),
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: 500,
-                        child: buildInfoRow(
-                            title: 'Titolo',
-                            value: widget.intervento.titolo ?? '//',
-                            context: context
-                        ),
+                      Text(
+                        'Informazioni Generali',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                       ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            modificaTitoloVisible = !modificaTitoloVisible;
-                          });
-                        },
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        ),
-                      )
-                    ],
-                  ),
-                  if(modificaTitoloVisible)
-                    SizedBox(
-                        width: 500,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 300,
-                              child: TextFormField(
-                                maxLines: null,
-                                controller: titoloController,
-                                decoration: InputDecoration(
-                                  labelText: 'Titolo',
-                                  hintText: 'Aggiungi un titolo',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 170,
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                              decoration: BoxDecoration(
-                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                              ),
-                              child: FloatingActionButton(
-                                heroTag: "Tag4",
-                                onPressed: () {
-                                  if(titoloController.text.isNotEmpty){
-                                    modificaTitolo();
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Non è possibile salvare un titolo vuoto!'),
-                                      ),
-                                    );
-                                  }
-                                },
-                                backgroundColor: Colors.red,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                      child: Text(
-                                        'Modifica Titolo'.toUpperCase(),
-                                        style: TextStyle(color: Colors.white, fontSize: 12),
-                                        textAlign: TextAlign.center, // Centra il testo
-                                        softWrap: true, // Permette al testo di andare a capo
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                    ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 500,
-                        child: buildInfoRow(
-                            title: 'Descrizione',
-                            value: widget.intervento.descrizione!,
-                            context: context
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            modificaDescrizioneVisible = !modificaDescrizioneVisible;
-                          });
-                        },
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  if(modificaDescrizioneVisible)
-                    SizedBox(
-                        width: 500,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 300,
-                              child: TextFormField(
-                                maxLines: null,
-                                controller: descrizioneController,
-                                decoration: InputDecoration(
-                                  labelText: 'Descrizione',
-                                  hintText: 'Aggiungi una descrizione',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 170,
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                              decoration: BoxDecoration(
-                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                              ),
-                              child: FloatingActionButton(
-                                heroTag: "Tag2",
-                                onPressed: () {
-                                  if(descrizioneController.text.isNotEmpty){
-                                    modificaDescrizione();
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Non è possibile salvare una descrizione nulla!'),
-                                      ),
-                                    );
-                                  }
-                                },
-                                backgroundColor: Colors.red,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                      child: Text(
-                                        'Modifica Descrizione'.toUpperCase(),
-                                        style: TextStyle(color: Colors.white, fontSize: 12),
-                                        textAlign: TextAlign.center, // Centra il testo
-                                        softWrap: true, // Permette al testo di andare a capo
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                    ),
-                  SizedBox(height : 12),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 500,
-                        child: buildInfoRow(
-                            title: 'Note',
-                            value: widget.intervento.note ?? 'N/A',
-                            context: context
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            modificaNotaVisibile = !modificaNotaVisibile;
-                          });
-                        },
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.black,
-                        ),
-                      )
-                    ],
-                  ),
-                  if(modificaNotaVisibile)
-                    SizedBox(
-                        width: 500,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 300,
-                              child: TextFormField(
-                                maxLines: null,
-                                controller: noteController,
-                                decoration: InputDecoration(
-                                  labelText: 'Nota',
-                                  hintText: 'Aggiungi una nota',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 170,
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                              decoration: BoxDecoration(
-                                // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                              ),
-                              child: FloatingActionButton(
-                                heroTag: "Tag12",
-                                onPressed: () {
-                                  setState(() {
-                                    widget.intervento.note = noteController.text;
-                                  });
-                                },
-                                backgroundColor: Colors.red,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                      child: Text(
-                                        'Modifica Nota'.toUpperCase(),
-                                        style: TextStyle(color: Colors.white, fontSize: 12),
-                                        textAlign: TextAlign.center, // Centra il testo
-                                        softWrap: true, // Permette al testo di andare a capo
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                    ),
-                  SizedBox(height : 10),
-                  Row(
-                    children: [
-                      buildInfoRow(
-                          title: "tipologia",
-                          value: intervento.tipologia!.descrizione!
-                      ),
-                      IconButton(
-                        icon : Icon(Icons.edit),
-                        onPressed: (){
-                          showTipologiaDialog(context, tipologieIntervento, selectedTipologiaIntervento);
-                        },
-                      )
-                    ],
-                  ),
-                  SizedBox(height : 10),
-                  buildInfoRow(
-                      title: 'Apertura',
-                      value: widget.intervento.utente_apertura!.nome! + " " + widget.intervento.utente_apertura!.cognome!.substring(0, 1) + ".",
-                      context: context
-                  ),
-                  SizedBox(height : 20),
-                  Row(
-                    children: [
-                      if(intervento.annullato == false)
-                        Container(
-                          width: 170,
-                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                          child: FloatingActionButton(
-                            onPressed: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti"
-                                ? () {
-                              annullaIntervento();
-                            }
-                                : null, // Il pulsante è disabilitato se onPressed è null
-                            heroTag: "TagAnnullamento",
-                            backgroundColor: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" ? Colors.red : Colors.grey, // Colore condizionale
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible( // Permette al testo di adattarsi alla dimensione
-                                  child: Text(
-                                    'Annulla intervento'.toUpperCase(),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                    textAlign: TextAlign.center, // Centra il testo
-                                    softWrap: true, // Permette al testo di andare a capo
-                                  ),
-                                ),
-                              ],
+                      SizedBox(height: 12.0),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 500,
+                            child: buildInfoRow(
+                                title: 'Titolo',
+                                value: widget.intervento.titolo ?? '//',
+                                context: context
                             ),
                           ),
-                        ),
-                      SizedBox(width: 10),
-                      if(intervento.annullato == true)
-                        Container(
-                          width: 170,
-                          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                          child: FloatingActionButton(
+                          SizedBox(
+                            width: 10,
+                          ),
+                          TextButton(
                             onPressed: () {
-                              riabilitaIntervento();
+                              setState(() {
+                                modificaTitoloVisible = !modificaTitoloVisible;
+                              });
                             },
-                            heroTag: "TagRiabilita",
-                            backgroundColor: Colors.red,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.black,
+                            ),
+                          )
+                        ],
+                      ),
+                      if(modificaTitoloVisible)
+                        SizedBox(
+                            width: 500,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Flexible( // Permette al testo di adattarsi alla dimensione
-                                  child: Text(
-                                    'Riabilita intervento'.toUpperCase(),
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                    textAlign: TextAlign.center, // Centra il testo
-                                    softWrap: true, // Permette al testo di andare a capo
+                                SizedBox(
+                                  width: 300,
+                                  child: TextFormField(
+                                    maxLines: null,
+                                    controller: titoloController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Titolo',
+                                      hintText: 'Aggiungi un titolo',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 170,
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                  decoration: BoxDecoration(
+                                    // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                  ),
+                                  child: FloatingActionButton(
+                                    heroTag: "Tag4",
+                                    onPressed: () {
+                                      if(titoloController.text.isNotEmpty){
+                                        modificaTitolo();
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Non è possibile salvare un titolo vuoto!'),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    backgroundColor: Colors.red,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                          child: Text(
+                                            'Modifica Titolo'.toUpperCase(),
+                                            style: TextStyle(color: Colors.white, fontSize: 12),
+                                            textAlign: TextAlign.center, // Centra il testo
+                                            softWrap: true, // Permette al testo di andare a capo
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
+                            )
+                        ),
+                      SizedBox(
+                        height: 12,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 500,
+                            child: buildInfoRow(
+                                title: 'Descrizione',
+                                value: widget.intervento.descrizione!,
+                                context: context
                             ),
                           ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                modificaDescrizioneVisible = !modificaDescrizioneVisible;
+                              });
+                            },
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.black,
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      if(modificaDescrizioneVisible)
+                        SizedBox(
+                            width: 500,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 300,
+                                  child: TextFormField(
+                                    maxLines: null,
+                                    controller: descrizioneController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Descrizione',
+                                      hintText: 'Aggiungi una descrizione',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 170,
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                  decoration: BoxDecoration(
+                                    // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                  ),
+                                  child: FloatingActionButton(
+                                    heroTag: "Tag2",
+                                    onPressed: () {
+                                      if(descrizioneController.text.isNotEmpty){
+                                        modificaDescrizione();
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Non è possibile salvare una descrizione nulla!'),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    backgroundColor: Colors.red,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                          child: Text(
+                                            'Modifica Descrizione'.toUpperCase(),
+                                            style: TextStyle(color: Colors.white, fontSize: 12),
+                                            textAlign: TextAlign.center, // Centra il testo
+                                            softWrap: true, // Permette al testo di andare a capo
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
                         ),
+                      SizedBox(height : 12),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 500,
+                            child: buildInfoRow(
+                                title: 'Note',
+                                value: widget.intervento.note ?? 'N/A',
+                                context: context
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                modificaNotaVisibile = !modificaNotaVisibile;
+                              });
+                            },
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.black,
+                            ),
+                          )
+                        ],
+                      ),
+                      if(modificaNotaVisibile)
+                        SizedBox(
+                            width: 500,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SizedBox(
+                                  width: 300,
+                                  child: TextFormField(
+                                    maxLines: null,
+                                    controller: noteController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Nota',
+                                      hintText: 'Aggiungi una nota',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 170,
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                  decoration: BoxDecoration(
+                                    // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                                  ),
+                                  child: FloatingActionButton(
+                                    heroTag: "Tag12",
+                                    onPressed: () {
+                                      setState(() {
+                                        widget.intervento.note = noteController.text;
+                                      });
+                                    },
+                                    backgroundColor: Colors.red,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                          child: Text(
+                                            'Modifica Nota'.toUpperCase(),
+                                            style: TextStyle(color: Colors.white, fontSize: 12),
+                                            textAlign: TextAlign.center, // Centra il testo
+                                            softWrap: true, // Permette al testo di andare a capo
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                        ),
+                      SizedBox(height : 10),
+                      Row(
+                        children: [
+                          buildInfoRow(
+                              title: "tipologia",
+                              value: intervento.tipologia!.descrizione!
+                          ),
+                          IconButton(
+                            icon : Icon(Icons.edit),
+                            onPressed: (){
+                              showTipologiaDialog(context, tipologieIntervento, selectedTipologiaIntervento);
+                            },
+                          )
+                        ],
+                      ),
+                      SizedBox(height : 10),
+                      buildInfoRow(
+                          title: 'Apertura',
+                          value: widget.intervento.utente_apertura!.nome! + " " + widget.intervento.utente_apertura!.cognome!.substring(0, 1) + ".",
+                          context: context
+                      ),
+                      SizedBox(height : 20),
+                      Row(
+                        children: [
+                          if(intervento.annullato == false)
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                              child: FloatingActionButton(
+                                onPressed: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" || widget.utente.cognome == "Zaminga"
+                                    ? () {
+                                  annullaIntervento();
+                                }
+                                    : null, // Il pulsante è disabilitato se onPressed è null
+                                heroTag: "TagAnnullamento",
+                                backgroundColor: widget.utente.cognome == "Mazzei" || widget.utente.cognome == "Chiriatti" || widget.utente.cognome == "Zaminga" ? Colors.red : Colors.grey, // Colore condizionale
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione
+                                      child: Text(
+                                        'Annulla intervento'.toUpperCase(),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          SizedBox(width: 10),
+                          if(intervento.annullato == true)
+                            Container(
+                              width: 170,
+                              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                              child: FloatingActionButton(
+                                onPressed: () {
+                                  riabilitaIntervento();
+                                },
+                                heroTag: "TagRiabilita",
+                                backgroundColor: Colors.red,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Flexible( // Permette al testo di adattarsi alla dimensione
+                                      child: Text(
+                                        'Riabilita intervento'.toUpperCase(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                        textAlign: TextAlign.center, // Centra il testo
+                                        softWrap: true, // Permette al testo di andare a capo
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
+                  SizedBox(width: 50),
+                  SizedBox(
+                    width: 550,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 48),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Cliente',
+                              value: widget.intervento.cliente?.denominazione ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'ID Danea cliente',
+                              value: widget.intervento.cliente?.cod_danea ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Città destinazione',
+                              value: widget.intervento.destinazione?.citta ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Indirizzo destinazione',
+                              value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Cellulare destinazione',
+                              value: widget.intervento.destinazione?.cellulare ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Telefono destinazione',
+                              value: widget.intervento.destinazione?.telefono ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Indirizzo cliente',
+                              value: widget.intervento.cliente?.indirizzo ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Telefono cliente',
+                              value: widget.intervento.cliente?.telefono ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                        SizedBox(
+                          width: 500,
+                          child: buildInfoRow(
+                              title: 'Cellulare cliente',
+                              value: widget.intervento.cliente?.cellulare ?? 'N/A',
+                              context: context
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 ],
-              ),
-              SizedBox(width: 50),
-              SizedBox(
-                width: 550,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 48),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Cliente',
-                          value: widget.intervento.cliente?.denominazione ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'ID Danea cliente',
-                          value: widget.intervento.cliente?.cod_danea ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Città destinazione',
-                          value: widget.intervento.destinazione?.citta ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Indirizzo destinazione',
-                          value: widget.intervento.destinazione?.indirizzo ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Cellulare destinazione',
-                          value: widget.intervento.destinazione?.cellulare ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Telefono destinazione',
-                          value: widget.intervento.destinazione?.telefono ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Indirizzo cliente',
-                          value: widget.intervento.cliente?.indirizzo ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Telefono cliente',
-                          value: widget.intervento.cliente?.telefono ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                          title: 'Cellulare cliente',
-                          value: widget.intervento.cliente?.cellulare ?? 'N/A',
-                          context: context
-                      ),
-                    ),
-                  ],
-                ),
               )
-            ],
-          )
-        ),
-      )
+          ),
+        )
     );
   }
 
   // Sezione "Dettagli Temporali"
   Widget _buildTemporalDetailsSection() {
     return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
+        padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Dettagli Temporali',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              SizedBox(height: 8.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  buildInfoRow(
-                      title: 'Data creazione',
-                      value: formatDate(widget.intervento.data_apertura_intervento),
-                      context: context
-                  ),
-                  IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed:(){
-                        _selectDate2(context);
-                      }
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  buildInfoRow(
-                      title: 'Appuntamento',
-                      value: formatDate(widget.intervento.data),
-                      context: context
-                  ),
-                  SizedBox(width: 20),
-                  Container(
-                    width: 170,
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        _selectDate(context);
-                      },
-                      heroTag: "Tag3",
-                      backgroundColor: Colors.red,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Flexible( // Permette al testo di adattarsi alla dimensione
-                            child: Text(
-                              'Modifica data appuntamento'.toUpperCase(),
-                              style: TextStyle(color: Colors.white, fontSize: 12),
-                              textAlign: TextAlign.center, // Centra il testo
-                              softWrap: true, // Permette al testo di andare a capo
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 5),
-                  Container(
-                    width: 70,
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        //_selectDate(context);
-                        setState(() {
-                          widget.intervento.data = null;
-                        });
-                      },
-                      heroTag: "TagDel",
-                      backgroundColor: Colors.red,
-                      child: Icon(Icons.delete, color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 5),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  buildInfoRow(
-                      title: 'Orario',
-                      value: formatTime(widget.intervento.orario_appuntamento),
-                      context: context
-                  ),
-                  SizedBox(width: 20),
-                  Container(
-                    width: 170,
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                    decoration: BoxDecoration(
-                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                    ),
-                    child: FloatingActionButton(
-                      heroTag: "Tag2",
-                      onPressed: () {
-                        _selectTimeAppuntamento(context);
-                      },
-                      backgroundColor: Colors.red,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                            child: Text(
-                              'Inserisci orario appuntamento'.toUpperCase(),
-                              style: TextStyle(color: Colors.white, fontSize: 12),
-                              textAlign: TextAlign.center, // Centra il testo
-                              softWrap: true, // Permette al testo di andare a capo
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 70,
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        setState(() {
-                          widget.intervento.orario_appuntamento = null;
-                          _selectedTimeAppuntamento = null;
-                        });
-                      },
-                      heroTag: "TagDel2",
-                      backgroundColor: Colors.red,
-                      child: Icon(Icons.delete, color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    // Prima colonna
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                            children:[
-                              buildInfoRow(
-                                  title: 'Orario Inizio',
-                                  value: widget.intervento.orario_inizio != null ? DateFormat("HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
-                                  context: context
-                              ),
-                              SizedBox(width : 10),
-                              Align(
-                                alignment: Alignment.center,
-                                child: InkWell(
-                                  onTap: () => _selectTime(context),
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.edit),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ]
-                        )
-                      ],
-                    ),
-                    // Divisore verticale
-                    SizedBox(
-                      width: 20,
-                    ),
-                  ],
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Dettagli Temporali',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
-              ),
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    buildInfoRow(
-                        title: 'Orario Fine',
-                        value: widget.intervento.orario_fine != null ? DateFormat("HH:mm").format(widget.intervento.orario_fine!) : "N/A",
-                        context: context
-                    ),
-                    SizedBox(width : 10),
-                    Align(
-                      alignment: Alignment.center,
-                      child: InkWell(
-                        onTap: () => _selectTime2(context),
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit),
-                            SizedBox(width: 8),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if(intervento.merce != null)
-                buildInfoRow(title: 'Data conclusione', value: intervento.merce?.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_conclusione!) : 'N/A'),
-              if(intervento.merce != null)
+                SizedBox(height: 8.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     buildInfoRow(
-                        title: 'Data consegna',
-                        value: formatDate(widget.intervento.merce?.data_consegna),
+                        title: 'Data creazione',
+                        value: formatDate(widget.intervento.data_apertura_intervento),
                         context: context
                     ),
                     IconButton(
                         icon: Icon(Icons.edit),
                         onPressed:(){
-                          _selectDate3(context);
+                          _selectDate2(context);
                         }
                     )
                   ],
                 ),
-            ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    buildInfoRow(
+                        title: 'Appuntamento',
+                        value: formatDate(widget.intervento.data),
+                        context: context
+                    ),
+                    SizedBox(width: 20),
+                    Container(
+                      width: 170,
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          _selectDate(context);
+                        },
+                        heroTag: "Tag3",
+                        backgroundColor: Colors.red,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible( // Permette al testo di adattarsi alla dimensione
+                              child: Text(
+                                'Modifica data appuntamento'.toUpperCase(),
+                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                textAlign: TextAlign.center, // Centra il testo
+                                softWrap: true, // Permette al testo di andare a capo
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 5),
+                    Container(
+                      width: 70,
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          //_selectDate(context);
+                          setState(() {
+                            widget.intervento.data = null;
+                          });
+                        },
+                        heroTag: "TagDel",
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    buildInfoRow(
+                        title: 'Orario',
+                        value: formatTime(widget.intervento.orario_appuntamento),
+                        context: context
+                    ),
+                    SizedBox(width: 20),
+                    Container(
+                      width: 170,
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                      decoration: BoxDecoration(
+                        // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
+                      ),
+                      child: FloatingActionButton(
+                        heroTag: "Tag2",
+                        onPressed: () {
+                          _selectTimeAppuntamento(context);
+                        },
+                        backgroundColor: Colors.red,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                              child: Text(
+                                'Inserisci orario appuntamento'.toUpperCase(),
+                                style: TextStyle(color: Colors.white, fontSize: 12),
+                                textAlign: TextAlign.center, // Centra il testo
+                                softWrap: true, // Permette al testo di andare a capo
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 70,
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 8), // Aggiunge padding
+                      child: FloatingActionButton(
+                        onPressed: () {
+                          setState(() {
+                            widget.intervento.orario_appuntamento = null;
+                            _selectedTimeAppuntamento = null;
+                          });
+                        },
+                        heroTag: "TagDel2",
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.delete, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // Prima colonna
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                              children:[
+                                buildInfoRow(
+                                    title: 'Orario Inizio',
+                                    value: widget.intervento.orario_inizio != null ? DateFormat("HH:mm").format(widget.intervento.orario_inizio!) : "N/A",
+                                    context: context
+                                ),
+                                SizedBox(width : 10),
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: InkWell(
+                                    onTap: () => _selectTime(context),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.edit),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ]
+                          )
+                        ],
+                      ),
+                      // Divisore verticale
+                      SizedBox(
+                        width: 20,
+                      ),
+                    ],
+                  ),
+                ),
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      buildInfoRow(
+                          title: 'Orario Fine',
+                          value: widget.intervento.orario_fine != null ? DateFormat("HH:mm").format(widget.intervento.orario_fine!) : "N/A",
+                          context: context
+                      ),
+                      SizedBox(width : 10),
+                      Align(
+                        alignment: Alignment.center,
+                        child: InkWell(
+                          onTap: () => _selectTime2(context),
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit),
+                              SizedBox(width: 8),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if(intervento.merce != null)
+                  buildInfoRow(title: 'Data conclusione', value: intervento.merce?.data_conclusione != null ? DateFormat('dd/MM/yyyy').format(intervento.merce!.data_conclusione!) : 'N/A'),
+                if(intervento.merce != null)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      buildInfoRow(
+                          title: 'Data consegna',
+                          value: formatDate(widget.intervento.merce?.data_consegna),
+                          context: context
+                      ),
+                      IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed:(){
+                            _selectDate3(context);
+                          }
+                      )
+                    ],
+                  ),
+              ],
+            ),
           ),
-        ),
-      )
+        )
     );
   }
 
@@ -2528,334 +2528,334 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
     return Padding(
         padding: EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      'Dettagli Finanziari',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                    SizedBox(height:10),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: 500,
-                          child: buildInfoRow(
-                            title: 'Importo intervento',
-                            value: getPrezzoIvato(widget.intervento), // Usa la funzione per calcolare il valore del prezzo ivato
-                            context: context,
-                          ),
+                        Text(
+                          'Dettagli Finanziari',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                         ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            openImportoDialog(context, _importoController);
-                          },
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.black,
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      width: 500,
-                      child: buildInfoRow(
-                        title: 'Inserito da',
-                        value: intervento.utente_importo ?? "//", // Usa la funzione per calcolare il valore del prezzo ivato
-                        context: context,
-                      ),
-                    ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children:[
-                          SizedBox(
-                            width: 500,
-                            child: buildInfoRow(
-                                title: 'Saldato',
-                                value: booleanToString(widget.intervento.saldato ?? false),
-                                context: context
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              showDialog(
+                        SizedBox(height:10),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 500,
+                              child: buildInfoRow(
+                                title: 'Importo intervento',
+                                value: getPrezzoIvato(widget.intervento), // Usa la funzione per calcolare il valore del prezzo ivato
                                 context: context,
-                                builder: (BuildContext context) {
-                                  bool isSaldato = widget.intervento.saldato ?? false;
-
-                                  return AlertDialog(
-                                    title: Text(isSaldato
-                                        ? 'L\'intervento non è stato saldato?'
-                                        : 'L\'intervento è stato saldato?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            widget.intervento.saldato = !isSaldato;
-                                          });
-                                          Navigator.of(context).pop(); // Chiude il dialogo
-                                        },
-                                        child: Text(isSaldato ? 'Non saldato' : 'Saldato'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Chiude il dialogo senza fare nulla
-                                        },
-                                        child: Text('Annulla'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ]
-                    ),
-                    Row(
-                      children: [
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                openImportoDialog(context, _importoController);
+                              },
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.black,
+                              ),
+                            )
+                          ],
+                        ),
                         SizedBox(
                           width: 500,
                           child: buildInfoRow(
-                              title: "Saldo tecnico",
-                              context: context,
-                              value : widget.intervento.saldo_tecnico.toString() ?? "N/A"
-                          ),
-                        ),
-                        IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: (){
-                              setState(() {
-                                modificaSaldoTecnicoVisibile = !modificaSaldoTecnicoVisibile;
-                              });
-                            }
-                        ),
-                      ],
-                    ),
-                    if(modificaSaldoTecnicoVisibile)
-                      SizedBox(
-                          width: 500,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: 300,
-                                child: TextFormField(
-                                  maxLines: null,
-                                  controller: saldoController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Saldo tecnico',
-                                    hintText: 'Aggiungi il saldo del tecnico',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 170,
-                                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
-                                decoration: BoxDecoration(
-                                  // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
-                                ),
-                                child: FloatingActionButton(
-                                  heroTag: "Tag4",
-                                  onPressed: () {
-                                    if(saldoController.text.isNotEmpty){
-                                      modificaSaldo();
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('Non è possibile salvare un titolo vuoto!'),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  backgroundColor: Colors.red,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
-                                        child: Text(
-                                          'Modifica saldo'.toUpperCase(),
-                                          style: TextStyle(color: Colors.white, fontSize: 12),
-                                          textAlign: TextAlign.center, // Centra il testo
-                                          softWrap: true, // Permette al testo di andare a capo
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                      ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 500,
-                          child: buildInfoRow(
-                            title: 'Metodo di pagamento',
-                            value: widget.intervento.tipologia_pagamento != null
-                                ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
-                                : 'N/A',
+                            title: 'Inserito da',
+                            value: intervento.utente_importo ?? "//", // Usa la funzione per calcolare il valore del prezzo ivato
                             context: context,
                           ),
                         ),
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                TipologiaPagamentoModel? tempSelectedTipologia = selectedTipologia ?? widget.intervento.tipologia_pagamento;
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children:[
+                              SizedBox(
+                                width: 500,
+                                child: buildInfoRow(
+                                    title: 'Saldato',
+                                    value: booleanToString(widget.intervento.saldato ?? false),
+                                    context: context
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      bool isSaldato = widget.intervento.saldato ?? false;
 
-                                return AlertDialog(
-                                  title: Text("Seleziona Metodo di Pagamento"),
-                                  content: StatefulBuilder(
-                                    builder: (BuildContext context, StateSetter setState) {
-                                      return DropdownButton<TipologiaPagamentoModel>(
-                                        value: tempSelectedTipologia,
-                                        isExpanded: true,
-                                        items: tipologiePagamento.map((tipologia) {
-                                          return DropdownMenuItem<TipologiaPagamentoModel>(
-                                            value: tipologia,
-                                            child: Text(tipologia.descrizione ?? "Sconosciuto"),
-                                          );
-                                        }).toList(),
-                                        onChanged: (TipologiaPagamentoModel? newValue) {
-                                          setState(() {
-                                            tempSelectedTipologia = newValue;
-                                          });
-                                        },
+                                      return AlertDialog(
+                                        title: Text(isSaldato
+                                            ? 'L\'intervento non è stato saldato?'
+                                            : 'L\'intervento è stato saldato?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                widget.intervento.saldato = !isSaldato;
+                                              });
+                                              Navigator.of(context).pop(); // Chiude il dialogo
+                                            },
+                                            child: Text(isSaldato ? 'Non saldato' : 'Saldato'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(); // Chiude il dialogo senza fare nulla
+                                            },
+                                            child: Text('Annulla'),
+                                          ),
+                                        ],
                                       );
                                     },
+                                  );
+                                },
+                              ),
+                            ]
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 500,
+                              child: buildInfoRow(
+                                  title: "Saldo tecnico",
+                                  context: context,
+                                  value : widget.intervento.saldo_tecnico.toString() ?? "N/A"
+                              ),
+                            ),
+                            IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: (){
+                                  setState(() {
+                                    modificaSaldoTecnicoVisibile = !modificaSaldoTecnicoVisibile;
+                                  });
+                                }
+                            ),
+                          ],
+                        ),
+                        if(modificaSaldoTecnicoVisibile)
+                          SizedBox(
+                              width: 500,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: 300,
+                                    child: TextFormField(
+                                      maxLines: null,
+                                      controller: saldoController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Saldo tecnico',
+                                        hintText: 'Aggiungi il saldo del tecnico',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(); // Chiude il dialog senza salvare
-                                      },
-                                      child: Text("Annulla"),
+                                  Container(
+                                    width: 170,
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Aggiunge padding attorno al FloatingActionButton
+                                    decoration: BoxDecoration(
+                                      // Puoi aggiungere altre decorazioni come bordi o ombre qui se necessario
                                     ),
-                                    TextButton(
+                                    child: FloatingActionButton(
+                                      heroTag: "Tag4",
                                       onPressed: () {
-                                        setState(() {
-                                          selectedTipologia = tempSelectedTipologia; // Salva il valore selezionato
-                                          widget.intervento.tipologia_pagamento = tempSelectedTipologia;
-                                        });
-                                        Navigator.of(context).pop(); // Chiude il dialog dopo aver salvato
+                                        if(saldoController.text.isNotEmpty){
+                                          modificaSaldo();
+                                        } else {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Non è possibile salvare un titolo vuoto!'),
+                                            ),
+                                          );
+                                        }
                                       },
-                                      child: Text("Conferma"),
+                                      backgroundColor: Colors.red,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Flexible( // Permette al testo di adattarsi alla dimensione del FloatingActionButton
+                                            child: Text(
+                                              'Modifica saldo'.toUpperCase(),
+                                              style: TextStyle(color: Colors.white, fontSize: 12),
+                                              textAlign: TextAlign.center, // Centra il testo
+                                              softWrap: true, // Permette al testo di andare a capo
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ],
+                                  ),
+                                ],
+                              )
+                          ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 500,
+                              child: buildInfoRow(
+                                title: 'Metodo di pagamento',
+                                value: widget.intervento.tipologia_pagamento != null
+                                    ? widget.intervento.tipologia_pagamento?.descrizione ?? 'N/A'
+                                    : 'N/A',
+                                context: context,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    TipologiaPagamentoModel? tempSelectedTipologia = selectedTipologia ?? widget.intervento.tipologia_pagamento;
+
+                                    return AlertDialog(
+                                      title: Text("Seleziona Metodo di Pagamento"),
+                                      content: StatefulBuilder(
+                                        builder: (BuildContext context, StateSetter setState) {
+                                          return DropdownButton<TipologiaPagamentoModel>(
+                                            value: tempSelectedTipologia,
+                                            isExpanded: true,
+                                            items: tipologiePagamento.map((tipologia) {
+                                              return DropdownMenuItem<TipologiaPagamentoModel>(
+                                                value: tipologia,
+                                                child: Text(tipologia.descrizione ?? "Sconosciuto"),
+                                              );
+                                            }).toList(),
+                                            onChanged: (TipologiaPagamentoModel? newValue) {
+                                              setState(() {
+                                                tempSelectedTipologia = newValue;
+                                              });
+                                            },
+                                          );
+                                        },
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(); // Chiude il dialog senza salvare
+                                          },
+                                          child: Text("Annulla"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedTipologia = tempSelectedTipologia; // Salva il valore selezionato
+                                              widget.intervento.tipologia_pagamento = tempSelectedTipologia;
+                                            });
+                                            Navigator.of(context).pop(); // Chiude il dialog dopo aver salvato
+                                          },
+                                          child: Text("Conferma"),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-                SizedBox(width : 30),
-                SizedBox(
-                  width: 500,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 8.0),
-                      if(prodottiDdt.isNotEmpty)
-                        Container(
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Prodotti inseriti nel DDT:',style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold)),
-                              ...prodottiDdt.map((relazione){
-                                return ListTile(
-                                  title: Text(
-                                      'Codice Danea: ${relazione.prodotto?.codice_danea}, ${relazione.prodotto?.descrizione}'
-                                  ),
-                                );
-                              }),
-                            ],
-                          ),
-                        ),
-                      if(allProdotti.isEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Nessun prodotto utilizzato', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                          ],
-                        ),
-                      if (allProdotti.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Prodotti utilizzati:',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    SizedBox(width : 30),
+                    SizedBox(
+                      width: 500,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 8.0),
+                          if(prodottiDdt.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Prodotti inseriti nel DDT:',style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold)),
+                                  ...prodottiDdt.map((relazione){
+                                    return ListTile(
+                                      title: Text(
+                                          'Codice Danea: ${relazione.prodotto?.codice_danea}, ${relazione.prodotto?.descrizione}'
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
                             ),
-                            ...allProdotti.map((relazione) {
-                              bool isInHistoricalUser = relazione.presenza_storico_utente ?? true; // Supponendo che il valore predefinito sia true
-                              bool hasDdt = relazione.ddt != null; // Controlla se ddt non è null
-                              bool hasSerial = relazione.seriale != null;
-                              bool shouldBeRed = !isInHistoricalUser && !hasDdt; // Colore rosso se isInHistoricalUser è false e se hasDdt è false
-                              String prezzoFornitore = relazione.prodotto?.prezzo_fornitore != null
-                                  ? relazione.prodotto!.prezzo_fornitore!.toStringAsFixed(2) + "€"
-                                  : "Non disponibile"; // Controlla se prezzo_fornitore è null
-                              return ListTile(
-                                title: Text(
-                                  '${relazione.prodotto?.descrizione ?? "Descrizione non disponibile"}',
-                                  style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                          if(allProdotti.isEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Nessun prodotto utilizzato', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+                              ],
+                            ),
+                          if (allProdotti.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Prodotti utilizzati:',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore - Quantità: ${relazione.quantita?.toStringAsFixed(2)}',
+                                ...allProdotti.map((relazione) {
+                                  bool isInHistoricalUser = relazione.presenza_storico_utente ?? true; // Supponendo che il valore predefinito sia true
+                                  bool hasDdt = relazione.ddt != null; // Controlla se ddt non è null
+                                  bool hasSerial = relazione.seriale != null;
+                                  bool shouldBeRed = !isInHistoricalUser && !hasDdt; // Colore rosso se isInHistoricalUser è false e se hasDdt è false
+                                  String prezzoFornitore = relazione.prodotto?.prezzo_fornitore != null
+                                      ? relazione.prodotto!.prezzo_fornitore!.toStringAsFixed(2) + "€"
+                                      : "Non disponibile"; // Controlla se prezzo_fornitore è null
+                                  return ListTile(
+                                    title: Text(
+                                      '${relazione.prodotto?.descrizione ?? "Descrizione non disponibile"}',
                                       style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
                                     ),
-                                    SizedBox(height: 6),
-                                    Text(
-                                      '${relazione.seriale ?? ''}', style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Codice Danea: ${relazione.prodotto?.codice_danea ?? "Codice non disponibile"} - Prezzo fornitore: $prezzoFornitore - Quantità: ${relazione.quantita?.toStringAsFixed(2)}',
+                                          style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                        ),
+                                        SizedBox(height: 6),
+                                        Text(
+                                          '${relazione.seriale ?? ''}', style: TextStyle(color: shouldBeRed ? Colors.red : Colors.black),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  );
+                                }).toList(),
+                                SizedBox(height: 16), // Aggiungere uno spazio tra la lista e il totale
+                                Text(
+                                  'Totale prezzo fornitore: ${totalePrezzoFornitore.toStringAsFixed(2)}€',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
-                              );
-                            }).toList(),
-                            SizedBox(height: 16), // Aggiungere uno spazio tra la lista e il totale
-                            Text(
-                              'Totale prezzo fornitore: ${totalePrezzoFornitore.toStringAsFixed(2)}€',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              ],
                             ),
-                          ],
-                        ),
-                    ],
-                  ),
+                        ],
+                      ),
+                    )
+                  ],
                 )
-              ],
             )
-          )
         )
     );
   }
@@ -3134,12 +3134,12 @@ class _DettaglioInterventoNewPageState extends State<DettaglioInterventoNewPage>
                           },
                         ),
                       value != 'Non assegnato' ? visualizzato ? Tooltip(
-                                      message: 'L\'UTENTE HA PRESO VISIONE',
-                                      child: Icon(Icons.check_circle, color: Colors.green, size: 20, ))
+                          message: 'L\'UTENTE HA PRESO VISIONE',
+                          child: Icon(Icons.check_circle, color: Colors.green, size: 20, ))
                           : Tooltip(
-                              message: 'L\'UTENTE NON HA ANCORA PRESO VISIONE',
-                              child: Icon(Icons.check_circle_outline, color: Colors.grey, size: 20))
-                      : Text('')],
+                          message: 'L\'UTENTE NON HA ANCORA PRESO VISIONE',
+                          child: Icon(Icons.check_circle_outline, color: Colors.grey, size: 20))
+                          : Text('')],
                   ),
                 ),
               ],
